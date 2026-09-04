@@ -10,323 +10,335 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-    --bg:#ffffff;
-    --text:#333333;
-    --text-secondary:#666666;
-    --border:#e5e7eb;
-    --card-bg:#f7f7f7;
-    --hover-bg:#ececec;
-    --primary:#444444;
-    --accent:#555555;
+--bg:#ffffff;
+--text:#333333;
+--text-secondary:#666666;
+--border:#e5e7eb;
+--card-bg:#f7f7f7;
+--hover-bg:#ececec;
+--primary:#444444;
+--accent:#555555;
 }
 .dark{
-    --bg:#121212;
-    --text:#e2e2e2;
-    --text-secondary:#aaaaaa;
-    --border:#2a2a2a;
-    --card-bg:#1e1e1e;
-    --hover-bg:#2c2c2c;
-    --primary:#dddddd;
-    --accent:#bbbbbb;
+--bg:#121212;
+--text:#e2e2e2;
+--text-secondary:#aaaaaa;
+--border:#2a2a2a;
+--card-bg:#1e1e1e;
+--hover-bg:#2c2c2c;
+--primary:#dddddd;
+--accent:#bbbbbb;
 }
 body{
-    background-color:var(--bg);
-    color:var(--text);
-    font-family:system-ui, -apple-system, sans-serif;
-    line-height:1.6;
+background-color:var(--bg);
+color:var(--text);
+font-family:system-ui, -apple-system, sans-serif;
+line-height:1.6;
 }
 .container{
-    max-width:1100px;
-    margin:0 auto;
-    padding:0 16px;
+max-width:1100px;
+margin:0 auto;
+padding:0 16px;
 }
 header{
-    padding:20px 0;
-    border-bottom:1px solid var(--border);
+padding:20px 0;
+border-bottom:1px solid var(--border);
 }
 .header-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+gap:12px;
 }
 .site-title{
-    font-size:22px;
-    font-weight:600;
+font-size:22px;
+font-weight:600;
 }
 .theme-btn{
-    padding:6px 12px;
-    border:1px solid var(--border);
-    background:var(--card-bg);
-    color:var(--text);
-    border-radius:6px;
-    cursor:pointer;
+padding:6px 12px;
+border:1px solid var(--border);
+background:var(--card-bg);
+color:var(--text);
+border-radius:6px;
+cursor:pointer;
 }
 .ad-slider-wrap{
-    position:relative;
-    overflow:hidden;
-    margin:20px 0;
-    border-radius:8px;
+position:relative;
+overflow:hidden;
+margin:20px 0;
+border-radius:8px;
 }
 .ad-slider{
-    display:flex;
-    overflow-x:auto;
-    scroll-behavior:smooth;
-    scrollbar-width:none;
-    position:relative;
+display:flex;
+overflow-x:auto;
+scroll-behavior:smooth;
+scrollbar-width:none;
+position:relative;
 }
 .ad-slider::-webkit-scrollbar{display:none;}
 .slide-item{
-    flex:0 0 100%;
-    min-height:200px;
-    background:var(--card-bg);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border:1px solid var(--border);
-    padding:20px;
+flex:0 0 100%;
+min-height:200px;
+background:var(--card-bg);
+display:flex;
+align-items:center;
+justify-content:center;
+border:1px solid var(--border);
+padding:20px;
 }
 .slide-dots{
-    display:flex;
-    gap:8px;
-    justify-content:center;
-    padding:10px 0;
+display:flex;
+gap:8px;
+justify-content:center;
+padding:10px 0;
 }
 .dot{
-    width:10px;height:10px;
-    border-radius:50%;
-    background:var(--border);
-    cursor:pointer;
+width:10px;height:10px;
+border-radius:50%;
+background:var(--border);
+cursor:pointer;
 }
 .dot.active{background:var(--accent);}
 nav{
-    margin:20px 0;
+margin:20px 0;
 }
 .nav-list{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    list-style:none;
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+list-style:none;
 }
 .nav-item button{
-    padding:10px 16px;
-    border:1px solid var(--border);
-    background:var(--card-bg);
-    color:var(--text);
-    border-radius:6px;
-    cursor:pointer;
+padding:10px 16px;
+border:1px solid var(--border);
+background:var(--card-bg);
+color:var(--text);
+border-radius:6px;
+cursor:pointer;
 }
 .nav-item button:hover{background:var(--hover-bg);}
 .page{
-    display:none;
-    padding:20px;
-    border:1px solid var(--border);
-    border-radius:8px;
-    margin-bottom:20px;
+display:none;
+padding:20px;
+border:1px solid var(--border);
+border-radius:8px;
+margin-bottom:20px;
 }
 .page.active{display:block;}
 .home-search-box{
-    margin:20px 0;
+margin:20px 0;
 }
 .home-search-box input{
-    width:100%;
-    padding:12px 14px;
-    border:1px solid var(--border);
-    border-radius:6px;
-    background:var(--card-bg);
-    color:var(--text);
-    font-size:15px;
+width:100%;
+padding:12px 14px;
+border:1px solid var(--border);
+border-radius:6px;
+background:var(--card-bg);
+color:var(--text);
+font-size:15px;
 }
 .info-card{
-    padding:16px;
-    background:var(--card-bg);
-    border-radius:6px;
-    margin:12px 0;
-    border:1px solid var(--border);
+padding:18px;
+background:var(--card-bg);
+border-radius:8px;
+margin:16px 0;
+border:1px solid var(--border);
 }
 .time-box{
-    padding:14px;
-    background:var(--card-bg);
-    border-radius:6px;
-    margin:12px 0;
-    border:1px solid var(--border);
+padding:16px;
+background:var(--card-bg);
+border-radius:8px;
+margin:16px 0;
+border:1px solid var(--border);
 }
 .btn{
-    padding:8px 14px;
-    border:1px solid var(--border);
-    background:var(--card-bg);
-    color:var(--text);
-    border-radius:6px;
-    cursor:pointer;
-    margin:4px 2px;
+padding:8px 14px;
+border:1px solid var(--border);
+background:var(--card-bg);
+color:var(--text);
+border-radius:6px;
+cursor:pointer;
+margin:4px 2px;
 }
 .btn:hover{background:var(--hover-bg);}
 .rule-search-wrap{
-    margin-bottom:16px;
+margin-bottom:16px;
 }
 .rule-search-wrap input{
-    width:100%;
-    padding:10px 12px;
-    border:1px solid var(--border);
-    border-radius:6px;
-    background:var(--card-bg);
-    color:var(--text);
+width:100%;
+padding:10px 12px;
+border:1px solid var(--border);
+border-radius:6px;
+background:var(--card-bg);
+color:var(--text);
 }
 .rule-scroll{
-    max-height:65vh;
-    overflow-y:auto;
-    padding-right:8px;
+max-height:65vh;
+overflow-y:auto;
+padding-right:8px;
 }
 .rule-section{
-    margin:18px 0;
+margin:18px 0;
 }
 .rule-section h3{
-    margin:8px 0;
+margin:8px 0;
 }
 .qr-wrap{
-    text-align:center;
-    padding:20px;
+text-align:center;
+padding:20px;
 }
 .qr-wrap img{
-    max-width:280px;
-    border-radius:8px;
+max-width:280px;
+border-radius:8px;
 }
 .code-card{
-    padding:18px;
-    background:var(--card-bg);
-    border-radius:8px;
-    border:1px solid var(--border);
-    margin:10px 0;
+padding:18px;
+background:var(--card-bg);
+border-radius:8px;
+border:1px solid var(--border);
+margin:10px 0;
 }
 footer{
-    margin-top:40px;
-    padding:20px 0;
-    border-top:1px solid var(--border);
-    text-align:center;
-    color:var(--text-secondary);
-    font-size:14px;
+margin-top:40px;
+padding:20px 0;
+border-top:1px solid var(--border);
+text-align:center;
+color:var(--text-secondary);
+font-size:14px;
+}
+.status-online{
+color:#22c55e;
+font-weight:bold;
 }
 @media(max-width:600px){
-    .nav-list{gap:6px;}
-    .nav-item button{padding:8px 11px;font-size:14px;}
+.nav-list{gap:6px;}
+.nav-item button{padding:8px 11px;font-size:14px;}
 }
 </style>
 </head>
 <body>
 <div class="container">
 <header>
-    <div class="header-row">
-        <div class="site-title">The Slow Tide官网</div>
-        <button class="theme-btn" id="themeToggle">深色模式</button>
-    </div>
+<div class="header-row">
+<div class="site-title">The Slow Tide官网</div>
+<button class="theme-btn" id="themeToggle">深色模式</button>
+</div>
 </header>
 
-<div class="ad-slider-wrap">
-    <div class="ad-slider" id="adSlider">
-        <div class="slide-item">
-            <div>
-                <h2>重要通知</h2>
-                <p>上架全新兑换码</p>
-            </div>
-        </div>
-        <div class="slide-item">
-            <div>
-                <h2>服务器活动预告</h2>
-                <p>敬请期待后续赛事</p>
-            </div>
-        </div>
-    </div>
-    <div class="slide-dots" id="slideDots"></div>
+<div class="ad-slider-wrap" id="adWrap">
+<div class="ad-slider" id="adSlider">
+<div class="slide-item">
+<div>
+<h2>重要通知</h2>
+<p>上架全新兑换码</p>
+</div>
+</div>
+<div class="slide-item">
+<div>
+<h2>服务器活动预告</h2>
+<p>敬请期待后续赛事</p>
+</div>
+</div>
+<div class="slide-item">
+<div>
+<h2>版本更新</h2>
+<p>网易1.21.50基岩版正常运行</p>
+</div>
+</div>
+</div>
+<div class="slide-dots" id="slideDots"></div>
 </div>
 
 <div class="home-search-box">
-    <input type="text" id="globalSearchInput" placeholder="全局搜索：输入关键词跳转对应页面或内容">
+<input type="text" id="globalSearchInput" placeholder="全局搜索：输入关键词跳转对应页面或内容">
 </div>
 
 <nav>
-    <ul class="nav-list">
-        <li class="nav-item"><button data-page="home">首页</button></li>
-        <li class="nav-item"><button data-page="notice">公告</button></li>
-        <li class="nav-item"><button data-page="event">赛事活动</button></li>
-        <li class="nav-item"><button data-page="cdkey">兑换码</button></li>
-        <li class="nav-item"><button data-page="sponsor">服务器赞助</button></li>
-        <li class="nav-item"><button data-page="rule">玩家公约</button></li>
-    </ul>
+<ul class="nav-list">
+<li class="nav-item"><button data-page="home">首页</button></li>
+<li class="nav-item"><button data-page="notice">公告</button></li>
+<li class="nav-item"><button data-page="event">赛事活动</button></li>
+<li class="nav-item"><button data-page="cdkey">兑换码</button></li>
+<li class="nav-item"><button data-page="sponsor">服务器赞助</button></li>
+<li class="nav-item"><button data-page="rule">玩家公约</button></li>
+</ul>
 </nav>
 
 <div id="home" class="page active">
-    <h2>首页</h2>
-    <div class="info-card">
-        <p>服务器地址：<span id="serverAddr">mc.163.com/open/mc_realms/?realms=270239C36AD</span> <button class="btn" id="copyAddrBtn">复制地址</button></p>
-        <p>QQ交流群：<button class="btn" id="openQQGroup">833470853</button></p>
-        <p>当前状态：运行中</p>
-    </div>
-    <div class="time-box">
-        <p>北京时间：<span id="bjTime"></span></p>
-        <p>累计运行时间：<span id="runTime"></span></p>
-    </div>
-    <div class="info-card">
-        <h3>最新动态</h3>
-        <p>优化了服务器官网的玩家公约与兑换码栏目</p>
-    </div>
+<h2>🏠 服务器首页</h2>
+<div class="info-card">
+<h3>服务器信息</h3>
+<p>服务器地址：<span id="serverAddr">mc.163.com/open/mc_realms/?realms=270239C36AD</span> <button class="btn" id="copyAddrBtn">复制地址</button></p>
+<p>QQ交流群：<button class="btn" id="openQQGroup">833470853</button></p>
+<p>当前状态：<span class="status-online">运行中</span></p>
+</div>
+<div class="time-box">
+<h3>运行计时</h3>
+<p>北京时间：<span id="bjTime"></span></p>
+<p>累计运行时间：<span id="runTime"></span></p>
+</div>
+<div class="info-card">
+<h3>最新动态</h3>
+<p>优化了服务器官网的玩家公约与兑换码栏目</p>
+</div>
 </div>
 
 <div id="notice" class="page">
-    <h2>服务器网站更新公告</h2>
-    <div class="info-card">
-        <p>本次官网更新内容：</p>
-        <ul style="margin-left:20px;margin-top:8px;">
-            <li>玩家公约页面新增公约内容搜索框，支持关键词定位条约条目</li>
-            <li>新增可用兑换码 ILOVEWYJ，奖励5000金币，兑换码栏目排版优化</li>
-            <li>首页增加全局搜索输入框，支持关键词检索网站内容</li>
-            <li>轮播图重要通知板块更新上架全新兑换码提示</li>
-            <li>修复玩家公约目录锚点滚动定位BUG</li>
-            <li>调整服务器累计运行时间计时，与北京时间错开小幅偏移</li>
-            <li>优化页面细节与移动端适配，清理多余留白</li>
-            <li>更新最新动态栏目文案</li>
-        </ul>
-        <p style="margin-top:10px;">请各位玩家知悉，祝游玩愉快。</p>
-    </div>
+<h2>服务器网站更新公告</h2>
+<div class="info-card">
+<p>本次官网更新内容：</p>
+<ul style="margin-left:20px;margin-top:8px;">
+<li>玩家公约页面新增公约内容搜索框，支持关键词定位条约条目</li>
+<li>新增可用兑换码 ILOVEWYJ，奖励5000金币，兑换码栏目排版优化</li>
+<li>首页增加全局搜索输入框，支持关键词检索网站内容</li>
+<li>轮播图重要通知板块更新上架全新兑换码提示</li>
+<li>修复玩家公约目录锚点滚动定位BUG</li>
+<li>调整服务器累计运行时间计时，与北京时间错开小幅偏移</li>
+<li>优化页面细节与移动端适配，清理多余留白</li>
+<li>更新最新动态栏目文案</li>
+</ul>
+<p style="margin-top:10px;">请各位玩家知悉，祝游玩愉快。</p>
+</div>
 </div>
 
 <div id="event" class="page">
-    <h2>赛事活动</h2>
-    <div class="info-card">
-        <p>暂无进行中赛事</p>
-    </div>
+<h2>赛事活动</h2>
+<div class="info-card">
+<p>暂无进行中赛事</p>
+</div>
 </div>
 
 <div id="cdkey" class="page">
-    <h2>兑换码</h2>
-    <div class="code-card">
-        <h3>可用兑换码</h3>
-        <p>兑换码：<strong>ILOVEWYJ</strong></p>
-        <p>奖励：5000金币</p>
-        <p style="font-size:14px;color:var(--text-secondary);margin-top:6px;">复制兑换码前往服务器内兑换功能进行领取</p>
-        <button class="btn" data-clip="ILOVEWYJ">复制兑换码</button>
-    </div>
-    <div class="info-card">
-        <p>其余暂无可用兑换码</p>
-    </div>
+<h2>兑换码</h2>
+<div class="code-card">
+<h3>可用兑换码</h3>
+<p>兑换码：<strong>ILOVEWYJ</strong></p>
+<p>奖励：5000金币</p>
+<p style="font-size:14px;color:var(--text-secondary);margin-top:6px;">复制兑换码前往服务器内兑换功能进行领取</p>
+<button class="btn" data-clip="ILOVEWYJ">复制兑换码</button>
+</div>
+<div class="info-card">
+<p>其余暂无可用兑换码</p>
+</div>
 </div>
 
 <div id="sponsor" class="page">
-    <h2>服务器赞助</h2>
-    <div class="qr-wrap">
-        <p>赞助收款二维码</p>
-        <img src="wechat-qrcode.jpg" alt="赞助收款码" id="payQrImg">
-        <p style="margin-top:10px;font-size:14px;color:var(--text-secondary);">谢谢喵（磕头）</p>
-    </div>
+<h2>服务器赞助</h2>
+<div class="qr-wrap">
+<p>赞助收款二维码</p>
+<img src="wechat-qrcode.jpg" alt="赞助收款码" id="payQrImg">
+<p style="margin-top:10px;font-size:14px;color:var(--text-secondary);">谢谢喵（磕头）</p>
+</div>
 </div>
 
 <div id="rule" class="page">
-    <h2>玩家公约</h2>
-    <div class="rule-search-wrap">
-        <input type="text" id="ruleSearchInput" placeholder="搜索公约内容，输入关键词自动跳转定位">
-    </div>
-    <div class="rule-scroll" id="ruleScrollDom">
-        <div id="ruleContent">
+<h2>玩家公约</h2>
+<div class="rule-search-wrap">
+<input type="text" id="ruleSearchInput" placeholder="搜索公约内容，输入关键词自动跳转定位">
+</div>
+<div class="rule-scroll" id="ruleScrollDom">
+<div id="ruleContent">
 <h3>The Slow Tide 服务器总条约</h3>
 <p>网易基岩TST山头</p>
 <p>本条约适用于 The Slow Tide 服务器 全体玩家，统一规范服务器内行为准则、经济秩序、建筑保护、PVP机制、设备使用及违规处罚等全部游玩相关事宜。</p>
@@ -351,7 +363,6 @@ footer{
 <li><a href="#sec13">数据与存档管理</a></li>
 <li><a href="#sec14">规则更新与解释权</a></li>
 </ul>
-
 <div class="rule-section" id="sec1">
 <h3>1. 基础行为规范</h3>
 <p>服务器管理组不受理玩家之间普通拆家、偷家、毁基地等私人纠纷，外挂破坏、恶性BUG滥用等违规行为除外。</p>
@@ -361,7 +372,7 @@ footer{
 <p>全体玩家需文明游玩、友善交流，遵守基础礼仪规范。</p>
 <p>严禁传播涉黄、涉黑、涉暴、低俗恶俗等不良信息。</p>
 <p>禁止在公共区域跑跳搭。</p>
-<p>服务器官方交流语言为简体/繁体中文，全员交流统一使用汉语。</p>
+<p>服务器官方语言为简体/繁体中文，全员交流统一使用汉语。</p>
 <p>禁止建造含低俗暗示、违规隐喻、不良导向的建筑。</p>
 <p>禁止利用游戏BUG、机制漏洞实施破坏、牟利、扰民等恶性行为。</p>
 <p>禁止一切违背双方意愿的强制PVP行为。</p>
@@ -371,7 +382,6 @@ footer{
 <p>服务器内全面禁止赌博行为，一经发现立刻责令拆除并永久封禁。</p>
 <p>玩家产生纠纷、矛盾争议时，禁止情绪化闹事，需冷静沟通或联系管理依规解决。</p>
 </div>
-
 <div class="rule-section" id="sec2">
 <h3>2. 聊天与社交规范</h3>
 <p>服务器及社群官方交流语言为中文（简体、繁体通用）。</p>
@@ -380,7 +390,6 @@ footer{
 <p>严禁发布、传播涉黄、涉暴、涉政、违法违规内容，一经发现永久封禁。</p>
 <p>禁止私自向服务器、社群内添加各类机器人、自动脚本、推送程序。</p>
 </div>
-
 <div class="rule-section" id="sec3">
 <h3>3. 建筑与领地保护</h3>
 <p>服务器默认无全域建筑保护，未圈地区域建筑损毁风险由玩家自行承担。</p>
@@ -391,7 +400,6 @@ footer{
 <p>领地所有者连续30天未登录服务器，该领地自动回收，归属权回归服务器。</p>
 <p>领地内非领地成员造成的一切破坏、违规、纠纷问题，由当事人自行承担全部责任。</p>
 </div>
-
 <div class="rule-section" id="sec4">
 <h3>4. 资源采集与环境维护</h3>
 <p>禁止在非领地范围内大规模破坏地形，包括掏空山体、大面积填水、大范围铲平地貌等。</p>
@@ -400,7 +408,6 @@ footer{
 <p>废弃矿洞、闲置建筑、残留工程设施，建议自行填埋、清理规整。</p>
 <p>禁止利用漏洞、机制刷取货币、物资、资源，违者严肃处罚。</p>
 </div>
-
 <div class="rule-section" id="sec5">
 <h3>5. 经济与交易规则</h3>
 <p>禁止恶意囤货、控价、哄抬物价、扰乱服务器市场经济秩序，违者从重处理。</p>
@@ -410,14 +417,12 @@ footer{
 <p>全面禁止现实货币交易（RMB交易），包括物品买卖、金币变现、代练交易等，一经发现永久封禁。</p>
 <p>服务器管理组有权不定期调整系统商店物价，玩家如有异议可以通过意见箱反馈。</p>
 </div>
-
 <div class="rule-section" id="sec6">
 <h3>6. PVP与战斗行为</h3>
 <p>所有非双方自愿的强制PVP、偷袭、追杀行为一律禁止，违者封号处理。</p>
 <p>禁止在主城、出生点等公共安全区域主动发起PVP战斗。</p>
 <p>官方活动、赛事期间的PVP规则，以当期活动公告为准。</p>
 </div>
-
 <div class="rule-section" id="sec7">
 <h3>7. 红石与生电设备规范</h3>
 <p>服务器开放红石、生电玩法，但所有设备必须控制在合理负载范围内，不得影响服务器运行。</p>
@@ -428,7 +433,6 @@ footer{
 <p>禁止搭建多核堆叠、多层叠加的超规格生电机器。</p>
 <p>服务器自带高频限制机制，高频类红石设备无法正常运行，请勿违规搭建。</p>
 </div>
-
 <div class="rule-section" id="sec8">
 <h3>8. 生物与村民管理</h3>
 <p>禁止恶意屠村、批量击杀无辜生物、浪费生物资源。</p>
@@ -438,7 +442,6 @@ footer{
 <p>合理、节制使用各类生物机制，杜绝滥用、恶意堆载。</p>
 <p>服务器开启区块清理机制，禁止大批量、密集饲养生物，防止卡顿、吞档。</p>
 </div>
-
 <div class="rule-section" id="sec9">
 <h3>9. 玩家权益与反馈渠道</h3>
 <p>玩家对管理处罚、判定结果存在异议，可凭有效证据通过意见箱提交申诉。</p>
@@ -456,7 +459,6 @@ footer{
 <p>玩家领地范围内的建筑、物品、设施受官方保护，其他人禁止擅自破坏、盗取、改动。</p>
 <p>因服务器故障、存档异常造成的数据损失，管理组会尽力修复，但不保证百分百完全恢复。</p>
 </div>
-
 <div class="rule-section" id="sec10">
 <h3>10. 违规处理与处罚制度</h3>
 <p>轻微违规：口头警告、书面提醒、临时限制部分权限。</p>
@@ -465,7 +467,6 @@ footer{
 <p>作弊、漏洞刷物、恶意破坏等恶性行为，直接处罚、不给予提前警告。</p>
 <p>全部处罚记录统一存档，作为后续判定参考依据。</p>
 </div>
-
 <div class="rule-section" id="sec11">
 <h3>11. 服务器管理组职责</h3>
 <p>负责规则执行、服务器维护、活动策划、玩家纠纷调解、秩序维护。</p>
@@ -473,7 +474,6 @@ footer{
 <p>不参与玩家正常经济竞争，不干预合规玩法与正常游戏发展。</p>
 <p>主动接受全体玩家监督，积极回应合理质疑与建议。</p>
 </div>
-
 <div class="rule-section" id="sec12">
 <h3>12. 活动与赛事规则</h3>
 <p>各类官方活动、赛事优先遵循当期专属活动规则。</p>
@@ -481,7 +481,6 @@ footer{
 <p>活动奖励、规则、流程以官方公告为准。</p>
 <p>全部活动最终解释权归服务器管理组所有。</p>
 </div>
-
 <div class="rule-section" id="sec13">
 <h3>13. 数据与存档管理</h3>
 <p>服务器会定期自动备份存档，但无法保证单个建筑、单件物品精准复原。</p>
@@ -489,7 +488,6 @@ footer{
 <p>服务器大版本更新前会发布公告，最大限度保留原有存档内容。</p>
 <p>玩家金币、物品、权限、成就等个人数据，以服务器后台记录作为唯一有效依据。</p>
 </div>
-
 <div class="rule-section" id="sec14">
 <h3>14. 规则更新与解释权</h3>
 <p>本条约会跟随服务器发展持续优化、补充、修改。</p>
@@ -497,7 +495,6 @@ footer{
 <p>小规模文字微调、细节优化，可直接更新不另行通知。</p>
 <p>本服务器全部条约的最终解释权归 The Slow Tide 管理组所有。</p>
 </div>
-
 <p><strong>条约制定说明</strong></p>
 <p>参与制定玩家：执又之贤、极岚 及 The Slow Tide 服务器全体参与研讨玩家</p>
 <p><br><strong>参考来源说明：</strong></p>
@@ -505,75 +502,89 @@ footer{
 <p>2. 参考公开服务器规约、玩家手册等公开资料，并结合本服实际情况优化改写；</p>
 <p>3. 感谢所有公开参考资料及参与规则完善的玩家与创作者。</p>
 <p>本条约目前仍在持续修订中，暂不作为最终正式版本执行，后续将根据实际情况进一步完善。如有建议，欢迎通过主城意见箱反馈。</p>
-        </div>
-    </div>
 </div>
-
+</div>
+</div>
 <footer>
-    <p>© 2026 The Slow Tide TST服务器</p>
+<p>© 2026 The Slow Tide TST服务器</p>
 </footer>
 </div>
-
 <script>
 //主题切换
 const root=document.documentElement;
 const themeToggle=document.getElementById('themeToggle');
 themeToggle.onclick=()=>{
-    root.classList.toggle('dark');
-    localStorage.setItem('tst-theme',root.classList.contains('dark')?'dark':'light');
+root.classList.toggle('dark');
+localStorage.setItem('tst-theme',root.classList.contains('dark')?'dark':'light');
 };
 
 //页面切换
 const navBtns=document.querySelectorAll('.nav-item button');
 const pages=document.querySelectorAll('.page');
 navBtns.forEach(btn=>{
-    btn.onclick=()=>{
-        const pid=btn.dataset.page;
-        pages.forEach(p=>p.classList.remove('active'));
-        document.getElementById(pid).classList.add('active');
-    }
+btn.onclick=()=>{
+const pid=btn.dataset.page;
+pages.forEach(p=>p.classList.remove('active'));
+document.getElementById(pid).classList.add('active');
+}
 });
 
-//轮播
+//轮播逻辑，悬停暂停，页面隐藏暂停
 const adSlider=document.getElementById('adSlider');
+const adWrap=document.getElementById('adWrap');
 const slides=Array.from(adSlider.querySelectorAll('.slide-item'));
 const slideDots=document.getElementById('slideDots');
 let curSlide=0;
 let slideTimer=null;
+
 slides.forEach((_,idx)=>{
-    const d=document.createElement('div');
-    d.className='dot'+(idx===0?' active':'');
-    d.onclick=()=>goSlide(idx);
-    slideDots.appendChild(d);
+const d=document.createElement('div');
+d.className='dot'+(idx===0?' active':'');
+d.onclick=()=>goSlide(idx);
+slideDots.appendChild(d);
 });
 const dotsAll=Array.from(slideDots.querySelectorAll('.dot'));
+
 function goSlide(idx){
-    curSlide=idx;
-    const targetLeft=slides[idx].getBoundingClientRect().left - adSlider.getBoundingClientRect().left + adSlider.scrollLeft;
-    adSlider.scrollTo({left:targetLeft,behavior:'smooth'});
-    dotsAll.forEach((d,i)=>d.classList.toggle('active',i===idx));
+curSlide=idx;
+const targetLeft=slides[idx].getBoundingClientRect().left - adSlider.getBoundingClientRect().left + adSlider.scrollLeft;
+adSlider.scrollTo({left:targetLeft,behavior:'smooth'});
+dotsAll.forEach((d,i)=>d.classList.toggle('active',i===idx));
 }
 function autoSlide(){
-    curSlide=(curSlide+1)%slides.length;
-    goSlide(curSlide);
+curSlide=(curSlide+1)%slides.length;
+goSlide(curSlide);
 }
+function startTimer(){
 slideTimer=setInterval(autoSlide,4500);
+}
+function stopTimer(){
+clearInterval(slideTimer);
+}
+startTimer();
+//鼠标悬停暂停
+adWrap.addEventListener('mouseenter',stopTimer);
+adWrap.addEventListener('mouseleave',startTimer);
+//页面切后台暂停
+document.addEventListener('visibilitychange',()=>{
+if(document.hidden) stopTimer();
+else startTimer();
+});
 
 //时间
 const bjTimeDom=document.getElementById('bjTime');
 const runTimeDom=document.getElementById('runTime');
 const serverStart=new Date('2026-06-30T00:00:00');
-//运行时间增加120秒偏移，不和北京时间完全对齐
 const offsetMs=120*1000;
 function updateTime(){
-    const now=new Date();
-    bjTimeDom.innerText=now.toLocaleString('zh-CN');
-    const diff=now.getTime() - serverStart.getTime() + offsetMs;
-    const day=Math.floor(diff/(1000*60*60*24));
-    const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-    const m=Math.floor((diff%(1000*60*60))/(1000*60));
-    const s=Math.floor((diff%(1000*60))/1000);
-    runTimeDom.innerText=`${day}天 ${h}时 ${m}分 ${s}秒`;
+const now=new Date();
+bjTimeDom.innerText=now.toLocaleString('zh-CN');
+const diff=now.getTime() - serverStart.getTime() + offsetMs;
+const day=Math.floor(diff/(1000*60*60*24));
+const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+const m=Math.floor((diff%(1000*60*60))/(1000*60));
+const s=Math.floor((diff%(1000*60))/1000);
+runTimeDom.innerText=`${day}天 ${h}时 ${m}分 ${s}秒`;
 }
 setInterval(updateTime,1000);
 updateTime();
@@ -582,80 +593,99 @@ updateTime();
 const copyAddrBtn=document.getElementById('copyAddrBtn');
 let copyFlag=false;
 copyAddrBtn.onclick=async ()=>{
-    if(copyFlag)return;
-    copyFlag=true;
-    try{
-        await navigator.clipboard.writeText(document.getElementById('serverAddr').innerText);
-        alert('服务器地址已复制');
-    }catch(e){alert('复制失败，请手动复制');}
-    setTimeout(()=>{copyFlag=false;},1500);
+if(copyFlag)return;
+copyFlag=true;
+try{
+await navigator.clipboard.writeText(document.getElementById('serverAddr').innerText);
+alert('服务器地址已复制');
+}catch(e){alert('复制失败，请手动复制');}
+setTimeout(()=>{copyFlag=false;},1500);
 };
 
 //QQ群跳转，使用QQ协议
 document.getElementById('openQQGroup').onclick=()=>{
-    window.location.href='mqqapi://card/show_pslcard?src_type=internal&version=1&card_type=group&uin=833470853';
+window.location.href='mqqapi://card/show_pslcard?src_type=internal&version=1&card_type=group&uin=833470853';
 };
 
 //复制兑换码按钮
 document.querySelectorAll('[data-clip]').forEach(b=>{
-    b.onclick=async ()=>{
-        const txt=b.dataset.clip;
-        try{await navigator.clipboard.writeText(txt);alert('兑换码已复制');}
-        catch(e){alert('复制失败，请手动复制：'+txt);}
-    }
+b.onclick=async ()=>{
+const txt=b.dataset.clip;
+try{await navigator.clipboard.writeText(txt);alert('兑换码已复制');}
+catch(e){alert('复制失败，请手动复制：'+txt);}
+}
 });
 
 //玩家公约目录锚点修复
 const ruleScrollDom=document.getElementById('ruleScrollDom');
 document.querySelectorAll('#ruleToc a').forEach(a=>{
-    a.onclick=(e)=>{
-        e.preventDefault();
-        const tid=a.getAttribute('href').substring(1);
-        const tar=document.getElementById(tid);
-        if(!tar)return;
-        const targetTop=tar.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
-        ruleScrollDom.scrollTo({top:targetTop -16, behavior:'smooth'});
-    }
+a.onclick=(e)=>{
+e.preventDefault();
+const tid=a.getAttribute('href').substring(1);
+const tar=document.getElementById(tid);
+if(!tar)return;
+const targetTop=tar.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
+ruleScrollDom.scrollTo({top:targetTop -16, behavior:'smooth'});
+}
 });
 
-//公约内搜索，文本匹配跳转
+//公约内搜索
 const ruleSearchInput=document.getElementById('ruleSearchInput');
 ruleSearchInput.onkeydown=(ev)=>{
-    if(ev.key!=='Enter')return;
-    const kw=ruleSearchInput.value.trim().toLowerCase();
-    if(!kw)return;
-    const sections=document.querySelectorAll('.rule-section');
-    for(let sec of sections){
-        const txt=sec.innerText.toLowerCase();
-        if(txt.includes(kw)){
-            const targetTop=sec.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
-            ruleScrollDom.scrollTo({top:targetTop-16,behavior:'smooth'});
-            return;
-        }
-    }
-    alert('未在公约中找到匹配关键词');
+if(ev.key!=='Enter')return;
+const kw=ruleSearchInput.value.trim();
+if(!kw)return;
+//彩蛋
+if(kw==="ILOVEWYJ"){
+alert("我喜欢你吴奕洁");
+return;
+}
+const kwLow=kw.toLowerCase();
+const sections=document.querySelectorAll('.rule-section');
+let found=false;
+for(let sec of sections){
+const txt=sec.innerText.toLowerCase();
+if(txt.includes(kwLow)){
+const targetTop=sec.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
+ruleScrollDom.scrollTo({top:targetTop-16,behavior:'smooth'});
+found=true;
+break;
+}
+}
+if(!found){
+alert('未在公约中找到匹配关键词');
+}
 };
 
 //首页全局搜索
 const globalSearchInput=document.getElementById('globalSearchInput');
 globalSearchInput.onkeydown=(ev)=>{
-    if(ev.key!=='Enter')return;
-    const kw=globalSearchInput.value.trim().toLowerCase();
-    if(!kw)return;
-    //优先跳公约页再搜索
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.getElementById('rule').classList.add('active');
-    ruleSearchInput.value=kw;
-    const sections=document.querySelectorAll('.rule-section');
-    for(let sec of sections){
-        const txt=sec.innerText.toLowerCase();
-        if(txt.includes(kw)){
-            const targetTop=sec.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
-            ruleScrollDom.scrollTo({top:targetTop-16,behavior:'smooth'});
-            return;
-        }
-    }
-    alert('网站内未检索到该关键词');
+if(ev.key!=='Enter')return;
+const kw=globalSearchInput.value.trim();
+if(!kw)return;
+//彩蛋
+if(kw==="ILOVEWYJ"){
+alert("我喜欢你吴奕洁");
+return;
+}
+const kwLow=kw.toLowerCase();
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById('rule').classList.add('active');
+ruleSearchInput.value=kw;
+const sections=document.querySelectorAll('.rule-section');
+let found=false;
+for(let sec of sections){
+const txt=sec.innerText.toLowerCase();
+if(txt.includes(kwLow)){
+const targetTop=sec.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
+ruleScrollDom.scrollTo({top:targetTop-16,behavior:'smooth'});
+found=true;
+break;
+}
+}
+if(!found){
+alert('网站内未检索到该关键词');
+}
 };
 </script>
 </body>
