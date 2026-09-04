@@ -6,16 +6,15 @@
 <title>The Slow Tide官网</title>
 <script>
 (function(){
-// 跟随系统 + 本地存储优先
-const saved=localStorage.getItem('tst-theme');
-const root=document.documentElement;
-if(saved){
-    saved==='dark'?root.classList.add('dark'):root.classList.remove('dark');
-}else{
-    if(window.matchMedia('(prefers-color-scheme: dark)').matches){
-        root.classList.add('dark');
-    }
-}
+// 主题三态：跟随系统 / 深色 / 浅色，localStorage 优先
+var mode=localStorage.getItem('tst-theme')||'system';
+var dark;
+if(mode==='system'){ dark=window.matchMedia('(prefers-color-scheme: dark)').matches; }
+else{ dark=(mode==='dark'); }
+if(dark){ document.documentElement.classList.add('dark'); }
+// 语言
+var lang=localStorage.getItem('tst-lang')||'zhCN';
+document.documentElement.lang = lang==='en'?'en':'zh';
 })();
 </script>
 <style>
@@ -29,6 +28,7 @@ if(saved){
 --hover-bg:#ececec;
 --primary:#444444;
 --accent:#555555;
+--shadow:rgba(0,0,0,.10);
 }
 html.dark{
 --bg:#121212;
@@ -39,6 +39,7 @@ html.dark{
 --hover-bg:#2c2c2c;
 --primary:#dddddd;
 --accent:#bbbbbb;
+--shadow:rgba(0,0,0,.45);
 }
 body{
 background-color:var(--bg);
@@ -66,14 +67,80 @@ gap:10px;
 font-size:20px;
 font-weight:600;
 }
-.theme-btn{
-padding:6px 10px;
+.header-right{
+display:flex;
+align-items:center;
+position:relative;
+}
+.icon-btn{
+width:38px;height:38px;
+display:flex;align-items:center;justify-content:center;
+padding:0;
 border:1px solid var(--border);
 background:var(--card-bg);
 color:var(--text);
+border-radius:8px;
+cursor:pointer;
+font-size:18px;
+line-height:1;
+}
+.icon-btn:hover{background:var(--hover-bg);}
+/* 设置面板：轻量柔和 */
+.settings-panel{
+position:absolute;
+top:calc(100% + 10px);
+right:0;
+width:300px;
+max-width:calc(100vw - 24px);
+background:var(--card-bg);
+border:1px solid var(--border);
+border-radius:12px;
+padding:16px;
+box-shadow:0 8px 28px var(--shadow);
+display:none;
+z-index:120;
+}
+.settings-panel.open{display:block;}
+.settings-panel::before{
+content:'';position:absolute;top:-8px;right:12px;
+width:14px;height:14px;
+background:var(--card-bg);
+border-left:1px solid var(--border);
+border-top:1px solid var(--border);
+transform:rotate(45deg);
+}
+.settings-title{
+font-size:15px;font-weight:600;
+margin-bottom:12px;
+display:flex;align-items:center;gap:6px;
+}
+.settings-group{margin:12px 0;}
+.settings-label{
+font-size:13px;
+color:var(--text-secondary);
+margin-bottom:8px;
+}
+.seg{
+display:flex;
+gap:6px;
+flex-wrap:wrap;
+}
+.seg-btn{
+padding:7px 12px;
+border:1px solid var(--border);
+background:var(--bg);
+color:var(--text);
 border-radius:6px;
 cursor:pointer;
-font-size:14px;
+font-size:13px;
+transition:background .15s;
+}
+.seg-btn:hover{background:var(--hover-bg);}
+.seg-btn.active{
+background:var(--accent);
+border-color:var(--accent);
+color:var(--bg);
+font-weight:600;
 }
 .ad-slider-wrap{
 position:relative;
@@ -141,6 +208,7 @@ margin-bottom:16px;
 }
 .page.active{display:block;}
 .search-row{
+position:relative;
 display:flex;
 gap:8px;
 flex-wrap:wrap;
@@ -201,6 +269,7 @@ font-size:14px;
 }
 .btn:hover{background:var(--hover-bg);}
 .rule-search-row{
+position:relative;
 display:flex;
 gap:8px;
 flex-wrap:wrap;
@@ -256,6 +325,87 @@ border-radius:8px;
 border:1px solid var(--border);
 margin:8px 0;
 }
+/* 搜索联想下拉 */
+.suggest-box{
+position:absolute;
+top:calc(100% + 4px);
+left:0;
+right:0;
+background:var(--bg);
+border:1px solid var(--border);
+border-radius:8px;
+box-shadow:0 6px 22px var(--shadow);
+z-index:110;
+display:none;
+max-height:300px;
+overflow-y:auto;
+}
+.suggest-box.show{display:block;}
+.suggest-item{
+padding:9px 13px;
+font-size:14px;
+cursor:pointer;
+border-bottom:1px solid var(--border);
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+.suggest-item:last-child{border-bottom:none;}
+.suggest-item:hover,
+.suggest-item.active{background:var(--hover-bg);}
+/* 全站搜索结果列表 */
+.results-box{
+display:none;
+margin:8px 0 10px;
+border:1px solid var(--border);
+border-radius:8px;
+background:var(--card-bg);
+overflow:hidden;
+}
+.results-box.show{display:block;}
+.results-head{
+padding:8px 12px;
+font-size:13px;
+color:var(--text-secondary);
+border-bottom:1px solid var(--border);
+}
+.result-item{
+display:flex;
+align-items:baseline;
+gap:8px;
+padding:9px 12px;
+cursor:pointer;
+border-bottom:1px solid var(--border);
+}
+.result-item:last-child{border-bottom:none;}
+.result-item:hover{background:var(--hover-bg);}
+.result-badge{
+flex:none;
+font-size:12px;
+color:var(--bg);
+background:var(--accent);
+border-radius:4px;
+padding:1px 6px;
+white-space:nowrap;
+}
+.result-snip{
+font-size:14px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+mark{
+background:#ffd54a;
+color:#333;
+border-radius:2px;
+padding:0 1px;
+}
+html.dark mark{background:#c99400;color:#1a1a1a;}
+.search-flash{
+outline:3px solid #ffb300;
+outline-offset:2px;
+border-radius:8px;
+}
 footer{
 margin-top:30px;
 padding:16px 0;
@@ -275,6 +425,7 @@ font-weight:bold;
 .slide-item img{height:140px;}
 .page{padding:12px;}
 .info-card,.time-box{padding:12px;}
+.settings-panel{width:280px;}
 }
 </style>
 </head>
@@ -282,11 +433,31 @@ font-weight:bold;
 <div class="container">
 <header>
 <div class="header-row">
-<div class="site-title">The Slow Tide官网</div>
-<button class="theme-btn" id="themeToggle">深色模式</button>
+<div class="site-title" data-i18n="siteTitle">The Slow Tide官网</div>
+<div class="header-right">
+<button class="icon-btn" id="settingsBtn" title="⚙" aria-label="settings">⚙</button>
+<div class="settings-panel" id="settingsPanel">
+<div class="settings-title"><span>⚙</span> <span data-i18n="settingsTitle">设置</span></div>
+<div class="settings-group">
+<div class="settings-label" data-i18n="themeSection">主题模式</div>
+<div class="seg">
+<button class="seg-btn" data-theme="system" data-i18n="themeSystem">跟随系统</button>
+<button class="seg-btn" data-theme="dark" data-i18n="themeDark">深色</button>
+<button class="seg-btn" data-theme="light" data-i18n="themeLight">浅色</button>
+</div>
+</div>
+<div class="settings-group">
+<div class="settings-label" data-i18n="langSection">语言</div>
+<div class="seg">
+<button class="seg-btn" data-lang="zhCN" data-i18n="langZhCN">简体中文</button>
+<button class="seg-btn" data-lang="zhTW" data-i18n="langZhTW">繁體中文</button>
+<button class="seg-btn" data-lang="en" data-i18n="langEn">English</button>
+</div>
+</div>
+</div>
+</div>
 </div>
 </header>
-
 <div class="ad-slider-wrap" id="adWrap">
 <div class="ad-slider" id="adSlider">
 <div class="slide-item">
@@ -301,428 +472,1204 @@ font-weight:bold;
 </div>
 <div class="slide-dots" id="slideDots"></div>
 </div>
-
 <div class="search-row">
-<input type="text" id="globalSearchInput" placeholder="全局搜索：输入关键词跳转对应页面或内容">
-<button id="globalSearchBtn">确认搜索</button>
+<input type="text" id="globalSearchInput" data-i18n-ph="searchPlaceholder" placeholder="全局搜索：输入关键词跳转对应页面或内容" autocomplete="off">
+<button id="globalSearchBtn" data-i18n="searchBtn">确认搜索</button>
+<div class="suggest-box" id="globalSuggest"></div>
 </div>
 <div class="tip-message" id="globalTip"></div>
-
+<div class="results-box" id="globalResults"></div>
 <nav>
 <ul class="nav-list">
-<li class="nav-item"><button data-page="home">首页</button></li>
-<li class="nav-item"><button data-page="notice">公告</button></li>
-<li class="nav-item"><button data-page="event">赛事活动</button></li>
-<li class="nav-item"><button data-page="cdkey">兑换码</button></li>
-<li class="nav-item"><button data-page="sponsor">服务器赞助</button></li>
-<li class="nav-item"><button data-page="rule">玩家公约</button></li>
+<li class="nav-item"><button data-page="home" data-i18n="nav_home">首页</button></li>
+<li class="nav-item"><button data-page="notice" data-i18n="nav_notice">公告</button></li>
+<li class="nav-item"><button data-page="event" data-i18n="nav_event">赛事活动</button></li>
+<li class="nav-item"><button data-page="cdkey" data-i18n="nav_cdkey">兑换码</button></li>
+<li class="nav-item"><button data-page="sponsor" data-i18n="nav_sponsor">服务器赞助</button></li>
+<li class="nav-item"><button data-page="rule" data-i18n="nav_rule">玩家公约</button></li>
 </ul>
 </nav>
-
 <div id="home" class="page active">
-<h2>🏠 服务器首页</h2>
-<div class="info-card">
-<h3>服务器信息</h3>
-<p>服务器地址：<span id="serverAddr">mc.163.com/open/mc_realms/?realms=270239C36AD</span> <button class="btn" id="copyAddrBtn">复制地址</button></p>
-<p>QQ交流群：<button class="btn" id="openQQGroup">833470853</button></p>
-<p>当前状态：<span class="status-online">运行中</span></p>
+<h2 data-i18n="home_title">🏠 服务器首页</h2>
+<div class="info-card" data-unit>
+<h3 data-i18n="serverInfo">服务器信息</h3>
+<p><span data-i18n="serverAddr">服务器地址：</span><span id="serverAddr">mc.163.com/open/mc_realms/?realms=270239C36AD</span> <button class="btn" id="copyAddrBtn" data-i18n="copyAddr">复制地址</button></p>
+<p><span data-i18n="qqGroup">QQ交流群：</span><button class="btn" id="openQQGroup">833470853</button></p>
+<p><span data-i18n="statusLabel">当前状态：</span><span class="status-online" data-i18n="statusOnline">运行中</span></p>
 </div>
-<div class="time-box">
-<h3>运行计时</h3>
-<p>北京时间：<span id="bjTime"></span></p>
-<p>累计运行时间：<span id="runTime"></span></p>
+<div class="time-box" data-unit>
+<h3 data-i18n="runTimeTitle">运行计时</h3>
+<p><span data-i18n="bjTime">北京时间：</span><span id="bjTime"></span></p>
+<p><span data-i18n="totalRun">累计运行时间：</span><span id="runTime"></span></p>
 </div>
-<div class="info-card">
-<h3>最新动态</h3>
-<p>优化了服务器官网的玩家公约与兑换码栏目</p>
+<div class="info-card" data-unit>
+<h3 data-i18n="latestNews">最新动态</h3>
+<p data-i18n="newsContent">优化了服务器官网的玩家公约与兑换码栏目</p>
 </div>
 </div>
-
 <div id="notice" class="page">
-<h2>服务器网站更新公告</h2>
-<div class="info-card">
-<p>本次官网更新内容：</p>
+<h2 data-i18n="notice_title">服务器网站更新公告</h2>
+<div class="info-card" data-unit>
+<p data-i18n="noticeContent">本次官网更新内容：</p>
 <ul style="margin-left:20px;margin-top:8px;">
-<li>玩家公约页面新增公约内容搜索框，支持关键词定位条约条目</li>
-<li>首页增加全局搜索输入框，支持关键词检索网站内容</li>
-<li>修复玩家公约目录锚点滚动定位BUG</li>
-<li>优化页面细节与移动端适配，清理多余留白</li>
+<li data-i18n="notice1">玩家公约页面新增公约内容搜索框，支持关键词定位条约条目</li>
+<li data-i18n="notice2">首页增加全局搜索输入框，支持关键词检索网站内容</li>
+<li data-i18n="notice3">修复玩家公约目录锚点滚动定位BUG</li>
+<li data-i18n="notice4">优化页面细节与移动端适配，清理多余留白</li>
 </ul>
-<p style="margin-top:10px;">请各位玩家知悉，祝游玩愉快。</p>
+<p style="margin-top:10px;" data-i18n="noticeEnd">请各位玩家知悉，祝游玩愉快。</p>
 </div>
 </div>
-
 <div id="event" class="page">
-<h2>赛事活动</h2>
-<div class="info-card">
-<p>暂无进行中赛事</p>
+<h2 data-i18n="event_title">赛事活动</h2>
+<div class="info-card" data-unit>
+<p data-i18n="noEvent">暂无进行中赛事</p>
 </div>
 </div>
-
 <div id="cdkey" class="page">
-<h2>兑换码</h2>
-<div class="info-card">
-<p>暂无可用兑换码</p>
+<h2 data-i18n="cdkey_title">兑换码</h2>
+<div class="info-card" data-unit>
+<p data-i18n="noCdkey">暂无可用兑换码</p>
 </div>
 </div>
-
 <div id="sponsor" class="page">
-<h2>服务器赞助</h2>
-<div class="qr-wrap">
-<p>赞助收款二维码</p>
+<h2 data-i18n="sponsor_title">服务器赞助</h2>
+<div class="qr-wrap" data-unit>
+<p data-i18n="payQr">赞助收款二维码</p>
 <img src="wechat-qrcode.jpg" alt="赞助收款码" id="payQrImg">
-<p style="margin-top:10px;font-size:14px;color:var(--text-secondary);">谢谢喵（磕头）</p>
+<p style="margin-top:10px;font-size:14px;color:var(--text-secondary);" data-i18n="sponsorNote">谢谢喵（磕头）</p>
 </div>
 </div>
-
 <div id="rule" class="page">
-<h2>玩家公约</h2>
+<h2 data-i18n="rule_title">玩家公约</h2>
 <div class="rule-search-row">
-<input type="text" id="ruleSearchInput" placeholder="搜索公约内容，输入关键词自动跳转定位">
-<button id="ruleSearchBtn">确认搜索</button>
+<input type="text" id="ruleSearchInput" data-i18n-ph="ruleSearchPlaceholder" placeholder="搜索公约内容，输入关键词自动跳转定位" autocomplete="off">
+<button id="ruleSearchBtn" data-i18n="ruleSearchBtn">确认搜索</button>
+<div class="suggest-box" id="ruleSuggest"></div>
 </div>
 <div class="tip-message" id="ruleTip"></div>
 <div class="rule-scroll" id="ruleScrollDom">
-<div id="ruleContent">
-<h3>The Slow Tide 服务器总条约</h3>
-<p>网易基岩TST山头</p>
-<p>本条约适用于 The Slow Tide 服务器 全体玩家，统一规范服务器内行为准则、经济秩序、建筑保护、PVP机制、设备使用及违规处罚等全部游玩相关事宜。</p>
-<p>本条约所有条款具备通用性、约束性与权威性。不接受“不知情”“规则未阅读”“卡规则漏洞”等任何免责理由。无论玩家资历、服务器贡献高低，管理员均有权对违规行为采取警告、权限限制、限时封禁、永久封禁等处置。</p>
-<p>针对本条约未明文列举，但确实扰乱服务器秩序、破坏公共环境、侵害他人权益的行为，管理组有权根据行为造成的实际影响，做出合理、公正的判定与处罚。</p>
-<p>全体玩家在服务器内及关联社群的一切行为，必须严格遵守《中华人民共和国法律法规》。严禁以任何形式诋毁、攻击、抹黑、诽谤服务器、管理团队及其他玩家；严禁使用任何技术手段干扰、破坏服务器正常运行。</p>
-<p>本条约将根据服务器运营状态动态优化更新。重大规则变更将提前发布官方公告告知全体玩家。凡进入本服务器游玩、参与社群交流，即视为已阅读、理解并自愿同意本条约全部内容；若不认可本规则，请勿进入服务器及相关社群。</p>
-<p><strong>目录（点击跳转）</strong></p>
-<ul id="ruleToc">
-<li><a href="#sec1">基础行为规范</a></li>
-<li><a href="#sec2">聊天与社交规范</a></li>
-<li><a href="#sec3">建筑与领地保护</a></li>
-<li><a href="#sec4">资源采集与环境维护</a></li>
-<li><a href="#sec5">经济与交易规则</a></li>
-<li><a href="#sec6">PVP与战斗行为</a></li>
-<li><a href="#sec7">红石与生电设备规范</a></li>
-<li><a href="#sec8">生物与村民管理</a></li>
-<li><a href="#sec9">玩家权益与反馈渠道</a></li>
-<li><a href="#sec10">违规处理与处罚制度</a></li>
-<li><a href="#sec11">服务器管理组职责</a></li>
-<li><a href="#sec12">活动与赛事规则</a></li>
-<li><a href="#sec13">数据与存档管理</a></li>
-<li><a href="#sec14">规则更新与解释权</a></li>
-</ul>
-<div class="rule-section" id="sec1">
-<h3>1. 基础行为规范</h3>
-<p>服务器管理组不受理玩家之间普通拆家、偷家、毁基地等私人纠纷，外挂破坏、恶性BUG滥用等违规行为除外。</p>
-<p>服务器日志与安全插件，仅用于防御外挂作弊、防护公共设施与玩家领地安全。</p>
-<p>严禁一切危害服务器安全、运行稳定、公共利益的行为，违者从重处罚。</p>
-<p>全面禁止任何形式的外挂、作弊程序、辅助工具。</p>
-<p>全体玩家需文明游玩、友善交流，遵守基础礼仪规范。</p>
-<p>严禁传播涉黄、涉黑、涉暴、低俗恶俗等不良信息。</p>
-<p>禁止在公共区域跑跳搭。</p>
-<p>服务器官方语言为简体/繁体中文，全员交流统一使用汉语。</p>
-<p>禁止建造含低俗暗示、违规隐喻、不良导向的建筑。</p>
-<p>禁止利用游戏BUG、机制漏洞实施破坏、牟利、扰民等恶性行为。</p>
-<p>禁止一切违背双方意愿的强制PVP行为。</p>
-<p>所有游戏行为、社交行为必须符合国家法律法规，违法违规行为一律从重处罚。</p>
-<p>所有生电、红石设备必须配备独立开关，做到人走机停，杜绝长期空转占用服务器资源。</p>
-<p>新建交通设施（冰道、铁路、通道等）不得干扰、占用、破坏已有公共交通线路。</p>
-<p>服务器内全面禁止赌博行为，一经发现立刻责令拆除并永久封禁。</p>
-<p>玩家产生纠纷、矛盾争议时，禁止情绪化闹事，需冷静沟通或联系管理依规解决。</p>
-</div>
-<div class="rule-section" id="sec2">
-<h3>2. 聊天与社交规范</h3>
-<p>服务器及社群官方交流语言为中文（简体、繁体通用）。</p>
-<p>禁止刻意断章取义、过度解读、歪曲他人发言、故意误导他人。</p>
-<p>禁止散布谣言、宗教传教、引流广告、无关推广信息。</p>
-<p>严禁发布、传播涉黄、涉暴、涉政、违法违规内容，一经发现永久封禁。</p>
-<p>禁止私自向服务器、社群内添加各类机器人、自动脚本、推送程序。</p>
-</div>
-<div class="rule-section" id="sec3">
-<h3>3. 建筑与领地保护</h3>
-<p>服务器默认无全域建筑保护，未圈地区域建筑损毁风险由玩家自行承担。</p>
-<p>玩家可使用圈地系统保护私人建筑，领地范围内禁止一切未经允许的破坏、改动、占用行为，违规可联系管理或通过举报箱申诉。</p>
-<p>未进行圈地的建筑、设施、临时建筑，不受服务器保护，除外挂、BUG恶意破坏外，损毁后果由建造者自行承担。</p>
-<p>未经领地主许可，禁止在他人领地内建造、改造地形、放置设施、改动结构。</p>
-<p>禁止破坏、损毁、改动服务器公共建筑，包含主城、公共传送点、出生点、末地出生点等公共设施。</p>
-<p>领地所有者连续30天未登录服务器，该领地自动回收，归属权回归服务器。</p>
-<p>领地内非领地成员造成的一切破坏、违规、纠纷问题，由当事人自行承担全部责任。</p>
-</div>
-<div class="rule-section" id="sec4">
-<h3>4. 资源采集与环境维护</h3>
-<p>禁止在非领地范围内大规模破坏地形，包括掏空山体、大面积填水、大范围铲平地貌等。</p>
-<p>禁止在出生点、公共区域进行大规模挖掘、爆破、地形改造。</p>
-<p>倡导合理、节制利用资源，避免过度采集造成资源浪费与枯竭。</p>
-<p>废弃矿洞、闲置建筑、残留工程设施，建议自行填埋、清理规整。</p>
-<p>禁止利用漏洞、机制刷取货币、物资、资源，违者严肃处罚。</p>
-</div>
-<div class="rule-section" id="sec5">
-<h3>5. 经济与交易规则</h3>
-<p>禁止恶意囤货、控价、哄抬物价、扰乱服务器市场经济秩序，违者从重处理。</p>
-<p>严禁利用漏洞刷取金币、物品、资源，一经查实直接封号处理。</p>
-<p>系统商店仅作为物资兜底补充渠道，不作为主要获取途径。</p>
-<p>玩家私下交易价格由双方自主协商，管理组不介入正常定价，仅干预恶意控价、欺诈行为。</p>
-<p>全面禁止现实货币交易（RMB交易），包括物品买卖、金币变现、代练交易等，一经发现永久封禁。</p>
-<p>服务器管理组有权不定期调整系统商店物价，玩家如有异议可以通过意见箱反馈。</p>
-</div>
-<div class="rule-section" id="sec6">
-<h3>6. PVP与战斗行为</h3>
-<p>所有非双方自愿的强制PVP、偷袭、追杀行为一律禁止，违者封号处理。</p>
-<p>禁止在主城、出生点等公共安全区域主动发起PVP战斗。</p>
-<p>官方活动、赛事期间的PVP规则，以当期活动公告为准。</p>
-</div>
-<div class="rule-section" id="sec7">
-<h3>7. 红石与生电设备规范</h3>
-<p>服务器开放红石、生电玩法，但所有设备必须控制在合理负载范围内，不得影响服务器运行。</p>
-<p>禁止建造高频红石、大面积卡顿装置、占服设备。</p>
-<p>长期运行、高负载、大型生电设备，建造前需要提前向管理组报备备案。</p>
-<p>废弃、闲置红石设备需要及时拆除，避免占用区块资源。</p>
-<p>全部红石、生电设备必须设置可控开关，严格执行人走机停规则。</p>
-<p>禁止搭建多核堆叠、多层叠加的超规格生电机器。</p>
-<p>服务器自带高频限制机制，高频类红石设备无法正常运行，请勿违规搭建。</p>
-</div>
-<div class="rule-section" id="sec8">
-<h3>8. 生物与村民管理</h3>
-<p>禁止恶意屠村、批量击杀无辜生物、浪费生物资源。</p>
-<p>村民交易、繁殖机制可以在合规范围内合理使用。</p>
-<p>禁止在公共区域建造大型刷怪塔、大规模村民繁殖机，特殊需求需要提前报备管理。</p>
-<p>禁止利用生物寻路机制、聚集机制恶意造成服务器卡顿。</p>
-<p>合理、节制使用各类生物机制，杜绝滥用、恶意堆载。</p>
-<p>服务器开启区块清理机制，禁止大批量、密集饲养生物，防止卡顿、吞档。</p>
-</div>
-<div class="rule-section" id="sec9">
-<h3>9. 玩家权益与反馈渠道</h3>
-<p>玩家对管理处罚、判定结果存在异议，可凭有效证据通过意见箱提交申诉。</p>
-<p>玩家合理建议、优化提案可以通过主城意见箱提交，管理组承诺三个工作日内回复处理。</p>
-<p>管理组不会无故干涉、限制玩家正常、合规的游戏发展与玩法。</p>
-<p>全体玩家享有平等游玩权益，不受管理员或其他玩家的针对、歧视、无端干预。</p>
-<p>玩家可以在不违反条约的前提下，自由选择玩法、建设方向与社交方式。</p>
-<p>玩家有权知晓自身账号处罚的全部依据、违规事由。</p>
-<p>管理组严格保护玩家隐私，绝不公开玩家IP、联系方式等私人信息。</p>
-<p>玩家游戏数据仅用于服务器正常运营，绝不向第三方泄露、转交。</p>
-<p>违规调查阶段，管理组可依规查阅对应游戏日志与数据，严禁滥用权限。</p>
-<p>管理组对所有玩家一视同仁，不存在特殊权限、亲友优待。</p>
-<p>管理组内部矛盾、争议判定，由全体管理员共同裁定，保证公开公正。</p>
-<p>玩家发现管理员存在违规操作、滥用权限行为，可向其他管理成员举报。</p>
-<p>玩家领地范围内的建筑、物品、设施受官方保护，其他人禁止擅自破坏、盗取、改动。</p>
-<p>因服务器故障、存档异常造成的数据损失，管理组会尽力修复，但不保证百分百完全恢复。</p>
-</div>
-<div class="rule-section" id="sec10">
-<h3>10. 违规处理与处罚制度</h3>
-<p>轻微违规：口头警告、书面提醒、临时限制部分权限。</p>
-<p>中度违规：清空违规资产、限时封禁账号。</p>
-<p>严重违规：永久封禁账号。</p>
-<p>作弊、漏洞刷物、恶意破坏等恶性行为，直接处罚、不给予提前警告。</p>
-<p>全部处罚记录统一存档，作为后续判定参考依据。</p>
-</div>
-<div class="rule-section" id="sec11">
-<h3>11. 服务器管理组职责</h3>
-<p>负责规则执行、服务器维护、活动策划、玩家纠纷调解、秩序维护。</p>
-<p>秉持公正、公开、透明原则处理全部服务器相关事务。</p>
-<p>不参与玩家正常经济竞争，不干预合规玩法与正常游戏发展。</p>
-<p>主动接受全体玩家监督，积极回应合理质疑与建议。</p>
-</div>
-<div class="rule-section" id="sec12">
-<h3>12. 活动与赛事规则</h3>
-<p>各类官方活动、赛事优先遵循当期专属活动规则。</p>
-<p>活动内违规玩家直接取消参赛资格与奖励资格，情节严重追加常规处罚。</p>
-<p>活动奖励、规则、流程以官方公告为准。</p>
-<p>全部活动最终解释权归服务器管理组所有。</p>
-</div>
-<div class="rule-section" id="sec13">
-<h3>13. 数据与存档管理</h3>
-<p>服务器会定期自动备份存档，但无法保证单个建筑、单件物品精准复原。</p>
-<p>因不可抗力、网络故障、设备问题造成的数据丢失，管理组不承担赔偿责任。</p>
-<p>服务器大版本更新前会发布公告，最大限度保留原有存档内容。</p>
-<p>玩家金币、物品、权限、成就等个人数据，以服务器后台记录作为唯一有效依据。</p>
-</div>
-<div class="rule-section" id="sec14">
-<h3>14. 规则更新与解释权</h3>
-<p>本条约会跟随服务器发展持续优化、补充、修改。</p>
-<p>规则重大修订、增减条款，会提前发布公告通知全体玩家。</p>
-<p>小规模文字微调、细节优化，可直接更新不另行通知。</p>
-<p>本服务器全部条约的最终解释权归 The Slow Tide 管理组所有。</p>
-</div>
-<p><strong>条约制定说明</strong></p>
-<p>参与制定玩家：执又之贤、极岚 及 The Slow Tide 服务器全体参与研讨玩家</p>
-<p><br><strong>参考来源说明：</strong></p>
-<p>1. 参考国内多社区Minecraft服务器成熟管理框架与运营经验；</p>
-<p>2. 参考公开服务器规约、玩家手册等公开资料，并结合本服实际情况优化改写；</p>
-<p>3. 感谢所有公开参考资料及参与规则完善的玩家与创作者。</p>
-<p>本条约目前仍在持续修订中，暂不作为最终正式版本执行，后续将根据实际情况进一步完善。如有建议，欢迎通过主城意见箱反馈。</p>
-</div>
+<div id="ruleContent"></div>
 </div>
 </div>
 <footer>
-<p>© 2026 The Slow Tide TST服务器</p>
+<p data-i18n="footer">© 2026 The Slow Tide TST服务器</p>
 </footer>
 </div>
 <script>
-//主题切换：手动切换，本地存储优先，无存储时跟随系统
-const root=document.documentElement;
-const themeToggle=document.getElementById('themeToggle');
-themeToggle.onclick=()=>{
-root.classList.toggle('dark');
-localStorage.setItem('tst-theme',root.classList.contains('dark')?'dark':'light');
+// ============================================================
+// 三语词典
+// ============================================================
+const I18N = {
+zhCN: {
+siteTitle:'The Slow Tide官网',
+settingsTitle:'设置',
+themeSection:'主题模式',
+langSection:'语言',
+themeSystem:'跟随系统',
+themeDark:'深色',
+themeLight:'浅色',
+langZhCN:'简体中文',
+langZhTW:'繁體中文',
+langEn:'English',
+searchPlaceholder:'全局搜索：输入关键词跳转对应页面或内容',
+searchBtn:'确认搜索',
+ruleSearchPlaceholder:'搜索公约内容，输入关键词自动跳转定位',
+ruleSearchBtn:'确认搜索',
+nav_home:'首页', nav_notice:'公告', nav_event:'赛事活动', nav_cdkey:'兑换码', nav_sponsor:'服务器赞助', nav_rule:'玩家公约',
+home_title:'🏠 服务器首页',
+serverInfo:'服务器信息',
+serverAddr:'服务器地址：',
+copyAddr:'复制地址',
+qqGroup:'QQ交流群：',
+statusLabel:'当前状态：',
+statusOnline:'运行中',
+runTimeTitle:'运行计时',
+bjTime:'北京时间：',
+totalRun:'累计运行时间：',
+latestNews:'最新动态',
+newsContent:'优化了服务器官网的玩家公约与兑换码栏目',
+notice_title:'服务器网站更新公告',
+noticeContent:'本次官网更新内容：',
+notice1:'玩家公约页面新增公约内容搜索框，支持关键词定位条约条目',
+notice2:'首页增加全局搜索输入框，支持关键词检索网站内容',
+notice3:'修复玩家公约目录锚点滚动定位BUG',
+notice4:'优化页面细节与移动端适配，清理多余留白',
+noticeEnd:'请各位玩家知悉，祝游玩愉快。',
+event_title:'赛事活动',
+noEvent:'暂无进行中赛事',
+cdkey_title:'兑换码',
+noCdkey:'暂无可用兑换码',
+sponsor_title:'服务器赞助',
+payQr:'赞助收款二维码',
+sponsorNote:'谢谢喵（磕头）',
+rule_title:'玩家公约',
+tip_input_kw:'请输入搜索关键词',
+tip_found:'已定位关键词：{kw}',
+found_many:'找到{n}条结果，点击跳转：{kw}',
+tip_not_found_rule:'未在公约中找到匹配关键词',
+tip_not_found_site:'网站内未检索到该关键词',
+copied:'服务器地址已复制',
+copyFail:'复制失败，请手动复制',
+sug_address:'服务器地址', sug_qq:'QQ交流群', sug_cdkey:'兑换码', sug_sponsor:'赞助',
+sug_rules:'玩家公约', sug_pvp:'PVP', sug_redstone:'红石', sug_tech:'生电',
+sug_build:'建筑', sug_claim:'领地', sug_economy:'经济', sug_trade:'交易',
+sug_villager:'村民', sug_cheat:'外挂', sug_gamble:'赌博', sug_event:'赛事',
+sug_runtime:'运行时间', sug_status:'状态',
+footer:'© 2026 The Slow Tide TST服务器'
+},
+zhTW: {
+siteTitle:'The Slow Tide官網',
+settingsTitle:'設定',
+themeSection:'主題模式',
+langSection:'語言',
+themeSystem:'跟隨系統',
+themeDark:'深色',
+themeLight:'淺色',
+langZhCN:'简体中文',
+langZhTW:'繁體中文',
+langEn:'English',
+searchPlaceholder:'全域搜尋：輸入關鍵字跳轉對應頁面或內容',
+searchBtn:'確認搜尋',
+ruleSearchPlaceholder:'搜尋公約內容，輸入關鍵字自動跳轉定位',
+ruleSearchBtn:'確認搜尋',
+nav_home:'首頁', nav_notice:'公告', nav_event:'賽事活動', nav_cdkey:'兌換碼', nav_sponsor:'伺服器贊助', nav_rule:'玩家公約',
+home_title:'🏠 伺服器首頁',
+serverInfo:'伺服器資訊',
+serverAddr:'伺服器位址：',
+copyAddr:'複製位址',
+qqGroup:'QQ交流群：',
+statusLabel:'目前狀態：',
+statusOnline:'運行中',
+runTimeTitle:'運行計時',
+bjTime:'北京時間：',
+totalRun:'累計運行時間：',
+latestNews:'最新動態',
+newsContent:'優化了伺服器官網的玩家公約與兌換碼欄目',
+notice_title:'伺服器網站更新公告',
+noticeContent:'本次官網更新內容：',
+notice1:'玩家公約頁面新增公約內容搜尋框，支援關鍵字定位條約條目',
+notice2:'首頁增加全域搜尋輸入框，支援關鍵字檢索網站內容',
+notice3:'修復玩家公約目錄錨點捲動定位BUG',
+notice4:'優化頁面細節與行動端適配，清理多餘留白',
+noticeEnd:'請各位玩家知悉，祝遊玩愉快。',
+event_title:'賽事活動',
+noEvent:'暫無進行中賽事',
+cdkey_title:'兌換碼',
+noCdkey:'暫無可用兌換碼',
+sponsor_title:'伺服器贊助',
+payQr:'贊助收款二維碼',
+sponsorNote:'謝謝喵（磕頭）',
+rule_title:'玩家公約',
+tip_input_kw:'請輸入搜尋關鍵字',
+tip_found:'已定位關鍵字：{kw}',
+found_many:'找到{n}筆結果，點擊跳轉：{kw}',
+tip_not_found_rule:'未在公約中找到符合關鍵字',
+tip_not_found_site:'網站內未檢索到該關鍵字',
+copied:'伺服器位址已複製',
+copyFail:'複製失敗，請手動複製',
+sug_address:'伺服器位址', sug_qq:'QQ交流群', sug_cdkey:'兌換碼', sug_sponsor:'贊助',
+sug_rules:'玩家公約', sug_pvp:'PVP', sug_redstone:'紅石', sug_tech:'生電',
+sug_build:'建築', sug_claim:'領地', sug_economy:'經濟', sug_trade:'交易',
+sug_villager:'村民', sug_cheat:'外掛', sug_gamble:'賭博', sug_event:'賽事',
+sug_runtime:'運行時間', sug_status:'狀態',
+footer:'© 2026 The Slow Tide TST伺服器'
+},
+en: {
+siteTitle:'The Slow Tide Official Website',
+settingsTitle:'Settings',
+themeSection:'Theme',
+langSection:'Language',
+themeSystem:'Follow System',
+themeDark:'Dark',
+themeLight:'Light',
+langZhCN:'简体中文',
+langZhTW:'繁體中文',
+langEn:'English',
+searchPlaceholder:'Global search: type a keyword to jump to the matching page or content',
+searchBtn:'Search',
+ruleSearchPlaceholder:'Search the rules: type a keyword to locate a clause',
+ruleSearchBtn:'Search',
+nav_home:'Home', nav_notice:'News', nav_event:'Events', nav_cdkey:'Redeem Codes', nav_sponsor:'Sponsor', nav_rule:'Player Rules',
+home_title:'🏠 Server Home',
+serverInfo:'Server Info',
+serverAddr:'Server Address: ',
+copyAddr:'Copy',
+qqGroup:'QQ Group: ',
+statusLabel:'Status: ',
+statusOnline:'Online',
+runTimeTitle:'Uptime',
+bjTime:'Beijing Time: ',
+totalRun:'Total Uptime: ',
+latestNews:'Latest Updates',
+newsContent:'Optimized the Player Rules and Redeem Code sections of the official website.',
+notice_title:'Official Website Update Notice',
+noticeContent:'This update includes:',
+notice1:'Added a content search box to the Player Rules page for locating treaty clauses by keyword.',
+notice2:'Added a global search box on the homepage to search site content by keyword.',
+notice3:'Fixed the bug where the Player Rules table-of-contents anchor scrolling was mispositioned.',
+notice4:'Optimized page details and mobile responsiveness, cleaned up extra whitespace.',
+noticeEnd:'Please take note and enjoy your time on the server.',
+event_title:'Events & Tournaments',
+noEvent:'No ongoing events.',
+cdkey_title:'Redeem Codes',
+noCdkey:'No redeem codes available.',
+sponsor_title:'Sponsor the Server',
+payQr:'Sponsorship Payment QR Code',
+sponsorNote:'Thank you meow (kowtow)',
+rule_title:'Player Rules',
+tip_input_kw:'Please enter a search keyword',
+tip_found:'Keyword found: {kw}',
+found_many:'Found {n} results, click to jump: {kw}',
+tip_not_found_rule:'No matching keyword found in the rules',
+tip_not_found_site:'No matching keyword found on this site',
+copied:'Server address copied',
+copyFail:'Copy failed, please copy manually',
+sug_address:'Server address', sug_qq:'QQ group', sug_cdkey:'Redeem code', sug_sponsor:'Sponsor',
+sug_rules:'Player rules', sug_pvp:'PVP', sug_redstone:'Redstone', sug_tech:'Tech machines',
+sug_build:'Building', sug_claim:'Claims', sug_economy:'Economy', sug_trade:'Trading',
+sug_villager:'Villagers', sug_cheat:'Hacks', sug_gamble:'Gambling', sug_event:'Events',
+sug_runtime:'Uptime', sug_status:'Status',
+footer:'© 2026 The Slow Tide TST Server'
+}
 };
 
-//页面切换
+// ============================================================
+// 玩家公约全文数据（三语）
+// ============================================================
+const RULES = {
+zhCN: {
+treatyTitle:'The Slow Tide 服务器总条约',
+subTitle:'网易基岩TST山头',
+intro:[
+'本条约适用于 The Slow Tide 服务器 全体玩家，统一规范服务器内行为准则、经济秩序、建筑保护、PVP机制、设备使用及违规处罚等全部游玩相关事宜。',
+'本条约所有条款具备通用性、约束性与权威性。不接受“不知情”“规则未阅读”“卡规则漏洞”等任何免责理由。无论玩家资历、服务器贡献高低，管理员均有权对违规行为采取警告、权限限制、限时封禁、永久封禁等处置。',
+'针对本条约未明文列举，但确实扰乱服务器秩序、破坏公共环境、侵害他人权益的行为，管理组有权根据行为造成的实际影响，做出合理、公正的判定与处罚。',
+'全体玩家在服务器内及关联社群的一切行为，必须严格遵守《中华人民共和国法律法规》。严禁以任何形式诋毁、攻击、抹黑、诽谤服务器、管理团队及其他玩家；严禁使用任何技术手段干扰、破坏服务器正常运行。',
+'本条约将根据服务器运营状态动态优化更新。重大规则变更将提前发布官方公告告知全体玩家。凡进入本服务器游玩、参与社群交流，即视为已阅读、理解并自愿同意本条约全部内容；若不认可本规则，请勿进入服务器及相关社群。'
+],
+tocLabel:'目录（点击跳转）',
+toc:[
+['sec1','基础行为规范'],['sec2','聊天与社交规范'],['sec3','建筑与领地保护'],['sec4','资源采集与环境维护'],['sec5','经济与交易规则'],['sec6','PVP与战斗行为'],['sec7','红石与生电设备规范'],['sec8','生物与村民管理'],['sec9','玩家权益与反馈渠道'],['sec10','违规处理与处罚制度'],['sec11','服务器管理组职责'],['sec12','活动与赛事规则'],['sec13','数据与存档管理'],['sec14','规则更新与解释权']
+],
+sections:[
+{id:'sec1',title:'1. 基础行为规范',paras:[
+'服务器管理组不受理玩家之间普通拆家、偷家、毁基地等私人纠纷，外挂破坏、恶性BUG滥用等违规行为除外。',
+'服务器日志与安全插件，仅用于防御外挂作弊、防护公共设施与玩家领地安全。',
+'严禁一切危害服务器安全、运行稳定、公共利益的行为，违者从重处罚。',
+'全面禁止任何形式的外挂、作弊程序、辅助工具。',
+'全体玩家需文明游玩、友善交流，遵守基础礼仪规范。',
+'严禁传播涉黄、涉黑、涉暴、低俗恶俗等不良信息。',
+'禁止在公共区域跑跳搭。',
+'服务器官方语言为简体/繁体中文，全员交流统一使用汉语。',
+'禁止建造含低俗暗示、违规隐喻、不良导向的建筑。',
+'禁止利用游戏BUG、机制漏洞实施破坏、牟利、扰民等恶性行为。',
+'禁止一切违背双方意愿的强制PVP行为。',
+'所有游戏行为、社交行为必须符合国家法律法规，违法违规行为一律从重处罚。',
+'所有生电、红石设备必须配备独立开关，做到人走机停，杜绝长期空转占用服务器资源。',
+'新建交通设施（冰道、铁路、通道等）不得干扰、占用、破坏已有公共交通线路。',
+'服务器内全面禁止赌博行为，一经发现立刻责令拆除并永久封禁。',
+'玩家产生纠纷、矛盾争议时，禁止情绪化闹事，需冷静沟通或联系管理依规解决。'
+]},
+{id:'sec2',title:'2. 聊天与社交规范',paras:[
+'服务器及社群官方交流语言为中文（简体、繁体通用）。',
+'禁止刻意断章取义、过度解读、歪曲他人发言、故意误导他人。',
+'禁止散布谣言、宗教传教、引流广告、无关推广信息。',
+'严禁发布、传播涉黄、涉暴、涉政、违法违规内容，一经发现永久封禁。',
+'禁止私自向服务器、社群内添加各类机器人、自动脚本、推送程序。'
+]},
+{id:'sec3',title:'3. 建筑与领地保护',paras:[
+'服务器默认无全域建筑保护，未圈地区域建筑损毁风险由玩家自行承担。',
+'玩家可使用圈地系统保护私人建筑，领地范围内禁止一切未经允许的破坏、改动、占用行为，违规可联系管理或通过举报箱申诉。',
+'未进行圈地的建筑、设施、临时建筑，不受服务器保护，除外挂、BUG恶意破坏外，损毁后果由建造者自行承担。',
+'未经领地主许可，禁止在他人领地内建造、改造地形、放置设施、改动结构。',
+'禁止破坏、损毁、改动服务器公共建筑，包含主城、公共传送点、出生点、末地出生点等公共设施。',
+'领地所有者连续30天未登录服务器，该领地自动回收，归属权回归服务器。',
+'领地内非领地成员造成的一切破坏、违规、纠纷问题，由当事人自行承担全部责任。'
+]},
+{id:'sec4',title:'4. 资源采集与环境维护',paras:[
+'禁止在非领地范围内大规模破坏地形，包括掏空山体、大面积填水、大范围铲平地貌等。',
+'禁止在出生点、公共区域进行大规模挖掘、爆破、地形改造。',
+'倡导合理、节制利用资源，避免过度采集造成资源浪费与枯竭。',
+'废弃矿洞、闲置建筑、残留工程设施，建议自行填埋、清理规整。',
+'禁止利用漏洞、机制刷取货币、物资、资源，违者严肃处罚。'
+]},
+{id:'sec5',title:'5. 经济与交易规则',paras:[
+'禁止恶意囤货、控价、哄抬物价、扰乱服务器市场经济秩序，违者从重处理。',
+'严禁利用漏洞刷取金币、物品、资源，一经查实直接封号处理。',
+'系统商店仅作为物资兜底补充渠道，不作为主要获取途径。',
+'玩家私下交易价格由双方自主协商，管理组不介入正常定价，仅干预恶意控价、欺诈行为。',
+'全面禁止现实货币交易（RMB交易），包括物品买卖、金币变现、代练交易等，一经发现永久封禁。',
+'服务器管理组有权不定期调整系统商店物价，玩家如有异议可以通过意见箱反馈。'
+]},
+{id:'sec6',title:'6. PVP与战斗行为',paras:[
+'所有非双方自愿的强制PVP、偷袭、追杀行为一律禁止，违者封号处理。',
+'禁止在主城、出生点等公共安全区域主动发起PVP战斗。',
+'官方活动、赛事期间的PVP规则，以当期活动公告为准。'
+]},
+{id:'sec7',title:'7. 红石与生电设备规范',paras:[
+'服务器开放红石、生电玩法，但所有设备必须控制在合理负载范围内，不得影响服务器运行。',
+'禁止建造高频红石、大面积卡顿装置、占服设备。',
+'长期运行、高负载、大型生电设备，建造前需要提前向管理组报备备案。',
+'废弃、闲置红石设备需要及时拆除，避免占用区块资源。',
+'全部红石、生电设备必须设置可控开关，严格执行人走机停规则。',
+'禁止搭建多核堆叠、多层叠加的超规格生电机器。',
+'服务器自带高频限制机制，高频类红石设备无法正常运行，请勿违规搭建。'
+]},
+{id:'sec8',title:'8. 生物与村民管理',paras:[
+'禁止恶意屠村、批量击杀无辜生物、浪费生物资源。',
+'村民交易、繁殖机制可以在合规范围内合理使用。',
+'禁止在公共区域建造大型刷怪塔、大规模村民繁殖机，特殊需求需要提前报备管理。',
+'禁止利用生物寻路机制、聚集机制恶意造成服务器卡顿。',
+'合理、节制使用各类生物机制，杜绝滥用、恶意堆载。',
+'服务器开启区块清理机制，禁止大批量、密集饲养生物，防止卡顿、吞档。'
+]},
+{id:'sec9',title:'9. 玩家权益与反馈渠道',paras:[
+'玩家对管理处罚、判定结果存在异议，可凭有效证据通过意见箱提交申诉。',
+'玩家合理建议、优化提案可以通过主城意见箱提交，管理组承诺三个工作日内回复处理。',
+'管理组不会无故干涉、限制玩家正常、合规的游戏发展与玩法。',
+'全体玩家享有平等游玩权益，不受管理员或其他玩家的针对、歧视、无端干预。',
+'玩家可以在不违反条约的前提下，自由选择玩法、建设方向与社交方式。',
+'玩家有权知晓自身账号处罚的全部依据、违规事由。',
+'管理组严格保护玩家隐私，绝不公开玩家IP、联系方式等私人信息。',
+'玩家游戏数据仅用于服务器正常运营，绝不向第三方泄露、转交。',
+'违规调查阶段，管理组可依规查阅对应游戏日志与数据，严禁滥用权限。',
+'管理组对所有玩家一视同仁，不存在特殊权限、亲友优待。',
+'管理组内部矛盾、争议判定，由全体管理员共同裁定，保证公开公正。',
+'玩家发现管理员存在违规操作、滥用权限行为，可向其他管理成员举报。',
+'玩家领地范围内的建筑、物品、设施受官方保护，其他人禁止擅自破坏、盗取、改动。',
+'因服务器故障、存档异常造成的数据损失，管理组会尽力修复，但不保证百分百完全恢复。'
+]},
+{id:'sec10',title:'10. 违规处理与处罚制度',paras:[
+'轻微违规：口头警告、书面提醒、临时限制部分权限。',
+'中度违规：清空违规资产、限时封禁账号。',
+'严重违规：永久封禁账号。',
+'作弊、漏洞刷物、恶意破坏等恶性行为，直接处罚、不给予提前警告。',
+'全部处罚记录统一存档，作为后续判定参考依据。'
+]},
+{id:'sec11',title:'11. 服务器管理组职责',paras:[
+'负责规则执行、服务器维护、活动策划、玩家纠纷调解、秩序维护。',
+'秉持公正、公开、透明原则处理全部服务器相关事务。',
+'不参与玩家正常经济竞争，不干预合规玩法与正常游戏发展。',
+'主动接受全体玩家监督，积极回应合理质疑与建议。'
+]},
+{id:'sec12',title:'12. 活动与赛事规则',paras:[
+'各类官方活动、赛事优先遵循当期专属活动规则。',
+'活动内违规玩家直接取消参赛资格与奖励资格，情节严重追加常规处罚。',
+'活动奖励、规则、流程以官方公告为准。',
+'全部活动最终解释权归服务器管理组所有。'
+]},
+{id:'sec13',title:'13. 数据与存档管理',paras:[
+'服务器会定期自动备份存档，但无法保证单个建筑、单件物品精准复原。',
+'因不可抗力、网络故障、设备问题造成的数据丢失，管理组不承担赔偿责任。',
+'服务器大版本更新前会发布公告，最大限度保留原有存档内容。',
+'玩家金币、物品、权限、成就等个人数据，以服务器后台记录作为唯一有效依据。'
+]},
+{id:'sec14',title:'14. 规则更新与解释权',paras:[
+'本条约会跟随服务器发展持续优化、补充、修改。',
+'规则重大修订、增减条款，会提前发布公告通知全体玩家。',
+'小规模文字微调、细节优化，可直接更新不另行通知。',
+'本服务器全部条约的最终解释权归 The Slow Tide 管理组所有。'
+]}
+],
+makeNote:'条约制定说明',
+makers:'参与制定玩家：执又之贤、极岚 及 The Slow Tide 服务器全体参与研讨玩家',
+refNote:'参考来源说明：',
+refs:[
+'1. 参考国内多社区Minecraft服务器成熟管理框架与运营经验；',
+'2. 参考公开服务器规约、玩家手册等公开资料，并结合本服实际情况优化改写；',
+'3. 感谢所有公开参考资料及参与规则完善的玩家与创作者。'
+],
+closing:'本条约目前仍在持续修订中，暂不作为最终正式版本执行，后续将根据实际情况进一步完善。如有建议，欢迎通过主城意见箱反馈。'
+},
+zhTW: {
+treatyTitle:'The Slow Tide 伺服器總條約',
+subTitle:'網易基岩TST山頭',
+intro:[
+'本條約適用於 The Slow Tide 伺服器全體玩家，統一規範伺服器內行為準則、經濟秩序、建築保護、PVP機制、設備使用及違規處罰等全部遊玩相關事宜。',
+'本條約所有條款具備通用性、約束性與權威性。不接受「不知情」「規則未閱讀」「卡規則漏洞」等任何免責理由。無論玩家資歷、伺服器貢獻高低，管理員均有權對違規行為採取警告、權限限制、限時封禁、永久封禁等處置。',
+'針對本條約未明文列舉，但確實擾亂伺服器秩序、破壞公共環境、侵害他人權益的行為，管理組有權根據行為造成的實際影響，做出合理、公正的判定與處罰。',
+'全體玩家在伺服器內及關聯社群的一切行為，必須嚴格遵守《中華人民共和國法律法規》。嚴禁以任何形式詆毀、攻擊、抹黑、誹謗伺服器、管理團隊及其他玩家；嚴禁使用任何技術手段干擾、破壞伺服器正常運行。',
+'本條約將根據伺服器運營狀態動態優化更新。重大規則變更將提前發布官方公告告知全體玩家。凡進入本伺服器遊玩、參與社群交流，即視為已閱讀、理解並自願同意本條約全部內容；若不認可本規則，請勿進入伺服器及相關社群。'
+],
+tocLabel:'目錄（點擊跳轉）',
+toc:[
+['sec1','基礎行為規範'],['sec2','聊天與社交規範'],['sec3','建築與領地保護'],['sec4','資源採集與環境維護'],['sec5','經濟與交易規則'],['sec6','PVP與戰鬥行為'],['sec7','紅石與生電設備規範'],['sec8','生物與村民管理'],['sec9','玩家權益與回饋管道'],['sec10','違規處理與處罰制度'],['sec11','伺服器管理組職責'],['sec12','活動與賽事規則'],['sec13','資料與存檔管理'],['sec14','規則更新與解釋權']
+],
+sections:[
+{id:'sec1',title:'1. 基礎行為規範',paras:[
+'伺服器管理組不受理玩家之間普通拆家、偷家、毀基地等私人糾紛，外掛破壞、惡性BUG濫用等違規行為除外。',
+'伺服器日誌與安全外掛，僅用於防禦外掛作弊、防護公共設施與玩家領地安全。',
+'嚴禁一切危害伺服器安全、運行穩定、公共利益的行為，違者從重處罰。',
+'全面禁止任何形式的外掛、作弊程式、輔助工具。',
+'全體玩家需文明遊玩、友善交流，遵守基礎禮儀規範。',
+'嚴禁傳播涉黃、涉黑、涉暴、低俗惡俗等不良資訊。',
+'禁止在公共區域跑跳搭。',
+'伺服器官方語言為簡體/繁體中文，全員交流統一使用漢語。',
+'禁止建造含低俗暗示、違規隱喻、不良導向的建築。',
+'禁止利用遊戲BUG、機制漏洞實施破壞、牟利、擾民等惡性行為。',
+'禁止一切違背雙方意願的強制PVP行為。',
+'所有遊戲行為、社交行為必須符合國家法律法規，違法違規行為一律從重處罰。',
+'所有生電、紅石設備必須配備獨立開關，做到人走機停，杜絕長期空轉佔用伺服器資源。',
+'新建交通設施（冰道、鐵路、通道等）不得干擾、佔用、破壞已有公共交通線路。',
+'伺服器內全面禁止賭博行為，一經發現立刻責令拆除並永久封禁。',
+'玩家產生糾紛、矛盾爭議時，禁止情緒化鬧事，需冷靜溝通或聯繫管理依規解決。'
+]},
+{id:'sec2',title:'2. 聊天與社交規範',paras:[
+'伺服器及社群官方交流語言為中文（簡體、繁體通用）。',
+'禁止刻意斷章取義、過度解讀、歪曲他人發言、故意誤導他人。',
+'禁止散布謠言、宗教傳教、引流廣告、無關推廣資訊。',
+'嚴禁發布、傳播涉黃、涉暴、涉政、違法違規內容，一經發現永久封禁。',
+'禁止私自向伺服器、社群內添加各類機器人、自動腳本、推播程式。'
+]},
+{id:'sec3',title:'3. 建築與領地保護',paras:[
+'伺服器預設無全域建築保護，未圈地區域建築損毀風險由玩家自行承擔。',
+'玩家可使用圈地系統保護私人建築，領地範圍內禁止一切未經允許的破壞、改動、佔用行為，違規可聯繫管理或透過舉報箱申訴。',
+'未進行圈地的建築、設施、臨時建築，不受伺服器保護，除外掛、BUG惡意破壞外，損毀後果由建造者自行承擔。',
+'未經領地主許可，禁止在他人領地內建造、改造地形、放置設施、改動結構。',
+'禁止破壞、損毀、改動伺服器公共建築，包含主城、公共傳送點、出生點、終界出生點等公共設施。',
+'領地所有者連續30天未登入伺服器，該領地自動回收，歸屬權回歸伺服器。',
+'領地內非領地成員造成的一切破壞、違規、糾紛問題，由當事人自行承擔全部責任。'
+]},
+{id:'sec4',title:'4. 資源採集與環境維護',paras:[
+'禁止在非領地範圍內大規模破壞地形，包括掏空山體、大面積填水、大範圍鏟平地貌等。',
+'禁止在出生點、公共區域進行大規模挖掘、爆破、地形改造。',
+'倡導合理、節制利用資源，避免過度採集造成資源浪費與枯竭。',
+'廢棄礦洞、閒置建築、殘留工程設施，建議自行填埋、清理規整。',
+'禁止利用漏洞、機制刷取貨幣、物資、資源，違者嚴肅處罰。'
+]},
+{id:'sec5',title:'5. 經濟與交易規則',paras:[
+'禁止惡意囤貨、控價、哄抬物價、擾亂伺服器市場經濟秩序，違者從重處理。',
+'嚴禁利用漏洞刷取金幣、物品、資源，一經查實直接封號處理。',
+'系統商店僅作為物資兜底補充管道，不作為主要取得途徑。',
+'玩家私下交易價格由雙方自主協商，管理組不介入正常定價，僅干預惡意控價、詐欺行為。',
+'全面禁止現實貨幣交易（RMB交易），包括物品買賣、金幣變現、代練交易等，一經發現永久封禁。',
+'伺服器管理組有權不定期調整系統商店物價，玩家如有異議可以透過意見箱回饋。'
+]},
+{id:'sec6',title:'6. PVP與戰鬥行為',paras:[
+'所有非雙方自願的強制PVP、偷襲、追殺行為一律禁止，違者封號處理。',
+'禁止在主城、出生點等公共安全區域主動發起PVP戰鬥。',
+'官方活動、賽事期間的PVP規則，以當期活動公告為準。'
+]},
+{id:'sec7',title:'7. 紅石與生電設備規範',paras:[
+'伺服器開放紅石、生電玩法，但所有設備必須控制在合理負載範圍內，不得影響伺服器運行。',
+'禁止建造高頻紅石、大面積卡頓裝置、佔服設備。',
+'長期運行、高負載、大型生電設備，建造前需要提前向管理組報備備案。',
+'廢棄、閒置紅石設備需要及時拆除，避免佔用區塊資源。',
+'全部紅石、生電設備必須設定可控開關，嚴格執行人走機停規則。',
+'禁止搭建多核堆疊、多層疊加的超規格生電機器。',
+'伺服器自帶高頻限制機制，高頻類紅石設備無法正常運行，請勿違規搭建。'
+]},
+{id:'sec8',title:'8. 生物與村民管理',paras:[
+'禁止惡意屠村、批量擊殺無辜生物、浪費生物資源。',
+'村民交易、繁殖機制可以在合規範圍內合理使用。',
+'禁止在公共區域建造大型生怪塔、大規模村民繁殖機，特殊需求需要提前報備管理。',
+'禁止利用生物尋路機制、聚集機制惡意造成伺服器卡頓。',
+'合理、節制使用各類生物機制，杜絕濫用、惡意堆載。',
+'伺服器開啟區塊清理機制，禁止大批量、密集飼養生物，防止卡頓、吞檔。'
+]},
+{id:'sec9',title:'9. 玩家權益與回饋管道',paras:[
+'玩家對管理處罰、判定結果存在異議，可憑有效證據透過意見箱提交申訴。',
+'玩家合理建議、最佳化提案可以透過主城意見箱提交，管理組承諾三個工作日內回覆處理。',
+'管理組不會無故干涉、限制玩家正常、合規的遊戲發展與玩法。',
+'全體玩家享有平等遊玩權益，不受管理員或其他玩家的針對、歧視、無端干預。',
+'玩家可以在不違反條約的前提下，自由選擇玩法、建設方向與社交方式。',
+'玩家有權知曉自身帳號處罰的全部依據、違規事由。',
+'管理組嚴格保護玩家隱私，絕不公開玩家IP、聯絡方式等私人資訊。',
+'玩家遊戲資料僅用於伺服器正常運營，絕不向第三方洩露、轉交。',
+'違規調查階段，管理組可依規查閱對應遊戲日誌與資料，嚴禁濫用權限。',
+'管理組對所有玩家一視同仁，不存在特殊權限、親友優待。',
+'管理組內部矛盾、爭議判定，由全體管理員共同裁定，保證公開公正。',
+'玩家發現管理員存在違規操作、濫用權限行為，可向其他管理成員檢舉。',
+'玩家領地範圍內的建築、物品、設施受官方保護，其他人禁止擅自破壞、盜取、改動。',
+'因伺服器故障、存檔異常造成的資料損失，管理組會盡力修復，但不保證百分百完全恢復。'
+]},
+{id:'sec10',title:'10. 違規處理與處罰制度',paras:[
+'輕微違規：口頭警告、書面提醒、臨時限制部分權限。',
+'中度違規：清空違規資產、限時封禁帳號。',
+'嚴重違規：永久封禁帳號。',
+'作弊、漏洞刷物、惡意破壞等惡性行為，直接處罰、不給予提前警告。',
+'全部處罰記錄統一存檔，作為後續判定參考依據。'
+]},
+{id:'sec11',title:'11. 伺服器管理組職責',paras:[
+'負責規則執行、伺服器維護、活動策劃、玩家糾紛調解、秩序維護。',
+'秉持公正、公開、透明原則處理全部伺服器相關事務。',
+'不參與玩家正常經濟競爭，不干預合規玩法與正常遊戲發展。',
+'主動接受全體玩家監督，積極回應合理質疑與建議。'
+]},
+{id:'sec12',title:'12. 活動與賽事規則',paras:[
+'各類官方活動、賽事優先遵循當期專屬活動規則。',
+'活動內違規玩家直接取消參賽資格與獎勵資格，情節嚴重追加常規處罰。',
+'活動獎勵、規則、流程以官方公告為準。',
+'全部活動最終解釋權歸伺服器管理組所有。'
+]},
+{id:'sec13',title:'13. 資料與存檔管理',paras:[
+'伺服器會定期自動備份存檔，但無法保證單個建築、單件物品精準復原。',
+'因不可抗力、網路故障、裝置問題造成的資料遺失，管理組不承擔賠償責任。',
+'伺服器大版本更新前會發布公告，最大限度保留原有存檔內容。',
+'玩家金幣、物品、權限、成就等個人資料，以伺服器後台記錄作為唯一有效依據。'
+]},
+{id:'sec14',title:'14. 規則更新與解釋權',paras:[
+'本條約會跟隨伺服器發展持續優化、補充、修改。',
+'規則重大修訂、增減條款，會提前發布公告通知全體玩家。',
+'小規模文字微調、細節最佳化，可直接更新不另行通知。',
+'本伺服器全部條約的最終解釋權歸 The Slow Tide 管理組所有。'
+]}
+],
+makeNote:'條約制定說明',
+makers:'參與制定玩家：執又之賢、極嵐 及 The Slow Tide 伺服器全體參與研討玩家',
+refNote:'參考來源說明：',
+refs:[
+'1. 參考國內多社群Minecraft伺服器成熟管理框架與運營經驗；',
+'2. 參考公開伺服器規約、玩家手冊等公開資料，並結合本服實際情況最佳化改寫；',
+'3. 感謝所有公開參考資料及參與規則完善的玩家與創作者。'
+],
+closing:'本條約目前仍在持續修訂中，暫不作為最終正式版本執行，後續將根據實際情況進一步完善。如有建議，歡迎透過主城意見箱回饋。'
+},
+en: {
+treatyTitle:'The Slow Tide Server Master Treaty',
+subTitle:'NetEase Bedrock TST Mountain',
+intro:[
+'This treaty applies to all players of The Slow Tide server, uniformly regulating all gameplay-related matters including in-game conduct, economic order, building protection, PVP mechanics, equipment usage, and violation penalties.',
+'All clauses of this treaty are universal, binding, and authoritative. No excuse — such as "I was unaware", "I did not read the rules", or "exploiting rule loopholes" — is accepted. Regardless of a player\'s seniority or contribution to the server, administrators have the right to take actions including warnings, permission restrictions, temporary bans, and permanent bans against violations.',
+'For behaviors that are not explicitly listed in this treaty but genuinely disrupt server order, damage the public environment, or infringe on the rights of others, the management team has the right to make reasonable and fair judgments and impose penalties based on the actual impact of the behavior.',
+'All players must strictly comply with the laws and regulations of the People\'s Republic of China in all actions within the server and related communities. It is strictly forbidden to defame, attack, smear, or slander the server, the management team, or other players in any form; it is strictly forbidden to use any technical means to interfere with or disrupt the normal operation of the server.',
+'This treaty will be dynamically optimized and updated according to the server\'s operation status. Major rule changes will be announced to all players in advance through official announcements. Anyone who enters the server to play or participates in community communication is deemed to have read, understood, and voluntarily agreed to all contents of this treaty. If you do not accept these rules, please do not enter the server or related communities.'
+],
+tocLabel:'Table of Contents (click to jump)',
+toc:[
+['sec1','Basic Conduct'],['sec2','Chat & Social Norms'],['sec3','Building & Claim Protection'],['sec4','Resource Gathering & Environment'],['sec5','Economy & Trading Rules'],['sec6','PVP & Combat'],['sec7','Redstone & Tech Machines'],['sec8','Mobs & Villagers'],['sec9','Player Rights & Feedback'],['sec10','Violations & Penalties'],['sec11','Server Admin Duties'],['sec12','Events & Tournaments'],['sec13','Data & Backup Management'],['sec14','Rule Updates & Interpretation']
+],
+sections:[
+{id:'sec1',title:'1. Basic Conduct',paras:[
+'The server management team does not handle ordinary private disputes between players, such as raiding bases, stealing from bases, or destroying bases. Exceptions are violations such as destruction caused by hacks or malicious abuse of serious bugs.',
+'Server logs and security plugins are used only to defend against cheating, protect public facilities, and safeguard the security of players\' claims.',
+'Any behavior that endangers server security, operational stability, or public interests is strictly prohibited; offenders will be severely punished.',
+'Any form of hacks, cheat programs, or helper tools is completely prohibited.',
+'All players must play civilly, interact kindly, and follow basic etiquette.',
+'Disseminating obscene, criminal, violent, vulgar, or otherwise harmful information is strictly prohibited.',
+'Running, jumping, and block-pillaring in public areas is prohibited.',
+'The official language of the server is Chinese (both Simplified and Traditional). All players must communicate in Chinese.',
+'Building structures containing vulgar hints, inappropriate metaphors, or negative connotations is prohibited.',
+'Using game bugs or mechanic loopholes for malicious acts such as destruction, profiteering, or harassment is prohibited.',
+'All forced PVP against the will of either party is prohibited.',
+'All in-game and social behavior must comply with national laws and regulations; illegal or non-compliant behavior will always be severely punished.',
+'All tech and redstone machines must be equipped with their own switches, so machines stop when the player leaves, preventing long-term idle operation from consuming server resources.',
+'New transportation facilities (ice highways, railways, tunnels, etc.) must not interfere with, occupy, or damage existing public transportation lines.',
+'Gambling is completely prohibited on the server. Once discovered, it will be ordered to be dismantled immediately and the offender will be permanently banned.',
+'When players have disputes or conflicts, emotional outbursts are prohibited. Players should communicate calmly or contact the management to resolve issues according to the rules.'
+]},
+{id:'sec2',title:'2. Chat & Social Norms',paras:[
+'The official language of the server and its communities is Chinese (both Simplified and Traditional).',
+'Deliberately taking statements out of context, over-interpreting, distorting others\' words, or intentionally misleading others is prohibited.',
+'Spreading rumors, religious proselytizing, traffic-diverting ads, or unrelated promotional information is prohibited.',
+'Publishing or spreading obscene, violent, politically sensitive, or illegal content is strictly prohibited and will result in a permanent ban once discovered.',
+'Adding any robots, automatic scripts, or push programs to the server or its communities without permission is prohibited.'
+]},
+{id:'sec3',title:'3. Building & Claim Protection',paras:[
+'The server has no global building protection by default; players bear the risk of damage to buildings in unclaimed areas.',
+'Players can use the claiming system to protect their private buildings. All unauthorized destruction, modification, or occupation within a claim is prohibited. Violations can be reported to the management or through the complaint box.',
+'Buildings, facilities, and temporary structures that are not claimed are not protected by the server. Except for malicious destruction by hacks or bugs, the builder bears the consequences of any damage.',
+'Without the permission of the claim owner, building, terraforming, placing facilities, or modifying structures within another player\'s claim is prohibited.',
+'Damaging, destroying, or modifying public server buildings is prohibited, including the main city, public teleport points, spawn, the End spawn, and other public facilities.',
+'If a claim owner has not logged into the server for 30 consecutive days, the claim will be automatically reclaimed, and ownership returns to the server.',
+'All destruction, violations, and disputes caused by non-members within a claim are the full responsibility of the persons involved.'
+]},
+{id:'sec4',title:'4. Resource Gathering & Environment',paras:[
+'Large-scale terrain destruction outside claimed areas is prohibited, including hollowing out mountains, large-scale water filling, and large-area flattening of terrain.',
+'Large-scale mining, blasting, and terrain modification at spawn or in public areas are prohibited.',
+'Reasonable and moderate use of resources is encouraged; avoid over-gathering that causes waste and depletion of resources.',
+'It is recommended that abandoned mines, idle buildings, and leftover construction facilities be backfilled and cleaned up properly.',
+'Using loopholes or mechanics to farm currency, items, or resources is prohibited; offenders will be seriously punished.'
+]},
+{id:'sec5',title:'5. Economy & Trading Rules',paras:[
+'Malicious hoarding, price control, price gouging, or disrupting the server\'s market economic order is prohibited; offenders will be severely dealt with.',
+'Using loopholes to farm coins, items, or resources is strictly prohibited; once verified, the account will be banned directly.',
+'The system shop serves only as a supplementary channel for essential goods, not as the main way to obtain them.',
+'Prices in private player-to-player trades are negotiated by both parties. The management team does not intervene in normal pricing, only in malicious price control and fraud.',
+'Real-money transactions (RMB trading) are completely prohibited, including buying and selling items, cashing out coins, and boosting services. Once discovered, a permanent ban will be issued.',
+'The management team reserves the right to adjust system shop prices from time to time. Players with objections can provide feedback through the suggestion box.'
+]},
+{id:'sec6',title:'6. PVP & Combat',paras:[
+'All forced PVP, sneak attacks, and hunting down players that are not mutually voluntary are prohibited; offenders will be banned.',
+'Initiating PVP combat in public safe areas such as the main city and spawn is prohibited.',
+'PVP rules during official events and tournaments follow the announcements of the current event.'
+]},
+{id:'sec7',title:'7. Redstone & Tech Machines',paras:[
+'The server allows redstone and tech gameplay, but all machines must be kept within a reasonable load and must not affect server performance.',
+'Building high-frequency redstone, large lag machines, or server-consuming devices is prohibited.',
+'Long-running, high-load, or large-scale tech machines must be reported and registered with the management team before construction.',
+'Abandoned or idle redstone devices must be removed promptly to avoid occupying chunk resources.',
+'All redstone and tech machines must have controllable switches and strictly follow the rule of stopping machines when the player leaves.',
+'Building over-spec tech machines with multi-core stacking or multi-layer stacking is prohibited.',
+'The server has a built-in high-frequency limit mechanism; high-frequency redstone devices cannot run normally. Please do not build them in violation.'
+]},
+{id:'sec8',title:'8. Mobs & Villagers',paras:[
+'Maliciously raiding villages, mass-killing innocent mobs, and wasting mob resources are prohibited.',
+'Villager trading and breeding mechanics may be used reasonably within compliant limits.',
+'Building large mob farms or mass villager breeding machines in public areas is prohibited; special needs must be reported to the management in advance.',
+'Using mob pathfinding or grouping mechanics to maliciously cause server lag is prohibited.',
+'Use mob mechanics reasonably and moderately; avoid abuse and malicious overloading.',
+'The server has a chunk-clearing mechanism; mass and dense mob breeding is prohibited to prevent lag and save corruption.'
+]},
+{id:'sec9',title:'9. Player Rights & Feedback',paras:[
+'Players who dispute management penalties or judgments can submit an appeal with valid evidence through the suggestion box.',
+'Reasonable suggestions and optimization proposals can be submitted through the main city suggestion box. The management team promises to respond within three working days.',
+'The management team will not interfere with or restrict players\' normal, compliant game development and gameplay without reason.',
+'All players enjoy equal gameplay rights and shall not be targeted, discriminated against, or unduly interfered with by administrators or other players.',
+'Players may freely choose their gameplay, building direction, and social style without violating the treaty.',
+'Players have the right to know all the evidence for their account\'s punishment and the reasons for the violation.',
+'The management team strictly protects player privacy and will never disclose private information such as IP addresses or contact details.',
+'Player game data is used only for the normal operation of the server and will never be leaked or transferred to third parties.',
+'During violation investigations, the management team may review the relevant game logs and data in accordance with the rules; abusing this authority is strictly prohibited.',
+'The management team treats all players equally; there are no special privileges or favoritism toward friends and relatives.',
+'Internal management disputes and contested judgments are decided jointly by all administrators to ensure fairness and transparency.',
+'Players who discover administrators engaging in violations or abusing authority can report them to other management members.',
+'Buildings, items, and facilities within a player\'s claim are officially protected; others are prohibited from destroying, stealing, or modifying them without permission.',
+'For data loss caused by server failures or save anomalies, the management team will try its best to restore the data but does not guarantee complete recovery.'
+]},
+{id:'sec10',title:'10. Violations & Penalties',paras:[
+'Minor violations: verbal warning, written reminder, or temporary restriction of certain permissions.',
+'Moderate violations: clearing the offending assets or a time-limited account ban.',
+'Serious violations: permanent account ban.',
+'Malicious acts such as cheating, farming items through loopholes, and malicious destruction are punished directly without prior warning.',
+'All penalty records are archived uniformly and serve as reference for subsequent judgments.'
+]},
+{id:'sec11',title:'11. Server Admin Duties',paras:[
+'Responsible for rule enforcement, server maintenance, event planning, player dispute mediation, and order maintenance.',
+'Handle all server-related matters with the principles of fairness, openness, and transparency.',
+'Do not participate in players\' normal economic competition, and do not interfere with compliant gameplay or normal game development.',
+'Proactively accept supervision from all players and respond positively to reasonable questions and suggestions.'
+]},
+{id:'sec12',title:'12. Events & Tournaments',paras:[
+'Official events and tournaments follow the dedicated rules of the current event first.',
+'Players who violate rules during an event will be directly disqualified from participation and rewards; serious cases will incur additional regular penalties.',
+'Event rewards, rules, and procedures are subject to official announcements.',
+'The server management team holds the final interpretation right for all events.'
+]},
+{id:'sec13',title:'13. Data & Backup Management',paras:[
+'The server regularly backs up saves automatically, but cannot guarantee precise restoration of a single building or item.',
+'The management team is not liable for data loss caused by force majeure, network failures, or device issues.',
+'Announcements will be released before major server version updates, preserving existing save content to the greatest extent.',
+'Personal data such as player coins, items, permissions, and achievements are subject to the server\'s backend records as the only valid basis.'
+]},
+{id:'sec14',title:'14. Rule Updates & Interpretation',paras:[
+'This treaty will continue to be optimized, supplemented, and revised as the server develops.',
+'Major rule revisions and additions or removals of clauses will be announced to all players in advance.',
+'Small text adjustments and detail optimizations can be updated directly without separate notice.',
+'The final interpretation right of all rules on this server belongs to The Slow Tide management team.'
+]}
+],
+makeNote:'Notes on the Making of the Treaty',
+makers:'Players involved in drafting: 执又之贤, 极岚, and all players of The Slow Tide server who participated in the discussion',
+refNote:'References:',
+refs:[
+'1. Referenced mature management frameworks and operational experience from multiple Minecraft server communities in China;',
+'2. Referenced public server rules, player handbooks, and other public materials, adapted and optimized for this server\'s actual situation;',
+'3. Thanks to all public reference materials and the players and creators who helped improve the rules.'
+],
+closing:'This treaty is still under continuous revision and is not yet enforced as a final official version. It will be further improved according to actual conditions in the future. If you have suggestions, please provide feedback through the main city suggestion box.'
+}
+};
+
+// ============================================================
+// 状态
+// ============================================================
+const root=document.documentElement;
+let lang=localStorage.getItem('tst-lang')||'zhCN';
+
+function t(key){
+  const d=I18N[lang];
+  return d[key]!=null?d[key]:'';
+}
+
+// ============================================================
+// 主题三态
+// ============================================================
+function themeState(){ return localStorage.getItem('tst-theme')||'system'; }
+function applyTheme(){
+  const mode=themeState();
+  let dark;
+  if(mode==='system'){ dark=window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  else{ dark=(mode==='dark'); }
+  root.classList.toggle('dark',dark);
+}
+function syncSettingsUI(){
+  const mode=themeState();
+  document.querySelectorAll('.seg-btn[data-theme]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.theme===mode);
+  });
+  document.querySelectorAll('.seg-btn[data-lang]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.lang===lang);
+  });
+}
+
+// ============================================================
+// 语言应用
+// ============================================================
+function renderRules(){
+  const R=RULES[lang];
+  const dom=document.getElementById('ruleContent');
+  let html='';
+  html+='<div class="rule-section" id="u-rule-head" data-unit>';
+  html+='<h3>'+R.treatyTitle+'</h3>';
+  html+='<p>'+R.subTitle+'</p>';
+  for(const p of R.intro){ html+='<p>'+p+'</p>'; }
+  html+='<p><strong>'+R.tocLabel+'</strong></p>';
+  html+='<ul id="ruleToc">';
+  for(const item of R.toc){ html+='<li><a href="#'+item[0]+'">'+item[1]+'</a></li>'; }
+  html+='</ul>';
+  html+='</div>';
+  for(const sec of R.sections){
+    html+='<div class="rule-section" id="'+sec.id+'" data-unit><h3>'+sec.title+'</h3>';
+    for(const p of sec.paras){ html+='<p>'+p+'</p>'; }
+    html+='</div>';
+  }
+  html+='<div class="rule-section" id="u-rule-notes" data-unit>';
+  html+='<p><strong>'+R.makeNote+'</strong></p>';
+  html+='<p>'+R.makers+'</p>';
+  html+='<p><br><strong>'+R.refNote+'</strong></p>';
+  for(const r of R.refs){ html+='<p>'+r+'</p>'; }
+  html+='<p>'+R.closing+'</p>';
+  html+='</div>';
+  dom.innerHTML=html;
+}
+
+function applyLang(){
+  const d=I18N[lang];
+  document.documentElement.lang = lang==='en'?'en':'zh';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(d[k]!=null){ el.textContent=d[k]; }
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+    const k=el.getAttribute('data-i18n-ph');
+    if(d[k]!=null){ el.setAttribute('placeholder',d[k]); }
+  });
+  // 清空搜索提示条，避免残留旧语言文案
+  document.getElementById('globalTip').textContent='';
+  document.getElementById('ruleTip').textContent='';
+  clearHighlight();
+  hideResults();
+  renderRules();
+  buildSuggestPool();
+  syncSettingsUI();
+  updateTime();
+  // 更新文档标题
+  document.title = lang==='zhCN'?'The Slow Tide官网':lang==='zhTW'?'The Slow Tide官網':'The Slow Tide Official Website';
+}
+
+// ============================================================
+// 页面切换
+// ============================================================
 const navBtns=document.querySelectorAll('.nav-item button');
 const pages=document.querySelectorAll('.page');
-navBtns.forEach(btn=>{
-btn.onclick=()=>{
-const pid=btn.dataset.page;
-pages.forEach(p=>p.classList.remove('active'));
-document.getElementById(pid).classList.add('active');
+function switchPage(pid){
+  pages.forEach(p=>p.classList.remove('active'));
+  const target=document.getElementById(pid);
+  if(target){ target.classList.add('active'); }
 }
+navBtns.forEach(btn=>{
+  btn.onclick=()=>switchPage(btn.dataset.page);
 });
 
-//轮播逻辑，悬停暂停，页面隐藏暂停
+// ============================================================
+// 轮播（悬停暂停、页面隐藏暂停）
+// ============================================================
 const adSlider=document.getElementById('adSlider');
 const adWrap=document.getElementById('adWrap');
 const slides=Array.from(adSlider.querySelectorAll('.slide-item'));
 const slideDots=document.getElementById('slideDots');
 let curSlide=0;
 let slideTimer=null;
-
 slides.forEach((_,idx)=>{
-const d=document.createElement('div');
-d.className='dot'+(idx===0?' active':'');
-d.onclick=()=>goSlide(idx);
-slideDots.appendChild(d);
+  const d=document.createElement('div');
+  d.className='dot'+(idx===0?' active':'');
+  d.onclick=()=>goSlide(idx);
+  slideDots.appendChild(d);
 });
 const dotsAll=Array.from(slideDots.querySelectorAll('.dot'));
-
 function goSlide(idx){
-curSlide=idx;
-const targetLeft=slides[idx].getBoundingClientRect().left - adSlider.getBoundingClientRect().left + adSlider.scrollLeft;
-adSlider.scrollTo({left:targetLeft,behavior:'smooth'});
-dotsAll.forEach((d,i)=>d.classList.toggle('active',i===idx));
+  curSlide=idx;
+  const targetLeft=slides[idx].getBoundingClientRect().left - adSlider.getBoundingClientRect().left + adSlider.scrollLeft;
+  adSlider.scrollTo({left:targetLeft,behavior:'smooth'});
+  dotsAll.forEach((d,i)=>d.classList.toggle('active',i===idx));
 }
-function autoSlide(){
-curSlide=(curSlide+1)%slides.length;
-goSlide(curSlide);
-}
-function startTimer(){
-slideTimer=setInterval(autoSlide,4500);
-}
-function stopTimer(){
-clearInterval(slideTimer);
-}
+function autoSlide(){ curSlide=(curSlide+1)%slides.length; goSlide(curSlide); }
+function startTimer(){ slideTimer=setInterval(autoSlide,4500); }
+function stopTimer(){ clearInterval(slideTimer); }
 startTimer();
 adWrap.addEventListener('mouseenter',stopTimer);
 adWrap.addEventListener('mouseleave',startTimer);
 document.addEventListener('visibilitychange',()=>{
-if(document.hidden) stopTimer();
-else startTimer();
+  if(document.hidden){ stopTimer(); } else { startTimer(); }
 });
 
-//时间
+// ============================================================
+// 时间
+// ============================================================
 const bjTimeDom=document.getElementById('bjTime');
 const runTimeDom=document.getElementById('runTime');
 const serverStart=new Date('2026-06-30T00:00:00');
 const offsetMs=120*1000;
+function timeFmt(d,h,m,s){
+  if(lang==='en'){ return d+'d '+h+'h '+m+'m '+s+'s'; }
+  if(lang==='zhTW'){ return d+'天 '+h+'時 '+m+'分 '+s+'秒'; }
+  return d+'天 '+h+'时 '+m+'分 '+s+'秒';
+}
+function timeLocale(){
+  if(lang==='en'){ return 'en-US'; }
+  if(lang==='zhTW'){ return 'zh-TW'; }
+  return 'zh-CN';
+}
 function updateTime(){
-const now=new Date();
-bjTimeDom.innerText=now.toLocaleString('zh-CN');
-const diff=now.getTime() - serverStart.getTime() + offsetMs;
-const day=Math.floor(diff/(1000*60*60*24));
-const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-const m=Math.floor((diff%(1000*60*60))/(1000*60));
-const s=Math.floor((diff%(1000*60))/1000);
-runTimeDom.innerText=`${day}天 ${h}时 ${m}分 ${s}秒`;
+  const now=new Date();
+  bjTimeDom.innerText=now.toLocaleString(timeLocale());
+  const diff=now.getTime() - serverStart.getTime() + offsetMs;
+  const day=Math.floor(diff/(1000*60*60*24));
+  const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+  const m=Math.floor((diff%(1000*60*60))/(1000*60));
+  const s=Math.floor((diff%(1000*60))/1000);
+  runTimeDom.innerText=timeFmt(day,h,m,s);
 }
 setInterval(updateTime,1000);
 updateTime();
 
-//复制服务器地址，只复制一次
+// ============================================================
+// 复制地址（降级到选中文本）
+// ============================================================
 const copyAddrBtn=document.getElementById('copyAddrBtn');
 let copyFlag=false;
-copyAddrBtn.onclick=async ()=>{
-if(copyFlag)return;
-copyFlag=true;
-try{
-await navigator.clipboard.writeText(document.getElementById('serverAddr').innerText);
-alert('服务器地址已复制');
-}catch(e){alert('复制失败，请手动复制');}
-setTimeout(()=>{copyFlag=false;},1500);
+copyAddrBtn.onclick=async()=>{
+  if(copyFlag){ return; }
+  copyFlag=true;
+  const addr=document.getElementById('serverAddr').innerText;
+  try{
+    await navigator.clipboard.writeText(addr);
+    alert(t('copied'));
+  }catch(e){
+    // 降级：选择文本
+    try{
+      const range=document.createRange();
+      range.selectNodeContents(document.getElementById('serverAddr'));
+      const sel=window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      alert(t('copied'));
+    }catch(e2){
+      alert(t('copyFail'));
+    }
+  }
+  setTimeout(()=>{ copyFlag=false; },1500);
 };
 
-//QQ群跳转
+// QQ群跳转
 document.getElementById('openQQGroup').onclick=()=>{
-window.location.href='mqqapi://card/show_pslcard?src_type=internal&version=1&card_type=group&uin=833470853';
+  window.location.href='mqqapi://card/show_pslcard?src_type=internal&version=1&card_type=group&uin=833470853';
 };
 
-//玩家公约目录锚点修复
+// ============================================================
+// 公约锚点（事件委托，i18n重渲染后依然有效）
+// ============================================================
 const ruleScrollDom=document.getElementById('ruleScrollDom');
-document.querySelectorAll('#ruleToc a').forEach(a=>{
-a.onclick=(e)=>{
-e.preventDefault();
-const tid=a.getAttribute('href').substring(1);
-const tar=document.getElementById(tid);
-if(!tar)return;
-const targetTop=tar.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
-ruleScrollDom.scrollTo({top:targetTop -16, behavior:'smooth'});
+function scrollToSec(id){
+  const tar=document.getElementById(id);
+  if(!tar){ return; }
+  const targetTop=tar.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
+  ruleScrollDom.scrollTo({top:targetTop-16,behavior:'smooth'});
 }
+document.addEventListener('click',(e)=>{
+  const a=e.target.closest('#ruleToc a');
+  if(a){
+    e.preventDefault();
+    scrollToSec(a.getAttribute('href').substring(1));
+  }
 });
 
-//公约搜索按钮
-const ruleSearchInput=document.getElementById('ruleSearchInput');
-const ruleSearchBtn=document.getElementById('ruleSearchBtn');
-const ruleTip=document.getElementById('ruleTip');
-ruleSearchBtn.onclick=()=>{
-ruleTip.innerText='';
-const kw=ruleSearchInput.value.trim();
-if(!kw){
-ruleTip.innerText='请输入搜索关键词';
-return;
+// ============================================================
+// 搜索
+// ============================================================
+function doRuleSearch(kw){
+  const tip=document.getElementById('ruleTip');
+  tip.textContent='';
+  kw=kw.trim();
+  if(!kw){ tip.textContent=t('tip_input_kw'); return; }
+  const kwLow=kw.toLowerCase();
+  const sections=document.querySelectorAll('.rule-section');
+  let found=false;
+  for(const sec of sections){
+    if(sec.innerText.toLowerCase().includes(kwLow)){
+      scrollToSec(sec.id);
+      tip.textContent=t('tip_found').replace('{kw}',kw);
+      found=true;
+      break;
+    }
+  }
+  if(!found){ tip.textContent=t('tip_not_found_rule'); }
 }
-const kwLow=kw.toLowerCase();
-const sections=document.querySelectorAll('.rule-section');
-let found=false;
-for(let sec of sections){
-const txt=sec.innerText.toLowerCase();
-if(txt.includes(kwLow)){
-const targetTop=sec.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
-ruleScrollDom.scrollTo({top:targetTop-16,behavior:'smooth'});
-ruleTip.innerText=`已定位关键词：${kw}`;
-found=true;
-break;
+// ============================================================
+// 全站搜索（首页/公告/赛事/兑换码/赞助/玩家公约）
+// ============================================================
+function searchUnits(){
+  const units=[];
+  const pids=['home','notice','event','cdkey','sponsor','rule'];
+  for(const pid of pids){
+    const page=document.getElementById(pid);
+    if(!page){ continue; }
+    // 页面标题作为独立单元，让"公告/兑换码"等页名可被搜到
+    const h2=page.querySelector(':scope > h2');
+    if(h2){ units.push({page:pid, el:h2, text:h2.innerText, title:true}); }
+    page.querySelectorAll('[data-unit]').forEach(el=>{
+      units.push({page:pid, el:el, text:el.innerText});
+    });
+  }
+  return units;
 }
+function clearHighlight(){
+  document.querySelectorAll('mark').forEach(m=>{
+    const t=document.createTextNode(m.textContent);
+    m.parentNode.replaceChild(t,m);
+  });
+  document.querySelectorAll('.search-flash').forEach(el=>el.classList.remove('search-flash'));
 }
-if(!found){
-ruleTip.innerText='未在公约中找到匹配关键词';
+function highlightIn(el, kwLow){
+  const walker=document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+  const nodes=[];
+  while(walker.nextNode()){
+    const n=walker.currentNode;
+    if(n.nodeValue && n.nodeValue.toLowerCase().includes(kwLow)){ nodes.push(n); }
+  }
+  nodes.forEach(n=>{
+    const frag=document.createDocumentFragment();
+    let rest=n.nodeValue;
+    let low=rest.toLowerCase();
+    let idx=low.indexOf(kwLow);
+    while(idx!==-1){
+      frag.appendChild(document.createTextNode(rest.slice(0,idx)));
+      const mk=document.createElement('mark');
+      mk.textContent=rest.slice(idx, idx+kwLow.length);
+      frag.appendChild(mk);
+      rest=rest.slice(idx+kwLow.length);
+      low=rest.toLowerCase();
+      idx=low.indexOf(kwLow);
+    }
+    frag.appendChild(document.createTextNode(rest));
+    n.parentNode.replaceChild(frag,n);
+  });
+  el.classList.add('search-flash');
+  setTimeout(()=>{ if(el){ el.classList.remove('search-flash'); } },1800);
 }
+function goToUnit(unit, kw){
+  clearHighlight();
+  switchPage(unit.page);
+  const kwLow=kw.toLowerCase();
+  requestAnimationFrame(()=>{
+    if(unit.page==='rule'){ scrollToSec(unit.el.id); }
+    else { unit.el.scrollIntoView({behavior:'smooth', block:'center'}); }
+    highlightIn(unit.el, kwLow);
+  });
+  hideResults();
+}
+function snippet(text, kwLow){
+  const idx=text.toLowerCase().indexOf(kwLow);
+  if(idx<0){ return text.slice(0,60); }
+  const start=Math.max(0, idx-18);
+  const end=Math.min(text.length, idx+kwLow.length+42);
+  return (start>0?'…':'')+text.slice(start,end)+(end<text.length?'…':'');
+}
+function renderResults(matches, kw){
+  const box=document.getElementById('globalResults');
+  box.innerHTML='';
+  const head=document.createElement('div');
+  head.className='results-head';
+  head.textContent=t('found_many').replace('{n}',matches.length).replace('{kw}',kw);
+  box.appendChild(head);
+  const kwLow=kw.toLowerCase();
+  matches.forEach(m=>{
+    const row=document.createElement('div');
+    row.className='result-item';
+    const badge=document.createElement('span');
+    badge.className='result-badge';
+    badge.textContent=I18N[lang]['nav_'+m.page]||m.page;
+    const snip=document.createElement('span');
+    snip.className='result-snip';
+    snip.textContent=snippet(m.text, kwLow);
+    row.appendChild(badge);
+    row.appendChild(snip);
+    row.onclick=()=>goToUnit(m, kw);
+    box.appendChild(row);
+  });
+  box.classList.add('show');
+}
+function hideResults(){
+  const box=document.getElementById('globalResults');
+  box.classList.remove('show');
+  box.innerHTML='';
+}
+function doGlobalSearch(kw){
+  const tip=document.getElementById('globalTip');
+  tip.textContent='';
+  hideResults();
+  kw=kw.trim();
+  if(!kw){ tip.textContent=t('tip_input_kw'); return; }
+  const kwLow=kw.toLowerCase();
+  const units=searchUnits();
+  const matches=units.filter(u=>u.text.toLowerCase().includes(kwLow));
+  if(!matches.length){ tip.textContent=t('tip_not_found_site'); return; }
+  if(matches.length===1){
+    goToUnit(matches[0], kw);
+    tip.textContent=t('tip_found').replace('{kw}',kw);
+    return;
+  }
+  renderResults(matches, kw);
+}
+document.getElementById('globalSearchBtn').onclick=()=>{
+  doGlobalSearch(document.getElementById('globalSearchInput').value);
 };
+document.getElementById('globalSearchInput').addEventListener('input',()=>{
+  hideResults();
+});
+document.getElementById('ruleSearchBtn').onclick=()=>{
+  doRuleSearch(document.getElementById('ruleSearchInput').value);
+};
+// 输入框回车触发
+document.getElementById('globalSearchInput').addEventListener('keydown',(e)=>{
+  if(e.key==='Enter' && !suggestOpen('globalSuggest')){ doGlobalSearch(e.target.value); }
+});
+document.getElementById('ruleSearchInput').addEventListener('keydown',(e)=>{
+  if(e.key==='Enter' && !suggestOpen('ruleSuggest')){ doRuleSearch(e.target.value); }
+});
 
-//全局搜索按钮
-const globalSearchInput=document.getElementById('globalSearchInput');
-const globalSearchBtn=document.getElementById('globalSearchBtn');
-const globalTip=document.getElementById('globalTip');
-globalSearchBtn.onclick=()=>{
-globalTip.innerText='';
-const kw=globalSearchInput.value.trim();
-if(!kw){
-globalTip.innerText='请输入搜索关键词';
-return;
+// ============================================================
+// 搜索联想（百度式）
+// ============================================================
+let suggestPool=[];
+function buildSuggestPool(){
+  const d=I18N[lang];
+  const pool=[];
+  // 页面名
+  pool.push(d.nav_home,d.nav_notice,d.nav_event,d.nav_cdkey,d.nav_sponsor,d.nav_rule);
+  // 常用搜索意图
+  const sugKeys=['sug_address','sug_qq','sug_cdkey','sug_sponsor','sug_rules','sug_pvp','sug_redstone','sug_tech','sug_build','sug_claim','sug_economy','sug_trade','sug_villager','sug_cheat','sug_gamble','sug_event','sug_runtime','sug_status'];
+  for(const k of sugKeys){ if(d[k]) pool.push(d[k]); }
+  // 公约各章节标题
+  for(const sec of RULES[lang].sections){ pool.push(sec.title); }
+  suggestPool=[...new Set(pool)];
 }
-const kwLow=kw.toLowerCase();
-document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-document.getElementById('rule').classList.add('active');
-ruleSearchInput.value=kw;
-const sections=document.querySelectorAll('.rule-section');
-let found=false;
-for(let sec of sections){
-const txt=sec.innerText.toLowerCase();
-if(txt.includes(kwLow)){
-const targetTop=sec.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
-ruleScrollDom.scrollTo({top:targetTop-16,behavior:'smooth'});
-globalTip.innerText=`已定位关键词：${kw}`;
-found=true;
-break;
+function getSuggestions(kwLow){
+  return suggestPool.filter(x=>x.toLowerCase().includes(kwLow)).slice(0,8);
 }
+function getDefaultSuggestions(){
+  const d=I18N[lang];
+  const defaults=[d.sug_address,d.sug_qq,d.sug_rules,d.sug_cdkey,d.sug_sponsor,d.sug_pvp];
+  return defaults.filter(Boolean);
 }
-if(!found){
-globalTip.innerText='网站内未检索到该关键词';
+function suggestOpen(boxId){
+  const box=document.getElementById(boxId);
+  return box.classList.contains('show');
 }
+// 绑定联想框（每个搜索输入框独立）
+function initSuggest(inputId,boxId,runSearch){
+  const input=document.getElementById(inputId);
+  const box=document.getElementById(boxId);
+  let active=-1;
+  function close(){ box.innerHTML=''; box.classList.remove('show'); active=-1; }
+  function render(items){
+    box.innerHTML='';
+    items.forEach((it,i)=>{
+      const div=document.createElement('div');
+      div.className='suggest-item';
+      div.textContent=it;
+      div.onmouseenter=()=>setActive(i);
+      div.onclick=()=>{ input.value=it; close(); runSearch(it); };
+      box.appendChild(div);
+    });
+    box.classList.add('show');
+    active=-1;
+  }
+  function setActive(i){
+    active=i;
+    Array.from(box.children).forEach((c,idx)=>c.classList.toggle('active',idx===i));
+    const el=box.children[i];
+    if(el){ el.scrollIntoView({block:'nearest'}); }
+  }
+  input.addEventListener('focus',()=>{
+    const kw=input.value.trim();
+    if(!kw){ render(getDefaultSuggestions()); }
+  });
+  input.addEventListener('input',()=>{
+    const kw=input.value.trim();
+    if(!kw){ render(getDefaultSuggestions()); return; }
+    const kwLow=kw.toLowerCase();
+    const items=getSuggestions(kwLow);
+    if(!items.length){ close(); return; }
+    render(items);
+  });
+  input.addEventListener('keydown',(e)=>{
+    if(!box.classList.contains('show') || !box.children.length){ return; }
+    const n=box.children.length;
+    if(e.key==='ArrowDown'){ e.preventDefault(); setActive((active+1)%n); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); setActive((active-1+n)%n); }
+    else if(e.key==='Enter'){
+      if(active>=0 && box.children[active]){
+        e.preventDefault();
+        const it=box.children[active].textContent;
+        input.value=it;
+        close();
+        runSearch(it);
+      }
+    } else if(e.key==='Escape'){ close(); }
+  });
+  document.addEventListener('click',(e)=>{
+    if(!e.target.closest('.search-row') && !e.target.closest('.rule-search-row')){
+      close();
+    }
+  });
+  return {close};
+}
+initSuggest('globalSearchInput','globalSuggest',(kw)=>doGlobalSearch(kw));
+initSuggest('ruleSearchInput','ruleSuggest',(kw)=>doRuleSearch(kw));
+
+// ============================================================
+// 设置面板
+// ============================================================
+const settingsBtn=document.getElementById('settingsBtn');
+const settingsPanel=document.getElementById('settingsPanel');
+settingsBtn.onclick=(e)=>{
+  e.stopPropagation();
+  settingsPanel.classList.toggle('open');
 };
+document.addEventListener('click',(e)=>{
+  if(!e.target.closest('.settings-panel') && !e.target.closest('#settingsBtn')){
+    settingsPanel.classList.remove('open');
+  }
+});
+document.querySelectorAll('.seg-btn[data-theme]').forEach(b=>{
+  b.onclick=()=>{
+    localStorage.setItem('tst-theme',b.dataset.theme);
+    applyTheme();
+    syncSettingsUI();
+  };
+});
+document.querySelectorAll('.seg-btn[data-lang]').forEach(b=>{
+  b.onclick=()=>{
+    lang=b.dataset.lang;
+    localStorage.setItem('tst-lang',lang);
+    applyLang();
+  };
+});
+// 系统主题变化时，跟随系统模式下实时响应
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{
+  if(themeState()==='system'){ applyTheme(); }
+});
+
+// ============================================================
+// 初始化
+// ============================================================
+applyTheme();
+applyLang();
+buildSuggestPool();
+syncSettingsUI();
 </script>
 </body>
 </html>
