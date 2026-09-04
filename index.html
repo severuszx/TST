@@ -9,409 +9,655 @@
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{--bg:#ffffff;--text:#333333;--text-secondary:#666666;--border:#e5e7eb;--card-bg:#f5f5f5;--hover-bg:#e9e9e9;--primary:#333333;}
-.dark{--bg:#0f0f11;--text:#eeeeee;--text-secondary:#aaaaaa;--border:#27272a;--card-bg:#1c1c1f;--hover-bg:#2e2e32;}
-body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;transition:background 0.3s,color 0.3s;}
-.page-hidden{display:none !important;}
-a,button{font-family:inherit;}
-button{cursor:pointer;border:none;}
-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
-.dark header{background:rgba(15,15,17,0.9);}
-.header-inner{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;}
-.header-title{font-size:20px;font-weight:bold;}
-.nav-group{display:flex;flex-wrap:wrap;gap:4px 8px;}
-.navBtn{padding:8px 12px;border-radius:6px;background:transparent;color:var(--text);}
-.navBtn.active{background:var(--card-bg);}
-.navBtn:hover{background:var(--hover-bg);}
-.theme-toggle{padding:8px;border-radius:6px;background:transparent;color:var(--text);}
-.theme-toggle:hover{background:var(--hover-bg);}
-.dark-hide{}
-.dark-show{display:none;}
-.dark .dark-hide{display:none;}
-.dark .dark-show{display:inline;}
-main{max-width:1200px;margin:0 auto;padding:24px 16px;}
-.ad-wrap{position:relative;border-radius:12px;overflow:hidden;margin-bottom:32px;}
-.ad-slider{position:relative;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;height:220px;}
-@media(min-width:768px){.ad-slider{height:300px;}}
-.ad-slider::-webkit-scrollbar{height:4px;}
-.ad-slider::-webkit-scrollbar-thumb{background:#ccc;border-radius:99px;}
-.dark .ad-slider::-webkit-scrollbar-thumb{background:#444;}
-.ad-slide{flex:0 0 100%;scroll-snap-align:start;position:relative;}
-.ad-slide img{width:100%;height:100%;object-fit:cover;}
-.ad-slide-text{position:absolute;inset:0;background:rgba(0,0,0,0.55);color:white;display:flex;flex-direction:column;justify-content:center;padding:0 32px;}
-.ad-slide-text h2{font-size:24px;}
-@media(min-width:768px){.ad-slide-text h2{font-size:36px;}}
-.ad-slide-text p{margin-top:8px;color:#ddd;}
-.ad-arrow{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.4);color:white;font-size:18px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;}
-.ad-wrap:hover .ad-arrow{opacity:1;}
-.ad-arrow:hover{background:rgba(0,0,0,0.6);}
-#adPrev{left:12px;}
-#adNext{right:12px;}
-.ad-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;}
-.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.4);}
-.dot.active{background:#ffffff;}
-.grid-2col{display:grid;grid-template-columns:1fr;gap:24px;}
-@media(min-width:768px){.grid-2col{grid-template-columns:2fr 1fr;}}
-.card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:24px;}
-.card h3{font-size:20px;margin-bottom:16px;}
-.form-item{margin-bottom:20px;}
-.form-item label{font-size:14px;color:var(--text-secondary);display:block;margin-bottom:6px;}
-.copy-btn{width:100%;text-align:left;padding:12px 16px;border-radius:8px;background:var(--bg);border:1px solid var(--border);color:var(--text);}
-.copy-btn:hover{background:var(--hover-bg);}
-.small-card{padding:20px;}
-.mono{font-family:Consolas,Monaco,monospace;}
-.goto-btn{width:100%;padding:8px;border-radius:6px;background:var(--hover-bg);color:var(--text);}
-.goto-btn:hover{opacity:0.85;}
-.rule-wrap{display:grid;grid-template-columns:1fr;}
-@media(min-width:768px){.rule-wrap{grid-template-columns:1fr 3fr;}}
-.rule-sidebar{padding:16px;border-right:1px solid var(--border);}
-.toc-item{font-size:14px;color:var(--text-secondary);cursor:pointer;margin:4px 0;}
-.toc-item:hover{text-decoration:underline;}
-#ruleScrollBox{padding:24px;max-height:70vh;overflow-y:auto;font-size:14px;line-height:1.7;}
-#ruleScrollBox p{margin-bottom:12px;}
-#backTop{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:#444;color:white;display:flex;align-items:center;justify-content:center;z-index:99;}
-.dark #backTop{background:#2e2e32;}
-footer{margin-top:56px;padding:24px 0;border-top:1px solid var(--border);text-align:center;font-size:14px;color:var(--text-secondary);}
-.icon-moon::before{content:"🌙";}
-.icon-sun::before{content:"☀️";}
-.icon-left::before{content:"‹";font-size:22px;}
-.icon-right::before{content:"›";font-size:22px;}
-.icon-up::before{content:"↑";font-size:18px;}
+:root{
+    --bg:#ffffff;
+    --text:#333333;
+    --text-secondary:#666666;
+    --border:#e5e7eb;
+    --card-bg:#f7f7f7;
+    --hover-bg:#ececec;
+    --primary:#444444;
+    --accent:#555555;
+}
+.dark{
+    --bg:#121212;
+    --text:#e2e2e2;
+    --text-secondary:#aaaaaa;
+    --border:#2a2a2a;
+    --card-bg:#1e1e1e;
+    --hover-bg:#2c2c2c;
+    --primary:#dddddd;
+    --accent:#bbbbbb;
+}
+body{
+    background-color:var(--bg);
+    color:var(--text);
+    font-family:system-ui, -apple-system, sans-serif;
+    line-height:1.6;
+}
+.container{
+    max-width:1100px;
+    margin:0 auto;
+    padding:0 16px;
+}
+header{
+    padding:20px 0;
+    border-bottom:1px solid var(--border);
+}
+.header-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+}
+.site-title{
+    font-size:22px;
+    font-weight:600;
+}
+.theme-btn{
+    padding:6px 12px;
+    border:1px solid var(--border);
+    background:var(--card-bg);
+    color:var(--text);
+    border-radius:6px;
+    cursor:pointer;
+}
+.ad-slider-wrap{
+    position:relative;
+    overflow:hidden;
+    margin:20px 0;
+    border-radius:8px;
+}
+.ad-slider{
+    display:flex;
+    overflow-x:auto;
+    scroll-behavior:smooth;
+    scrollbar-width:none;
+    position:relative;
+}
+.ad-slider::-webkit-scrollbar{display:none;}
+.slide-item{
+    flex:0 0 100%;
+    min-height:200px;
+    background:var(--card-bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--border);
+    padding:20px;
+}
+.slide-dots{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    padding:10px 0;
+}
+.dot{
+    width:10px;height:10px;
+    border-radius:50%;
+    background:var(--border);
+    cursor:pointer;
+}
+.dot.active{background:var(--accent);}
+nav{
+    margin:20px 0;
+}
+.nav-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    list-style:none;
+}
+.nav-item button{
+    padding:10px 16px;
+    border:1px solid var(--border);
+    background:var(--card-bg);
+    color:var(--text);
+    border-radius:6px;
+    cursor:pointer;
+}
+.nav-item button:hover{background:var(--hover-bg);}
+.page{
+    display:none;
+    padding:20px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin-bottom:20px;
+}
+.page.active{display:block;}
+.home-search-box{
+    margin:20px 0;
+}
+.home-search-box input{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:var(--card-bg);
+    color:var(--text);
+    font-size:15px;
+}
+.info-card{
+    padding:16px;
+    background:var(--card-bg);
+    border-radius:6px;
+    margin:12px 0;
+    border:1px solid var(--border);
+}
+.time-box{
+    padding:14px;
+    background:var(--card-bg);
+    border-radius:6px;
+    margin:12px 0;
+    border:1px solid var(--border);
+}
+.btn{
+    padding:8px 14px;
+    border:1px solid var(--border);
+    background:var(--card-bg);
+    color:var(--text);
+    border-radius:6px;
+    cursor:pointer;
+    margin:4px 2px;
+}
+.btn:hover{background:var(--hover-bg);}
+.rule-search-wrap{
+    margin-bottom:16px;
+}
+.rule-search-wrap input{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:var(--card-bg);
+    color:var(--text);
+}
+.rule-scroll{
+    max-height:65vh;
+    overflow-y:auto;
+    padding-right:8px;
+}
+.rule-section{
+    margin:18px 0;
+}
+.rule-section h3{
+    margin:8px 0;
+}
+.qr-wrap{
+    text-align:center;
+    padding:20px;
+}
+.qr-wrap img{
+    max-width:280px;
+    border-radius:8px;
+}
+.code-card{
+    padding:18px;
+    background:var(--card-bg);
+    border-radius:8px;
+    border:1px solid var(--border);
+    margin:10px 0;
+}
+footer{
+    margin-top:40px;
+    padding:20px 0;
+    border-top:1px solid var(--border);
+    text-align:center;
+    color:var(--text-secondary);
+    font-size:14px;
+}
+@media(max-width:600px){
+    .nav-list{gap:6px;}
+    .nav-item button{padding:8px 11px;font-size:14px;}
+}
 </style>
 </head>
 <body>
+<div class="container">
 <header>
-<div class="header-inner">
-<div class="header-title">TST · The Slow Tide</div>
-<div style="display:flex;align-items:center;gap:12px;">
-<div class="nav-group">
-<button data-page="home" class="navBtn active">首页</button>
-<button data-page="notice" class="navBtn">公告</button>
-<button data-page="event" class="navBtn">赛事活动</button>
-<button data-page="code" class="navBtn">兑换码</button>
-<button data-page="rule" class="navBtn">玩家公约</button>
-<button data-page="sponsor" class="navBtn">赞助</button>
-</div>
-<button id="themeToggle" class="theme-toggle">
-<span class="icon-moon dark-hide"></span>
-<span class="icon-sun dark-show"></span>
-</button>
-</div>
-</div>
+    <div class="header-row">
+        <div class="site-title">The Slow Tide - TST服务器官网</div>
+        <button class="theme-btn" id="themeToggle">切换深色模式</button>
+    </div>
 </header>
-<main>
-<section class="ad-wrap">
-<div id="adSlider" class="ad-slider">
-<div class="ad-slide">
-<img src="ad1.jpg" alt="活动横幅">
-<div class="ad-slide-text">
-<h2>近期赛事活动</h2>
-<p>暂无</p>
+
+<div class="ad-slider-wrap">
+    <div class="ad-slider" id="adSlider">
+        <div class="slide-item">
+            <div>
+                <h2>重要通知</h2>
+                <p>上架全新兑换码</p>
+            </div>
+        </div>
+        <div class="slide-item">
+            <div>
+                <h2>服务器活动预告</h2>
+                <p>敬请期待后续赛事</p>
+            </div>
+        </div>
+    </div>
+    <div class="slide-dots" id="slideDots"></div>
 </div>
+
+<div class="home-search-box">
+    <input type="text" id="globalSearchInput" placeholder="全局搜索：输入关键词跳转对应页面或内容">
 </div>
-<div class="ad-slide">
-<img src="ad2.jpg" alt="服务器宣传">
-<div class="ad-slide-text">
-<h2>网易基岩版 1.21.50</h2>
-<p>原版生存｜社区共建生存服务器</p>
+
+<nav>
+    <ul class="nav-list">
+        <li class="nav-item"><button data-page="home">首页</button></li>
+        <li class="nav-item"><button data-page="notice">公告</button></li>
+        <li class="nav-item"><button data-page="event">赛事活动</button></li>
+        <li class="nav-item"><button data-page="cdkey">兑换码</button></li>
+        <li class="nav-item"><button data-page="sponsor">服务器赞助</button></li>
+        <li class="nav-item"><button data-page="rule">玩家公约</button></li>
+    </ul>
+</nav>
+
+<div id="home" class="page active">
+    <h2>首页</h2>
+    <div class="info-card">
+        <p>服务器地址：<span id="serverAddr">mc.163.com/open/mc_realms/?realms=270239C36AD</span> <button class="btn" id="copyAddrBtn">复制地址</button></p>
+        <p>QQ交流群：<button class="btn" id="openQQGroup">833470853</button></p>
+        <p>当前状态：运行中</p>
+    </div>
+    <div class="time-box">
+        <p>北京时间：<span id="bjTime"></span></p>
+        <p>累计运行时间：<span id="runTime"></span></p>
+    </div>
+    <div class="info-card">
+        <h3>最新动态</h3>
+        <p>优化了服务器官网的玩家公约与兑换码栏目</p>
+    </div>
 </div>
+
+<div id="notice" class="page">
+    <h2>服务器网站更新公告</h2>
+    <div class="info-card">
+        <p>本次官网更新内容：</p>
+        <ul style="margin-left:20px;margin-top:8px;">
+            <li>玩家公约页面新增公约内容搜索框，支持关键词定位条约条目</li>
+            <li>新增可用兑换码 ILOVEWYJ，奖励5000金币，兑换码栏目排版优化</li>
+            <li>首页增加全局搜索输入框，支持关键词检索网站内容</li>
+            <li>轮播图重要通知板块更新上架全新兑换码提示</li>
+            <li>修复玩家公约目录锚点滚动定位BUG</li>
+            <li>调整服务器累计运行时间计时，与北京时间错开小幅偏移</li>
+            <li>优化页面细节与移动端适配，清理多余留白</li>
+            <li>更新最新动态栏目文案</li>
+        </ul>
+        <p style="margin-top:10px;">请各位玩家知悉，祝游玩愉快。</p>
+    </div>
 </div>
-<div class="ad-slide">
-<img src="ad3.jpg" alt="重要公告">
-<div class="ad-slide-text">
-<h2>重要通知</h2>
-<p>版本更新、规则修订等重要信息展示</p>
+
+<div id="event" class="page">
+    <h2>赛事活动</h2>
+    <div class="info-card">
+        <p>暂无进行中赛事</p>
+    </div>
 </div>
+
+<div id="cdkey" class="page">
+    <h2>兑换码</h2>
+    <div class="code-card">
+        <h3>可用兑换码</h3>
+        <p>兑换码：<strong>ILOVEWYJ</strong></p>
+        <p>奖励：5000金币</p>
+        <p style="font-size:14px;color:var(--text-secondary);margin-top:6px;">复制兑换码前往服务器内兑换功能进行领取</p>
+        <button class="btn" data-clip="ILOVEWYJ">复制兑换码</button>
+    </div>
+    <div class="info-card">
+        <p>其余暂无可用兑换码</p>
+    </div>
 </div>
+
+<div id="sponsor" class="page">
+    <h2>服务器赞助</h2>
+    <div class="qr-wrap">
+        <p>赞助收款二维码</p>
+        <!-- 将下面src替换为你的收款码图片链接，支持网络图片地址 -->
+        <img src="" alt="赞助收款码" id="payQrImg">
+        <p style="margin-top:10px;font-size:14px;color:var(--text-secondary);">请填入真实图片URL，图片方可正常显示</p>
+    </div>
 </div>
-<button id="adPrev" class="ad-arrow"><span class="icon-left"></span></button>
-<button id="adNext" class="ad-arrow"><span class="icon-right"></span></button>
-<div id="adDots" class="ad-dots"></div>
-</section>
-<div id="page-home" class="page">
-<div class="grid-2col">
-<div class="col-main">
-<div class="card">
-<h3>🚀 快速加入服务器</h3>
-<div class="form-item">
-<label>服务器地址</label>
-<button id="copyServerAddr" data-original="点击复制服务器连接地址" class="copy-btn">点击复制服务器连接地址</button>
-</div>
-<div class="form-item">
-<label>官方QQ交流群</label>
-<button id="copyQqGroup" data-original="点击复制QQ群号 833470853" class="copy-btn">点击复制QQ群号 833470853</button>
-</div>
-</div>
-<div class="card" style="margin-top:24px;">
-<h3>📖 服务器简述</h3>
-<div style="color:var(--text-secondary);line-height:1.7;">
-<p>TST The Slow Tide，网易基岩版1.21.50生存服务器。主打红石生电、大型社区共建、休闲生存玩法。</p>
-<p>进入服务器游玩前，请务必完整阅读《玩家公约》，遵守全部服务器规则。</p>
-<p>鼓励建筑创作、红石研究，拒绝恶意破坏与作弊行为。</p>
-</div>
-</div>
-<div class="card" style="margin-top:24px;">
-<h3>📢 最新动态</h3>
-<ul style="padding-left:12px;color:var(--text-secondary);">
-<li style="border-left:2px solid #999;padding-left:10px;margin:8px 0;">暂无动态，前往公告页查看完整信息</li>
-</ul>
-</div>
-</div>
-<div class="col-side">
-<div class="card small-card">
-<div style="font-size:14px;color:var(--text-secondary);">🕒 北京时间</div>
-<div id="bjClock" class="mono" style="font-size:22px;margin-top:4px;">--:--:--</div>
-</div>
-<div class="card small-card" style="margin-top:24px;">
-<div style="font-size:14px;color:var(--text-secondary);">⏱ 服务器运行时长</div>
-<div id="serverRunTimer" class="mono" style="font-size:18px;margin-top:4px;">计算中...</div>
-</div>
-<div class="card small-card" style="margin-top:24px;">
-<div style="font-size:14px;color:var(--text-secondary);">🟢 服务器状态</div>
-<div style="color:#10b981;font-size:18px;margin-top:4px;font-weight:500;">正常运行</div>
-</div>
-<div class="card small-card" style="margin-top:24px;">
-<h4 style="margin-bottom:12px;">🔗 快速跳转</h4>
-<div style="display:flex;flex-direction:column;gap:8px;">
-<button data-goto="rule" class="goto-btn">玩家公约</button>
-<button data-goto="event" class="goto-btn">赛事活动</button>
-<button data-goto="sponsor" class="goto-btn">服务器赞助</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="page-notice" class="page page-hidden">
-<div class="card">
-<h2 style="font-size:24px;margin-bottom:24px;">📢 服务器公告</h2>
-<div style="border-bottom:1px solid var(--border);padding-bottom:16px;">
-<h4 style="font-size:18px;">示例公告标题</h4>
-<p style="font-size:14px;color:var(--text-secondary);margin:4px 0;">2026‑08‑31</p>
-<p style="margin-top:8px;color:var(--text-secondary);">在此填写公告正文内容。</p>
-</div>
-</div>
-</div>
-<div id="page-event" class="page page-hidden">
-<div class="card">
-<h2 style="font-size:24px;margin-bottom:24px;">🏁 赛事 & 活动</h2>
-<div style="border:1px solid var(--border);border-radius:8px;padding:20px;">
-<h4 style="font-size:18px;">暂无进行中活动</h4>
-<p style="color:var(--text-secondary);margin-top:8px;">新活动开启后会在此展示全部规则、奖励与报名方式</p>
-</div>
-</div>
-</div>
-<div id="page-code" class="page page-hidden">
-<div class="card">
-<h2 style="font-size:24px;margin-bottom:24px;">🎁 兑换码</h2>
-<p style="color:var(--text-secondary);">当前暂无可用兑换码。</p>
-</div>
-</div>
-<div id="page-rule" class="page page-hidden">
-<div class="card" style="padding:0;overflow:hidden;">
-<div style="padding:24px;border-bottom:1px solid var(--border);">
-<h2 style="font-size:24px;">📜 The Slow Tide 服务器总条约</h2>
-</div>
-<div class="rule-wrap">
-<div class="rule-sidebar">
-<h4 style="font-weight:bold;margin-bottom:12px;">目录</h4>
-<div class="toc-list">
-<p class="toc-item">基础行为规范</p>
-<p class="toc-item">聊天与社交规范</p>
-<p class="toc-item">建筑与领地保护</p>
-<p class="toc-item">资源采集与环境维护</p>
-<p class="toc-item">经济与交易规则</p>
-<p class="toc-item">PVP与战斗行为</p>
-<p class="toc-item">红石与生电设备规范</p>
-<p class="toc-item">生物与村民管理</p>
-<p class="toc-item">玩家权益与反馈渠道</p>
-<p class="toc-item">违规处理与处罚制度</p>
-<p class="toc-item">服务器管理组职责</p>
-<p class="toc-item">活动与赛事规则</p>
-<p class="toc-item">数据与存档管理</p>
-<p class="toc-item">规则更新与解释权</p>
-</div>
-</div>
-<div id="ruleScrollBox">
-<p>本条约适用于 The Slow Tide 服务器全体玩家，统一规范服务器内行为准则、经济秩序、建筑保护、PVP机制、设备使用及违规处罚等全部游玩相关事宜。</p>
+
+<div id="rule" class="page">
+    <h2>玩家公约</h2>
+    <div class="rule-search-wrap">
+        <input type="text" id="ruleSearchInput" placeholder="搜索公约内容，输入关键词自动跳转定位">
+    </div>
+    <div class="rule-scroll" id="ruleScrollDom">
+        <div id="ruleContent">
+<h3>The Slow Tide 服务器总条约</h3>
+<p>网易基岩TST山头</p>
+<p>本条约适用于 The Slow Tide 服务器 全体玩家，统一规范服务器内行为准则、经济秩序、建筑保护、PVP机制、设备使用及违规处罚等全部游玩相关事宜。</p>
 <p>本条约所有条款具备通用性、约束性与权威性。不接受“不知情”“规则未阅读”“卡规则漏洞”等任何免责理由。无论玩家资历、服务器贡献高低，管理员均有权对违规行为采取警告、权限限制、限时封禁、永久封禁等处置。</p>
 <p>针对本条约未明文列举，但确实扰乱服务器秩序、破坏公共环境、侵害他人权益的行为，管理组有权根据行为造成的实际影响，做出合理、公正的判定与处罚。</p>
 <p>全体玩家在服务器内及关联社群的一切行为，必须严格遵守《中华人民共和国法律法规》。严禁以任何形式诋毁、攻击、抹黑、诽谤服务器、管理团队及其他玩家；严禁使用任何技术手段干扰、破坏服务器正常运行。</p>
 <p>本条约将根据服务器运营状态动态优化更新。重大规则变更将提前发布官方公告告知全体玩家。凡进入本服务器游玩、参与社群交流，即视为已阅读、理解并自愿同意本条约全部内容；若不认可本规则，请勿进入服务器及相关社群。</p>
-<p id="r1" style="font-weight:bold;font-size:16px;margin-top:24px;">1. 基础行为规范</p>
-<p>服务器管理组不受理玩家之间普通拆家、偷家、毁基地等私人纠纷，外挂破坏、恶性BUG滥用等违规行为除外。服务器日志与安全插件，仅用于防御外挂作弊、防护公共设施与玩家领地安全。严禁一切危害服务器安全、运行稳定、公共利益的行为，违者从重处罚。全面禁止任何形式的外挂、作弊程序、辅助工具。全体玩家需文明游玩、友善交流，遵守基础礼仪规范。严禁传播涉黄、涉黑、涉暴、低俗恶俗等不良信息。禁止在公共区域跑跳搭。服务器官方交流语言为简体/繁体中文，全员交流统一使用汉语。禁止建造含低俗暗示、违规隐喻、不良导向的建筑。禁止利用游戏BUG、机制漏洞实施破坏、牟利、扰民等恶性行为。禁止一切违背双方意愿的强制PVP行为。所有游戏行为、社交行为必须符合国家法律法规，违法违规行为一律从重处罚。所有生电、红石设备必须配备独立开关，做到人走机停，杜绝长期空转占用服务器资源。新建交通设施（冰道、铁路、通道等）不得干扰、占用、破坏已有公共交通线路。</p>
-<p id="r2" style="font-weight:bold;font-size:16px;margin-top:24px;">2. 聊天与社交规范</p>
-<p>公屏聊天禁止刷屏、复读、引战、人身攻击、阴阳怪气。禁止公开挂人、曝光他人隐私。广告、外部群链接未经管理许可禁止公屏发送。遇到矛盾优先私下沟通，无法解决找管理。</p>
-<p id="r3" style="font-weight:bold;font-size:16px;margin-top:24px;">3. 建筑与领地保护</p>
-<p>他人未授权建筑，禁止随意拆改、填充。公共区域建设尽量和周边风格协调。大型工程建议提前报备管理。废弃建筑长期无人维护，管理有权清理。</p>
-<p id="r4" style="font-weight:bold;font-size:16px;margin-top:24px;">4. 资源采集与环境维护</p>
-<p>禁止大规模恶意挖空地形、乱挖地狱、爆破毁坏地貌。挖矿尽量做好回填。不要随意大量屠杀动物，维持生态。</p>
-<p id="r5" style="font-weight:bold;font-size:16px;margin-top:24px;">5. 经济与交易规则</p>
-<p>玩家之间交易自愿，管理不介入普通交易纠纷。禁止诈骗、虚假交易。禁止利用BUG刷物品牟利。</p>
-<p id="r6" style="font-weight:bold;font-size:16px;margin-top:24px;">6. PVP与战斗行为</p>
-<p>非PVP区域禁止主动追杀他人。不得埋伏偷袭挂机玩家。决斗需要双方同意。</p>
-<p id="r7" style="font-weight:bold;font-size:16px;margin-top:24px;">7. 红石与生电设备规范</p>
-<p>大型生电机器必须开关可控。禁止无限制刷怪、卡服务器TPS。机器故障造成卡顿，管理有权直接关停。</p>
-<p id="r8" style="font-weight:bold;font-size:16px;margin-top:24px;">8. 生物与村民管理</p>
-<p>禁止恶意囚禁大量村民、堆积大量实体造成卡顿。村民交易平台建议做好管控。</p>
-<p id="r9" style="font-weight:bold;font-size:16px;margin-top:24px;">9. 玩家权益与反馈渠道</p>
-<p>遇到作弊、恶意破坏，保存截图证据前往QQ群找管理。禁止造谣诬告。反馈问题请客观描述。</p>
-<p id="r10" style="font-weight:bold;font-size:16px;margin-top:24px;">10. 违规处理与处罚制度</p>
-<p>处罚梯度：口头警告→限时禁言→限时封禁→永久封禁。屡犯、外挂、恶性破坏直接拉高处罚等级。</p>
-<p id="r11" style="font-weight:bold;font-size:16px;margin-top:24px;">11. 服务器管理组职责</p>
-<p>管理员维护秩序，不偏袒熟人。管理员同样受条约约束。滥用管理权限可以向服主举报。</p>
-<p id="r12" style="font-weight:bold;font-size:16px;margin-top:24px;">12. 活动与赛事规则</p>
-<p>参加活动即认可活动附加规则。作弊、捣乱直接取消参赛资格。</p>
-<p id="r13" style="font-weight:bold;font-size:16px;margin-top:24px;">13. 数据与存档管理</p>
-<p>服务器会定期备份，但不承诺100%数据无损。玩家自行做好重要物资备份。因BUG、机器故障造成损失，一般不予补偿。</p>
-<p id="r14" style="font-weight:bold;font-size:16px;margin-top:24px;">14. 规则更新与解释权</p>
-<p>本条约最终解释权归TST服务器管理组所有，更新后自动生效。</p>
+<p><strong>目录（点击跳转）</strong></p>
+<ul id="ruleToc">
+<li><a href="#sec1">基础行为规范</a></li>
+<li><a href="#sec2">聊天与社交规范</a></li>
+<li><a href="#sec3">建筑与领地保护</a></li>
+<li><a href="#sec4">资源采集与环境维护</a></li>
+<li><a href="#sec5">经济与交易规则</a></li>
+<li><a href="#sec6">PVP与战斗行为</a></li>
+<li><a href="#sec7">红石与生电设备规范</a></li>
+<li><a href="#sec8">生物与村民管理</a></li>
+<li><a href="#sec9">玩家权益与反馈渠道</a></li>
+<li><a href="#sec10">违规处理与处罚制度</a></li>
+<li><a href="#sec11">服务器管理组职责</a></li>
+<li><a href="#sec12">活动与赛事规则</a></li>
+<li><a href="#sec13">数据与存档管理</a></li>
+<li><a href="#sec14">规则更新与解释权</a></li>
+</ul>
+
+<div class="rule-section" id="sec1">
+<h3>1. 基础行为规范</h3>
+<p>服务器管理组不受理玩家之间普通拆家、偷家、毁基地等私人纠纷，外挂破坏、恶性BUG滥用等违规行为除外。</p>
+<p>服务器日志与安全插件，仅用于防御外挂作弊、防护公共设施与玩家领地安全。</p>
+<p>严禁一切危害服务器安全、运行稳定、公共利益的行为，违者从重处罚。</p>
+<p>全面禁止任何形式的外挂、作弊程序、辅助工具。</p>
+<p>全体玩家需文明游玩、友善交流，遵守基础礼仪规范。</p>
+<p>严禁传播涉黄、涉黑、涉暴、低俗恶俗等不良信息。</p>
+<p>禁止在公共区域跑跳搭。</p>
+<p>服务器官方交流语言为简体/繁体中文，全员交流统一使用汉语。</p>
+<p>禁止建造含低俗暗示、违规隐喻、不良导向的建筑。</p>
+<p>禁止利用游戏BUG、机制漏洞实施破坏、牟利、扰民等恶性行为。</p>
+<p>禁止一切违背双方意愿的强制PVP行为。</p>
+<p>所有游戏行为、社交行为必须符合国家法律法规，违法违规行为一律从重处罚。</p>
+<p>所有生电、红石设备必须配备独立开关，做到人走机停，杜绝长期空转占用服务器资源。</p>
+<p>新建交通设施（冰道、铁路、通道等）不得干扰、占用、破坏已有公共交通线路。</p>
+<p>服务器内全面禁止赌博行为，一经发现立刻责令拆除并永久封禁。</p>
+<p>玩家产生纠纷、矛盾争议时，禁止情绪化闹事，需冷静沟通或联系管理依规解决。</p>
 </div>
+
+<div class="rule-section" id="sec2">
+<h3>2. 聊天与社交规范</h3>
+<p>服务器及社群官方交流语言为中文（简体、繁体通用）。</p>
+<p>禁止刻意断章取义、过度解读、歪曲他人发言、故意误导他人。</p>
+<p>禁止散布谣言、宗教传教、引流广告、无关推广信息。</p>
+<p>严禁发布、传播涉黄、涉暴、涉政、违法违规内容，一经发现永久封禁。</p>
+<p>禁止私自向服务器、社群内添加各类机器人、自动脚本、推送程序。</p>
 </div>
+
+<div class="rule-section" id="sec3">
+<h3>3. 建筑与领地保护</h3>
+<p>服务器默认无全域建筑保护，未圈地区域建筑损毁风险由玩家自行承担。</p>
+<p>玩家可使用圈地系统保护私人建筑，领地范围内禁止一切未经允许的破坏、改动、占用行为，违规可联系管理或通过举报箱申诉。</p>
+<p>未进行圈地的建筑、设施、临时建筑，不受服务器保护，除外挂、BUG恶意破坏外，损毁后果由建造者自行承担。</p>
+<p>未经领地主许可，禁止在他人领地内建造、改造地形、放置设施、改动结构。</p>
+<p>禁止破坏、损毁、改动服务器公共建筑，包含主城、公共传送点、出生点、末地出生点等公共设施。</p>
+<p>领地所有者连续30天未登录服务器，该领地自动回收，归属权回归服务器。</p>
+<p>领地内非领地成员造成的一切破坏、违规、纠纷问题，由当事人自行承担全部责任。</p>
 </div>
+
+<div class="rule-section" id="sec4">
+<h3>4. 资源采集与环境维护</h3>
+<p>禁止在非领地范围内大规模破坏地形，包括掏空山体、大面积填水、大范围铲平地貌等。</p>
+<p>禁止在出生点、公共区域进行大规模挖掘、爆破、地形改造。</p>
+<p>倡导合理、节制利用资源，避免过度采集造成资源浪费与枯竭。</p>
+<p>废弃矿洞、闲置建筑、残留工程设施，建议自行填埋、清理规整。</p>
+<p>禁止利用漏洞、机制刷取货币、物资、资源，违者严肃处罚。</p>
 </div>
-<div id="page-sponsor" class="page page-hidden">
-<div class="card">
-<h2 style="font-size:24px;margin-bottom:24px;">💎 服务器赞助</h2>
-<p style="color:var(--text-secondary);">赞助用于服务器维持运行，赞助相关权益后续会在此页面展示。</p>
+
+<div class="rule-section" id="sec5">
+<h3>5. 经济与交易规则</h3>
+<p>禁止恶意囤货、控价、哄抬物价、扰乱服务器市场经济秩序，违者从重处理。</p>
+<p>严禁利用漏洞刷取金币、物品、资源，一经查实直接封号处理。</p>
+<p>系统商店仅作为物资兜底补充渠道，不作为主要获取途径。</p>
+<p>玩家私下交易价格由双方自主协商，管理组不介入正常定价，仅干预恶意控价、欺诈行为。</p>
+<p>全面禁止现实货币交易（RMB交易），包括物品买卖、金币变现、代练交易等，一经发现永久封禁。</p>
+<p>服务器管理组有权不定期调整系统商店物价，玩家如有异议可以通过意见箱反馈。</p>
 </div>
+
+<div class="rule-section" id="sec6">
+<h3>6. PVP与战斗行为</h3>
+<p>所有非双方自愿的强制PVP、偷袭、追杀行为一律禁止，违者封号处理。</p>
+<p>禁止在主城、出生点等公共安全区域主动发起PVP战斗。</p>
+<p>官方活动、赛事期间的PVP规则，以当期活动公告为准。</p>
 </div>
-</main>
-<button id="backTop"><span class="icon-up"></span></button>
+
+<div class="rule-section" id="sec7">
+<h3>7. 红石与生电设备规范</h3>
+<p>服务器开放红石、生电玩法，但所有设备必须控制在合理负载范围内，不得影响服务器运行。</p>
+<p>禁止建造高频红石、大面积卡顿装置、占服设备。</p>
+<p>长期运行、高负载、大型生电设备，建造前需要提前向管理组报备备案。</p>
+<p>废弃、闲置红石设备需要及时拆除，避免占用区块资源。</p>
+<p>全部红石、生电设备必须设置可控开关，严格执行人走机停规则。</p>
+<p>禁止搭建多核堆叠、多层叠加的超规格生电机器。</p>
+<p>服务器自带高频限制机制，高频类红石设备无法正常运行，请勿违规搭建。</p>
+</div>
+
+<div class="rule-section" id="sec8">
+<h3>8. 生物与村民管理</h3>
+<p>禁止恶意屠村、批量击杀无辜生物、浪费生物资源。</p>
+<p>村民交易、繁殖机制可以在合规范围内合理使用。</p>
+<p>禁止在公共区域建造大型刷怪塔、大规模村民繁殖机，特殊需求需要提前报备管理。</p>
+<p>禁止利用生物寻路机制、聚集机制恶意造成服务器卡顿。</p>
+<p>合理、节制使用各类生物机制，杜绝滥用、恶意堆载。</p>
+<p>服务器开启区块清理机制，禁止大批量、密集饲养生物，防止卡顿、吞档。</p>
+</div>
+
+<div class="rule-section" id="sec9">
+<h3>9. 玩家权益与反馈渠道</h3>
+<p>玩家对管理处罚、判定结果存在异议，可凭有效证据通过意见箱提交申诉。</p>
+<p>玩家合理建议、优化提案可以通过主城意见箱提交，管理组承诺三个工作日内回复处理。</p>
+<p>管理组不会无故干涉、限制玩家正常、合规的游戏发展与玩法。</p>
+<p>全体玩家享有平等游玩权益，不受管理员或其他玩家的针对、歧视、无端干预。</p>
+<p>玩家可以在不违反条约的前提下，自由选择玩法、建设方向与社交方式。</p>
+<p>玩家有权知晓自身账号处罚的全部依据、违规事由。</p>
+<p>管理组严格保护玩家隐私，绝不公开玩家IP、联系方式等私人信息。</p>
+<p>玩家游戏数据仅用于服务器正常运营，绝不向第三方泄露、转交。</p>
+<p>违规调查阶段，管理组可依规查阅对应游戏日志与数据，严禁滥用权限。</p>
+<p>管理组对所有玩家一视同仁，不存在特殊权限、亲友优待。</p>
+<p>管理组内部矛盾、争议判定，由全体管理员共同裁定，保证公开公正。</p>
+<p>玩家发现管理员存在违规操作、滥用权限行为，可向其他管理成员举报。</p>
+<p>玩家领地范围内的建筑、物品、设施受官方保护，其他人禁止擅自破坏、盗取、改动。</p>
+<p>因服务器故障、存档异常造成的数据损失，管理组会尽力修复，但不保证百分百完全恢复。</p>
+</div>
+
+<div class="rule-section" id="sec10">
+<h3>10. 违规处理与处罚制度</h3>
+<p>轻微违规：口头警告、书面提醒、临时限制部分权限。</p>
+<p>中度违规：清空违规资产、限时封禁账号。</p>
+<p>严重违规：永久封禁账号。</p>
+<p>作弊、漏洞刷物、恶意破坏等恶性行为，直接处罚、不给予提前警告。</p>
+<p>全部处罚记录统一存档，作为后续判定参考依据。</p>
+</div>
+
+<div class="rule-section" id="sec11">
+<h3>11. 服务器管理组职责</h3>
+<p>负责规则执行、服务器维护、活动策划、玩家纠纷调解、秩序维护。</p>
+<p>秉持公正、公开、透明原则处理全部服务器相关事务。</p>
+<p>不参与玩家正常经济竞争，不干预合规玩法与正常游戏发展。</p>
+<p>主动接受全体玩家监督，积极回应合理质疑与建议。</p>
+</div>
+
+<div class="rule-section" id="sec12">
+<h3>12. 活动与赛事规则</h3>
+<p>各类官方活动、赛事优先遵循当期专属活动规则。</p>
+<p>活动内违规玩家直接取消参赛资格与奖励资格，情节严重追加常规处罚。</p>
+<p>活动奖励、规则、流程以官方公告为准。</p>
+<p>全部活动最终解释权归服务器管理组所有。</p>
+</div>
+
+<div class="rule-section" id="sec13">
+<h3>13. 数据与存档管理</h3>
+<p>服务器会定期自动备份存档，但无法保证单个建筑、单件物品精准复原。</p>
+<p>因不可抗力、网络故障、设备问题造成的数据丢失，管理组不承担赔偿责任。</p>
+<p>服务器大版本更新前会发布公告，最大限度保留原有存档内容。</p>
+<p>玩家金币、物品、权限、成就等个人数据，以服务器后台记录作为唯一有效依据。</p>
+</div>
+
+<div class="rule-section" id="sec14">
+<h3>14. 规则更新与解释权</h3>
+<p>本条约会跟随服务器发展持续优化、补充、修改。</p>
+<p>规则重大修订、增减条款，会提前发布公告通知全体玩家。</p>
+<p>小规模文字微调、细节优化，可直接更新不另行通知。</p>
+<p>本服务器全部条约的最终解释权归 The Slow Tide 管理组所有。</p>
+</div>
+
+<p><strong>条约制定说明</strong></p>
+<p>参与制定玩家：执又之贤、极岚 及 The Slow Tide 服务器全体参与研讨玩家</p>
+<p><br><strong>参考来源说明：</strong></p>
+<p>1. 参考国内多社区Minecraft服务器成熟管理框架与运营经验；</p>
+<p>2. 参考公开服务器规约、玩家手册等公开资料，并结合本服实际情况优化改写；</p>
+<p>3. 感谢所有公开参考资料及参与规则完善的玩家与创作者。</p>
+<p>本条约目前仍在持续修订中，暂不作为最终正式版本执行，后续将根据实际情况进一步完善。如有建议，欢迎通过主城意见箱反馈。</p>
+        </div>
+    </div>
+</div>
+
 <footer>
-<p>The Slow Tide｜网易基岩版1.21.50生存服务器</p>
-<p style="margin-top:8px;font-size:13px;color:var(--text-secondary);">© 2026 The Slow Tide 保留所有权利。</p>
+    <p>© 2026 The Slow Tide TST服务器 版权所有</p>
 </footer>
+</div>
+
 <script>
-function syncDarkIcon(){
-const isDark=document.documentElement.classList.contains('dark');
-document.querySelectorAll('.dark-hide').forEach(el=>el.style.display=isDark?'none':'inline');
-document.querySelectorAll('.dark-show').forEach(el=>el.style.display=isDark?'inline':'none');
-}
-syncDarkIcon();
-const toggleBtn=document.getElementById('themeToggle');
-const htmlRoot=document.documentElement;
-function applyTheme(isDark){
-if(isDark){htmlRoot.classList.add('dark');localStorage.setItem('tst-theme','dark');}
-else{htmlRoot.classList.remove('dark');localStorage.setItem('tst-theme','light');}
-syncDarkIcon();
-}
-toggleBtn.addEventListener('click',()=>{applyTheme(!htmlRoot.classList.contains('dark'));});
-const navButtons=document.querySelectorAll('.navBtn');
-const pageList=document.querySelectorAll('.page');
-navButtons.forEach(btn=>{
-btn.addEventListener('click',()=>{
-const pid=btn.dataset.page;
-pageList.forEach(p=>p.classList.add('page-hidden'));
-document.getElementById('page-'+pid).classList.remove('page-hidden');
-navButtons.forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-window.scrollTo({top:0,behavior:'smooth'});
-})
-})
-document.querySelectorAll('.goto-btn').forEach(btn=>{
-btn.addEventListener('click',()=>{
-const pid=btn.dataset.goto;
-pageList.forEach(p=>p.classList.add('page-hidden'));
-document.getElementById('page-'+pid).classList.remove('page-hidden');
-navButtons.forEach(b=>b.classList.remove('active'));
-document.querySelector(`[data-page="${pid}"]`).classList.add('active');
-window.scrollTo({top:0,behavior:'smooth'});
-})
-})
-const SERVER_ADDR="mc.163.com/open/mc_realms/?realms=270239C36AD";
-const QQ_GROUP_NUM="833470853";
-async function copyText(btnEl,text){
-const originText=btnEl.dataset.original;
-btnEl.disabled=true;
-let ok=false;
-try{
-if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);ok=true;}
-}catch(e){ok=false;}
-if(ok){btnEl.innerText="✅已复制！";}
-else{btnEl.innerText="⚠️复制失败，请手动复制："+text;}
-setTimeout(()=>{btnEl.innerText=originText;btnEl.disabled=false;},1400);
-}
-document.getElementById('copyServerAddr').addEventListener('click',e=>copyText(e.currentTarget,SERVER_ADDR));
-document.getElementById('copyQqGroup').addEventListener('click',e=>copyText(e.currentTarget,QQ_GROUP_NUM));
-function updateClock(){const d=new Date();document.getElementById('bjClock').innerText=d.toLocaleTimeString('zh-CN',{hour12:false});}
-updateClock();
-setInterval(updateClock,1000);
-const startTime=new Date('2026-06-30T00:00:00');
-function runTimeCalc(){
-const diff=Date.now()-startTime.getTime();
-const day=Math.floor(diff/(1000*60*60*24));
-const hour=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-const min=Math.floor((diff%(1000*60*60))/(1000*60));
-const sec=Math.floor((diff%(1000*60))/1000);
-document.getElementById('serverRunTimer').innerText=`${day}天 ${hour}时 ${min}分 ${sec}秒`;
-}
-runTimeCalc();
-setInterval(runTimeCalc,1000);
-const tocDom=document.querySelectorAll('.toc-item');
-const ruleIds=["r1","r2","r3","r4","r5","r6","r7","r8","r9","r10","r11","r12","r13","r14"];
-const ruleScrollDom=document.querySelector('#ruleScrollBox');
-tocDom.forEach((el,idx)=>{
-el.addEventListener('click',()=>{
-const tar=document.getElementById(ruleIds[idx]);
-if(!tar)return;
-const targetTop=tar.getBoundingClientRect().top-ruleScrollDom.getBoundingClientRect().top+ruleScrollDom.scrollTop;
-ruleScrollDom.scrollTo({top:targetTop-16,behavior:"smooth"});
-})
-})
-document.getElementById('backTop').addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'});});
+//主题切换
+const root=document.documentElement;
+const themeToggle=document.getElementById('themeToggle');
+themeToggle.onclick=()=>{
+    root.classList.toggle('dark');
+    localStorage.setItem('tst-theme',root.classList.contains('dark')?'dark':'light');
+};
+
+//页面切换
+const navBtns=document.querySelectorAll('.nav-item button');
+const pages=document.querySelectorAll('.page');
+navBtns.forEach(btn=>{
+    btn.onclick=()=>{
+        const pid=btn.dataset.page;
+        pages.forEach(p=>p.classList.remove('active'));
+        document.getElementById(pid).classList.add('active');
+    }
+});
+
+//轮播
 const adSlider=document.getElementById('adSlider');
-const slides=Array.from(adSlider.querySelectorAll('.ad-slide'));
-const adDotsWrap=document.getElementById('adDots');
-const adPrev=document.getElementById('adPrev');
-const adNext=document.getElementById('adNext');
-let currentSlideIndex=0;
-let adTimer=null;
-function stopAutoPlay(){clearInterval(adTimer);}
-function startAutoPlay(){adTimer=setInterval(nextSlide,5000);}
-function restartAutoPlay(){stopAutoPlay();startAutoPlay();}
-slides.forEach((_,i)=>{
-const dot=document.createElement('button');
-dot.className="dot";
-dot.dataset.idx=i;
-dot.addEventListener('click',()=>goSlide(i));
-adDotsWrap.appendChild(dot);
-})
-const dots=Array.from(adDotsWrap.querySelectorAll('.dot'));
-function updateDots(){
-dots.forEach((d,i)=>{
-if(i===currentSlideIndex){d.classList.add('active');}
-else{d.classList.remove('active');}
-})
-}
+const slides=Array.from(adSlider.querySelectorAll('.slide-item'));
+const slideDots=document.getElementById('slideDots');
+let curSlide=0;
+let slideTimer=null;
+slides.forEach((_,idx)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(idx===0?' active':'');
+    d.onclick=()=>goSlide(idx);
+    slideDots.appendChild(d);
+});
+const dotsAll=Array.from(slideDots.querySelectorAll('.dot'));
 function goSlide(idx){
-currentSlideIndex=idx;
-const targetLeft=slides[idx].getBoundingClientRect().left-adSlider.getBoundingClientRect().left+adSlider.scrollLeft;
-adSlider.scrollTo({left:targetLeft,behavior:'smooth'});
-updateDots();
-restartAutoPlay();
+    curSlide=idx;
+    const targetLeft=slides[idx].getBoundingClientRect().left - adSlider.getBoundingClientRect().left + adSlider.scrollLeft;
+    adSlider.scrollTo({left:targetLeft,behavior:'smooth'});
+    dotsAll.forEach((d,i)=>d.classList.toggle('active',i===idx));
 }
-function nextSlide(){
-let next=currentSlideIndex+1;
-if(next>=slides.length)next=0;
-goSlide(next);
+function autoSlide(){
+    curSlide=(curSlide+1)%slides.length;
+    goSlide(curSlide);
 }
-function prevSlide(){
-let p=currentSlideIndex-1;
-if(p<0)p=slides.length-1;
-goSlide(p);
+slideTimer=setInterval(autoSlide,4500);
+
+//时间
+const bjTimeDom=document.getElementById('bjTime');
+const runTimeDom=document.getElementById('runTime');
+const serverStart=new Date('2026-06-30T00:00:00');
+//运行时间增加120秒偏移，不和北京时间完全对齐
+const offsetMs=120*1000;
+function updateTime(){
+    const now=new Date();
+    bjTimeDom.innerText=now.toLocaleString('zh-CN');
+    const diff=now.getTime() - serverStart.getTime() + offsetMs;
+    const day=Math.floor(diff/(1000*60*60*24));
+    const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+    const m=Math.floor((diff%(1000*60*60))/(1000*60));
+    const s=Math.floor((diff%(1000*60))/1000);
+    runTimeDom.innerText=`${day}天 ${h}时 ${m}分 ${s}秒`;
 }
-adNext.addEventListener('click',nextSlide);
-adPrev.addEventListener('click',prevSlide);
-adSlider.addEventListener('mouseenter',stopAutoPlay);
-adSlider.addEventListener('mouseleave',startAutoPlay);
-adSlider.addEventListener('scroll',()=>{
-const scrollX=adSlider.scrollLeft;
-const w=adSlider.clientWidth;
-const idx=Math.round(scrollX/w);
-if(idx!==currentSlideIndex){currentSlideIndex=idx;updateDots();}
-})
-goSlide(0);
-startAutoPlay();
+setInterval(updateTime,1000);
+updateTime();
+
+//复制服务器地址，只复制一次
+const copyAddrBtn=document.getElementById('copyAddrBtn');
+let copyFlag=false;
+copyAddrBtn.onclick=async ()=>{
+    if(copyFlag)return;
+    copyFlag=true;
+    try{
+        await navigator.clipboard.writeText(document.getElementById('serverAddr').innerText);
+        alert('服务器地址已复制');
+    }catch(e){alert('复制失败，请手动复制');}
+    setTimeout(()=>{copyFlag=false;},1500);
+};
+
+//QQ群跳转，使用QQ协议
+document.getElementById('openQQGroup').onclick=()=>{
+    window.location.href='mqqapi://card/show_pslcard?src_type=internal&version=1&card_type=group&uin=833470853';
+};
+
+//复制兑换码按钮
+document.querySelectorAll('[data-clip]').forEach(b=>{
+    b.onclick=async ()=>{
+        const txt=b.dataset.clip;
+        try{await navigator.clipboard.writeText(txt);alert('兑换码已复制');}
+        catch(e){alert('复制失败，请手动复制：'+txt);}
+    }
+});
+
+//玩家公约目录锚点修复
+const ruleScrollDom=document.getElementById('ruleScrollDom');
+document.querySelectorAll('#ruleToc a').forEach(a=>{
+    a.onclick=(e)=>{
+        e.preventDefault();
+        const tid=a.getAttribute('href').substring(1);
+        const tar=document.getElementById(tid);
+        if(!tar)return;
+        const targetTop=tar.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
+        ruleScrollDom.scrollTo({top:targetTop -16, behavior:'smooth'});
+    }
+});
+
+//公约内搜索，文本匹配跳转
+const ruleSearchInput=document.getElementById('ruleSearchInput');
+ruleSearchInput.onkeydown=(ev)=>{
+    if(ev.key!=='Enter')return;
+    const kw=ruleSearchInput.value.trim().toLowerCase();
+    if(!kw)return;
+    const sections=document.querySelectorAll('.rule-section');
+    for(let sec of sections){
+        const txt=sec.innerText.toLowerCase();
+        if(txt.includes(kw)){
+            const targetTop=sec.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
+            ruleScrollDom.scrollTo({top:targetTop-16,behavior:'smooth'});
+            return;
+        }
+    }
+    alert('未在公约中找到匹配关键词');
+};
+
+//首页全局搜索
+const globalSearchInput=document.getElementById('globalSearchInput');
+globalSearchInput.onkeydown=(ev)=>{
+    if(ev.key!=='Enter')return;
+    const kw=globalSearchInput.value.trim().toLowerCase();
+    if(!kw)return;
+    //优先跳公约页再搜索
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('rule').classList.add('active');
+    ruleSearchInput.value=kw;
+    const sections=document.querySelectorAll('.rule-section');
+    for(let sec of sections){
+        const txt=sec.innerText.toLowerCase();
+        if(txt.includes(kw)){
+            const targetTop=sec.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
+            ruleScrollDom.scrollTo({top:targetTop-16,behavior:'smooth'});
+            return;
+        }
+    }
+    alert('网站内未检索到该关键词');
+};
 </script>
 </body>
 </html>
