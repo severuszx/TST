@@ -342,6 +342,38 @@ font-size:13px;
 .notice-para{
 margin-top:10px;
 }
+/* 动态栏目 */
+.feed-card{
+padding:14px;
+background:var(--card-bg);
+border-radius:8px;
+margin:12px 0;
+border:1px solid var(--border);
+}
+.feed-text{
+margin-top:8px;
+}
+.feed-img{
+width:100%;
+max-width:520px;
+border-radius:8px;
+margin-top:12px;
+display:block;
+}
+.feed-status{
+display:inline-block;
+margin-top:10px;
+padding:2px 10px;
+font-size:12px;
+border-radius:999px;
+background:var(--accent);
+color:var(--bg);
+}
+.feed-date{
+margin-top:12px;
+font-size:12px;
+color:var(--text-secondary);
+}
 /* 搜索联想下拉 */
 .suggest-box{
 position:absolute;
@@ -500,6 +532,7 @@ font-weight:bold;
 <ul class="nav-list">
 <li class="nav-item"><button data-page="home" data-i18n="nav_home">首页</button></li>
 <li class="nav-item"><button data-page="notice" data-i18n="nav_notice">公告</button></li>
+<li class="nav-item"><button data-page="feed" data-i18n="nav_feed">动态</button></li>
 <li class="nav-item"><button data-page="event" data-i18n="nav_event">赛事活动</button></li>
 <li class="nav-item"><button data-page="cdkey" data-i18n="nav_cdkey">兑换码</button></li>
 <li class="nav-item"><button data-page="sponsor" data-i18n="nav_sponsor">服务器赞助</button></li>
@@ -539,6 +572,10 @@ font-weight:bold;
 </ul>
 <p style="margin-top:10px;" data-i18n="noticeEnd">请各位玩家知悉，祝游玩愉快。</p>
 </div>
+</div>
+<div id="feed" class="page">
+<h2 data-i18n="feed_title">服务器动态</h2>
+<div id="feedContent"></div>
 </div>
 <div id="event" class="page">
 <h2 data-i18n="event_title">赛事活动</h2>
@@ -596,7 +633,7 @@ searchPlaceholder:'全局搜索：输入关键词跳转对应页面或内容',
 searchBtn:'确认搜索',
 ruleSearchPlaceholder:'搜索公约内容，输入关键词自动跳转定位',
 ruleSearchBtn:'确认搜索',
-nav_home:'首页', nav_notice:'公告', nav_event:'赛事活动', nav_cdkey:'兑换码', nav_sponsor:'服务器赞助', nav_rule:'玩家公约',
+nav_home:'首页', nav_notice:'公告', nav_feed:'动态', nav_event:'赛事活动', nav_cdkey:'兑换码', nav_sponsor:'服务器赞助', nav_rule:'玩家公约',
 home_title:'🏠 服务器首页',
 serverInfo:'服务器信息',
 serverAddr:'服务器地址：',
@@ -617,6 +654,7 @@ notice2:'首页增加全局搜索输入框，支持关键词检索网站内容',
 notice3:'修复玩家公约目录锚点滚动定位BUG',
 notice4:'优化页面细节与移动端适配，清理多余留白',
 noticeEnd:'请各位玩家知悉，祝游玩愉快。',
+feed_title:'服务器动态',
 event_title:'赛事活动',
 noEvent:'暂无进行中赛事',
 cdkey_title:'兑换码',
@@ -654,7 +692,7 @@ searchPlaceholder:'全域搜尋：輸入關鍵字跳轉對應頁面或內容',
 searchBtn:'確認搜尋',
 ruleSearchPlaceholder:'搜尋公約內容，輸入關鍵字自動跳轉定位',
 ruleSearchBtn:'確認搜尋',
-nav_home:'首頁', nav_notice:'公告', nav_event:'賽事活動', nav_cdkey:'兌換碼', nav_sponsor:'伺服器贊助', nav_rule:'玩家公約',
+nav_home:'首頁', nav_notice:'公告', nav_feed:'動態', nav_event:'賽事活動', nav_cdkey:'兌換碼', nav_sponsor:'伺服器贊助', nav_rule:'玩家公約',
 home_title:'🏠 伺服器首頁',
 serverInfo:'伺服器資訊',
 serverAddr:'伺服器位址：',
@@ -675,6 +713,7 @@ notice2:'首頁增加全域搜尋輸入框，支援關鍵字檢索網站內容',
 notice3:'修復玩家公約目錄錨點捲動定位BUG',
 notice4:'優化頁面細節與行動端適配，清理多餘留白',
 noticeEnd:'請各位玩家知悉，祝遊玩愉快。',
+feed_title:'伺服器動態',
 event_title:'賽事活動',
 noEvent:'暫無進行中賽事',
 cdkey_title:'兌換碼',
@@ -712,7 +751,7 @@ searchPlaceholder:'Global search: type a keyword to jump to the matching page or
 searchBtn:'Search',
 ruleSearchPlaceholder:'Search the rules: type a keyword to locate a clause',
 ruleSearchBtn:'Search',
-nav_home:'Home', nav_notice:'News', nav_event:'Events', nav_cdkey:'Redeem Codes', nav_sponsor:'Sponsor', nav_rule:'Player Rules',
+nav_home:'Home', nav_notice:'News', nav_feed:'Feed', nav_event:'Events', nav_cdkey:'Redeem Codes', nav_sponsor:'Sponsor', nav_rule:'Player Rules',
 home_title:'🏠 Server Home',
 serverInfo:'Server Info',
 serverAddr:'Server Address: ',
@@ -733,6 +772,7 @@ notice2:'Added a global search box on the homepage to search site content by key
 notice3:'Fixed the bug where the Player Rules table-of-contents anchor scrolling was mispositioned.',
 notice4:'Optimized page details and mobile responsiveness, cleaned up extra whitespace.',
 noticeEnd:'Please take note and enjoy your time on the server.',
+feed_title:'Server Feed',
 event_title:'Events & Tournaments',
 noEvent:'No ongoing events.',
 cdkey_title:'Redeem Codes',
@@ -1244,6 +1284,72 @@ date:'September 2026'
 };
 
 // ============================================================
+// 动态栏目数据（三语）
+// ============================================================
+const FEED = {
+zhCN: [
+{
+type:'event',
+img:'dt2',
+title:'🏁 S1 裂痕杯 · 赛事动态',
+status:'筹备中',
+paras:[
+'「裂痕杯」是 The Slow Tide 服务器首个官方 PVP 赛事，面向全体玩家开放。赛事采用单人淘汰制，玩家需自备装备，在指定竞技场内进行对决。',
+'由于服务器近期完成重置，赛事各项准备工作正在重新推进中。具体开赛时间、报名方式及详细规则将在后续公告中陆续公布，请留意官网「服务器公告」栏目及游戏内通知。',
+'有意参与的玩家可提前做好装备与物资准备。期待在赛场上与各位相见。'
+],
+date:'2026-09-05'
+},
+{
+type:'post',
+img:'dt1',
+text:'捷报！玩家 极岚 在矿洞中发现了连续 28 枚钻石的矿脉，创下服务器新纪录，目前位居全服第一！',
+date:'2026-09-05'
+}
+],
+zhTW: [
+{
+type:'event',
+img:'dt2',
+title:'🏁 S1 裂痕杯 · 賽事動態',
+status:'籌備中',
+paras:[
+'「裂痕杯」是 The Slow Tide 伺服器首個官方 PVP 賽事，面向全體玩家開放。賽事採用單人淘汰制，玩家需自備裝備，在指定競技場內進行對決。',
+'由於伺服器近期完成重置，賽事各項準備工作正在重新推進中。具體開賽時間、報名方式及詳細規則將在後續公告中陸續公布，請留意官網「伺服器公告」欄目及遊戲內通知。',
+'有意參與的玩家可提前做好裝備與物資準備。期待在賽場上與各位相見。'
+],
+date:'2026-09-05'
+},
+{
+type:'post',
+img:'dt1',
+text:'捷報！玩家 極嵐 在礦洞中發現了連續 28 枚鑽石的礦脈，創下伺服器新紀錄，目前位居全服第一！',
+date:'2026-09-05'
+}
+],
+en: [
+{
+type:'event',
+img:'dt2',
+title:'🏁 S1 Rift Cup · Event Update',
+status:'In Preparation',
+paras:[
+'The Rift Cup is The Slow Tide server\'s first official PVP tournament, open to all players. The tournament uses a single-elimination format; players must bring their own equipment and battle in a designated arena.',
+'As the server has recently been reset, all tournament preparations are being reworked. The exact start time, registration method, and detailed rules will be announced in upcoming notices — please watch the "Server News" section on the official website and in-game notifications.',
+'Players who wish to participate can prepare their equipment and supplies in advance. We look forward to seeing you all in the arena.'
+],
+date:'2026-09-05'
+},
+{
+type:'post',
+img:'dt1',
+text:'Great news! Player Ji Lan discovered a continuous vein of 28 diamonds in a cave, setting a new server record — currently ranked #1 on the server!',
+date:'2026-09-05'
+}
+]
+};
+
+// ============================================================
 // 状态
 // ============================================================
 const root=document.documentElement;
@@ -1323,6 +1429,27 @@ function renderNoticeLimit(){
   html+='<p class="notice-date">'+N.date+'</p>';
   dom.innerHTML=html;
 }
+function renderFeed(){
+  const items=FEED[lang];
+  const dom=document.getElementById('feedContent');
+  if(!dom){ return; }
+  let html='';
+  for(const it of items){
+    html+='<div class="feed-card" data-unit>';
+    if(it.type==='post'){
+      html+='<p class="feed-text">'+it.text+'</p>';
+      if(it.img){ html+='<img class="feed-img" src="'+it.img+'" alt="'+it.img+'">'; }
+    }else if(it.type==='event'){
+      html+='<h3>'+it.title+'</h3>';
+      html+='<span class="feed-status">'+it.status+'</span>';
+      if(it.img){ html+='<img class="feed-img" src="'+it.img+'" alt="'+it.img+'">'; }
+      for(const p of it.paras){ html+='<p class="feed-text">'+p+'</p>'; }
+    }
+    html+='<div class="feed-date">'+it.date+'</div>';
+    html+='</div>';
+  }
+  dom.innerHTML=html;
+}
 
 function applyLang(){
   const d=I18N[lang];
@@ -1342,6 +1469,7 @@ function applyLang(){
   hideResults();
   renderRules();
   renderNoticeLimit();
+  renderFeed();
   buildSuggestPool();
   syncSettingsUI();
   updateTime();
@@ -1502,7 +1630,7 @@ function doRuleSearch(kw){
 // ============================================================
 function searchUnits(){
   const units=[];
-  const pids=['home','notice','event','cdkey','sponsor','rule'];
+  const pids=['home','notice','feed','event','cdkey','sponsor','rule'];
   for(const pid of pids){
     const page=document.getElementById(pid);
     if(!page){ continue; }
@@ -1638,7 +1766,7 @@ function buildSuggestPool(){
   const d=I18N[lang];
   const pool=[];
   // 页面名
-  pool.push(d.nav_home,d.nav_notice,d.nav_event,d.nav_cdkey,d.nav_sponsor,d.nav_rule);
+  pool.push(d.nav_home,d.nav_notice,d.nav_feed,d.nav_event,d.nav_cdkey,d.nav_sponsor,d.nav_rule);
   // 常用搜索意图
   const sugKeys=['sug_address','sug_qq','sug_cdkey','sug_sponsor','sug_rules','sug_pvp','sug_redstone','sug_tech','sug_build','sug_claim','sug_economy','sug_trade','sug_villager','sug_cheat','sug_gamble','sug_event','sug_runtime','sug_status'];
   for(const k of sugKeys){ if(d[k]) pool.push(d[k]); }
