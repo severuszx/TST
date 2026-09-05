@@ -325,6 +325,23 @@ border-radius:8px;
 border:1px solid var(--border);
 margin:8px 0;
 }
+.notice-divider{
+border-top:1px dashed var(--border);
+margin:16px 0 12px;
+}
+.notice-sign{
+margin-top:14px;
+text-align:right;
+font-weight:600;
+}
+.notice-date{
+text-align:right;
+color:var(--text-secondary);
+font-size:13px;
+}
+.notice-para{
+margin-top:10px;
+}
 /* 搜索联想下拉 */
 .suggest-box{
 position:absolute;
@@ -504,13 +521,16 @@ font-weight:bold;
 </div>
 <div class="info-card" data-unit>
 <h3 data-i18n="latestNews">最新动态</h3>
-<p data-i18n="newsContent">优化了服务器官网的玩家公约与兑换码栏目</p>
+<p data-i18n="newsContent">发布了关于服务器人数限制的说明与补偿公告</p>
 </div>
 </div>
 <div id="notice" class="page">
 <h2 data-i18n="notice_title">服务器网站更新公告</h2>
 <div class="info-card" data-unit>
-<p data-i18n="noticeContent">本次官网更新内容：</p>
+<h3 data-i18n="noticeContent">关于服务器人数限制的说明与补偿公告</h3>
+<div id="noticeLimitContent"></div>
+<div class="notice-divider"></div>
+<p data-i18n="noticeListLabel">本次官网更新内容：</p>
 <ul style="margin-left:20px;margin-top:8px;">
 <li data-i18n="notice1">玩家公约页面新增公约内容搜索框，支持关键词定位条约条目</li>
 <li data-i18n="notice2">首页增加全局搜索输入框，支持关键词检索网站内容</li>
@@ -529,7 +549,7 @@ font-weight:bold;
 <div id="cdkey" class="page">
 <h2 data-i18n="cdkey_title">兑换码</h2>
 <div class="info-card" data-unit>
-<p data-i18n="noCdkey">暂无可用兑换码</p>
+<p data-i18n="noCdkey">ILOVEWYJ</p>
 </div>
 </div>
 <div id="sponsor" class="page">
@@ -588,9 +608,10 @@ runTimeTitle:'运行计时',
 bjTime:'北京时间：',
 totalRun:'累计运行时间：',
 latestNews:'最新动态',
-newsContent:'优化了服务器官网的玩家公约与兑换码栏目',
+newsContent:'发布了关于服务器人数限制的说明与补偿公告',
 notice_title:'服务器网站更新公告',
-noticeContent:'本次官网更新内容：',
+noticeContent:'关于服务器人数限制的说明与补偿公告',
+noticeListLabel:'本次官网更新内容：',
 notice1:'玩家公约页面新增公约内容搜索框，支持关键词定位条约条目',
 notice2:'首页增加全局搜索输入框，支持关键词检索网站内容',
 notice3:'修复玩家公约目录锚点滚动定位BUG',
@@ -599,7 +620,7 @@ noticeEnd:'请各位玩家知悉，祝游玩愉快。',
 event_title:'赛事活动',
 noEvent:'暂无进行中赛事',
 cdkey_title:'兑换码',
-noCdkey:'暂无可用兑换码',
+noCdkey:'ILOVEWYJ',
 sponsor_title:'服务器赞助',
 payQr:'赞助收款二维码',
 sponsorNote:'谢谢喵（磕头）',
@@ -645,9 +666,10 @@ runTimeTitle:'運行計時',
 bjTime:'北京時間：',
 totalRun:'累計運行時間：',
 latestNews:'最新動態',
-newsContent:'優化了伺服器官網的玩家公約與兌換碼欄目',
+newsContent:'發布了關於伺服器人數限制的說明與補償公告',
 notice_title:'伺服器網站更新公告',
-noticeContent:'本次官網更新內容：',
+noticeContent:'關於伺服器人數限制的說明與補償公告',
+noticeListLabel:'本次官網更新內容：',
 notice1:'玩家公約頁面新增公約內容搜尋框，支援關鍵字定位條約條目',
 notice2:'首頁增加全域搜尋輸入框，支援關鍵字檢索網站內容',
 notice3:'修復玩家公約目錄錨點捲動定位BUG',
@@ -656,7 +678,7 @@ noticeEnd:'請各位玩家知悉，祝遊玩愉快。',
 event_title:'賽事活動',
 noEvent:'暫無進行中賽事',
 cdkey_title:'兌換碼',
-noCdkey:'暫無可用兌換碼',
+noCdkey:'ILOVEWYJ',
 sponsor_title:'伺服器贊助',
 payQr:'贊助收款二維碼',
 sponsorNote:'謝謝喵（磕頭）',
@@ -702,9 +724,10 @@ runTimeTitle:'Uptime',
 bjTime:'Beijing Time: ',
 totalRun:'Total Uptime: ',
 latestNews:'Latest Updates',
-newsContent:'Optimized the Player Rules and Redeem Code sections of the official website.',
+newsContent:'Published a notice on the server player limit and compensation.',
 notice_title:'Official Website Update Notice',
-noticeContent:'This update includes:',
+noticeContent:'Notice on the Server Player Limit and Compensation',
+noticeListLabel:'Website update details:',
 notice1:'Added a content search box to the Player Rules page for locating treaty clauses by keyword.',
 notice2:'Added a global search box on the homepage to search site content by keyword.',
 notice3:'Fixed the bug where the Player Rules table-of-contents anchor scrolling was mispositioned.',
@@ -713,7 +736,7 @@ noticeEnd:'Please take note and enjoy your time on the server.',
 event_title:'Events & Tournaments',
 noEvent:'No ongoing events.',
 cdkey_title:'Redeem Codes',
-noCdkey:'No redeem codes available.',
+noCdkey:'ILOVEWYJ',
 sponsor_title:'Sponsor the Server',
 payQr:'Sponsorship Payment QR Code',
 sponsorNote:'Thank you meow (kowtow)',
@@ -1173,6 +1196,54 @@ closing:'This treaty is still under continuous revision and is not yet enforced 
 };
 
 // ============================================================
+// 公告正文数据（关于服务器人数限制的说明与补偿公告，三语）
+// ============================================================
+const NOTICE_LIMIT = {
+zhCN: {
+items:[
+{t:'p', x:'近期随着服务器活跃度上升，同时在线人数不断增加。为了保障全体玩家的游戏体验，避免因负载过高导致的卡顿、回档、掉线等问题，我们决定对服务器在线人数进行动态管理。'},
+{t:'p', x:'自本公告发布起，当服务器同时在线人数超过 10 人时，系统将自动踢出最后进入的玩家，以维持服务器的稳定运行。'},
+{t:'p', x:'这一决定并非轻率之举。我们深知每一位进入服务器的玩家都带着时间和期待，但服务器的硬件资源有限，长期超载不仅会影响当前玩家的体验，也可能对存档和数据安全造成潜在风险。我们希望在现有条件下，尽可能为每一位在线玩家提供流畅、稳定的环境。'},
+{t:'p', x:'对于因此受到影响的玩家，我们将发放 50 金币作为补偿。虽然金额不大，但代表我们对每一位玩家理解与支持的感谢。'},
+{t:'p', x:'我们也在积极寻求更长期的优化方案，包括但不限于：'},
+{t:'ul', x:['优化现有命令方块与红石设备的执行效率','清理不必要的实体与加载区块','评估服务器配置升级的可能性']},
+{t:'p', x:'我们理解这一措施可能会给部分玩家带来不便，但希望各位能够理解并支持。服务器的长远稳定，需要管理组与每一位玩家共同努力。'},
+{t:'p', x:'感谢大家一路以来的陪伴与包容。'}
+],
+sign:'The Slow Tide 管理组',
+date:'2026年9月'
+},
+zhTW: {
+items:[
+{t:'p', x:'近期隨著伺服器活躍度上升，同時線上人數不斷增加。為了保障全體玩家的遊戲體驗，避免因負載過高導致的卡頓、回檔、掉線等問題，我們決定對伺服器線上人數進行動態管理。'},
+{t:'p', x:'自本公告發布起，當伺服器同時線上人數超過 10 人時，系統將自動踢出最後進入的玩家，以維持伺服器的穩定運行。'},
+{t:'p', x:'這一決定並非輕率之舉。我們深知每一位進入伺服器的玩家都帶著時間和期待，但伺服器的硬體資源有限，長期超載不僅會影響當前玩家的體驗，也可能對存檔和資料安全造成潛在風險。我們希望在現有條件下，盡可能為每一位線上玩家提供流暢、穩定的環境。'},
+{t:'p', x:'對於因此受到影響的玩家，我們將發放 50 金幣作為補償。雖然金額不大，但代表我們對每一位玩家理解與支持的感謝。'},
+{t:'p', x:'我們也在積極尋求更長期的優化方案，包括但不限於：'},
+{t:'ul', x:['優化現有指令方塊與紅石設備的執行效率','清理不必要的實體與載入區塊','評估伺服器配置升級的可能性']},
+{t:'p', x:'我們理解這一措施可能會給部分玩家帶來不便，但希望各位能夠理解並支持。伺服器的長遠穩定，需要管理組與每一位玩家共同努力。'},
+{t:'p', x:'感謝大家一路以來的陪伴與包容。'}
+],
+sign:'The Slow Tide 管理組',
+date:'2026年9月'
+},
+en: {
+items:[
+{t:'p', x:'As server activity has grown recently, the number of concurrent online players keeps increasing. To protect the gaming experience of all players and avoid problems such as lag, rollbacks, and disconnections caused by excessive load, we have decided to manage the number of concurrent online players dynamically.'},
+{t:'p', x:'Effective from the release of this notice, when the number of concurrent online players exceeds 10, the system will automatically kick the most recently joined player to keep the server running stably.'},
+{t:'p', x:'This decision was not made lightly. We are well aware that every player who enters the server brings their time and expectations. However, the server\'s hardware resources are limited. Long-term overload would not only hurt the experience of current players, but could also pose potential risks to the world saves and data safety. We hope to provide every online player with a smooth and stable environment to the best of our ability under the current conditions.'},
+{t:'p', x:'Players affected by this measure will receive 50 gold coins as compensation. The amount may be small, but it represents our gratitude for every player\'s understanding and support.'},
+{t:'p', x:'We are also actively working on more long-term optimization plans, including but not limited to:'},
+{t:'ul', x:['Optimizing the execution efficiency of existing command blocks and redstone devices','Cleaning up unnecessary entities and loaded chunks','Evaluating the possibility of upgrading the server configuration']},
+{t:'p', x:'We understand that this measure may inconvenience some players, but we hope everyone can understand and support it. The long-term stability of the server requires the joint efforts of the management team and every player.'},
+{t:'p', x:'Thank you all for your company and tolerance along the way.'}
+],
+sign:'The Slow Tide Management Team',
+date:'September 2026'
+}
+};
+
+// ============================================================
 // 状态
 // ============================================================
 const root=document.documentElement;
@@ -1234,6 +1305,24 @@ function renderRules(){
   html+='</div>';
   dom.innerHTML=html;
 }
+function renderNoticeLimit(){
+  const N=NOTICE_LIMIT[lang];
+  const dom=document.getElementById('noticeLimitContent');
+  if(!dom){ return; }
+  let html='';
+  for(const item of N.items){
+    if(item.t==='p'){
+      html+='<p class="notice-para">'+item.x+'</p>';
+    }else if(item.t==='ul'){
+      html+='<ul style="margin-left:24px;margin-top:8px;">';
+      for(const li of item.x){ html+='<li>'+li+'</li>'; }
+      html+='</ul>';
+    }
+  }
+  html+='<p class="notice-sign">'+N.sign+'</p>';
+  html+='<p class="notice-date">'+N.date+'</p>';
+  dom.innerHTML=html;
+}
 
 function applyLang(){
   const d=I18N[lang];
@@ -1252,6 +1341,7 @@ function applyLang(){
   clearHighlight();
   hideResults();
   renderRules();
+  renderNoticeLimit();
   buildSuggestPool();
   syncSettingsUI();
   updateTime();
