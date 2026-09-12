@@ -342,6 +342,11 @@ font-size:13px;
 .notice-para{
 margin-top:10px;
 }
+.notice-sub{
+margin:14px 0 2px;
+font-size:15px;
+font-weight:600;
+}
 /* 动态栏目 */
 .feed-card{
 padding:14px;
@@ -560,6 +565,9 @@ font-weight:bold;
 <div id="notice" class="page">
 <h2 data-i18n="notice_title">服务器网站更新公告</h2>
 <div class="info-card" data-unit>
+<h3 data-i18n="noticeSupportTitle">关于服务器扶持通道的公告</h3>
+<div id="noticeSupportContent"></div>
+<div class="notice-divider"></div>
 <h3 data-i18n="noticeContent">关于服务器人数限制的说明与补偿公告</h3>
 <div id="noticeLimitContent"></div>
 <div class="notice-divider"></div>
@@ -645,8 +653,9 @@ runTimeTitle:'运行计时',
 bjTime:'北京时间：',
 totalRun:'累计运行时间：',
 latestNews:'最新动态',
-newsContent:'发布了关于服务器人数限制的说明与补偿公告',
+newsContent:'发布了新公告：服务器扶持通道正式开放',
 notice_title:'服务器网站更新公告',
+noticeSupportTitle:'关于服务器扶持通道的公告',
 noticeContent:'关于服务器人数限制的说明与补偿公告',
 noticeListLabel:'本次官网更新内容：',
 notice1:'玩家公约页面新增公约内容搜索框，支持关键词定位条约条目',
@@ -704,8 +713,9 @@ runTimeTitle:'運行計時',
 bjTime:'北京時間：',
 totalRun:'累計運行時間：',
 latestNews:'最新動態',
-newsContent:'發布了關於伺服器人數限制的說明與補償公告',
+newsContent:'發布了新公告：伺服器扶持通道正式開放',
 notice_title:'伺服器網站更新公告',
+noticeSupportTitle:'關於伺服器扶持通道的公告',
 noticeContent:'關於伺服器人數限制的說明與補償公告',
 noticeListLabel:'本次官網更新內容：',
 notice1:'玩家公約頁面新增公約內容搜尋框，支援關鍵字定位條約條目',
@@ -763,8 +773,9 @@ runTimeTitle:'Uptime',
 bjTime:'Beijing Time: ',
 totalRun:'Total Uptime: ',
 latestNews:'Latest Updates',
-newsContent:'Published a notice on the server player limit and compensation.',
+newsContent:'New notice published: the Server Support Program is now open.',
 notice_title:'Official Website Update Notice',
+noticeSupportTitle:'Notice on the Server Support Program',
 noticeContent:'Notice on the Server Player Limit and Compensation',
 noticeListLabel:'Website update details:',
 notice1:'Added a content search box to the Player Rules page for locating treaty clauses by keyword.',
@@ -1284,6 +1295,57 @@ date:'September 2026'
 };
 
 // ============================================================
+// 扶持通道公告数据（三语）
+// ============================================================
+const NOTICE_SUPPORT = {
+zhCN: {
+items:[
+{t:'p', x:'即日起，服务器开放以下扶持通道：'},
+{t:'h', x:'一、玩家自行举办赛事或活动'},
+{t:'p', x:'可向管理组报备，说明活动内容、时间、人数规模，管理组审核通过后，将根据活动规模发放物资与金币支持。'},
+{t:'h', x:'二、大型公共建筑'},
+{t:'p', x:'凡建造供全服使用的公共设施（如交通枢纽、公共农场、活动场地、图书馆等），建成后可申请认证，管理组将发放建材补贴与对应称号。'},
+{t:'h', x:'三、大型私有建筑'},
+{t:'p', x:'个人建造的大型城市、庄园、基地等，建成后可申请认证，管理组将根据规模发放建材补贴与称号。'},
+{t:'p', x:'申请方式：私聊管理组，提供截图与坐标，审核通过后发放扶持物资。'},
+{t:'p', x:'欢迎各位踊跃参与，共同建设这个世界。'}
+],
+sign:'The Slow Tide 管理组',
+date:'2026年9月12日'
+},
+zhTW: {
+items:[
+{t:'p', x:'即日起，伺服器開放以下扶持通道：'},
+{t:'h', x:'一、玩家自行舉辦賽事或活動'},
+{t:'p', x:'可向管理組報備，說明活動內容、時間、人數規模，管理組審核通過後，將根據活動規模發放物資與金幣支持。'},
+{t:'h', x:'二、大型公共建築'},
+{t:'p', x:'凡建造供全服使用的公共設施（如交通樞紐、公共農場、活動場地、圖書館等），建成後可申請認證，管理組將發放建材補貼與對應稱號。'},
+{t:'h', x:'三、大型私有建築'},
+{t:'p', x:'個人建造的大型城市、莊園、基地等，建成後可申請認證，管理組將根據規模發放建材補貼與稱號。'},
+{t:'p', x:'申請方式：私聊管理組，提供截圖與座標，審核通過後發放扶持物資。'},
+{t:'p', x:'歡迎各位踴躍參與，共同建設這個世界。'}
+],
+sign:'The Slow Tide 管理組',
+date:'2026年9月12日'
+},
+en: {
+items:[
+{t:'p', x:'Starting today, the server opens the following support channels:'},
+{t:'h', x:'1. Player-Hosted Events or Activities'},
+{t:'p', x:'Players can report to the management team with the activity content, schedule, and expected number of participants. Once approved, the management team will provide supplies and gold coin support based on the scale of the activity.'},
+{t:'h', x:'2. Large Public Buildings'},
+{t:'p', x:'Anyone who builds public facilities for the whole server (such as transport hubs, public farms, event venues, libraries, etc.) can apply for certification after completion. The management team will provide building material subsidies and a corresponding title.'},
+{t:'h', x:'3. Large Private Buildings'},
+{t:'p', x:'Individuals who build large cities, manors, bases, etc. can apply for certification after completion. The management team will provide building material subsidies and a title based on the scale.'},
+{t:'p', x:'How to apply: DM the management team with screenshots and coordinates. Support materials will be distributed after review and approval.'},
+{t:'p', x:'Everyone is welcome to participate actively and build this world together.'}
+],
+sign:'The Slow Tide Management Team',
+date:'September 12, 2026'
+}
+};
+
+// ============================================================
 // 动态栏目数据（三语）
 // ============================================================
 const FEED = {
@@ -1429,6 +1491,26 @@ function renderNoticeLimit(){
   html+='<p class="notice-date">'+N.date+'</p>';
   dom.innerHTML=html;
 }
+function renderNoticeSupport(){
+  const N=NOTICE_SUPPORT[lang];
+  const dom=document.getElementById('noticeSupportContent');
+  if(!dom){ return; }
+  let html='';
+  for(const item of N.items){
+    if(item.t==='p'){
+      html+='<p class="notice-para">'+item.x+'</p>';
+    }else if(item.t==='h'){
+      html+='<h4 class="notice-sub">'+item.x+'</h4>';
+    }else if(item.t==='ul'){
+      html+='<ul style="margin-left:24px;margin-top:8px;">';
+      for(const li of item.x){ html+='<li>'+li+'</li>'; }
+      html+='</ul>';
+    }
+  }
+  html+='<p class="notice-sign">'+N.sign+'</p>';
+  html+='<p class="notice-date">'+N.date+'</p>';
+  dom.innerHTML=html;
+}
 function renderFeed(){
   const items=FEED[lang];
   const dom=document.getElementById('feedContent');
@@ -1469,6 +1551,7 @@ function applyLang(){
   hideResults();
   renderRules();
   renderNoticeLimit();
+  renderNoticeSupport();
   renderFeed();
   buildSuggestPool();
   syncSettingsUI();
