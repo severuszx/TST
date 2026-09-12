@@ -6,15 +6,12 @@
 <title>The Slow Tide官网</title>
 <script>
 (function(){
-// 主题三态：跟随系统 / 深色 / 浅色，localStorage 优先
+// 主题多选：跟随系统 / 浅色 / 深色 / 海洋 / 森林 / 幻紫，localStorage 优先
 var mode=localStorage.getItem('tst-theme')||'system';
-var dark;
-if(mode==='system'){ dark=window.matchMedia('(prefers-color-scheme: dark)').matches; }
-else{ dark=(mode==='dark'); }
-if(dark){ document.documentElement.classList.add('dark'); }
-// 语言
-var lang=localStorage.getItem('tst-lang')||'zhCN';
-document.documentElement.lang = lang==='en'?'en':'zh';
+var theme=mode;
+if(mode==='system'){ theme=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; }
+document.documentElement.setAttribute('data-theme',theme);
+document.documentElement.lang='zh-CN';
 })();
 </script>
 <style>
@@ -30,7 +27,7 @@ document.documentElement.lang = lang==='en'?'en':'zh';
 --accent:#555555;
 --shadow:rgba(0,0,0,.10);
 }
-html.dark{
+html[data-theme="dark"]{
 --bg:#121212;
 --text:#e2e2e2;
 --text-secondary:#aaaaaa;
@@ -40,6 +37,39 @@ html.dark{
 --primary:#dddddd;
 --accent:#bbbbbb;
 --shadow:rgba(0,0,0,.45);
+}
+html[data-theme="ocean"]{
+--bg:#0d1b2a;
+--text:#e0e6ee;
+--text-secondary:#9fb2c6;
+--border:#22405e;
+--card-bg:#14293f;
+--hover-bg:#1b3554;
+--primary:#dce6f0;
+--accent:#4cc9f0;
+--shadow:rgba(0,0,0,.5);
+}
+html[data-theme="forest"]{
+--bg:#0f1a12;
+--text:#dde7dc;
+--text-secondary:#93a894;
+--border:#24402e;
+--card-bg:#17281d;
+--hover-bg:#1f3626;
+--primary:#dae6d8;
+--accent:#6bcb77;
+--shadow:rgba(0,0,0,.5);
+}
+html[data-theme="purple"]{
+--bg:#171226;
+--text:#e6e0f2;
+--text-secondary:#a89ec4;
+--border:#352a58;
+--card-bg:#201937;
+--hover-bg:#2b2249;
+--primary:#e6e0f2;
+--accent:#b39ddb;
+--shadow:rgba(0,0,0,.5);
 }
 body{
 background-color:var(--bg);
@@ -454,7 +484,10 @@ color:#333;
 border-radius:2px;
 padding:0 1px;
 }
-html.dark mark{background:#c99400;color:#1a1a1a;}
+html[data-theme="dark"] mark,
+html[data-theme="ocean"] mark,
+html[data-theme="forest"] mark,
+html[data-theme="purple"] mark{background:#c99400;color:#1a1a1a;}
 .search-flash{
 outline:3px solid #ffb300;
 outline-offset:2px;
@@ -496,16 +529,11 @@ font-weight:bold;
 <div class="settings-label" data-i18n="themeSection">主题模式</div>
 <div class="seg">
 <button class="seg-btn" data-theme="system" data-i18n="themeSystem">跟随系统</button>
-<button class="seg-btn" data-theme="dark" data-i18n="themeDark">深色</button>
 <button class="seg-btn" data-theme="light" data-i18n="themeLight">浅色</button>
-</div>
-</div>
-<div class="settings-group">
-<div class="settings-label" data-i18n="langSection">语言</div>
-<div class="seg">
-<button class="seg-btn" data-lang="zhCN" data-i18n="langZhCN">简体中文</button>
-<button class="seg-btn" data-lang="zhTW" data-i18n="langZhTW">繁體中文</button>
-<button class="seg-btn" data-lang="en" data-i18n="langEn">English</button>
+<button class="seg-btn" data-theme="dark" data-i18n="themeDark">深色</button>
+<button class="seg-btn" data-theme="ocean" data-i18n="themeOcean">海洋</button>
+<button class="seg-btn" data-theme="forest" data-i18n="themeForest">森林</button>
+<button class="seg-btn" data-theme="purple" data-i18n="themePurple">幻紫</button>
 </div>
 </div>
 </div>
@@ -559,12 +587,15 @@ font-weight:bold;
 </div>
 <div class="info-card" data-unit>
 <h3 data-i18n="latestNews">最新动态</h3>
-<p data-i18n="newsContent">发布了关于服务器人数限制的说明与补偿公告</p>
+<p data-i18n="newsContent">发布了新公告：服务器扶持通道正式开放</p>
 </div>
 </div>
 <div id="notice" class="page">
 <h2 data-i18n="notice_title">服务器网站更新公告</h2>
 <div class="info-card" data-unit>
+<h3 data-i18n="noticeUpdateTitle">服务器更新公告</h3>
+<div id="noticeUpdateContent"></div>
+<div class="notice-divider"></div>
 <h3 data-i18n="noticeSupportTitle">关于服务器扶持通道的公告</h3>
 <div id="noticeSupportContent"></div>
 <div class="notice-divider"></div>
@@ -632,8 +663,11 @@ settingsTitle:'设置',
 themeSection:'主题模式',
 langSection:'语言',
 themeSystem:'跟随系统',
-themeDark:'深色',
 themeLight:'浅色',
+themeDark:'深色',
+themeOcean:'海洋',
+themeForest:'森林',
+themePurple:'幻紫',
 langZhCN:'简体中文',
 langZhTW:'繁體中文',
 langEn:'English',
@@ -655,6 +689,7 @@ totalRun:'累计运行时间：',
 latestNews:'最新动态',
 newsContent:'发布了新公告：服务器扶持通道正式开放',
 notice_title:'服务器网站更新公告',
+noticeUpdateTitle:'服务器更新公告',
 noticeSupportTitle:'关于服务器扶持通道的公告',
 noticeContent:'关于服务器人数限制的说明与补偿公告',
 noticeListLabel:'本次官网更新内容：',
@@ -685,126 +720,6 @@ sug_build:'建筑', sug_claim:'领地', sug_economy:'经济', sug_trade:'交易'
 sug_villager:'村民', sug_cheat:'外挂', sug_gamble:'赌博', sug_event:'赛事',
 sug_runtime:'运行时间', sug_status:'状态',
 footer:'© 2026 The Slow Tide TST服务器'
-},
-zhTW: {
-siteTitle:'The Slow Tide官網',
-settingsTitle:'設定',
-themeSection:'主題模式',
-langSection:'語言',
-themeSystem:'跟隨系統',
-themeDark:'深色',
-themeLight:'淺色',
-langZhCN:'简体中文',
-langZhTW:'繁體中文',
-langEn:'English',
-searchPlaceholder:'全域搜尋：輸入關鍵字跳轉對應頁面或內容',
-searchBtn:'確認搜尋',
-ruleSearchPlaceholder:'搜尋公約內容，輸入關鍵字自動跳轉定位',
-ruleSearchBtn:'確認搜尋',
-nav_home:'首頁', nav_notice:'公告', nav_feed:'動態', nav_event:'賽事活動', nav_cdkey:'兌換碼', nav_sponsor:'伺服器贊助', nav_rule:'玩家公約',
-home_title:'🏠 伺服器首頁',
-serverInfo:'伺服器資訊',
-serverAddr:'伺服器位址：',
-copyAddr:'複製位址',
-qqGroup:'QQ交流群：',
-statusLabel:'目前狀態：',
-statusOnline:'運行中',
-runTimeTitle:'運行計時',
-bjTime:'北京時間：',
-totalRun:'累計運行時間：',
-latestNews:'最新動態',
-newsContent:'發布了新公告：伺服器扶持通道正式開放',
-notice_title:'伺服器網站更新公告',
-noticeSupportTitle:'關於伺服器扶持通道的公告',
-noticeContent:'關於伺服器人數限制的說明與補償公告',
-noticeListLabel:'本次官網更新內容：',
-notice1:'玩家公約頁面新增公約內容搜尋框，支援關鍵字定位條約條目',
-notice2:'首頁增加全域搜尋輸入框，支援關鍵字檢索網站內容',
-notice3:'修復玩家公約目錄錨點捲動定位BUG',
-notice4:'優化頁面細節與行動端適配，清理多餘留白',
-noticeEnd:'請各位玩家知悉，祝遊玩愉快。',
-feed_title:'伺服器動態',
-event_title:'賽事活動',
-noEvent:'暫無進行中賽事',
-cdkey_title:'兌換碼',
-noCdkey:'ILOVEWYJ',
-sponsor_title:'伺服器贊助',
-payQr:'贊助收款二維碼',
-sponsorNote:'謝謝喵（磕頭）',
-rule_title:'玩家公約',
-tip_input_kw:'請輸入搜尋關鍵字',
-tip_found:'已定位關鍵字：{kw}',
-found_many:'找到{n}筆結果，點擊跳轉：{kw}',
-tip_not_found_rule:'未在公約中找到符合關鍵字',
-tip_not_found_site:'網站內未檢索到該關鍵字',
-copied:'伺服器位址已複製',
-copyFail:'複製失敗，請手動複製',
-sug_address:'伺服器位址', sug_qq:'QQ交流群', sug_cdkey:'兌換碼', sug_sponsor:'贊助',
-sug_rules:'玩家公約', sug_pvp:'PVP', sug_redstone:'紅石', sug_tech:'生電',
-sug_build:'建築', sug_claim:'領地', sug_economy:'經濟', sug_trade:'交易',
-sug_villager:'村民', sug_cheat:'外掛', sug_gamble:'賭博', sug_event:'賽事',
-sug_runtime:'運行時間', sug_status:'狀態',
-footer:'© 2026 The Slow Tide TST伺服器'
-},
-en: {
-siteTitle:'The Slow Tide Official Website',
-settingsTitle:'Settings',
-themeSection:'Theme',
-langSection:'Language',
-themeSystem:'Follow System',
-themeDark:'Dark',
-themeLight:'Light',
-langZhCN:'简体中文',
-langZhTW:'繁體中文',
-langEn:'English',
-searchPlaceholder:'Global search: type a keyword to jump to the matching page or content',
-searchBtn:'Search',
-ruleSearchPlaceholder:'Search the rules: type a keyword to locate a clause',
-ruleSearchBtn:'Search',
-nav_home:'Home', nav_notice:'News', nav_feed:'Feed', nav_event:'Events', nav_cdkey:'Redeem Codes', nav_sponsor:'Sponsor', nav_rule:'Player Rules',
-home_title:'🏠 Server Home',
-serverInfo:'Server Info',
-serverAddr:'Server Address: ',
-copyAddr:'Copy',
-qqGroup:'QQ Group: ',
-statusLabel:'Status: ',
-statusOnline:'Online',
-runTimeTitle:'Uptime',
-bjTime:'Beijing Time: ',
-totalRun:'Total Uptime: ',
-latestNews:'Latest Updates',
-newsContent:'New notice published: the Server Support Program is now open.',
-notice_title:'Official Website Update Notice',
-noticeSupportTitle:'Notice on the Server Support Program',
-noticeContent:'Notice on the Server Player Limit and Compensation',
-noticeListLabel:'Website update details:',
-notice1:'Added a content search box to the Player Rules page for locating treaty clauses by keyword.',
-notice2:'Added a global search box on the homepage to search site content by keyword.',
-notice3:'Fixed the bug where the Player Rules table-of-contents anchor scrolling was mispositioned.',
-notice4:'Optimized page details and mobile responsiveness, cleaned up extra whitespace.',
-noticeEnd:'Please take note and enjoy your time on the server.',
-feed_title:'Server Feed',
-event_title:'Events & Tournaments',
-noEvent:'No ongoing events.',
-cdkey_title:'Redeem Codes',
-noCdkey:'ILOVEWYJ',
-sponsor_title:'Sponsor the Server',
-payQr:'Sponsorship Payment QR Code',
-sponsorNote:'Thank you meow (kowtow)',
-rule_title:'Player Rules',
-tip_input_kw:'Please enter a search keyword',
-tip_found:'Keyword found: {kw}',
-found_many:'Found {n} results, click to jump: {kw}',
-tip_not_found_rule:'No matching keyword found in the rules',
-tip_not_found_site:'No matching keyword found on this site',
-copied:'Server address copied',
-copyFail:'Copy failed, please copy manually',
-sug_address:'Server address', sug_qq:'QQ group', sug_cdkey:'Redeem code', sug_sponsor:'Sponsor',
-sug_rules:'Player rules', sug_pvp:'PVP', sug_redstone:'Redstone', sug_tech:'Tech machines',
-sug_build:'Building', sug_claim:'Claims', sug_economy:'Economy', sug_trade:'Trading',
-sug_villager:'Villagers', sug_cheat:'Hacks', sug_gamble:'Gambling', sug_event:'Events',
-sug_runtime:'Uptime', sug_status:'Status',
-footer:'© 2026 The Slow Tide TST Server'
 }
 };
 
@@ -955,294 +870,6 @@ refs:[
 '3. 感谢所有公开参考资料及参与规则完善的玩家与创作者。'
 ],
 closing:'本条约目前仍在持续修订中，暂不作为最终正式版本执行，后续将根据实际情况进一步完善。如有建议，欢迎通过主城意见箱反馈。'
-},
-zhTW: {
-treatyTitle:'The Slow Tide 伺服器總條約',
-subTitle:'網易基岩TST山頭',
-intro:[
-'本條約適用於 The Slow Tide 伺服器全體玩家，統一規範伺服器內行為準則、經濟秩序、建築保護、PVP機制、設備使用及違規處罰等全部遊玩相關事宜。',
-'本條約所有條款具備通用性、約束性與權威性。不接受「不知情」「規則未閱讀」「卡規則漏洞」等任何免責理由。無論玩家資歷、伺服器貢獻高低，管理員均有權對違規行為採取警告、權限限制、限時封禁、永久封禁等處置。',
-'針對本條約未明文列舉，但確實擾亂伺服器秩序、破壞公共環境、侵害他人權益的行為，管理組有權根據行為造成的實際影響，做出合理、公正的判定與處罰。',
-'全體玩家在伺服器內及關聯社群的一切行為，必須嚴格遵守《中華人民共和國法律法規》。嚴禁以任何形式詆毀、攻擊、抹黑、誹謗伺服器、管理團隊及其他玩家；嚴禁使用任何技術手段干擾、破壞伺服器正常運行。',
-'本條約將根據伺服器運營狀態動態優化更新。重大規則變更將提前發布官方公告告知全體玩家。凡進入本伺服器遊玩、參與社群交流，即視為已閱讀、理解並自願同意本條約全部內容；若不認可本規則，請勿進入伺服器及相關社群。'
-],
-tocLabel:'目錄（點擊跳轉）',
-toc:[
-['sec1','基礎行為規範'],['sec2','聊天與社交規範'],['sec3','建築與領地保護'],['sec4','資源採集與環境維護'],['sec5','經濟與交易規則'],['sec6','PVP與戰鬥行為'],['sec7','紅石與生電設備規範'],['sec8','生物與村民管理'],['sec9','玩家權益與回饋管道'],['sec10','違規處理與處罰制度'],['sec11','伺服器管理組職責'],['sec12','活動與賽事規則'],['sec13','資料與存檔管理'],['sec14','規則更新與解釋權']
-],
-sections:[
-{id:'sec1',title:'1. 基礎行為規範',paras:[
-'伺服器管理組不受理玩家之間普通拆家、偷家、毀基地等私人糾紛，外掛破壞、惡性BUG濫用等違規行為除外。',
-'伺服器日誌與安全外掛，僅用於防禦外掛作弊、防護公共設施與玩家領地安全。',
-'嚴禁一切危害伺服器安全、運行穩定、公共利益的行為，違者從重處罰。',
-'全面禁止任何形式的外掛、作弊程式、輔助工具。',
-'全體玩家需文明遊玩、友善交流，遵守基礎禮儀規範。',
-'嚴禁傳播涉黃、涉黑、涉暴、低俗惡俗等不良資訊。',
-'禁止在公共區域跑跳搭。',
-'伺服器官方語言為簡體/繁體中文，全員交流統一使用漢語。',
-'禁止建造含低俗暗示、違規隱喻、不良導向的建築。',
-'禁止利用遊戲BUG、機制漏洞實施破壞、牟利、擾民等惡性行為。',
-'禁止一切違背雙方意願的強制PVP行為。',
-'所有遊戲行為、社交行為必須符合國家法律法規，違法違規行為一律從重處罰。',
-'所有生電、紅石設備必須配備獨立開關，做到人走機停，杜絕長期空轉佔用伺服器資源。',
-'新建交通設施（冰道、鐵路、通道等）不得干擾、佔用、破壞已有公共交通線路。',
-'伺服器內全面禁止賭博行為，一經發現立刻責令拆除並永久封禁。',
-'玩家產生糾紛、矛盾爭議時，禁止情緒化鬧事，需冷靜溝通或聯繫管理依規解決。'
-]},
-{id:'sec2',title:'2. 聊天與社交規範',paras:[
-'伺服器及社群官方交流語言為中文（簡體、繁體通用）。',
-'禁止刻意斷章取義、過度解讀、歪曲他人發言、故意誤導他人。',
-'禁止散布謠言、宗教傳教、引流廣告、無關推廣資訊。',
-'嚴禁發布、傳播涉黃、涉暴、涉政、違法違規內容，一經發現永久封禁。',
-'禁止私自向伺服器、社群內添加各類機器人、自動腳本、推播程式。'
-]},
-{id:'sec3',title:'3. 建築與領地保護',paras:[
-'伺服器預設無全域建築保護，未圈地區域建築損毀風險由玩家自行承擔。',
-'玩家可使用圈地系統保護私人建築，領地範圍內禁止一切未經允許的破壞、改動、佔用行為，違規可聯繫管理或透過舉報箱申訴。',
-'未進行圈地的建築、設施、臨時建築，不受伺服器保護，除外掛、BUG惡意破壞外，損毀後果由建造者自行承擔。',
-'未經領地主許可，禁止在他人領地內建造、改造地形、放置設施、改動結構。',
-'禁止破壞、損毀、改動伺服器公共建築，包含主城、公共傳送點、出生點、終界出生點等公共設施。',
-'領地所有者連續30天未登入伺服器，該領地自動回收，歸屬權回歸伺服器。',
-'領地內非領地成員造成的一切破壞、違規、糾紛問題，由當事人自行承擔全部責任。'
-]},
-{id:'sec4',title:'4. 資源採集與環境維護',paras:[
-'禁止在非領地範圍內大規模破壞地形，包括掏空山體、大面積填水、大範圍鏟平地貌等。',
-'禁止在出生點、公共區域進行大規模挖掘、爆破、地形改造。',
-'倡導合理、節制利用資源，避免過度採集造成資源浪費與枯竭。',
-'廢棄礦洞、閒置建築、殘留工程設施，建議自行填埋、清理規整。',
-'禁止利用漏洞、機制刷取貨幣、物資、資源，違者嚴肅處罰。'
-]},
-{id:'sec5',title:'5. 經濟與交易規則',paras:[
-'禁止惡意囤貨、控價、哄抬物價、擾亂伺服器市場經濟秩序，違者從重處理。',
-'嚴禁利用漏洞刷取金幣、物品、資源，一經查實直接封號處理。',
-'系統商店僅作為物資兜底補充管道，不作為主要取得途徑。',
-'玩家私下交易價格由雙方自主協商，管理組不介入正常定價，僅干預惡意控價、詐欺行為。',
-'全面禁止現實貨幣交易（RMB交易），包括物品買賣、金幣變現、代練交易等，一經發現永久封禁。',
-'伺服器管理組有權不定期調整系統商店物價，玩家如有異議可以透過意見箱回饋。'
-]},
-{id:'sec6',title:'6. PVP與戰鬥行為',paras:[
-'所有非雙方自願的強制PVP、偷襲、追殺行為一律禁止，違者封號處理。',
-'禁止在主城、出生點等公共安全區域主動發起PVP戰鬥。',
-'官方活動、賽事期間的PVP規則，以當期活動公告為準。'
-]},
-{id:'sec7',title:'7. 紅石與生電設備規範',paras:[
-'伺服器開放紅石、生電玩法，但所有設備必須控制在合理負載範圍內，不得影響伺服器運行。',
-'禁止建造高頻紅石、大面積卡頓裝置、佔服設備。',
-'長期運行、高負載、大型生電設備，建造前需要提前向管理組報備備案。',
-'廢棄、閒置紅石設備需要及時拆除，避免佔用區塊資源。',
-'全部紅石、生電設備必須設定可控開關，嚴格執行人走機停規則。',
-'禁止搭建多核堆疊、多層疊加的超規格生電機器。',
-'伺服器自帶高頻限制機制，高頻類紅石設備無法正常運行，請勿違規搭建。'
-]},
-{id:'sec8',title:'8. 生物與村民管理',paras:[
-'禁止惡意屠村、批量擊殺無辜生物、浪費生物資源。',
-'村民交易、繁殖機制可以在合規範圍內合理使用。',
-'禁止在公共區域建造大型生怪塔、大規模村民繁殖機，特殊需求需要提前報備管理。',
-'禁止利用生物尋路機制、聚集機制惡意造成伺服器卡頓。',
-'合理、節制使用各類生物機制，杜絕濫用、惡意堆載。',
-'伺服器開啟區塊清理機制，禁止大批量、密集飼養生物，防止卡頓、吞檔。'
-]},
-{id:'sec9',title:'9. 玩家權益與回饋管道',paras:[
-'玩家對管理處罰、判定結果存在異議，可憑有效證據透過意見箱提交申訴。',
-'玩家合理建議、最佳化提案可以透過主城意見箱提交，管理組承諾三個工作日內回覆處理。',
-'管理組不會無故干涉、限制玩家正常、合規的遊戲發展與玩法。',
-'全體玩家享有平等遊玩權益，不受管理員或其他玩家的針對、歧視、無端干預。',
-'玩家可以在不違反條約的前提下，自由選擇玩法、建設方向與社交方式。',
-'玩家有權知曉自身帳號處罰的全部依據、違規事由。',
-'管理組嚴格保護玩家隱私，絕不公開玩家IP、聯絡方式等私人資訊。',
-'玩家遊戲資料僅用於伺服器正常運營，絕不向第三方洩露、轉交。',
-'違規調查階段，管理組可依規查閱對應遊戲日誌與資料，嚴禁濫用權限。',
-'管理組對所有玩家一視同仁，不存在特殊權限、親友優待。',
-'管理組內部矛盾、爭議判定，由全體管理員共同裁定，保證公開公正。',
-'玩家發現管理員存在違規操作、濫用權限行為，可向其他管理成員檢舉。',
-'玩家領地範圍內的建築、物品、設施受官方保護，其他人禁止擅自破壞、盜取、改動。',
-'因伺服器故障、存檔異常造成的資料損失，管理組會盡力修復，但不保證百分百完全恢復。'
-]},
-{id:'sec10',title:'10. 違規處理與處罰制度',paras:[
-'輕微違規：口頭警告、書面提醒、臨時限制部分權限。',
-'中度違規：清空違規資產、限時封禁帳號。',
-'嚴重違規：永久封禁帳號。',
-'作弊、漏洞刷物、惡意破壞等惡性行為，直接處罰、不給予提前警告。',
-'全部處罰記錄統一存檔，作為後續判定參考依據。'
-]},
-{id:'sec11',title:'11. 伺服器管理組職責',paras:[
-'負責規則執行、伺服器維護、活動策劃、玩家糾紛調解、秩序維護。',
-'秉持公正、公開、透明原則處理全部伺服器相關事務。',
-'不參與玩家正常經濟競爭，不干預合規玩法與正常遊戲發展。',
-'主動接受全體玩家監督，積極回應合理質疑與建議。'
-]},
-{id:'sec12',title:'12. 活動與賽事規則',paras:[
-'各類官方活動、賽事優先遵循當期專屬活動規則。',
-'活動內違規玩家直接取消參賽資格與獎勵資格，情節嚴重追加常規處罰。',
-'活動獎勵、規則、流程以官方公告為準。',
-'全部活動最終解釋權歸伺服器管理組所有。'
-]},
-{id:'sec13',title:'13. 資料與存檔管理',paras:[
-'伺服器會定期自動備份存檔，但無法保證單個建築、單件物品精準復原。',
-'因不可抗力、網路故障、裝置問題造成的資料遺失，管理組不承擔賠償責任。',
-'伺服器大版本更新前會發布公告，最大限度保留原有存檔內容。',
-'玩家金幣、物品、權限、成就等個人資料，以伺服器後台記錄作為唯一有效依據。'
-]},
-{id:'sec14',title:'14. 規則更新與解釋權',paras:[
-'本條約會跟隨伺服器發展持續優化、補充、修改。',
-'規則重大修訂、增減條款，會提前發布公告通知全體玩家。',
-'小規模文字微調、細節最佳化，可直接更新不另行通知。',
-'本伺服器全部條約的最終解釋權歸 The Slow Tide 管理組所有。'
-]}
-],
-makeNote:'條約制定說明',
-makers:'參與制定玩家：執又之賢、極嵐 及 The Slow Tide 伺服器全體參與研討玩家',
-refNote:'參考來源說明：',
-refs:[
-'1. 參考國內多社群Minecraft伺服器成熟管理框架與運營經驗；',
-'2. 參考公開伺服器規約、玩家手冊等公開資料，並結合本服實際情況最佳化改寫；',
-'3. 感謝所有公開參考資料及參與規則完善的玩家與創作者。'
-],
-closing:'本條約目前仍在持續修訂中，暫不作為最終正式版本執行，後續將根據實際情況進一步完善。如有建議，歡迎透過主城意見箱回饋。'
-},
-en: {
-treatyTitle:'The Slow Tide Server Master Treaty',
-subTitle:'NetEase Bedrock TST Mountain',
-intro:[
-'This treaty applies to all players of The Slow Tide server, uniformly regulating all gameplay-related matters including in-game conduct, economic order, building protection, PVP mechanics, equipment usage, and violation penalties.',
-'All clauses of this treaty are universal, binding, and authoritative. No excuse — such as "I was unaware", "I did not read the rules", or "exploiting rule loopholes" — is accepted. Regardless of a player\'s seniority or contribution to the server, administrators have the right to take actions including warnings, permission restrictions, temporary bans, and permanent bans against violations.',
-'For behaviors that are not explicitly listed in this treaty but genuinely disrupt server order, damage the public environment, or infringe on the rights of others, the management team has the right to make reasonable and fair judgments and impose penalties based on the actual impact of the behavior.',
-'All players must strictly comply with the laws and regulations of the People\'s Republic of China in all actions within the server and related communities. It is strictly forbidden to defame, attack, smear, or slander the server, the management team, or other players in any form; it is strictly forbidden to use any technical means to interfere with or disrupt the normal operation of the server.',
-'This treaty will be dynamically optimized and updated according to the server\'s operation status. Major rule changes will be announced to all players in advance through official announcements. Anyone who enters the server to play or participates in community communication is deemed to have read, understood, and voluntarily agreed to all contents of this treaty. If you do not accept these rules, please do not enter the server or related communities.'
-],
-tocLabel:'Table of Contents (click to jump)',
-toc:[
-['sec1','Basic Conduct'],['sec2','Chat & Social Norms'],['sec3','Building & Claim Protection'],['sec4','Resource Gathering & Environment'],['sec5','Economy & Trading Rules'],['sec6','PVP & Combat'],['sec7','Redstone & Tech Machines'],['sec8','Mobs & Villagers'],['sec9','Player Rights & Feedback'],['sec10','Violations & Penalties'],['sec11','Server Admin Duties'],['sec12','Events & Tournaments'],['sec13','Data & Backup Management'],['sec14','Rule Updates & Interpretation']
-],
-sections:[
-{id:'sec1',title:'1. Basic Conduct',paras:[
-'The server management team does not handle ordinary private disputes between players, such as raiding bases, stealing from bases, or destroying bases. Exceptions are violations such as destruction caused by hacks or malicious abuse of serious bugs.',
-'Server logs and security plugins are used only to defend against cheating, protect public facilities, and safeguard the security of players\' claims.',
-'Any behavior that endangers server security, operational stability, or public interests is strictly prohibited; offenders will be severely punished.',
-'Any form of hacks, cheat programs, or helper tools is completely prohibited.',
-'All players must play civilly, interact kindly, and follow basic etiquette.',
-'Disseminating obscene, criminal, violent, vulgar, or otherwise harmful information is strictly prohibited.',
-'Running, jumping, and block-pillaring in public areas is prohibited.',
-'The official language of the server is Chinese (both Simplified and Traditional). All players must communicate in Chinese.',
-'Building structures containing vulgar hints, inappropriate metaphors, or negative connotations is prohibited.',
-'Using game bugs or mechanic loopholes for malicious acts such as destruction, profiteering, or harassment is prohibited.',
-'All forced PVP against the will of either party is prohibited.',
-'All in-game and social behavior must comply with national laws and regulations; illegal or non-compliant behavior will always be severely punished.',
-'All tech and redstone machines must be equipped with their own switches, so machines stop when the player leaves, preventing long-term idle operation from consuming server resources.',
-'New transportation facilities (ice highways, railways, tunnels, etc.) must not interfere with, occupy, or damage existing public transportation lines.',
-'Gambling is completely prohibited on the server. Once discovered, it will be ordered to be dismantled immediately and the offender will be permanently banned.',
-'When players have disputes or conflicts, emotional outbursts are prohibited. Players should communicate calmly or contact the management to resolve issues according to the rules.'
-]},
-{id:'sec2',title:'2. Chat & Social Norms',paras:[
-'The official language of the server and its communities is Chinese (both Simplified and Traditional).',
-'Deliberately taking statements out of context, over-interpreting, distorting others\' words, or intentionally misleading others is prohibited.',
-'Spreading rumors, religious proselytizing, traffic-diverting ads, or unrelated promotional information is prohibited.',
-'Publishing or spreading obscene, violent, politically sensitive, or illegal content is strictly prohibited and will result in a permanent ban once discovered.',
-'Adding any robots, automatic scripts, or push programs to the server or its communities without permission is prohibited.'
-]},
-{id:'sec3',title:'3. Building & Claim Protection',paras:[
-'The server has no global building protection by default; players bear the risk of damage to buildings in unclaimed areas.',
-'Players can use the claiming system to protect their private buildings. All unauthorized destruction, modification, or occupation within a claim is prohibited. Violations can be reported to the management or through the complaint box.',
-'Buildings, facilities, and temporary structures that are not claimed are not protected by the server. Except for malicious destruction by hacks or bugs, the builder bears the consequences of any damage.',
-'Without the permission of the claim owner, building, terraforming, placing facilities, or modifying structures within another player\'s claim is prohibited.',
-'Damaging, destroying, or modifying public server buildings is prohibited, including the main city, public teleport points, spawn, the End spawn, and other public facilities.',
-'If a claim owner has not logged into the server for 30 consecutive days, the claim will be automatically reclaimed, and ownership returns to the server.',
-'All destruction, violations, and disputes caused by non-members within a claim are the full responsibility of the persons involved.'
-]},
-{id:'sec4',title:'4. Resource Gathering & Environment',paras:[
-'Large-scale terrain destruction outside claimed areas is prohibited, including hollowing out mountains, large-scale water filling, and large-area flattening of terrain.',
-'Large-scale mining, blasting, and terrain modification at spawn or in public areas are prohibited.',
-'Reasonable and moderate use of resources is encouraged; avoid over-gathering that causes waste and depletion of resources.',
-'It is recommended that abandoned mines, idle buildings, and leftover construction facilities be backfilled and cleaned up properly.',
-'Using loopholes or mechanics to farm currency, items, or resources is prohibited; offenders will be seriously punished.'
-]},
-{id:'sec5',title:'5. Economy & Trading Rules',paras:[
-'Malicious hoarding, price control, price gouging, or disrupting the server\'s market economic order is prohibited; offenders will be severely dealt with.',
-'Using loopholes to farm coins, items, or resources is strictly prohibited; once verified, the account will be banned directly.',
-'The system shop serves only as a supplementary channel for essential goods, not as the main way to obtain them.',
-'Prices in private player-to-player trades are negotiated by both parties. The management team does not intervene in normal pricing, only in malicious price control and fraud.',
-'Real-money transactions (RMB trading) are completely prohibited, including buying and selling items, cashing out coins, and boosting services. Once discovered, a permanent ban will be issued.',
-'The management team reserves the right to adjust system shop prices from time to time. Players with objections can provide feedback through the suggestion box.'
-]},
-{id:'sec6',title:'6. PVP & Combat',paras:[
-'All forced PVP, sneak attacks, and hunting down players that are not mutually voluntary are prohibited; offenders will be banned.',
-'Initiating PVP combat in public safe areas such as the main city and spawn is prohibited.',
-'PVP rules during official events and tournaments follow the announcements of the current event.'
-]},
-{id:'sec7',title:'7. Redstone & Tech Machines',paras:[
-'The server allows redstone and tech gameplay, but all machines must be kept within a reasonable load and must not affect server performance.',
-'Building high-frequency redstone, large lag machines, or server-consuming devices is prohibited.',
-'Long-running, high-load, or large-scale tech machines must be reported and registered with the management team before construction.',
-'Abandoned or idle redstone devices must be removed promptly to avoid occupying chunk resources.',
-'All redstone and tech machines must have controllable switches and strictly follow the rule of stopping machines when the player leaves.',
-'Building over-spec tech machines with multi-core stacking or multi-layer stacking is prohibited.',
-'The server has a built-in high-frequency limit mechanism; high-frequency redstone devices cannot run normally. Please do not build them in violation.'
-]},
-{id:'sec8',title:'8. Mobs & Villagers',paras:[
-'Maliciously raiding villages, mass-killing innocent mobs, and wasting mob resources are prohibited.',
-'Villager trading and breeding mechanics may be used reasonably within compliant limits.',
-'Building large mob farms or mass villager breeding machines in public areas is prohibited; special needs must be reported to the management in advance.',
-'Using mob pathfinding or grouping mechanics to maliciously cause server lag is prohibited.',
-'Use mob mechanics reasonably and moderately; avoid abuse and malicious overloading.',
-'The server has a chunk-clearing mechanism; mass and dense mob breeding is prohibited to prevent lag and save corruption.'
-]},
-{id:'sec9',title:'9. Player Rights & Feedback',paras:[
-'Players who dispute management penalties or judgments can submit an appeal with valid evidence through the suggestion box.',
-'Reasonable suggestions and optimization proposals can be submitted through the main city suggestion box. The management team promises to respond within three working days.',
-'The management team will not interfere with or restrict players\' normal, compliant game development and gameplay without reason.',
-'All players enjoy equal gameplay rights and shall not be targeted, discriminated against, or unduly interfered with by administrators or other players.',
-'Players may freely choose their gameplay, building direction, and social style without violating the treaty.',
-'Players have the right to know all the evidence for their account\'s punishment and the reasons for the violation.',
-'The management team strictly protects player privacy and will never disclose private information such as IP addresses or contact details.',
-'Player game data is used only for the normal operation of the server and will never be leaked or transferred to third parties.',
-'During violation investigations, the management team may review the relevant game logs and data in accordance with the rules; abusing this authority is strictly prohibited.',
-'The management team treats all players equally; there are no special privileges or favoritism toward friends and relatives.',
-'Internal management disputes and contested judgments are decided jointly by all administrators to ensure fairness and transparency.',
-'Players who discover administrators engaging in violations or abusing authority can report them to other management members.',
-'Buildings, items, and facilities within a player\'s claim are officially protected; others are prohibited from destroying, stealing, or modifying them without permission.',
-'For data loss caused by server failures or save anomalies, the management team will try its best to restore the data but does not guarantee complete recovery.'
-]},
-{id:'sec10',title:'10. Violations & Penalties',paras:[
-'Minor violations: verbal warning, written reminder, or temporary restriction of certain permissions.',
-'Moderate violations: clearing the offending assets or a time-limited account ban.',
-'Serious violations: permanent account ban.',
-'Malicious acts such as cheating, farming items through loopholes, and malicious destruction are punished directly without prior warning.',
-'All penalty records are archived uniformly and serve as reference for subsequent judgments.'
-]},
-{id:'sec11',title:'11. Server Admin Duties',paras:[
-'Responsible for rule enforcement, server maintenance, event planning, player dispute mediation, and order maintenance.',
-'Handle all server-related matters with the principles of fairness, openness, and transparency.',
-'Do not participate in players\' normal economic competition, and do not interfere with compliant gameplay or normal game development.',
-'Proactively accept supervision from all players and respond positively to reasonable questions and suggestions.'
-]},
-{id:'sec12',title:'12. Events & Tournaments',paras:[
-'Official events and tournaments follow the dedicated rules of the current event first.',
-'Players who violate rules during an event will be directly disqualified from participation and rewards; serious cases will incur additional regular penalties.',
-'Event rewards, rules, and procedures are subject to official announcements.',
-'The server management team holds the final interpretation right for all events.'
-]},
-{id:'sec13',title:'13. Data & Backup Management',paras:[
-'The server regularly backs up saves automatically, but cannot guarantee precise restoration of a single building or item.',
-'The management team is not liable for data loss caused by force majeure, network failures, or device issues.',
-'Announcements will be released before major server version updates, preserving existing save content to the greatest extent.',
-'Personal data such as player coins, items, permissions, and achievements are subject to the server\'s backend records as the only valid basis.'
-]},
-{id:'sec14',title:'14. Rule Updates & Interpretation',paras:[
-'This treaty will continue to be optimized, supplemented, and revised as the server develops.',
-'Major rule revisions and additions or removals of clauses will be announced to all players in advance.',
-'Small text adjustments and detail optimizations can be updated directly without separate notice.',
-'The final interpretation right of all rules on this server belongs to The Slow Tide management team.'
-]}
-],
-makeNote:'Notes on the Making of the Treaty',
-makers:'Players involved in drafting: 执又之贤, 极岚, and all players of The Slow Tide server who participated in the discussion',
-refNote:'References:',
-refs:[
-'1. Referenced mature management frameworks and operational experience from multiple Minecraft server communities in China;',
-'2. Referenced public server rules, player handbooks, and other public materials, adapted and optimized for this server\'s actual situation;',
-'3. Thanks to all public reference materials and the players and creators who helped improve the rules.'
-],
-closing:'This treaty is still under continuous revision and is not yet enforced as a final official version. It will be further improved according to actual conditions in the future. If you have suggestions, please provide feedback through the main city suggestion box.'
 }
 };
 
@@ -1263,34 +890,6 @@ items:[
 ],
 sign:'The Slow Tide 管理组',
 date:'2026年9月'
-},
-zhTW: {
-items:[
-{t:'p', x:'近期隨著伺服器活躍度上升，同時線上人數不斷增加。為了保障全體玩家的遊戲體驗，避免因負載過高導致的卡頓、回檔、掉線等問題，我們決定對伺服器線上人數進行動態管理。'},
-{t:'p', x:'自本公告發布起，當伺服器同時線上人數超過 10 人時，系統將自動踢出最後進入的玩家，以維持伺服器的穩定運行。'},
-{t:'p', x:'這一決定並非輕率之舉。我們深知每一位進入伺服器的玩家都帶著時間和期待，但伺服器的硬體資源有限，長期超載不僅會影響當前玩家的體驗，也可能對存檔和資料安全造成潛在風險。我們希望在現有條件下，盡可能為每一位線上玩家提供流暢、穩定的環境。'},
-{t:'p', x:'對於因此受到影響的玩家，我們將發放 50 金幣作為補償。雖然金額不大，但代表我們對每一位玩家理解與支持的感謝。'},
-{t:'p', x:'我們也在積極尋求更長期的優化方案，包括但不限於：'},
-{t:'ul', x:['優化現有指令方塊與紅石設備的執行效率','清理不必要的實體與載入區塊','評估伺服器配置升級的可能性']},
-{t:'p', x:'我們理解這一措施可能會給部分玩家帶來不便，但希望各位能夠理解並支持。伺服器的長遠穩定，需要管理組與每一位玩家共同努力。'},
-{t:'p', x:'感謝大家一路以來的陪伴與包容。'}
-],
-sign:'The Slow Tide 管理組',
-date:'2026年9月'
-},
-en: {
-items:[
-{t:'p', x:'As server activity has grown recently, the number of concurrent online players keeps increasing. To protect the gaming experience of all players and avoid problems such as lag, rollbacks, and disconnections caused by excessive load, we have decided to manage the number of concurrent online players dynamically.'},
-{t:'p', x:'Effective from the release of this notice, when the number of concurrent online players exceeds 10, the system will automatically kick the most recently joined player to keep the server running stably.'},
-{t:'p', x:'This decision was not made lightly. We are well aware that every player who enters the server brings their time and expectations. However, the server\'s hardware resources are limited. Long-term overload would not only hurt the experience of current players, but could also pose potential risks to the world saves and data safety. We hope to provide every online player with a smooth and stable environment to the best of our ability under the current conditions.'},
-{t:'p', x:'Players affected by this measure will receive 50 gold coins as compensation. The amount may be small, but it represents our gratitude for every player\'s understanding and support.'},
-{t:'p', x:'We are also actively working on more long-term optimization plans, including but not limited to:'},
-{t:'ul', x:['Optimizing the execution efficiency of existing command blocks and redstone devices','Cleaning up unnecessary entities and loaded chunks','Evaluating the possibility of upgrading the server configuration']},
-{t:'p', x:'We understand that this measure may inconvenience some players, but we hope everyone can understand and support it. The long-term stability of the server requires the joint efforts of the management team and every player.'},
-{t:'p', x:'Thank you all for your company and tolerance along the way.'}
-],
-sign:'The Slow Tide Management Team',
-date:'September 2026'
 }
 };
 
@@ -1312,41 +911,35 @@ items:[
 ],
 sign:'The Slow Tide 管理组',
 date:'2026年9月12日'
-},
-zhTW: {
-items:[
-{t:'p', x:'即日起，伺服器開放以下扶持通道：'},
-{t:'h', x:'一、玩家自行舉辦賽事或活動'},
-{t:'p', x:'可向管理組報備，說明活動內容、時間、人數規模，管理組審核通過後，將根據活動規模發放物資與金幣支持。'},
-{t:'h', x:'二、大型公共建築'},
-{t:'p', x:'凡建造供全服使用的公共設施（如交通樞紐、公共農場、活動場地、圖書館等），建成後可申請認證，管理組將發放建材補貼與對應稱號。'},
-{t:'h', x:'三、大型私有建築'},
-{t:'p', x:'個人建造的大型城市、莊園、基地等，建成後可申請認證，管理組將根據規模發放建材補貼與稱號。'},
-{t:'p', x:'申請方式：私聊管理組，提供截圖與座標，審核通過後發放扶持物資。'},
-{t:'p', x:'歡迎各位踴躍參與，共同建設這個世界。'}
-],
-sign:'The Slow Tide 管理組',
-date:'2026年9月12日'
-},
-en: {
-items:[
-{t:'p', x:'Starting today, the server opens the following support channels:'},
-{t:'h', x:'1. Player-Hosted Events or Activities'},
-{t:'p', x:'Players can report to the management team with the activity content, schedule, and expected number of participants. Once approved, the management team will provide supplies and gold coin support based on the scale of the activity.'},
-{t:'h', x:'2. Large Public Buildings'},
-{t:'p', x:'Anyone who builds public facilities for the whole server (such as transport hubs, public farms, event venues, libraries, etc.) can apply for certification after completion. The management team will provide building material subsidies and a corresponding title.'},
-{t:'h', x:'3. Large Private Buildings'},
-{t:'p', x:'Individuals who build large cities, manors, bases, etc. can apply for certification after completion. The management team will provide building material subsidies and a title based on the scale.'},
-{t:'p', x:'How to apply: DM the management team with screenshots and coordinates. Support materials will be distributed after review and approval.'},
-{t:'p', x:'Everyone is welcome to participate actively and build this world together.'}
-],
-sign:'The Slow Tide Management Team',
-date:'September 12, 2026'
 }
 };
 
 // ============================================================
-// 动态栏目数据（三语）
+// 服务器更新公告数据
+// ============================================================
+const NOTICE_UPDATE = {
+zhCN: {
+items:[
+{t:'h', x:'一、问题修复'},
+{t:'p', x:'修复了兑换码无法正常使用的问题。此前部分玩家在输入兑换码时提示无效或无法领取奖励，现已完成修复，可正常使用。'},
+{t:'p', x:'优化了兑换码使用插件，提升兑换响应速度与稳定性，减少兑换失败的情况。'},
+{t:'h', x:'二、内容新增'},
+{t:'p', x:'新增少量遗迹，分布在生存世界各处。遗迹中包含物资与探索要素，欢迎前往寻找。具体位置不公开，请自行探索。'},
+{t:'h', x:'三、赛事开启'},
+{t:'p', x:'裂痕杯报名现已开启。裂痕杯为服务器官方 PVP 赛事，采用单人淘汰制，需自备装备，禁止携带神器类物品。'},
+{t:'p', x:'报名方式：前往主城赛事/活动区域，按提示完成报名。'},
+{t:'p', x:'具体赛程、时间及规则将在报名结束后统一公布，请留意后续公告。'},
+{t:'h', x:'四、其他说明'},
+{t:'p', x:'如在兑换码使用过程中仍遇到问题，请及时反馈至管理组。'},
+{t:'p', x:'遗迹探索过程中如发现异常，也欢迎反馈。'}
+],
+sign:'The Slow Tide 管理组',
+date:'2026年9月12日'
+}
+};
+
+// ============================================================
+// 动态栏目数据
 // ============================================================
 const FEED = {
 zhCN: [
@@ -1369,53 +962,13 @@ text:'捷报！玩家 极岚 在矿洞中发现了连续 28 枚钻石的矿脉�
 date:'2026-09-05'
 }
 ],
-zhTW: [
-{
-type:'event',
-img:'dt2.jpg',
-title:'🏁 S1 裂痕杯 · 賽事動態',
-status:'籌備中',
-paras:[
-'「裂痕杯」是 The Slow Tide 伺服器首個官方 PVP 賽事，面向全體玩家開放。賽事採用單人淘汰制，玩家需自備裝備，在指定競技場內進行對決。',
-'由於伺服器近期完成重置，賽事各項準備工作正在重新推進中。具體開賽時間、報名方式及詳細規則將在後續公告中陸續公布，請留意官網「伺服器公告」欄目及遊戲內通知。',
-'有意參與的玩家可提前做好裝備與物資準備。期待在賽場上與各位相見。'
-],
-date:'2026-09-05'
-},
-{
-type:'post',
-img:'dt1.jpg',
-text:'捷報！玩家 極嵐 在礦洞中發現了連續 28 枚鑽石的礦脈，創下伺服器新紀錄，目前位居全服第一！',
-date:'2026-09-05'
-}
-],
-en: [
-{
-type:'event',
-img:'dt2.jpg',
-title:'🏁 S1 Rift Cup · Event Update',
-status:'In Preparation',
-paras:[
-'The Rift Cup is The Slow Tide server\'s first official PVP tournament, open to all players. The tournament uses a single-elimination format; players must bring their own equipment and battle in a designated arena.',
-'As the server has recently been reset, all tournament preparations are being reworked. The exact start time, registration method, and detailed rules will be announced in upcoming notices — please watch the "Server News" section on the official website and in-game notifications.',
-'Players who wish to participate can prepare their equipment and supplies in advance. We look forward to seeing you all in the arena.'
-],
-date:'2026-09-05'
-},
-{
-type:'post',
-img:'dt1.jpg',
-text:'Great news! Player Ji Lan discovered a continuous vein of 28 diamonds in a cave, setting a new server record — currently ranked #1 on the server!',
-date:'2026-09-05'
-}
-]
 };
 
 // ============================================================
 // 状态
 // ============================================================
 const root=document.documentElement;
-let lang=localStorage.getItem('tst-lang')||'zhCN';
+const lang='zhCN';
 
 function t(key){
   const d=I18N[lang];
@@ -1428,18 +981,14 @@ function t(key){
 function themeState(){ return localStorage.getItem('tst-theme')||'system'; }
 function applyTheme(){
   const mode=themeState();
-  let dark;
-  if(mode==='system'){ dark=window.matchMedia('(prefers-color-scheme: dark)').matches; }
-  else{ dark=(mode==='dark'); }
-  root.classList.toggle('dark',dark);
+  let theme=mode;
+  if(mode==='system'){ theme=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; }
+  root.setAttribute('data-theme',theme);
 }
 function syncSettingsUI(){
   const mode=themeState();
   document.querySelectorAll('.seg-btn[data-theme]').forEach(b=>{
     b.classList.toggle('active',b.dataset.theme===mode);
-  });
-  document.querySelectorAll('.seg-btn[data-lang]').forEach(b=>{
-    b.classList.toggle('active',b.dataset.lang===lang);
   });
 }
 
@@ -1511,6 +1060,26 @@ function renderNoticeSupport(){
   html+='<p class="notice-date">'+N.date+'</p>';
   dom.innerHTML=html;
 }
+function renderNoticeUpdate(){
+  const N=NOTICE_UPDATE[lang];
+  const dom=document.getElementById('noticeUpdateContent');
+  if(!dom){ return; }
+  let html='';
+  for(const item of N.items){
+    if(item.t==='p'){
+      html+='<p class="notice-para">'+item.x+'</p>';
+    }else if(item.t==='h'){
+      html+='<h4 class="notice-sub">'+item.x+'</h4>';
+    }else if(item.t==='ul'){
+      html+='<ul style="margin-left:24px;margin-top:8px;">';
+      for(const li of item.x){ html+='<li>'+li+'</li>'; }
+      html+='</ul>';
+    }
+  }
+  html+='<p class="notice-sign">'+N.sign+'</p>';
+  html+='<p class="notice-date">'+N.date+'</p>';
+  dom.innerHTML=html;
+}
 function renderFeed(){
   const items=FEED[lang];
   const dom=document.getElementById('feedContent');
@@ -1535,7 +1104,7 @@ function renderFeed(){
 
 function applyLang(){
   const d=I18N[lang];
-  document.documentElement.lang = lang==='en'?'en':'zh';
+  document.documentElement.lang = 'zh-CN';
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const k=el.getAttribute('data-i18n');
     if(d[k]!=null){ el.textContent=d[k]; }
@@ -1544,7 +1113,7 @@ function applyLang(){
     const k=el.getAttribute('data-i18n-ph');
     if(d[k]!=null){ el.setAttribute('placeholder',d[k]); }
   });
-  // 清空搜索提示条，避免残留旧语言文案
+  // 清空搜索提示条，避免残留旧文案
   document.getElementById('globalTip').textContent='';
   document.getElementById('ruleTip').textContent='';
   clearHighlight();
@@ -1552,12 +1121,13 @@ function applyLang(){
   renderRules();
   renderNoticeLimit();
   renderNoticeSupport();
+  renderNoticeUpdate();
   renderFeed();
   buildSuggestPool();
   syncSettingsUI();
   updateTime();
   // 更新文档标题
-  document.title = lang==='zhCN'?'The Slow Tide官网':lang==='zhTW'?'The Slow Tide官網':'The Slow Tide Official Website';
+  document.title = 'The Slow Tide官网';
 }
 
 // ============================================================
@@ -1614,13 +1184,9 @@ const runTimeDom=document.getElementById('runTime');
 const serverStart=new Date('2026-06-30T00:00:00');
 const offsetMs=120*1000;
 function timeFmt(d,h,m,s){
-  if(lang==='en'){ return d+'d '+h+'h '+m+'m '+s+'s'; }
-  if(lang==='zhTW'){ return d+'天 '+h+'時 '+m+'分 '+s+'秒'; }
   return d+'天 '+h+'时 '+m+'分 '+s+'秒';
 }
 function timeLocale(){
-  if(lang==='en'){ return 'en-US'; }
-  if(lang==='zhTW'){ return 'zh-TW'; }
   return 'zh-CN';
 }
 function updateTime(){
@@ -1950,13 +1516,6 @@ document.querySelectorAll('.seg-btn[data-theme]').forEach(b=>{
     localStorage.setItem('tst-theme',b.dataset.theme);
     applyTheme();
     syncSettingsUI();
-  };
-});
-document.querySelectorAll('.seg-btn[data-lang]').forEach(b=>{
-  b.onclick=()=>{
-    lang=b.dataset.lang;
-    localStorage.setItem('tst-lang',lang);
-    applyLang();
   };
 });
 // 系统主题变化时，跟随系统模式下实时响应
