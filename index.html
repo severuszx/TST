@@ -3,800 +3,848 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Slow Tide官网</title>
+<title>The Slow Tide 官网</title>
 <script>
 (function(){
 // 主题：浅色 / 深色，localStorage 优先，默认浅色
 var mode=localStorage.getItem('tst-theme');
-if(mode!=='light' && mode!=='dark'){ mode='light'; }
+if(mode!=='dark' && mode!=='light'){ mode='light'; }
 document.documentElement.setAttribute('data-theme',mode);
-document.documentElement.lang='zh-CN';
 })();
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
---bg:#ffffff;
---text:#333333;
---text-secondary:#666666;
---border:#e5e7eb;
---card-bg:#f7f7f7;
---hover-bg:#ececec;
---primary:#444444;
---accent:#555555;
---shadow:rgba(0,0,0,.10);
+--bg:#f3f5f8;
+--text:#1f2937;
+--text-secondary:#5b6675;
+--border:#e2e8f0;
+--card:#ffffff;
+--hover:#eef2f7;
+--header-bg:rgba(255,255,255,.92);
+--primary:#0f172a;
+--accent:#52525b;
+--accent-soft:rgba(82,82,91,.1);
+--shadow:0 4px 14px rgba(15,23,42,.07);
+--hero-grad:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
 }
 html[data-theme="dark"]{
---bg:#121212;
---text:#e2e2e2;
---text-secondary:#aaaaaa;
---border:#2a2a2a;
---card-bg:#1e1e1e;
---hover-bg:#2c2c2c;
---primary:#dddddd;
---accent:#bbbbbb;
---shadow:rgba(0,0,0,.45);
+--bg:#111113;
+--text:#e5e5e7;
+--text-secondary:#9a9aa0;
+--border:#26262b;
+--card:#18181b;
+--hover:#222226;
+--header-bg:rgba(17,17,19,.92);
+--primary:#f4f4f5;
+--accent:#a1a1aa;
+--accent-soft:rgba(161,161,170,.14);
+--shadow:0 4px 14px rgba(0,0,0,.5);
+--hero-grad:linear-gradient(135deg,#0a0a0b 0%,#18181b 100%);
 }
+html[data-theme="dark"] .btn-primary{background:#71717a;}
 body{
-background-color:var(--bg);
-color:var(--text);
-font-family:system-ui, -apple-system, sans-serif;
-line-height:1.6;
-}
-.container{
-max-width:1100px;
-margin:0 auto;
-padding:0 12px;
-}
-header{
-padding:16px 0;
-border-bottom:1px solid var(--border);
-}
-.header-row{
-display:flex;
-justify-content:space-between;
-align-items:center;
-flex-wrap:wrap;
-gap:10px;
-}
-.site-title{
-font-size:20px;
-font-weight:600;
-}
-.header-right{
-display:flex;
-align-items:center;
-position:relative;
-gap:8px;
-}
-.header-feedback{
-display:inline-block;
-padding:7px 14px;
-border:none;
-border-radius:7px;
-background:linear-gradient(135deg,#34d399,#14b8a6);
-color:#ffffff;
-font-size:14px;
-font-weight:700;
-text-decoration:none;
-cursor:pointer;
-box-shadow:0 2px 8px rgba(20,184,166,.35);
-transition:transform .15s,box-shadow .15s,filter .15s;
-}
-.header-feedback:hover{
-transform:translateY(-2px);
-box-shadow:0 4px 14px rgba(20,184,166,.5);
-filter:brightness(1.05);
-}
-.icon-btn{
-width:38px;height:38px;
-display:flex;align-items:center;justify-content:center;
-padding:0;
-border:1px solid var(--border);
-background:var(--card-bg);
-color:var(--text);
-border-radius:8px;
-cursor:pointer;
-font-size:18px;
-line-height:1;
-}
-.icon-btn:hover{background:var(--hover-bg);}
-/* 设置面板：轻量柔和 */
-.settings-panel{
-position:absolute;
-top:calc(100% + 10px);
-right:0;
-width:300px;
-max-width:calc(100vw - 24px);
-background:var(--card-bg);
-border:1px solid var(--border);
-border-radius:12px;
-padding:16px;
-box-shadow:0 8px 28px var(--shadow);
-display:none;
-z-index:120;
-}
-.settings-panel.open{display:block;}
-.settings-panel::before{
-content:'';position:absolute;top:-8px;right:12px;
-width:14px;height:14px;
-background:var(--card-bg);
-border-left:1px solid var(--border);
-border-top:1px solid var(--border);
-transform:rotate(45deg);
-}
-.settings-title{
-font-size:15px;font-weight:600;
-margin-bottom:12px;
-display:flex;align-items:center;gap:6px;
-}
-.settings-group{margin:12px 0;}
-.settings-label{
-font-size:13px;
-color:var(--text-secondary);
-margin-bottom:8px;
-}
-.seg{
-display:flex;
-gap:6px;
-flex-wrap:wrap;
-}
-.seg-btn{
-padding:7px 12px;
-border:1px solid var(--border);
 background:var(--bg);
 color:var(--text);
-border-radius:6px;
-cursor:pointer;
-font-size:13px;
-transition:background .15s;
+font-family:system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.65;
 }
-.seg-btn:hover{background:var(--hover-bg);}
-.seg-btn.active{
-background:var(--accent);
-border-color:var(--accent);
-color:var(--bg);
-font-weight:600;
+.container{max-width:1140px;margin:0 auto;padding:0 16px;}
+a{color:var(--accent);}
+button{font-family:inherit;}
+
+/* ===== 顶部导航 ===== */
+.site-header{
+position:sticky;top:0;z-index:100;
+background:var(--header-bg);
+backdrop-filter:blur(10px);
+border-bottom:1px solid var(--border);
 }
-.ad-slider-wrap{
-position:relative;
-overflow:hidden;
-margin:16px 0;
-border-radius:8px;
+.header-inner{
+display:flex;align-items:center;gap:18px;
+min-height:62px;
+flex-wrap:wrap;
 }
-.ad-slider{
-display:flex;
-overflow-x:auto;
-scroll-behavior:smooth;
-scrollbar-width:none;
-position:relative;
+.logo{
+font-size:20px;font-weight:700;color:var(--primary);
+display:flex;align-items:center;gap:8px;white-space:nowrap;
 }
-.ad-slider::-webkit-scrollbar{display:none;}
-.slide-item{
-flex:0 0 100%;
-min-height:180px;
-padding:0;
+.logo-mark{
+width:34px;height:34px;border-radius:4px;
+background:var(--hero-grad);
+color:#fff;display:flex;align-items:center;justify-content:center;
+font-size:18px;flex:none;
 }
-.slide-item img{
-width:100%;
-height:180px;
-object-fit:cover;
-display:block;
+.logo-img{
+width:34px;height:34px;border-radius:4px;
+object-fit:cover;flex:none;display:block;
 }
-.slide-dots{
-display:flex;
-gap:8px;
-justify-content:center;
-padding:8px 0;
+html[data-theme="dark"] .logo-img{filter:invert(1);}
+.main-nav{
+display:flex;gap:2px;flex:1;flex-wrap:wrap;
 }
-.dot{
-width:10px;height:10px;
-border-radius:50%;
-background:var(--border);
-cursor:pointer;
+.nav-link{
+padding:8px 12px;border-radius:6px;border:none;background:transparent;
+color:var(--text);font-size:14px;cursor:pointer;white-space:nowrap;
 }
+.nav-link:hover{background:var(--hover);}
+.nav-link.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+.header-right{
+display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;
+}
+.time-badge{
+display:flex;flex-direction:column;align-items:flex-end;gap:1px;
+padding:5px 12px;border:1px solid var(--border);border-radius:6px;
+background:var(--card);font-size:12px;line-height:1.35;white-space:nowrap;
+}
+.tb-time{color:var(--primary);font-weight:600;font-variant-numeric:tabular-nums;}
+.tb-uptime{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums;}
+.btn{
+padding:8px 14px;border-radius:6px;border:1px solid var(--border);
+background:var(--card);color:var(--text);cursor:pointer;font-size:14px;white-space:nowrap;
+}
+.btn:hover{background:var(--hover);}
+.btn-primary{
+background:#52525b;
+border:none;color:#fff;font-weight:600;
+}
+.btn-primary:hover{filter:brightness(1.06);}
+.btn-danger{background:#fee2e2;border-color:#fecaca;color:#b91c1c;}
+.btn-danger:hover{background:#fecaca;}
+.feedback-btn{
+padding:8px 14px;border-radius:6px;border:1px solid var(--border);
+background:var(--card);color:var(--text);font-weight:600;text-decoration:none;
+font-size:14px;white-space:nowrap;transition:background-color .2s ease;
+}
+.feedback-btn:hover{background:var(--hover);}
+.icon-btn{
+width:38px;height:38px;border-radius:6px;border:1px solid var(--border);
+background:var(--card);color:var(--text);cursor:pointer;font-size:17px;
+display:flex;align-items:center;justify-content:center;
+}
+.icon-btn:hover{background:var(--hover);}
+/* 主题切换开关 */
+.theme-toggle{
+position:relative;width:54px;height:28px;flex:none;
+border:1px solid var(--border);background:var(--card);
+border-radius:14px;cursor:pointer;padding:0;overflow:hidden;
+}
+.theme-toggle .tt-ic{
+position:absolute;top:50%;transform:translateY(-50%);
+font-size:13px;line-height:1;pointer-events:none;
+}
+.theme-toggle .tt-sun{left:8px;opacity:.75;}
+.theme-toggle .tt-moon{right:8px;opacity:.75;}
+.theme-toggle .tt-thumb{
+position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
+background:var(--accent);display:flex;align-items:center;justify-content:center;
+font-size:11px;color:#fff;transition:left .28s cubic-bezier(.4,0,.2,1),background-color .28s;
+}
+html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
+/* 主题切换过渡动画 */
+body,.site-header,.card,.server-card,.search-row input,.suggest-box,.results-box,
+.rule-section,.modal,.admin-tab,.btn,.feedback-btn,.icon-btn,.theme-toggle,
+.time-badge,.footer-col,.img-item,.toast-item{
+transition:background-color .3s ease,color .3s ease,border-color .3s ease;
+}
+
+/* ===== Hero 轮播 ===== */
+.hero{padding:22px 0 6px;}
+.hero-slider-wrap{
+position:relative;overflow:hidden;border-radius:12px;
+box-shadow:var(--shadow);border:1px solid var(--border);
+}
+.hero-slider{display:flex;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;}
+.hero-slider::-webkit-scrollbar{display:none;}
+.slide-item{flex:0 0 100%;}
+.slide-item img{width:100%;height:300px;object-fit:cover;display:block;}
+.slide-dots{display:flex;gap:8px;justify-content:center;padding:10px 0 4px;}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--border);cursor:pointer;}
 .dot.active{background:var(--accent);}
-nav{
-margin:16px 0;
+
+/* ===== 服务器状态条 ===== */
+.server-bar{padding:14px 0;}
+.server-card{
+display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+background:var(--card);border:1px solid var(--border);border-radius:10px;
+padding:14px 18px;box-shadow:var(--shadow);
 }
-.nav-list{
-display:flex;
-flex-wrap:wrap;
-gap:8px;
-list-style:none;
+.status-dot{width:10px;height:10px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:6px;}
+.server-card .item{display:flex;align-items:center;gap:6px;font-size:14px;}
+.server-card .label{color:var(--text-secondary);}
+.addr{font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--accent);word-break:break-all;}
+
+/* ===== Section 通用 ===== */
+.section{padding:26px 0;}
+.section-title{
+display:flex;align-items:center;gap:10px;
+font-size:21px;font-weight:700;margin-bottom:18px;color:var(--primary);
 }
-.nav-item button{
-padding:9px 12px;
-border:1px solid var(--border);
-background:var(--card-bg);
-color:var(--text);
-border-radius:6px;
-cursor:pointer;
-font-size:14px;
+.section-title::before{
+content:'';width:5px;height:22px;border-radius:0;background:var(--accent);
 }
-.nav-item button:hover{background:var(--hover-bg);}
-.page{
-display:none;
-padding:16px;
-border:1px solid var(--border);
-border-radius:8px;
-margin-bottom:16px;
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+.card{
+background:var(--card);border:1px solid var(--border);border-radius:10px;
+padding:18px;box-shadow:var(--shadow);
 }
-.page.active{display:block;}
+.card h3{font-size:16px;margin-bottom:8px;}
+.card .date{font-size:12px;color:var(--text-secondary);margin-bottom:8px;}
+.card .content{font-size:14px;color:var(--text);white-space:pre-line;}
+.pinned-tag{
+display:inline-block;background:#52525b;color:#fff;font-size:11px;font-weight:700;
+padding:1px 7px;border-radius:4px;margin-left:8px;vertical-align:2px;
+}
+html[data-theme="dark"] .pinned-tag{background:#71717a;}
+.feed-img{width:100%;max-height:260px;object-fit:cover;border-radius:8px;margin-top:10px;border:1px solid var(--border);}
+.empty-hint{color:var(--text-secondary);font-size:14px;padding:10px 0;}
+
+/* ===== 页面切换 ===== */
+.page{display:none;}
+.page.active{display:block;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* ===== 搜索 ===== */
 .search-row{
-position:relative;
-display:flex;
-gap:8px;
-flex-wrap:wrap;
-margin:16px 0 6px;
+position:relative;display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px;
 }
 .search-row input{
-flex:1;
-min-width:140px;
-padding:10px 12px;
-border:1px solid var(--border);
-border-radius:6px;
-background:var(--card-bg);
-color:var(--text);
-font-size:14px;
+flex:1;min-width:160px;padding:10px 14px;border:1px solid var(--border);border-radius:6px;
+background:var(--card);color:var(--text);font-size:14px;outline:none;
 }
-.search-row button{
-padding:10px 12px;
-border:1px solid var(--border);
-background:var(--card-bg);
-color:var(--text);
-border-radius:6px;
-cursor:pointer;
-white-space:nowrap;
-font-size:14px;
-}
-.search-row button:hover{background:var(--hover-bg);}
-.tip-message{
-padding:6px 10px;
-margin:4px 0 10px;
-border-radius:4px;
-background:var(--hover-bg);
-font-size:13px;
-min-height:24px;
-}
-.info-card{
-padding:14px;
-background:var(--card-bg);
-border-radius:8px;
-margin:12px 0;
-border:1px solid var(--border);
-}
-.time-box{
-padding:14px;
-background:var(--card-bg);
-border-radius:8px;
-margin:12px 0;
-border:1px solid var(--border);
-}
-.btn{
-padding:7px 12px;
-border:1px solid var(--border);
-background:var(--card-bg);
-color:var(--text);
-border-radius:6px;
-cursor:pointer;
-margin:3px 2px;
-font-size:14px;
-}
-.btn:hover{background:var(--hover-bg);}
-.rule-search-row{
-position:relative;
-display:flex;
-gap:8px;
-flex-wrap:wrap;
-margin-bottom:6px;
-}
-.rule-search-row input{
-flex:1;
-min-width:140px;
-padding:9px 10px;
-border:1px solid var(--border);
-border-radius:6px;
-background:var(--card-bg);
-color:var(--text);
-font-size:14px;
-}
-.rule-search-row button{
-padding:9px 12px;
-border:1px solid var(--border);
-background:var(--card-bg);
-color:var(--text);
-border-radius:6px;
-cursor:pointer;
-white-space:nowrap;
-font-size:14px;
-}
-.rule-search-row button:hover{background:var(--hover-bg);}
-.rule-scroll{
-max-height:60vh;
-overflow-y:auto;
-padding-right:6px;
-font-size:14px;
-}
-.rule-section{
-margin:14px 0;
-}
-.rule-section h3{
-margin:6px 0;
-font-size:16px;
-}
-.qr-wrap{
-text-align:center;
-padding:16px;
-}
-.qr-wrap img{
-max-width:240px;
-width:100%;
-border-radius:8px;
-}
-.code-card{
-padding:14px;
-background:var(--card-bg);
-border-radius:8px;
-border:1px solid var(--border);
-margin:8px 0;
-}
-.notice-divider{
-border-top:1px dashed var(--border);
-margin:16px 0 12px;
-}
-.notice-sign{
-margin-top:14px;
-text-align:right;
-font-weight:600;
-}
-.notice-date{
-text-align:right;
-color:var(--text-secondary);
-font-size:13px;
-}
-.notice-para{
-margin-top:10px;
-}
-.notice-sub{
-margin:14px 0 2px;
-font-size:15px;
-font-weight:600;
-}
-/* 赞助排行榜 */
-.board-table{
-width:100%;
-border-collapse:collapse;
-margin-top:8px;
-}
-.board-table th,
-.board-table td{
-padding:8px 10px;
-border-bottom:1px solid var(--border);
-text-align:left;
-font-size:14px;
-}
-.board-table th{
-color:var(--text-secondary);
-font-weight:600;
-}
-.board-table td.num{
-color:var(--text-secondary);
-width:44px;
-}
-.board-table td.amount{
-text-align:right;
-font-weight:600;
-white-space:nowrap;
-}
-.board-empty{
-padding:12px 0;
-color:var(--text-secondary);
-font-size:14px;
-}
-/* 回到顶部 */
-.back-top{
-position:fixed;
-right:18px;
-bottom:24px;
-width:44px;height:44px;
-border:1px solid var(--border);
-background:var(--card-bg);
-color:var(--text);
-border-radius:50%;
-cursor:pointer;
-font-size:20px;
-line-height:1;
-display:none;
-align-items:center;
-justify-content:center;
-box-shadow:0 4px 14px var(--shadow);
-z-index:200;
-opacity:0;
-transform:translateY(8px);
-transition:opacity .2s,transform .2s;
-}
-.back-top.show{display:flex;opacity:1;transform:translateY(0);}
-.back-top:hover{background:var(--hover-bg);}
-/* Toast 轻提示 */
-.toast-wrap{
-position:fixed;
-left:50%;
-bottom:32px;
-transform:translateX(-50%);
-z-index:300;
-display:flex;
-flex-direction:column;
-gap:8px;
-align-items:center;
-pointer-events:none;
-}
-.toast{
-background:var(--text);
-color:var(--bg);
-padding:9px 16px;
-border-radius:8px;
-font-size:14px;
-box-shadow:0 4px 14px var(--shadow);
-opacity:0;
-transform:translateY(8px);
-transition:opacity .25s,transform .25s;
-}
-.toast.show{opacity:1;transform:translateY(0);}
-/* 动态栏目 */
-.feed-card{
-padding:14px;
-background:var(--card-bg);
-border-radius:8px;
-margin:12px 0;
-border:1px solid var(--border);
-}
-.feed-text{
-margin-top:8px;
-}
-.feed-img{
-width:100%;
-max-width:520px;
-border-radius:8px;
-margin-top:12px;
-display:block;
-}
-.feed-status{
-display:inline-block;
-margin-top:10px;
-padding:2px 10px;
-font-size:12px;
-border-radius:999px;
-background:var(--accent);
-color:var(--bg);
-}
-.feed-date{
-margin-top:12px;
-font-size:12px;
-color:var(--text-secondary);
-}
-/* 搜索联想下拉 */
+.search-row input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
 .suggest-box{
-position:absolute;
-top:calc(100% + 4px);
-left:0;
-right:0;
-background:var(--bg);
-border:1px solid var(--border);
-border-radius:8px;
-box-shadow:0 6px 22px var(--shadow);
-z-index:110;
-display:none;
-max-height:300px;
-overflow-y:auto;
+position:absolute;top:calc(100% + 4px);left:0;right:0;
+background:var(--card);border:1px solid var(--border);border-radius:6px;
+box-shadow:var(--shadow);z-index:90;display:none;max-height:300px;overflow-y:auto;
 }
 .suggest-box.show{display:block;}
-.suggest-item{
-padding:9px 13px;
-font-size:14px;
-cursor:pointer;
-border-bottom:1px solid var(--border);
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-}
+.suggest-item{padding:9px 14px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border);}
 .suggest-item:last-child{border-bottom:none;}
-.suggest-item:hover,
-.suggest-item.active{background:var(--hover-bg);}
-/* 全站搜索结果列表 */
+.suggest-item:hover,.suggest-item.active{background:var(--hover);}
+.tip-message{padding:4px 2px;font-size:13px;color:var(--text-secondary);min-height:20px;}
 .results-box{
-display:none;
-margin:8px 0 10px;
-border:1px solid var(--border);
-border-radius:8px;
-background:var(--card-bg);
-overflow:hidden;
+display:none;margin:6px 0 10px;border:1px solid var(--border);border-radius:6px;
+background:var(--card);overflow:hidden;
 }
 .results-box.show{display:block;}
-.results-head{
-padding:8px 12px;
-font-size:13px;
-color:var(--text-secondary);
-border-bottom:1px solid var(--border);
-}
-.result-item{
-display:flex;
-align-items:baseline;
-gap:8px;
-padding:9px 12px;
-cursor:pointer;
-border-bottom:1px solid var(--border);
-}
+.results-head{padding:8px 14px;font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border);}
+.result-item{display:flex;align-items:baseline;gap:8px;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--border);}
 .result-item:last-child{border-bottom:none;}
-.result-item:hover{background:var(--hover-bg);}
-.result-badge{
-flex:none;
-font-size:12px;
-color:var(--bg);
-background:var(--accent);
-border-radius:4px;
-padding:1px 6px;
-white-space:nowrap;
-}
-.result-snip{
-font-size:14px;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-}
-mark{
-background:#ffd54a;
-color:#333;
-border-radius:2px;
-padding:0 1px;
-}
+.result-item:hover{background:var(--hover);}
+.result-badge{flex:none;font-size:12px;color:var(--bg);background:var(--accent);border-radius:4px;padding:1px 7px;}
+.result-snip{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+mark{background:#ffd54a;color:#333;border-radius:2px;padding:0 1px;}
 html[data-theme="dark"] mark{background:#c99400;color:#1a1a1a;}
-.search-flash{
-outline:3px solid #ffb300;
-outline-offset:2px;
-border-radius:8px;
+.search-flash{outline:3px solid #ffb300;outline-offset:2px;border-radius:6px;}
+
+/* ===== 公约 ===== */
+.rule-scroll{max-height:65vh;overflow-y:auto;padding-right:6px;font-size:14px;margin-top:8px;}
+.rule-section{margin:16px 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.rule-section h3{margin-bottom:8px;font-size:16px;}
+.rule-section p{margin:6px 0;color:var(--text);}
+#ruleToc{margin-left:20px;margin-top:8px;}
+#ruleToc li{margin:4px 0;}
+#ruleToc a{text-decoration:none;}
+
+/* ===== 管理面板 ===== */
+.modal-mask{
+position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+display:none;align-items:center;justify-content:center;padding:16px;
 }
-footer{
-margin-top:30px;
-padding:16px 0;
-border-top:1px solid var(--border);
-text-align:center;
-color:var(--text-secondary);
-font-size:13px;
+.modal-mask.open{display:flex;}
+.modal{
+width:680px;max-width:100%;max-height:88vh;overflow-y:auto;
+background:var(--card);border:1px solid var(--border);border-radius:8px;
+box-shadow:var(--shadow);padding:22px;
 }
-.status-online{
-color:#22c55e;
-font-weight:bold;
+.modal h2{font-size:18px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.modal-close{float:right;cursor:pointer;border:none;background:none;font-size:18px;color:var(--text-secondary);}
+.form-row{margin:10px 0;}
+.form-row label{display:block;font-size:13px;color:var(--text-secondary);margin-bottom:5px;}
+.form-row input[type="text"],.form-row input[type="password"],.form-row textarea{
+width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;
+background:var(--bg);color:var(--text);font-size:14px;outline:none;font-family:inherit;
 }
-@media(max-width:600px){
-.nav-list{gap:6px;}
-.nav-item button{padding:8px 10px;font-size:13px;}
-.slide-item{min-height:140px;}
-.slide-item img{height:140px;}
-.page{padding:12px;}
-.info-card,.time-box{padding:12px;}
-.settings-panel{width:280px;}
+.form-row input:focus,.form-row textarea:focus{border-color:var(--accent);}
+.form-row textarea{min-height:90px;resize:vertical;}
+.form-row .hint{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+.form-check{display:flex;align-items:center;gap:6px;font-size:14px;}
+.admin-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.admin-tab{padding:7px 14px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;font-size:14px;}
+.admin-tab.active{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;}
+.admin-pane{display:none;}
+.admin-pane.active{display:block;}
+.admin-list-item{
+display:flex;align-items:flex-start;gap:10px;justify-content:space-between;
+padding:10px 0;border-bottom:1px solid var(--border);
+}
+.admin-list-item .meta{font-size:13px;color:var(--text-secondary);}
+.admin-list-item .ops{flex:none;display:flex;gap:6px;}
+.admin-list-item img{max-width:120px;border-radius:4px;margin-top:6px;}
+.img-preview{max-width:200px;border-radius:6px;margin-top:8px;border:1px solid var(--border);}
+.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+.img-item{
+background:var(--bg);border:1px solid var(--border);border-radius:6px;
+padding:8px;overflow:hidden;display:flex;flex-direction:column;gap:6px;
+}
+.img-item img{width:100%;height:100px;object-fit:cover;border-radius:4px;display:block;border:1px solid var(--border);}
+.img-item .im-name{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.img-item .im-meta{font-size:11px;color:var(--text-secondary);}
+.img-item .im-ops{display:flex;gap:5px;flex-wrap:wrap;}
+.img-item .im-ops .btn{padding:4px 8px;font-size:12px;}
+
+/* ===== 页脚 ===== */
+.site-footer{
+margin-top:40px;padding:30px 0 18px;border-top:1px solid var(--border);
+background:var(--card);
+}
+.footer-grid{
+display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:26px;
+padding-bottom:20px;border-bottom:1px solid var(--border);
+}
+.footer-col h4{
+font-size:14px;font-weight:700;margin-bottom:10px;color:var(--primary);
+}
+.footer-col p{
+font-size:13px;color:var(--text-secondary);line-height:1.7;
+}
+.footer-links{list-style:none;font-size:13px;color:var(--text-secondary);line-height:2;}
+.footer-links button{
+border:none;background:none;color:var(--text-secondary);cursor:pointer;padding:0;font-size:13px;
+}
+.footer-links button:hover{color:var(--accent);}
+.footer-links a{color:var(--accent);text-decoration:none;}
+.footer-links a:hover{text-decoration:underline;}
+.footer-bottom{
+padding-top:14px;text-align:center;color:var(--text-secondary);font-size:12px;
+}
+@media(max-width:720px){
+.footer-grid{grid-template-columns:1fr;gap:16px;}
+}
+
+/* ===== 回顶 / Toast ===== */
+.back-top{
+position:fixed;right:22px;bottom:26px;width:44px;height:44px;border-radius:8px;
+background:var(--accent);color:#fff;border:none;font-size:20px;cursor:pointer;
+display:none;z-index:120;
+}
+.back-top.show{display:block;}
+.toast-wrap{
+position:fixed;left:50%;bottom:34px;transform:translateX(-50%);z-index:300;
+display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.toast-item{
+background:var(--primary);color:var(--bg);padding:9px 18px;border-radius:6px;
+font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
+}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+@media(max-width:720px){
+.header-inner{gap:10px;}
+.main-nav{order:3;flex-basis:100%;}
+.time-badge{display:none;}
+.slide-item img{height:200px;}
+.card-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
-<div class="container">
-<header>
-<div class="header-row">
-<div class="site-title" data-i18n="siteTitle">The Slow Tide官网</div>
+<header class="site-header">
+<div class="container header-inner">
+<div class="logo"><img src="logo.jpg" alt="The Slow Tide" class="logo-img"> The Slow Tide</div>
+<nav class="main-nav" id="mainNav">
+<button class="nav-link active" data-nav="home">首页</button>
+<button class="nav-link" data-nav="notice">公告</button>
+<button class="nav-link" data-nav="feed">动态</button>
+<button class="nav-link" data-nav="event">赛事活动</button>
+<button class="nav-link" data-nav="cdkey">兑换码</button>
+<button class="nav-link" data-nav="sponsor">服务器赞助</button>
+<button class="nav-link" data-nav="rule">玩家公约</button>
+</nav>
 <div class="header-right">
-<a class="header-feedback" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener" data-i18n="nav_feedback">反馈</a>
-<button class="icon-btn" id="settingsBtn" title="⚙" aria-label="settings">⚙</button>
-<div class="settings-panel" id="settingsPanel">
-<div class="settings-title"><span>⚙</span> <span data-i18n="settingsTitle">设置</span></div>
-<div class="settings-group">
-<div class="settings-label" data-i18n="themeSection">主题模式</div>
-<div class="seg">
-<button class="seg-btn" data-theme="light" data-i18n="themeLight">浅色</button>
-<button class="seg-btn" data-theme="dark" data-i18n="themeDark">深色</button>
+<div class="time-badge" title="北京时间与服务器运行时间">
+<span class="tb-time" id="bjTime">--:--:--</span>
+<span class="tb-uptime" id="runTime">--</span>
 </div>
-</div>
-</div>
+<a class="feedback-btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
+<button class="btn btn-primary" id="adminBtn">管理</button>
+<button class="theme-toggle" id="themeToggle" title="切换深色/浅色" aria-label="切换主题">
+<span class="tt-ic tt-sun">☀</span>
+<span class="tt-ic tt-moon">☾</span>
+<span class="tt-thumb" id="themeThumb"></span>
+</button>
 </div>
 </div>
 </header>
-<div class="ad-slider-wrap" id="adWrap">
-<div class="ad-slider" id="adSlider">
-<div class="slide-item">
-<img src="ad1.jpg" alt="轮播图1">
-</div>
-<div class="slide-item">
-<img src="ad2.jpg" alt="轮播图2">
-</div>
-<div class="slide-item">
-<img src="ad3.jpg" alt="轮播图3">
-</div>
-</div>
-<div class="slide-dots" id="slideDots"></div>
-</div>
+
+
+
+<section class="section">
+<div class="container">
 <div class="search-row">
-<input type="text" id="globalSearchInput" data-i18n-ph="searchPlaceholder" placeholder="全局搜索：输入关键词跳转对应页面或内容" autocomplete="off">
-<button id="globalSearchBtn" data-i18n="searchBtn">确认搜索</button>
+<input type="text" id="globalSearchInput" placeholder="全局搜索：公告 / 动态 / 公约 / 页面" autocomplete="off">
+<button class="btn btn-primary" id="globalSearchBtn">搜索</button>
 <div class="suggest-box" id="globalSuggest"></div>
 </div>
 <div class="tip-message" id="globalTip"></div>
 <div class="results-box" id="globalResults"></div>
-<nav>
-<ul class="nav-list">
-<li class="nav-item"><button data-page="home" data-i18n="nav_home">首页</button></li>
-<li class="nav-item"><button data-page="notice" data-i18n="nav_notice">公告</button></li>
-<li class="nav-item"><button data-page="feed" data-i18n="nav_feed">动态</button></li>
-<li class="nav-item"><button data-page="event" data-i18n="nav_event">赛事活动</button></li>
-<li class="nav-item"><button data-page="cdkey" data-i18n="nav_cdkey">兑换码</button></li>
-<li class="nav-item"><button data-page="sponsor" data-i18n="nav_sponsor">服务器赞助</button></li>
-<li class="nav-item"><button data-page="rule" data-i18n="nav_rule">玩家公约</button></li>
-</ul>
-</nav>
-<div id="home" class="page active">
-<h2 data-i18n="home_title">🏠 服务器首页</h2>
-<div class="info-card" data-unit>
-<h3 data-i18n="serverInfo">服务器信息</h3>
-<p><span data-i18n="serverAddr">服务器地址：</span><span id="serverAddr">mc.163.com/open/mc_realms/?realms=270239C36AD</span> <button class="btn" id="copyAddrBtn" data-i18n="copyAddr">复制地址</button></p>
-<p><span data-i18n="qqGroup">QQ交流群：</span><button class="btn" id="openQQGroup">833470853</button></p>
-<p><span data-i18n="statusLabel">当前状态：</span><span class="status-online" data-i18n="statusOnline">运行中</span></p>
 </div>
-<div class="time-box" data-unit>
-<h3 data-i18n="runTimeTitle">运行计时</h3>
-<p><span data-i18n="bjTime">北京时间：</span><span id="bjTime"></span></p>
-<p><span data-i18n="totalRun">累计运行时间：</span><span id="runTime"></span></p>
-</div>
-<div class="info-card" data-unit>
-<h3 data-i18n="latestNews">最新动态</h3>
-<p data-i18n="newsContent">发布了新公告：服务器扶持通道正式开放</p>
+</section>
+
+<main>
+<!-- 首页 -->
+<section id="home" class="page active">
+<section class="hero">
+<div class="container">
+<div class="hero-slider-wrap">
+<div class="hero-slider" id="heroSlider">
+<div class="slide-item"><img src="ad1.jpg" alt="轮播图1"></div>
+<div class="slide-item"><img src="ad2.jpg" alt="轮播图2"></div>
+<div class="slide-item"><img src="ad3.jpg" alt="轮播图3"></div>
 </div>
 </div>
-<div id="notice" class="page">
-<h2 data-i18n="notice_title">服务器网站更新公告</h2>
-<div class="info-card" data-unit>
-<h3 data-i18n="noticeUpdateTitle">服务器更新公告</h3>
-<div id="noticeUpdateContent"></div>
-<div class="notice-divider"></div>
-<h3 data-i18n="noticeSupportTitle">关于服务器扶持通道的公告</h3>
-<div id="noticeSupportContent"></div>
-<div class="notice-divider"></div>
-<h3 data-i18n="noticeContent">关于服务器人数限制的说明与补偿公告</h3>
-<div id="noticeLimitContent"></div>
-<div class="notice-divider"></div>
-<p data-i18n="noticeListLabel">本次官网更新内容：</p>
-<ul style="margin-left:20px;margin-top:8px;">
-<li data-i18n="notice1">玩家公约页面新增公约内容搜索框，支持关键词定位条约条目</li>
-<li data-i18n="notice2">首页增加全局搜索输入框，支持关键词检索网站内容</li>
-<li data-i18n="notice3">修复玩家公约目录锚点滚动定位BUG</li>
-<li data-i18n="notice4">优化页面细节与移动端适配，清理多余留白</li>
-</ul>
-<p style="margin-top:10px;" data-i18n="noticeEnd">请各位玩家知悉，祝游玩愉快。</p>
+<div class="slide-dots" id="slideDots"></div>
+</div>
+</section>
+
+<section class="server-bar">
+<div class="container">
+<div class="server-card">
+<div class="item"><span class="status-dot"></span><strong>服务器运行中</strong></div>
+<div class="item"><span class="label">地址：</span><span class="addr" id="serverAddr">mc.163.com/open/mc_realms/?realms=270239C36AD</span>
+<button class="btn" id="copyAddrBtn" style="padding:5px 10px;font-size:13px;">复制</button></div>
+<div class="item"><span class="label">QQ交流群：</span><button class="btn" id="openQQGroup" style="padding:5px 10px;font-size:13px;">833470853</button></div>
 </div>
 </div>
-<div id="feed" class="page">
-<h2 data-i18n="feed_title">服务器动态</h2>
-<div id="feedContent"></div>
+</section>
+<div class="container">
+<div class="section-title">最新公告</div>
+<div class="card-grid" id="homeNotices"></div>
+<div class="section-title">最新动态</div>
+<div class="card-grid" id="homeFeeds"></div>
 </div>
-<div id="event" class="page">
-<h2 data-i18n="event_title">赛事活动</h2>
-<div class="info-card" data-unit>
-<p data-i18n="noEvent">暂无进行中赛事</p>
+</section>
+
+<!-- 公告 -->
+<section id="notice" class="page">
+<div class="container">
+<div class="section-title">服务器公告</div>
+<div class="card-grid" id="noticeList"></div>
+</div>
+</section>
+
+<!-- 动态 -->
+<section id="feed" class="page">
+<div class="container">
+<div class="section-title">服务器动态</div>
+<div id="feedList"></div>
+</div>
+</section>
+
+<!-- 赛事 -->
+<section id="event" class="page">
+<div class="container">
+<div class="section-title">赛事活动</div>
+<div class="card">
+<h3>🏁 S1 裂痕杯</h3>
+<p class="date">赛事状态：筹备中</p>
+<div class="content">「裂痕杯」是 The Slow Tide 服务器首个官方 PVP 赛事，面向全体玩家开放。赛事采用单人淘汰制，玩家需自备装备，在指定竞技场内进行对决。
+具体开赛时间、报名方式及详细规则将在后续公告中陆续公布，请留意官网「服务器公告」栏目及游戏内通知。
+有意参与的玩家可提前做好装备与物资准备。期待在赛场上与各位相见。</div>
+</div>
+<div class="card" style="margin-top:14px;">
+<h3>📢 近期赛事动态</h3>
+<p class="empty-hint">暂无进行中赛事</p>
+</div>
+<div class="section-title" style="margin-top:30px;">赛事回放</div>
+<div id="replayList"></div>
+</div>
+</section>
+
+<!-- 兑换码 -->
+<section id="cdkey" class="page">
+<div class="container">
+<div class="section-title">兑换码</div>
+<div class="card">
+<h3>可用兑换码</h3>
+<p class="empty-hint">暂无可用兑换码</p>
 </div>
 </div>
-<div id="cdkey" class="page">
-<h2 data-i18n="cdkey_title">兑换码</h2>
-<div class="info-card" data-unit>
-<p data-i18n="noCdkey">ILOVEWYJ</p>
+</section>
+
+<!-- 赞助 -->
+<section id="sponsor" class="page">
+<div class="container">
+<div class="section-title">服务器赞助</div>
+<div class="card-grid">
+<div class="card">
+<h3>💳 赞助收款二维码</h3>
+<div style="text-align:center;padding:8px 0;">
+<img src="wechat-qrcode.jpg" alt="赞助收款码" style="max-width:220px;width:100%;border-radius:6px;">
 </div>
 </div>
-<div id="sponsor" class="page">
-<h2 data-i18n="sponsor_title">服务器赞助</h2>
-<div class="qr-wrap" data-unit>
-<p data-i18n="payQr">赞助收款二维码</p>
-<img src="wechat-qrcode.jpg" alt="赞助收款码" id="payQrImg">
-</div>
-<div class="info-card" data-unit>
-<h3 data-i18n="sponsorBoardTitle">赞助名单排行榜</h3>
-<div id="sponsorBoard"></div>
+<div class="card">
+<h3>🏆 赞助排行榜</h3>
+<div id="sponsorList"></div>
 </div>
 </div>
-<div id="rule" class="page">
-<h2 data-i18n="rule_title">玩家公约</h2>
-<div class="rule-search-row">
-<input type="text" id="ruleSearchInput" data-i18n-ph="ruleSearchPlaceholder" placeholder="搜索公约内容，输入关键词自动跳转定位" autocomplete="off">
-<button id="ruleSearchBtn" data-i18n="ruleSearchBtn">确认搜索</button>
+</div>
+</section>
+
+<!-- 公约 -->
+<section id="rule" class="page">
+<div class="container">
+<div class="section-title">玩家公约</div>
+<div class="search-row">
+<input type="text" id="ruleSearchInput" placeholder="搜索公约内容，输入关键词定位条约" autocomplete="off">
+<button class="btn btn-primary" id="ruleSearchBtn">搜索</button>
 <div class="suggest-box" id="ruleSuggest"></div>
 </div>
 <div class="tip-message" id="ruleTip"></div>
-<div class="rule-scroll" id="ruleScrollDom">
-<div id="ruleContent"></div>
+<div class="rule-scroll" id="ruleScrollDom"><div id="ruleContent"></div></div>
+</div>
+</section>
+</main>
+
+<footer class="site-footer">
+<div class="container">
+<div class="footer-grid">
+<div class="footer-col">
+<h4>The Slow Tide</h4>
+<p>网易基岩 TST 山头 · 社区向 Minecraft 生存服务器。友善交流，共建世界。</p>
+</div>
+<div class="footer-col">
+<h4>快捷导航</h4>
+<ul class="footer-links">
+<li><button data-fnav="home">首页</button></li>
+<li><button data-fnav="notice">公告</button></li>
+<li><button data-fnav="feed">动态</button></li>
+<li><button data-fnav="event">赛事活动</button></li>
+<li><button data-fnav="cdkey">兑换码</button></li>
+<li><button data-fnav="sponsor">服务器赞助</button></li>
+<li><button data-fnav="rule">玩家公约</button></li>
+</ul>
+</div>
+<div class="footer-col">
+<h4>联系我们</h4>
+<ul class="footer-links">
+<li>QQ交流群：833470853</li>
+<li>服务器：mc.163.com/open/mc_realms/?realms=270239C36AD</li>
+<li><a href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">问题反馈</a></li>
+</ul>
 </div>
 </div>
-<footer>
-<p data-i18n="footer">© 2026 The Slow Tide TST服务器</p>
+<div class="footer-bottom">© 2026 The Slow Tide</div>
+</div>
 </footer>
-<button class="back-top" id="backTop" title="回到顶部" aria-label="回到顶部">↑</button>
+
+<button class="back-top" id="backTop" title="回到顶部">↑</button>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- 管理面板 -->
+<div class="modal-mask" id="adminModal">
+<div class="modal">
+<button class="modal-close" id="adminClose">✕</button>
+<h2>管理员面板</h2>
+<div id="adminLoginBox">
+<div class="form-row">
+<label>管理员密码</label>
+<input type="password" id="adminPwd" placeholder="请输入管理员密码">
 </div>
+<button class="btn btn-primary" id="adminLoginBtn">登录</button>
+</div>
+<div id="adminPanel" style="display:none;">
+<div class="admin-tabs">
+<button class="admin-tab active" data-tab="notice">公告管理</button>
+<button class="admin-tab" data-tab="feed">动态管理</button>
+<button class="admin-tab" data-tab="sponsor">赞助管理</button>
+<button class="admin-tab" data-tab="replay">赛事管理</button>
+<button class="admin-tab" data-tab="image">图片管理</button>
+</div>
+<div class="admin-pane active" id="paneNotice">
+<div class="card">
+<div class="form-row"><label>公告标题</label><input type="text" id="anTitle" placeholder="公告标题"></div>
+<div class="form-row"><label>公告内容</label><textarea id="anContent" placeholder="公告内容（支持多行）"></textarea></div>
+<div class="form-row"><label>日期（留空为今天）</label><input type="text" id="anDate" placeholder="如 2026-09-13"></div>
+<button class="btn btn-primary" id="anAddBtn">发布公告</button>
+<button class="btn" id="anCancelBtn" style="display:none;">取消编辑</button>
+</div>
+<div id="anList" style="margin-top:14px;"></div>
+</div>
+<div class="admin-pane" id="paneFeed">
+<div class="card">
+<div class="form-row"><label>动态标题</label><input type="text" id="fdTitle" placeholder="动态标题"></div>
+<div class="form-row"><label>动态内容</label><textarea id="fdContent" placeholder="动态内容（支持多行）"></textarea></div>
+<div class="form-row"><label>配图（可选）</label><input type="file" id="fdImage" accept="image/*"><div class="hint">可上传图片（≤1.5MB），或粘贴图片管理中的引用（如 img:xxx）到下方输入框</div></div>
+<div class="form-row"><label>配图引用（可选，二选一）</label><input type="text" id="fdImageRef" placeholder="如 img:abc123 或图片链接"></div></div>
+<div class="img-preview" id="fdImgPreview" style="display:none;"><img id="fdImgPreviewImg" alt="预览" style="max-width:100%;"></div>
+<div class="form-row form-check"><input type="checkbox" id="fdPinned"> 置顶此动态</div>
+<div class="form-row"><label>日期（留空为今天）</label><input type="text" id="fdDate" placeholder="如 2026-09-13"></div>
+<button class="btn btn-primary" id="fdAddBtn">发布动态</button>
+<button class="btn" id="fdCancelBtn" style="display:none;">取消编辑</button>
+</div>
+<div id="fdList" style="margin-top:14px;"></div>
+</div>
+<div class="admin-pane" id="paneSponsor">
+<div class="card">
+<div class="form-row"><label>玩家名</label><input type="text" id="spName" placeholder="玩家名"></div>
+<div class="form-row"><label>赞助金额</label><input type="text" id="spAmount" placeholder="如 5.00"></div>
+<button class="btn btn-primary" id="spAddBtn">添加赞助记录</button>
+<button class="btn" id="spCancelBtn" style="display:none;">取消编辑</button>
+</div>
+<div id="spList" style="margin-top:14px;"></div>
+</div>
+<div class="admin-pane" id="paneReplay">
+<div class="card">
+<div class="form-row"><label>回放标题</label><input type="text" id="rpTitle" placeholder="如 裂痕杯 1/8 决赛"></div>
+<div class="form-row"><label>视频链接</label><input type="text" id="rpUrl" placeholder="mp4/webm 直链，或 B站等平台链接"></div>
+<div class="form-row"><label>日期（留空为今天）</label><input type="text" id="rpDate" placeholder="如 2026-09-13"></div>
+<button class="btn btn-primary" id="rpAddBtn">发布回放</button>
+<button class="btn" id="rpCancelBtn" style="display:none;">取消编辑</button>
+<div class="hint" style="font-size:12px;color:var(--text-secondary);margin-top:6px;">mp4/webm 等直链会内嵌播放；平台链接（B站等）显示为跳转观看卡片</div>
+</div>
+<div id="rpList" style="margin-top:14px;"></div>
+</div>
+<div class="admin-pane" id="paneImage">
+<div class="card">
+<div class="form-row"><label>选择图片（≤1.5MB）</label><input type="file" id="imFile" accept="image/*"></div>
+<div class="form-row"><label>图片名称（可选，用于识别）</label><input type="text" id="imName" placeholder="如 裂痕杯宣传图"></div>
+<button class="btn btn-primary" id="imUploadBtn">上传图片</button>
+<div class="hint" style="font-size:12px;color:var(--text-secondary);margin-top:6px;">上传后点「复制引用」得到 <code>img:xxx</code>，可粘贴到动态的配图字段直接引用</div>
+</div>
+<div id="imList" style="margin-top:14px;"></div>
+</div>
+</div>
+</div>
+</div>
+
 <script>
 // ============================================================
-// 三语词典
+// 工具
 // ============================================================
-const I18N = {
-zhCN: {
-siteTitle:'The Slow Tide官网',
-settingsTitle:'设置',
-themeSection:'主题模式',
-themeLight:'浅色',
-themeDark:'深色',
-langZhCN:'简体中文',
-langZhTW:'繁體中文',
-langEn:'English',
-searchPlaceholder:'全局搜索：输入关键词跳转对应页面或内容',
-searchBtn:'确认搜索',
-ruleSearchPlaceholder:'搜索公约内容，输入关键词自动跳转定位',
-ruleSearchBtn:'确认搜索',
-nav_home:'首页', nav_notice:'公告', nav_feed:'动态', nav_event:'赛事活动', nav_cdkey:'兑换码', nav_sponsor:'服务器赞助', nav_rule:'玩家公约', nav_feedback:'反馈',
-home_title:'🏠 服务器首页',
-serverInfo:'服务器信息',
-serverAddr:'服务器地址：',
-copyAddr:'复制地址',
-qqGroup:'QQ交流群：',
-statusLabel:'当前状态：',
-statusOnline:'运行中',
-runTimeTitle:'运行计时',
-bjTime:'北京时间：',
-totalRun:'累计运行时间：',
-latestNews:'最新动态',
-newsContent:'发布了新公告：服务器扶持通道正式开放',
-notice_title:'服务器网站更新公告',
-noticeUpdateTitle:'服务器更新公告',
-noticeSupportTitle:'关于服务器扶持通道的公告',
-noticeContent:'关于服务器人数限制的说明与补偿公告',
-noticeListLabel:'本次官网更新内容：',
-notice1:'玩家公约页面新增公约内容搜索框，支持关键词定位条约条目',
-notice2:'首页增加全局搜索输入框，支持关键词检索网站内容',
-notice3:'修复玩家公约目录锚点滚动定位BUG',
-notice4:'优化页面细节与移动端适配，清理多余留白',
-noticeEnd:'请各位玩家知悉，祝游玩愉快。',
-feed_title:'服务器动态',
-event_title:'赛事活动',
-noEvent:'暂无进行中赛事',
-cdkey_title:'兑换码',
-noCdkey:'ILOVEWYJ',
-sponsor_title:'服务器赞助',
-payQr:'赞助收款二维码',
-sponsorBoardTitle:'赞助名单排行榜',
-rule_title:'玩家公约',
-tip_input_kw:'请输入搜索关键词',
-tip_found:'已定位关键词：{kw}',
-found_many:'找到{n}条结果，点击跳转：{kw}',
-tip_not_found_rule:'未在公约中找到匹配关键词',
-tip_not_found_site:'网站内未检索到该关键词',
-copied:'服务器地址已复制',
-copyFail:'复制失败，请手动复制',
-sug_address:'服务器地址', sug_qq:'QQ交流群', sug_cdkey:'兑换码', sug_sponsor:'赞助',
-sug_rules:'玩家公约', sug_pvp:'PVP', sug_redstone:'红石', sug_tech:'生电',
-sug_build:'建筑', sug_claim:'领地', sug_economy:'经济', sug_trade:'交易',
-sug_villager:'村民', sug_cheat:'外挂', sug_gamble:'赌博', sug_event:'赛事',
-sug_runtime:'运行时间', sug_status:'状态',
-footer:'© 2026 The Slow Tide TST服务器'
+const $ = s => document.querySelector(s);
+function esc(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
+function showToast(msg){
+  const w=$('#toastWrap');
+  const d=document.createElement('div');
+  d.className='toast-item';
+  d.textContent=msg;
+  w.appendChild(d);
+  setTimeout(()=>{d.style.opacity='0';d.style.transition='opacity .3s';},2200);
+  setTimeout(()=>d.remove(),2600);
+}
+const root=document.documentElement;
+function themeState(){
+  const v=localStorage.getItem('tst-theme');
+  return (v==='dark'||v==='light')?v:'light';
+}
+function applyTheme(){
+  const m=themeState();
+  root.setAttribute('data-theme',m);
+}
+$('#themeToggle').onclick=()=>{
+  localStorage.setItem('tst-theme',themeState()==='dark'?'light':'dark');
+  applyTheme();
+};
+applyTheme();
+
+// ============================================================
+// 导航切换
+// ============================================================
+const navBtns=document.querySelectorAll('.nav-link');
+const pages=document.querySelectorAll('.page');
+function switchPage(pid){
+  pages.forEach(p=>p.classList.remove('active'));
+  navBtns.forEach(b=>b.classList.toggle('active',b.dataset.nav===pid));
+  const t=document.getElementById(pid);
+  if(t){ t.classList.add('active'); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
+document.querySelectorAll('[data-fnav]').forEach(b=>{
+  b.onclick=()=>{ switchPage(b.dataset.fnav); window.scrollTo({top:0,behavior:'smooth'}); };
+});
+
+// ============================================================
+// 轮播
+// ============================================================
+const heroSlider=$('#heroSlider');
+const slides=Array.from(heroSlider.querySelectorAll('.slide-item'));
+const slideDots=$('#slideDots');
+let curSlide=0,slideTimer=null;
+slides.forEach((_,i)=>{
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>goSlide(i);
+  slideDots.appendChild(d);
+});
+const dotsAll=Array.from(slideDots.querySelectorAll('.dot'));
+function goSlide(i){
+  curSlide=i;
+  const left=slides[i].getBoundingClientRect().left-heroSlider.getBoundingClientRect().left+heroSlider.scrollLeft;
+  heroSlider.scrollTo({left,behavior:'smooth'});
+  dotsAll.forEach((d,k)=>d.classList.toggle('active',k===i));
+}
+function autoSlide(){ goSlide((curSlide+1)%slides.length); }
+function startTimer(){ slideTimer=setInterval(autoSlide,4500); }
+function stopTimer(){ clearInterval(slideTimer); }
+startTimer();
+heroSlider.parentElement.addEventListener('mouseenter',stopTimer);
+heroSlider.parentElement.addEventListener('mouseleave',startTimer);
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){ stopTimer(); } else { startTimer(); }
+});
+
+// ============================================================
+// 时间徽章（北京时间 + 运行时间）
+// ============================================================
+const serverStart=new Date('2026-06-30T00:00:00');
+const offsetMs=120*1000;
+function updateTime(){
+  const now=new Date();
+  const hh=String(now.getHours()).padStart(2,'0');
+  const mm=String(now.getMinutes()).padStart(2,'0');
+  const ss=String(now.getSeconds()).padStart(2,'0');
+  $('#bjTime').textContent='北京时间 '+hh+':'+mm+':'+ss;
+  const diff=now.getTime()-serverStart.getTime()+offsetMs;
+  const day=Math.floor(diff/86400000);
+  const h=Math.floor((diff%86400000)/3600000);
+  $('#runTime').textContent='运行 '+day+'天'+h+'时';
+}
+setInterval(updateTime,1000);
+updateTime();
+
+// 复制地址
+let copyFlag=false;
+$('#copyAddrBtn').onclick=async()=>{
+  if(copyFlag){ return; }
+  copyFlag=true;
+  try{
+    await navigator.clipboard.writeText($('#serverAddr').textContent);
+    showToast('服务器地址已复制');
+  }catch(e){
+    const range=document.createRange();
+    range.selectNodeContents($('#serverAddr'));
+    const sel=window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    showToast('服务器地址已复制');
+  }
+  setTimeout(()=>{ copyFlag=false; },1500);
+};
+$('#openQQGroup').onclick=()=>{
+  window.location.href='mqqapi://card/show_pslcard?src_type=internal&version=1&card_type=group&uin=833470853';
 };
 
 // ============================================================
-// 玩家公约全文数据（三语）
+// 数据加载（公开 API）
 // ============================================================
-const RULES = {
-zhCN: {
+let SITE_DATA={announcements:[],feeds:[],sponsors:[],images:[],replays:[]};
+async function loadData(){
+  try{
+    const r=await fetch('https://tst-server-site.pages.dev/api/data');
+    const d=await r.json();
+    if(d.ok){
+      SITE_DATA=d;
+      renderAll();
+    }
+  }catch(e){
+    $('#noticeList').innerHTML='<div class="empty-hint">数据加载失败，请刷新重试</div>';
+  }
+}
+function renderAll(){
+  renderNotices();
+  renderFeeds();
+  renderSponsors();
+  renderReplays();
+}
+function isVideoUrl(u){
+  return /\.(mp4|webm|ogg|mov)(\?|$)/i.test(String(u||''));
+}
+function renderReplays(){
+  const list=SITE_DATA.replays||[];
+  $('#replayList').innerHTML=list.map(r=>{
+    const vid=isVideoUrl(r.url)
+      ? `<video controls preload="metadata" style="width:100%;max-height:380px;background:#000;margin-top:8px;display:block;"><source src="${esc(r.url)}"></video>`
+      : `<p style="margin-top:8px;"><a href="${esc(r.url)}" target="_blank" rel="noopener" style="color:var(--accent);">前往平台观看 →</a></p>`;
+    return `
+    <div class="card" style="margin-bottom:14px;">
+      <h3>${esc(r.title)}</h3>
+      <div class="date">${esc(r.date||'')}</div>
+      ${vid}
+    </div>`;
+  }).join('')||'<div class="empty-hint">暂无赛事回放</div>';
+}
+function renderNotices(){
+  const list=SITE_DATA.announcements||[];
+  const cards=list.map(a=>`
+    <div class="card" data-uid="notice-${esc(a.id)}">
+      <h3>${esc(a.title)}</h3>
+      <div class="date">${esc(a.date||'')}</div>
+      <div class="content">${esc(a.content)}</div>
+    </div>`).join('');
+  $('#noticeList').innerHTML=cards||'<div class="empty-hint">暂无公告</div>';
+  $('#homeNotices').innerHTML=list.slice(0,2).map(a=>`
+    <div class="card">
+      <h3>${esc(a.title)}</h3>
+      <div class="date">${esc(a.date||'')}</div>
+      <div class="content">${esc(a.content)}</div>
+    </div>`).join('')||'<div class="empty-hint">暂无公告</div>';
+}
+function feedCard(f){
+  const img=f.image?`<img class="feed-img" src="${esc(resolveImg(f.image))}" alt="${esc(f.title)}">`:'';
+  const pin=f.pinned?'<span class="pinned-tag">置顶</span>':'';
+  return `
+  <div class="card" data-uid="feed-${esc(f.id)}" style="margin-bottom:14px;">
+    <h3>${esc(f.title)}${pin}</h3>
+    <div class="date">${esc(f.date||'')}</div>
+    <div class="content">${esc(f.content)}</div>
+    ${img}
+  </div>`;
+}
+function renderFeeds(){
+  const list=SITE_DATA.feeds||[];
+  $('#feedList').innerHTML=list.map(feedCard).join('')||'<div class="empty-hint">暂无动态</div>';
+  $('#homeFeeds').innerHTML=list.slice(0,2).map(feedCard).join('')||'<div class="empty-hint">暂无动态</div>';
+}
+function renderSponsors(){
+  const list=SITE_DATA.sponsors||[];
+  if(!list.length){
+    $('#sponsorList').innerHTML='<div class="empty-hint">暂无赞助记录</div>';
+    return;
+  }
+  $('#sponsorList').innerHTML=`
+  <table style="width:100%;border-collapse:collapse;font-size:14px;">
+  <thead><tr style="text-align:left;color:var(--text-secondary);border-bottom:1px solid var(--border);">
+  <th style="padding:6px 4px;">名次</th><th style="padding:6px 4px;">玩家</th><th style="padding:6px 4px;">金额</th>
+  </tr></thead><tbody>
+  ${list.map((s,i)=>`
+    <tr style="border-bottom:1px solid var(--border);">
+      <td style="padding:8px 4px;">${i+1}</td>
+      <td style="padding:8px 4px;font-weight:600;">${esc(s.name)}</td>
+      <td style="padding:8px 4px;color:var(--accent);font-weight:600;">${esc(s.amount)}</td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+// ============================================================
+// 玩家公约（本地数据）
+// ============================================================
+const RULES={
 treatyTitle:'The Slow Tide 服务器总条约',
-subTitle:'网易基岩TST山头',
+subTitle:'网易基岩 TST 山头',
 intro:[
-'本条约适用于 The Slow Tide 服务器 全体玩家，统一规范服务器内行为准则、经济秩序、建筑保护、PVP机制、设备使用及违规处罚等全部游玩相关事宜。',
+'本条约适用于 The Slow Tide 服务器全体玩家，统一规范服务器内行为准则、经济秩序、建筑保护、PVP机制、设备使用及违规处罚等全部游玩相关事宜。',
 '本条约所有条款具备通用性、约束性与权威性。不接受“不知情”“规则未阅读”“卡规则漏洞”等任何免责理由。无论玩家资历、服务器贡献高低，管理员均有权对违规行为采取警告、权限限制、限时封禁、永久封禁等处置。',
 '针对本条约未明文列举，但确实扰乱服务器秩序、破坏公共环境、侵害他人权益的行为，管理组有权根据行为造成的实际影响，做出合理、公正的判定与处罚。',
 '全体玩家在服务器内及关联社群的一切行为，必须严格遵守《中华人民共和国法律法规》。严禁以任何形式诋毁、攻击、抹黑、诽谤服务器、管理团队及其他玩家；严禁使用任何技术手段干扰、破坏服务器正常运行。',
 '本条约将根据服务器运营状态动态优化更新。重大规则变更将提前发布官方公告告知全体玩家。凡进入本服务器游玩、参与社群交流，即视为已阅读、理解并自愿同意本条约全部内容；若不认可本规则，请勿进入服务器及相关社群。'
 ],
-tocLabel:'目录（点击跳转）',
 toc:[
 ['sec1','基础行为规范'],['sec2','聊天与社交规范'],['sec3','建筑与领地保护'],['sec4','资源采集与环境维护'],['sec5','经济与交易规则'],['sec6','PVP与战斗行为'],['sec7','红石与生电设备规范'],['sec8','生物与村民管理'],['sec9','玩家权益与反馈渠道'],['sec10','违规处理与处罚制度'],['sec11','服务器管理组职责'],['sec12','活动与赛事规则'],['sec13','数据与存档管理'],['sec14','规则更新与解释权']
 ],
@@ -809,7 +857,7 @@ sections:[
 '全体玩家需文明游玩、友善交流，遵守基础礼仪规范。',
 '严禁传播涉黄、涉黑、涉暴、低俗恶俗等不良信息。',
 '禁止在公共区域跑跳搭。',
-'服务器官方语言为简体/繁体中文，全员交流统一使用汉语。',
+'服务器官方语言为简体中文，全员交流统一使用汉语。',
 '禁止建造含低俗暗示、违规隐喻、不良导向的建筑。',
 '禁止利用游戏BUG、机制漏洞实施破坏、牟利、扰民等恶性行为。',
 '禁止一切违背双方意愿的强制PVP行为。',
@@ -929,448 +977,78 @@ refs:[
 '3. 感谢所有公开参考资料及参与规则完善的玩家与创作者。'
 ],
 closing:'本条约目前仍在持续修订中，暂不作为最终正式版本执行，后续将根据实际情况进一步完善。如有建议，欢迎通过主城意见箱反馈。'
-}
 };
-
-// ============================================================
-// 公告正文数据（关于服务器人数限制的说明与补偿公告，三语）
-// ============================================================
-const NOTICE_LIMIT = {
-zhCN: {
-items:[
-{t:'p', x:'近期随着服务器活跃度上升，同时在线人数不断增加。为了保障全体玩家的游戏体验，避免因负载过高导致的卡顿、回档、掉线等问题，我们决定对服务器在线人数进行动态管理。'},
-{t:'p', x:'自本公告发布起，当服务器同时在线人数超过 10 人时，系统将自动踢出最后进入的玩家，以维持服务器的稳定运行。'},
-{t:'p', x:'这一决定并非轻率之举。我们深知每一位进入服务器的玩家都带着时间和期待，但服务器的硬件资源有限，长期超载不仅会影响当前玩家的体验，也可能对存档和数据安全造成潜在风险。我们希望在现有条件下，尽可能为每一位在线玩家提供流畅、稳定的环境。'},
-{t:'p', x:'对于因此受到影响的玩家，我们将发放 50 金币作为补偿。虽然金额不大，但代表我们对每一位玩家理解与支持的感谢。'},
-{t:'p', x:'我们也在积极寻求更长期的优化方案，包括但不限于：'},
-{t:'ul', x:['优化现有命令方块与红石设备的执行效率','清理不必要的实体与加载区块','评估服务器配置升级的可能性']},
-{t:'p', x:'我们理解这一措施可能会给部分玩家带来不便，但希望各位能够理解并支持。服务器的长远稳定，需要管理组与每一位玩家共同努力。'},
-{t:'p', x:'感谢大家一路以来的陪伴与包容。'}
-],
-sign:'The Slow Tide 管理组',
-date:'2026年9月'
-}
-};
-
-// ============================================================
-// 扶持通道公告数据（三语）
-// ============================================================
-const NOTICE_SUPPORT = {
-zhCN: {
-items:[
-{t:'p', x:'即日起，服务器开放以下扶持通道：'},
-{t:'h', x:'一、玩家自行举办赛事或活动'},
-{t:'p', x:'可向管理组报备，说明活动内容、时间、人数规模，管理组审核通过后，将根据活动规模发放物资与金币支持。'},
-{t:'h', x:'二、大型公共建筑'},
-{t:'p', x:'凡建造供全服使用的公共设施（如交通枢纽、公共农场、活动场地、图书馆等），建成后可申请认证，管理组将发放建材补贴与对应称号。'},
-{t:'h', x:'三、大型私有建筑'},
-{t:'p', x:'个人建造的大型城市、庄园、基地等，建成后可申请认证，管理组将根据规模发放建材补贴与称号。'},
-{t:'p', x:'申请方式：私聊管理组，提供截图与坐标，审核通过后发放扶持物资。'},
-{t:'p', x:'欢迎各位踊跃参与，共同建设这个世界。'}
-],
-sign:'The Slow Tide 管理组',
-date:'2026年9月12日'
-}
-};
-
-// ============================================================
-// 服务器更新公告数据
-// ============================================================
-const NOTICE_UPDATE = {
-zhCN: {
-items:[
-{t:'h', x:'一、问题修复'},
-{t:'p', x:'修复了兑换码无法正常使用的问题。此前部分玩家在输入兑换码时提示无效或无法领取奖励，现已完成修复，可正常使用。'},
-{t:'p', x:'优化了兑换码使用插件，提升兑换响应速度与稳定性，减少兑换失败的情况。'},
-{t:'h', x:'二、内容新增'},
-{t:'p', x:'新增少量遗迹，分布在生存世界各处。遗迹中包含物资与探索要素，欢迎前往寻找。具体位置不公开，请自行探索。'},
-{t:'h', x:'三、赛事开启'},
-{t:'p', x:'裂痕杯报名现已开启。裂痕杯为服务器官方 PVP 赛事，采用单人淘汰制，需自备装备，禁止携带神器类物品。'},
-{t:'p', x:'报名方式：前往主城赛事/活动区域，按提示完成报名。'},
-{t:'p', x:'具体赛程、时间及规则将在报名结束后统一公布，请留意后续公告。'},
-{t:'h', x:'四、其他说明'},
-{t:'p', x:'如在兑换码使用过程中仍遇到问题，请及时反馈至管理组。'},
-{t:'p', x:'遗迹探索过程中如发现异常，也欢迎反馈。'}
-],
-sign:'The Slow Tide 管理组',
-date:'2026年9月12日'
-}
-};
-
-// ============================================================
-// 动态栏目数据
-// ============================================================
-const FEED = {
-zhCN: [
-{
-type:'event',
-img:'dt2.jpg',
-title:'🏁 S1 裂痕杯 · 赛事动态',
-status:'筹备中',
-paras:[
-'「裂痕杯」是 The Slow Tide 服务器首个官方 PVP 赛事，面向全体玩家开放。赛事采用单人淘汰制，玩家需自备装备，在指定竞技场内进行对决。',
-'由于服务器近期完成重置，赛事各项准备工作正在重新推进中。具体开赛时间、报名方式及详细规则将在后续公告中陆续公布，请留意官网「服务器公告」栏目及游戏内通知。',
-'有意参与的玩家可提前做好装备与物资准备。期待在赛场上与各位相见。'
-],
-date:'2026-09-05'
-},
-{
-type:'post',
-img:'dt1.jpg',
-text:'捷报！玩家 极岚 在矿洞中发现了连续 28 枚钻石的矿脉，创下服务器新纪录，目前位居全服第一！',
-date:'2026-09-05'
-}
-]
-};
-
-// ============================================================
-// 赞助名单数据
-// ============================================================
-const SPONSORS = [
-{name:'极嵐', amount:'5.00'}
-];
-
-// ============================================================
-// 状态
-// ============================================================
-const root=document.documentElement;
-const lang='zhCN';
-
-function t(key){
-  const d=I18N[lang];
-  return d[key]!=null?d[key]:'';
-}
-
-// ============================================================
-// 主题二态：浅色 / 深色
-// ============================================================
-function themeState(){
-  const v=localStorage.getItem('tst-theme');
-  return (v==='dark'||v==='light')?v:'light';
-}
-function applyTheme(){
-  root.setAttribute('data-theme',themeState());
-}
-function syncSettingsUI(){
-  const mode=themeState();
-  document.querySelectorAll('.seg-btn[data-theme]').forEach(b=>{
-    b.classList.toggle('active',b.dataset.theme===mode);
-  });
-}
-
-// ============================================================
-// 语言应用
-// ============================================================
 function renderRules(){
-  const R=RULES[lang];
-  const dom=document.getElementById('ruleContent');
+  const R=RULES;
+  const dom=$('#ruleContent');
   let html='';
-  html+='<div class="rule-section" id="u-rule-head" data-unit>';
-  html+='<h3>'+R.treatyTitle+'</h3>';
-  html+='<p>'+R.subTitle+'</p>';
-  for(const p of R.intro){ html+='<p>'+p+'</p>'; }
-  html+='<p><strong>'+R.tocLabel+'</strong></p>';
-  html+='<ul id="ruleToc">';
-  for(const item of R.toc){ html+='<li><a href="#'+item[0]+'">'+item[1]+'</a></li>'; }
-  html+='</ul>';
-  html+='</div>';
+  html+='<div class="rule-section"><h3>'+esc(R.treatyTitle)+'</h3>';
+  html+='<p>'+esc(R.subTitle)+'</p>';
+  for(const p of R.intro){ html+='<p>'+esc(p)+'</p>'; }
+  html+='<p><strong>目录（点击跳转）</strong></p><ul id="ruleToc">';
+  for(const item of R.toc){ html+='<li><a href="#'+item[0]+'">'+esc(item[1])+'</a></li>'; }
+  html+='</ul></div>';
   for(const sec of R.sections){
-    html+='<div class="rule-section" id="'+sec.id+'" data-unit><h3>'+sec.title+'</h3>';
-    for(const p of sec.paras){ html+='<p>'+p+'</p>'; }
+    html+='<div class="rule-section" id="'+sec.id+'"><h3>'+esc(sec.title)+'</h3>';
+    for(const p of sec.paras){ html+='<p>'+esc(p)+'</p>'; }
     html+='</div>';
   }
-  html+='<div class="rule-section" id="u-rule-notes" data-unit>';
-  html+='<p><strong>'+R.makeNote+'</strong></p>';
-  html+='<p>'+R.makers+'</p>';
-  html+='<p><br><strong>'+R.refNote+'</strong></p>';
-  for(const r of R.refs){ html+='<p>'+r+'</p>'; }
-  html+='<p>'+R.closing+'</p>';
-  html+='</div>';
+  html+='<div class="rule-section"><p><strong>'+esc(R.makeNote)+'</strong></p>';
+  html+='<p>'+esc(R.makers)+'</p>';
+  html+='<p><br><strong>'+esc(R.refNote)+'</strong></p>';
+  for(const r of R.refs){ html+='<p>'+esc(r)+'</p>'; }
+  html+='<p>'+esc(R.closing)+'</p></div>';
   dom.innerHTML=html;
 }
-function renderNoticeLimit(){
-  const N=NOTICE_LIMIT[lang];
-  const dom=document.getElementById('noticeLimitContent');
-  if(!dom){ return; }
-  let html='';
-  for(const item of N.items){
-    if(item.t==='p'){
-      html+='<p class="notice-para">'+item.x+'</p>';
-    }else if(item.t==='ul'){
-      html+='<ul style="margin-left:24px;margin-top:8px;">';
-      for(const li of item.x){ html+='<li>'+li+'</li>'; }
-      html+='</ul>';
-    }
-  }
-  html+='<p class="notice-sign">'+N.sign+'</p>';
-  html+='<p class="notice-date">'+N.date+'</p>';
-  dom.innerHTML=html;
-}
-function renderNoticeSupport(){
-  const N=NOTICE_SUPPORT[lang];
-  const dom=document.getElementById('noticeSupportContent');
-  if(!dom){ return; }
-  let html='';
-  for(const item of N.items){
-    if(item.t==='p'){
-      html+='<p class="notice-para">'+item.x+'</p>';
-    }else if(item.t==='h'){
-      html+='<h4 class="notice-sub">'+item.x+'</h4>';
-    }else if(item.t==='ul'){
-      html+='<ul style="margin-left:24px;margin-top:8px;">';
-      for(const li of item.x){ html+='<li>'+li+'</li>'; }
-      html+='</ul>';
-    }
-  }
-  html+='<p class="notice-sign">'+N.sign+'</p>';
-  html+='<p class="notice-date">'+N.date+'</p>';
-  dom.innerHTML=html;
-}
-function renderNoticeUpdate(){
-  const N=NOTICE_UPDATE[lang];
-  const dom=document.getElementById('noticeUpdateContent');
-  if(!dom){ return; }
-  let html='';
-  for(const item of N.items){
-    if(item.t==='p'){
-      html+='<p class="notice-para">'+item.x+'</p>';
-    }else if(item.t==='h'){
-      html+='<h4 class="notice-sub">'+item.x+'</h4>';
-    }else if(item.t==='ul'){
-      html+='<ul style="margin-left:24px;margin-top:8px;">';
-      for(const li of item.x){ html+='<li>'+li+'</li>'; }
-      html+='</ul>';
-    }
-  }
-  html+='<p class="notice-sign">'+N.sign+'</p>';
-  html+='<p class="notice-date">'+N.date+'</p>';
-  dom.innerHTML=html;
-}
-function renderFeed(){
-  const items=FEED[lang];
-  const dom=document.getElementById('feedContent');
-  if(!dom){ return; }
-  let html='';
-  for(const it of items){
-    html+='<div class="feed-card" data-unit>';
-    if(it.type==='post'){
-      html+='<p class="feed-text">'+it.text+'</p>';
-      if(it.img){ html+='<img class="feed-img" src="'+it.img+'" alt="'+it.img+'">'; }
-    }else if(it.type==='event'){
-      html+='<h3>'+it.title+'</h3>';
-      html+='<span class="feed-status">'+it.status+'</span>';
-      if(it.img){ html+='<img class="feed-img" src="'+it.img+'" alt="'+it.img+'">'; }
-      for(const p of it.paras){ html+='<p class="feed-text">'+p+'</p>'; }
-    }
-    html+='<div class="feed-date">'+it.date+'</div>';
-    html+='</div>';
-  }
-  dom.innerHTML=html;
-}
-function renderSponsors(){
-  const dom=document.getElementById('sponsorBoard');
-  if(!dom){ return; }
-  if(!SPONSORS.length){
-    dom.innerHTML='<p class="board-empty">暂无赞助记录</p>';
-    return;
-  }
-  let html='<table class="board-table"><thead><tr><th class="num">名次</th><th>玩家</th><th class="amount">赞助金额</th></tr></thead><tbody>';
-  SPONSORS.forEach((s,i)=>{
-    html+='<tr><td class="num">'+(i+1)+'</td><td>'+s.name+'</td><td class="amount">'+s.amount+'</td></tr>';
-  });
-  html+='</tbody></table>';
-  dom.innerHTML=html;
-}
-
-function applyLang(){
-  const d=I18N[lang];
-  document.documentElement.lang = 'zh-CN';
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const k=el.getAttribute('data-i18n');
-    if(d[k]!=null){ el.textContent=d[k]; }
-  });
-  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
-    const k=el.getAttribute('data-i18n-ph');
-    if(d[k]!=null){ el.setAttribute('placeholder',d[k]); }
-  });
-  // 清空搜索提示条，避免残留旧文案
-  document.getElementById('globalTip').textContent='';
-  document.getElementById('ruleTip').textContent='';
-  clearHighlight();
-  hideResults();
-  renderRules();
-  renderNoticeLimit();
-  renderNoticeSupport();
-  renderNoticeUpdate();
-  renderFeed();
-  renderSponsors();
-  buildSuggestPool();
-  syncSettingsUI();
-  updateTime();
-  // 更新文档标题
-  document.title = 'The Slow Tide官网';
-}
-
-// ============================================================
-// 页面切换
-// ============================================================
-const navBtns=document.querySelectorAll('.nav-item button');
-const pages=document.querySelectorAll('.page');
-function switchPage(pid){
-  pages.forEach(p=>p.classList.remove('active'));
-  const target=document.getElementById(pid);
-  if(target){ target.classList.add('active'); }
-}
-navBtns.forEach(btn=>{
-  btn.onclick=()=>switchPage(btn.dataset.page);
-});
-
-// ============================================================
-// 轮播（悬停暂停、页面隐藏暂停）
-// ============================================================
-const adSlider=document.getElementById('adSlider');
-const adWrap=document.getElementById('adWrap');
-const slides=Array.from(adSlider.querySelectorAll('.slide-item'));
-const slideDots=document.getElementById('slideDots');
-let curSlide=0;
-let slideTimer=null;
-slides.forEach((_,idx)=>{
-  const d=document.createElement('div');
-  d.className='dot'+(idx===0?' active':'');
-  d.onclick=()=>goSlide(idx);
-  slideDots.appendChild(d);
-});
-const dotsAll=Array.from(slideDots.querySelectorAll('.dot'));
-function goSlide(idx){
-  curSlide=idx;
-  const targetLeft=slides[idx].getBoundingClientRect().left - adSlider.getBoundingClientRect().left + adSlider.scrollLeft;
-  adSlider.scrollTo({left:targetLeft,behavior:'smooth'});
-  dotsAll.forEach((d,i)=>d.classList.toggle('active',i===idx));
-}
-function autoSlide(){ curSlide=(curSlide+1)%slides.length; goSlide(curSlide); }
-function startTimer(){ slideTimer=setInterval(autoSlide,4500); }
-function stopTimer(){ clearInterval(slideTimer); }
-startTimer();
-adWrap.addEventListener('mouseenter',stopTimer);
-adWrap.addEventListener('mouseleave',startTimer);
-document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){ stopTimer(); } else { startTimer(); }
-});
-
-// ============================================================
-// 时间
-// ============================================================
-const bjTimeDom=document.getElementById('bjTime');
-const runTimeDom=document.getElementById('runTime');
-const serverStart=new Date('2026-06-30T00:00:00');
-const offsetMs=120*1000;
-function timeFmt(d,h,m,s){
-  return d+'天 '+h+'时 '+m+'分 '+s+'秒';
-}
-function timeLocale(){
-  return 'zh-CN';
-}
-function updateTime(){
-  const now=new Date();
-  bjTimeDom.innerText=now.toLocaleString(timeLocale());
-  const diff=now.getTime() - serverStart.getTime() + offsetMs;
-  const day=Math.floor(diff/(1000*60*60*24));
-  const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-  const m=Math.floor((diff%(1000*60*60))/(1000*60));
-  const s=Math.floor((diff%(1000*60))/1000);
-  runTimeDom.innerText=timeFmt(day,h,m,s);
-}
-setInterval(updateTime,1000);
-updateTime();
-
-// ============================================================
-// 复制地址（降级到选中文本）
-// ============================================================
-const copyAddrBtn=document.getElementById('copyAddrBtn');
-let copyFlag=false;
-copyAddrBtn.onclick=async()=>{
-  if(copyFlag){ return; }
-  copyFlag=true;
-  const addr=document.getElementById('serverAddr').innerText;
-  try{
-    await navigator.clipboard.writeText(addr);
-    showToast(t('copied'));
-  }catch(e){
-    // 降级：选择文本
-    try{
-      const range=document.createRange();
-      range.selectNodeContents(document.getElementById('serverAddr'));
-      const sel=window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-      showToast(t('copied'));
-    }catch(e2){
-      showToast(t('copyFail'));
-    }
-  }
-  setTimeout(()=>{ copyFlag=false; },1500);
-};
-
-// QQ群跳转
-document.getElementById('openQQGroup').onclick=()=>{
-  window.location.href='mqqapi://card/show_pslcard?src_type=internal&version=1&card_type=group&uin=833470853';
-};
-
-// ============================================================
-// 公约锚点（事件委托，i18n重渲染后依然有效）
-// ============================================================
-const ruleScrollDom=document.getElementById('ruleScrollDom');
+const ruleScrollDom=$('#ruleScrollDom');
 function scrollToSec(id){
   const tar=document.getElementById(id);
   if(!tar){ return; }
-  const targetTop=tar.getBoundingClientRect().top - ruleScrollDom.getBoundingClientRect().top + ruleScrollDom.scrollTop;
-  ruleScrollDom.scrollTo({top:targetTop-16,behavior:'smooth'});
+  const top=tar.getBoundingClientRect().top-ruleScrollDom.getBoundingClientRect().top+ruleScrollDom.scrollTop;
+  ruleScrollDom.scrollTo({top:top-16,behavior:'smooth'});
 }
 document.addEventListener('click',(e)=>{
   const a=e.target.closest('#ruleToc a');
-  if(a){
-    e.preventDefault();
-    scrollToSec(a.getAttribute('href').substring(1));
-  }
+  if(a){ e.preventDefault(); scrollToSec(a.getAttribute('href').substring(1)); }
 });
-
-// ============================================================
-// 搜索
-// ============================================================
+// 公约搜索
+$('#ruleSearchBtn').onclick=()=>doRuleSearch($('#ruleSearchInput').value);
+$('#ruleSearchInput').addEventListener('keydown',(e)=>{
+  if(e.key==='Enter' && !suggestOpen('ruleSuggest')){ doRuleSearch(e.target.value); }
+});
 function doRuleSearch(kw){
-  const tip=document.getElementById('ruleTip');
+  const tip=$('#ruleTip');
   tip.textContent='';
   kw=kw.trim();
-  if(!kw){ tip.textContent=t('tip_input_kw'); return; }
+  if(!kw){ tip.textContent='请输入搜索关键词'; return; }
   const kwLow=kw.toLowerCase();
   const sections=document.querySelectorAll('.rule-section');
   let found=false;
   for(const sec of sections){
     if(sec.innerText.toLowerCase().includes(kwLow)){
       scrollToSec(sec.id);
-      tip.textContent=t('tip_found').replace('{kw}',kw);
-      found=true;
-      break;
+      tip.textContent='已定位关键词：'+kw;
+      found=true; break;
     }
   }
-  if(!found){ tip.textContent=t('tip_not_found_rule'); }
+  if(!found){ tip.textContent='未在公约中找到匹配关键词'; }
 }
+
 // ============================================================
-// 全站搜索（首页/公告/赛事/兑换码/赞助/玩家公约）
+// 全局搜索（公告 / 动态 / 公约 / 页面）
 // ============================================================
 function searchUnits(){
   const units=[];
   const pids=['home','notice','feed','event','cdkey','sponsor','rule'];
-  for(const pid of pids){
-    const page=document.getElementById(pid);
-    if(!page){ continue; }
-    // 页面标题作为独立单元，让"公告/兑换码"等页名可被搜到
-    const h2=page.querySelector(':scope > h2');
-    if(h2){ units.push({page:pid, el:h2, text:h2.innerText, title:true}); }
-    page.querySelectorAll('[data-unit]').forEach(el=>{
-      units.push({page:pid, el:el, text:el.innerText});
-    });
-  }
+  const navName={home:'首页',notice:'公告',feed:'动态',event:'赛事活动',cdkey:'兑换码',sponsor:'服务器赞助',rule:'玩家公约'};
+  for(const pid of pids){ units.push({page:pid, text:navName[pid], kind:'page'}); }
+  for(const a of (SITE_DATA.announcements||[])){ units.push({page:'notice', elId:'notice-'+a.id, text:a.title+' '+a.content, kind:'公告'}); }
+  for(const f of (SITE_DATA.feeds||[])){ units.push({page:'feed', elId:'feed-'+f.id, text:f.title+' '+f.content, kind:'动态'}); }
+  for(const s of (SITE_DATA.sponsors||[])){ units.push({page:'sponsor', text:'赞助 '+s.name+' '+s.amount, kind:'赞助'}); }
+  const sections=document.querySelectorAll('.rule-section');
+  sections.forEach((sec,idx)=>{
+    units.push({page:'rule', ruleSec:sec.id||('sec'+idx), text:sec.innerText, kind:'公约'});
+  });
   return units;
 }
 function clearHighlight(){
@@ -1380,8 +1058,8 @@ function clearHighlight(){
   });
   document.querySelectorAll('.search-flash').forEach(el=>el.classList.remove('search-flash'));
 }
-function highlightIn(el, kwLow){
-  const walker=document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+function highlightIn(el,kwLow){
+  const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null);
   const nodes=[];
   while(walker.nextNode()){
     const n=walker.currentNode;
@@ -1389,13 +1067,11 @@ function highlightIn(el, kwLow){
   }
   nodes.forEach(n=>{
     const frag=document.createDocumentFragment();
-    let rest=n.nodeValue;
-    let low=rest.toLowerCase();
-    let idx=low.indexOf(kwLow);
+    let rest=n.nodeValue, low=rest.toLowerCase(), idx=low.indexOf(kwLow);
     while(idx!==-1){
       frag.appendChild(document.createTextNode(rest.slice(0,idx)));
       const mk=document.createElement('mark');
-      mk.textContent=rest.slice(idx, idx+kwLow.length);
+      mk.textContent=rest.slice(idx,idx+kwLow.length);
       frag.appendChild(mk);
       rest=rest.slice(idx+kwLow.length);
       low=rest.toLowerCase();
@@ -1407,30 +1083,33 @@ function highlightIn(el, kwLow){
   el.classList.add('search-flash');
   setTimeout(()=>{ if(el){ el.classList.remove('search-flash'); } },1800);
 }
-function goToUnit(unit, kw){
+function goToUnit(u,kw){
   clearHighlight();
-  switchPage(unit.page);
+  switchPage(u.page);
   const kwLow=kw.toLowerCase();
   requestAnimationFrame(()=>{
-    if(unit.page==='rule'){ scrollToSec(unit.el.id); }
-    else { unit.el.scrollIntoView({behavior:'smooth', block:'center'}); }
-    highlightIn(unit.el, kwLow);
+    let el=null;
+    if(u.ruleSec){ el=document.getElementById(u.ruleSec); }
+    else if(u.elId){ el=document.getElementById(u.elId); }
+    if(u.page==='rule' && el){ scrollToSec(u.ruleSec); }
+    else if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); }
+    if(el){ highlightIn(el,kwLow); }
   });
   hideResults();
 }
-function snippet(text, kwLow){
+function snippet(text,kwLow){
   const idx=text.toLowerCase().indexOf(kwLow);
   if(idx<0){ return text.slice(0,60); }
-  const start=Math.max(0, idx-18);
-  const end=Math.min(text.length, idx+kwLow.length+42);
+  const start=Math.max(0,idx-18);
+  const end=Math.min(text.length,idx+kwLow.length+42);
   return (start>0?'…':'')+text.slice(start,end)+(end<text.length?'…':'');
 }
-function renderResults(matches, kw){
-  const box=document.getElementById('globalResults');
+function renderResults(matches,kw){
+  const box=$('#globalResults');
   box.innerHTML='';
   const head=document.createElement('div');
   head.className='results-head';
-  head.textContent=t('found_many').replace('{n}',matches.length).replace('{kw}',kw);
+  head.textContent='找到'+matches.length+'条结果，点击跳转：'+kw;
   box.appendChild(head);
   const kwLow=kw.toLowerCase();
   matches.forEach(m=>{
@@ -1438,85 +1117,53 @@ function renderResults(matches, kw){
     row.className='result-item';
     const badge=document.createElement('span');
     badge.className='result-badge';
-    badge.textContent=I18N[lang]['nav_'+m.page]||m.page;
+    badge.textContent=m.kind||m.page;
     const snip=document.createElement('span');
     snip.className='result-snip';
-    snip.textContent=snippet(m.text, kwLow);
+    snip.textContent=snippet(m.text,kwLow);
     row.appendChild(badge);
     row.appendChild(snip);
-    row.onclick=()=>goToUnit(m, kw);
+    row.onclick=()=>goToUnit(m,kw);
     box.appendChild(row);
   });
   box.classList.add('show');
 }
 function hideResults(){
-  const box=document.getElementById('globalResults');
+  const box=$('#globalResults');
   box.classList.remove('show');
   box.innerHTML='';
 }
 function doGlobalSearch(kw){
-  const tip=document.getElementById('globalTip');
+  const tip=$('#globalTip');
   tip.textContent='';
   hideResults();
   kw=kw.trim();
-  if(!kw){ tip.textContent=t('tip_input_kw'); return; }
+  if(!kw){ tip.textContent='请输入搜索关键词'; return; }
   const kwLow=kw.toLowerCase();
-  const units=searchUnits();
-  const matches=units.filter(u=>u.text.toLowerCase().includes(kwLow));
-  if(!matches.length){ tip.textContent=t('tip_not_found_site'); return; }
+  const matches=searchUnits().filter(u=>u.text.toLowerCase().includes(kwLow));
+  if(!matches.length){ tip.textContent='网站内未检索到该关键词'; return; }
   if(matches.length===1){
-    goToUnit(matches[0], kw);
-    tip.textContent=t('tip_found').replace('{kw}',kw);
+    goToUnit(matches[0],kw);
+    tip.textContent='已定位关键词：'+kw;
     return;
   }
-  renderResults(matches, kw);
+  renderResults(matches,kw);
 }
-document.getElementById('globalSearchBtn').onclick=()=>{
-  doGlobalSearch(document.getElementById('globalSearchInput').value);
-};
-document.getElementById('globalSearchInput').addEventListener('input',()=>{
-  hideResults();
-});
-document.getElementById('ruleSearchBtn').onclick=()=>{
-  doRuleSearch(document.getElementById('ruleSearchInput').value);
-};
-// 输入框回车触发
-document.getElementById('globalSearchInput').addEventListener('keydown',(e)=>{
+$('#globalSearchBtn').onclick=()=>doGlobalSearch($('#globalSearchInput').value);
+$('#globalSearchInput').addEventListener('keydown',(e)=>{
   if(e.key==='Enter' && !suggestOpen('globalSuggest')){ doGlobalSearch(e.target.value); }
 });
-document.getElementById('ruleSearchInput').addEventListener('keydown',(e)=>{
-  if(e.key==='Enter' && !suggestOpen('ruleSuggest')){ doRuleSearch(e.target.value); }
-});
+$('#globalSearchInput').addEventListener('input',()=>hideResults());
 
 // ============================================================
-// 搜索联想（百度式）
+// 搜索联想
 // ============================================================
-let suggestPool=[];
-function buildSuggestPool(){
-  const d=I18N[lang];
-  const pool=[];
-  // 页面名
-  pool.push(d.nav_home,d.nav_notice,d.nav_feed,d.nav_event,d.nav_cdkey,d.nav_sponsor,d.nav_rule);
-  // 常用搜索意图
-  const sugKeys=['sug_address','sug_qq','sug_cdkey','sug_sponsor','sug_rules','sug_pvp','sug_redstone','sug_tech','sug_build','sug_claim','sug_economy','sug_trade','sug_villager','sug_cheat','sug_gamble','sug_event','sug_runtime','sug_status'];
-  for(const k of sugKeys){ if(d[k]) pool.push(d[k]); }
-  // 公约各章节标题
-  for(const sec of RULES[lang].sections){ pool.push(sec.title); }
-  suggestPool=[...new Set(pool)];
-}
+function suggestOpen(id){ return document.getElementById(id).classList.contains('show'); }
 function getSuggestions(kwLow){
-  return suggestPool.filter(x=>x.toLowerCase().includes(kwLow)).slice(0,8);
+  const pool=['首页','公告','动态','赛事活动','兑换码','服务器赞助','玩家公约','服务器地址','QQ交流群','裂痕杯','PVP','红石','生电','建筑','领地','经济','交易','村民','外挂','赌博','赞助','运行时间','状态'];
+  for(const s of RULES.sections){ pool.push(s.title); }
+  return pool.filter(x=>x.toLowerCase().includes(kwLow)).slice(0,8);
 }
-function getDefaultSuggestions(){
-  const d=I18N[lang];
-  const defaults=[d.sug_address,d.sug_qq,d.sug_rules,d.sug_cdkey,d.sug_sponsor,d.sug_pvp];
-  return defaults.filter(Boolean);
-}
-function suggestOpen(boxId){
-  const box=document.getElementById(boxId);
-  return box.classList.contains('show');
-}
-// 绑定联想框（每个搜索输入框独立）
 function initSuggest(inputId,boxId,runSearch){
   const input=document.getElementById(inputId);
   const box=document.getElementById(boxId);
@@ -1537,19 +1184,18 @@ function initSuggest(inputId,boxId,runSearch){
   }
   function setActive(i){
     active=i;
-    Array.from(box.children).forEach((c,idx)=>c.classList.toggle('active',idx===i));
+    Array.from(box.children).forEach((c,k)=>c.classList.toggle('active',k===i));
     const el=box.children[i];
     if(el){ el.scrollIntoView({block:'nearest'}); }
   }
   input.addEventListener('focus',()=>{
     const kw=input.value.trim();
-    if(!kw){ render(getDefaultSuggestions()); }
+    if(!kw){ render(['服务器地址','QQ交流群','玩家公约','兑换码','裂痕杯','赞助']); }
   });
   input.addEventListener('input',()=>{
     const kw=input.value.trim();
-    if(!kw){ render(getDefaultSuggestions()); return; }
-    const kwLow=kw.toLowerCase();
-    const items=getSuggestions(kwLow);
+    if(!kw){ render(['服务器地址','QQ交流群','玩家公约','兑换码','裂痕杯','赞助']); return; }
+    const items=getSuggestions(kw.toLowerCase());
     if(!items.length){ close(); return; }
     render(items);
   });
@@ -1562,107 +1208,427 @@ function initSuggest(inputId,boxId,runSearch){
       if(active>=0 && box.children[active]){
         e.preventDefault();
         const it=box.children[active].textContent;
-        input.value=it;
-        close();
-        runSearch(it);
+        input.value=it; close(); runSearch(it);
       }
     } else if(e.key==='Escape'){ close(); }
   });
   document.addEventListener('click',(e)=>{
-    if(!e.target.closest('.search-row') && !e.target.closest('.rule-search-row')){
-      close();
-    }
+    if(!e.target.closest('.search-row')){ close(); }
   });
-  return {close};
 }
 initSuggest('globalSearchInput','globalSuggest',(kw)=>doGlobalSearch(kw));
 initSuggest('ruleSearchInput','ruleSuggest',(kw)=>doRuleSearch(kw));
 
 // ============================================================
-// 设置面板
+// 管理员面板
 // ============================================================
-const settingsBtn=document.getElementById('settingsBtn');
-const settingsPanel=document.getElementById('settingsPanel');
-settingsBtn.onclick=(e)=>{
-  e.stopPropagation();
-  settingsPanel.classList.toggle('open');
-};
-document.addEventListener('click',(e)=>{
-  if(!e.target.closest('.settings-panel') && !e.target.closest('#settingsBtn')){
-    settingsPanel.classList.remove('open');
-  }
+let ADMIN_TOKEN=sessionStorage.getItem('tst_admin_token')||'';
+const adminModal=$('#adminModal');
+function openAdmin(){
+  adminModal.classList.add('open');
+  if(ADMIN_TOKEN){ showAdminPanel(); } else { $('#adminLoginBox').style.display='block'; $('#adminPanel').style.display='none'; }
+}
+function closeAdmin(){ adminModal.classList.remove('open'); }
+$('#adminBtn').onclick=()=>openAdmin();
+$('#adminClose').onclick=()=>closeAdmin();
+adminModal.addEventListener('click',(e)=>{
+  if(e.target===adminModal){ closeAdmin(); }
 });
-document.querySelectorAll('.seg-btn[data-theme]').forEach(b=>{
-  b.onclick=()=>{
-    localStorage.setItem('tst-theme',b.dataset.theme);
-    applyTheme();
-    syncSettingsUI();
+$('#adminLoginBtn').onclick=async()=>{
+  const pwd=$('#adminPwd').value;
+  if(!pwd){ showToast('请输入密码'); return; }
+  const r=await fetch('https://tst-server-site.pages.dev/api/admin',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:'login',password:pwd})
+  });
+  const d=await r.json();
+  if(d.ok){
+    ADMIN_TOKEN=d.token;
+    sessionStorage.setItem('tst_admin_token',ADMIN_TOKEN);
+    showToast('登录成功');
+    showAdminPanel();
+  }else{
+    showToast(d.error||'登录失败');
+  }
+};
+$('#adminPwd').addEventListener('keydown',(e)=>{
+  if(e.key==='Enter'){ $('#adminLoginBtn').click(); }
+});
+function showAdminPanel(){
+  $('#adminLoginBox').style.display='none';
+  $('#adminPanel').style.display='block';
+  refreshAdminLists();
+}
+// Tab 切换
+document.querySelectorAll('.admin-tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.admin-pane').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    $('#pane'+t.dataset.tab.charAt(0).toUpperCase()+t.dataset.tab.slice(1)).classList.add('active');
   };
 });
-
-// ============================================================
-// Toast 轻提示
-// ============================================================
-function showToast(msg){
-  let wrap=document.querySelector('.toast-wrap');
-  if(!wrap){
-    wrap=document.createElement('div');
-    wrap.className='toast-wrap';
-    document.body.appendChild(wrap);
+async function adminApi(action,data,extra){
+  const r=await fetch('https://tst-server-site.pages.dev/api/admin',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+ADMIN_TOKEN},
+    body:JSON.stringify({action,data,...(extra||{})})
+  });
+  const d=await r.json();
+  if(!d.ok && r.status===401){
+    ADMIN_TOKEN='';
+    sessionStorage.removeItem('tst_admin_token');
+    showToast('登录已过期，请重新登录');
+    $('#adminLoginBox').style.display='block';
+    $('#adminPanel').style.display='none';
+    return null;
   }
-  const t=document.createElement('div');
-  t.className='toast';
-  t.textContent=msg;
-  wrap.appendChild(t);
-  requestAnimationFrame(()=>t.classList.add('show'));
-  setTimeout(()=>{
-    t.classList.remove('show');
-    setTimeout(()=>t.remove(),300);
-  },1800);
+  return d;
 }
+async function refreshAdminLists(){
+  if(ADMIN_TOKEN){
+    await loadData();
+  }
+  renderAdminNotices();
+  renderAdminFeeds();
+  renderAdminSponsors();
+  renderAdminReplays();
+  renderAdminImages();
+}
+function renderAdminNotices(){
+  const list=SITE_DATA.announcements||[];
+  $('#anList').innerHTML=list.map(a=>`
+  <div class="admin-list-item">
+    <div>
+      <strong>${esc(a.title)}</strong>
+      <div class="meta">${esc(a.date||'')}</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">${esc(a.content)}</div>
+    </div>
+    <div class="ops"><button class="btn" data-edit="announcement" data-id="${esc(a.id)}">编辑</button><button class="btn btn-danger" data-del="announcement" data-id="${esc(a.id)}">删除</button></div>
+  </div>`).join('')||'<div class="empty-hint">暂无公告</div>';
+}
+function renderAdminFeeds(){
+  const list=SITE_DATA.feeds||[];
+  $('#fdList').innerHTML=list.map(f=>`
+  <div class="admin-list-item">
+    <div>
+      <strong>${esc(f.title)}${f.pinned?' <span class="pinned-tag">置顶</span>':''}</strong>
+      <div class="meta">${esc(f.date||'')}</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">${esc(f.content)}</div>
+      ${f.image?`<img src="${esc(resolveImg(f.image))}" alt="配图" style="max-width:120px;border-radius:4px;margin-top:6px;border:1px solid var(--border);">`:''}
+    </div>
+    <div class="ops"><button class="btn" data-edit="feed" data-id="${esc(f.id)}">编辑</button><button class="btn btn-danger" data-del="feed" data-id="${esc(f.id)}">删除</button></div>
+  </div>`).join('')||'<div class="empty-hint">暂无动态</div>';
+}
+function renderAdminSponsors(){
+  const list=SITE_DATA.sponsors||[];
+  $('#spList').innerHTML=list.map(s=>`
+  <div class="admin-list-item">
+    <div><strong>${esc(s.name)}</strong> <span class="meta">赞助 ${esc(s.amount)}</span></div>
+    <div class="ops"><button class="btn" data-edit="sponsor" data-id="${esc(s.id)}">编辑</button><button class="btn btn-danger" data-del="sponsor" data-id="${esc(s.id)}">删除</button></div>
+  </div>`).join('')||'<div class="empty-hint">暂无赞助记录</div>';
+}
+document.addEventListener('click',async(e)=>{
+  const btn=e.target.closest('[data-del]');
+  if(!btn || !ADMIN_TOKEN){ return; }
+  const kind=btn.dataset.del, id=btn.dataset.id;
+  const action=kind==='announcement'?'deleteAnnouncement':kind==='feed'?'deleteFeed':kind==='sponsor'?'deleteSponsor':kind==='replay'?'deleteReplay':'deleteImage';
+  if(!confirm('确定删除这条记录吗？')){ return; }
+  const d=await adminApi(action,{id});
+  if(d && d.ok){
+    SITE_DATA={...SITE_DATA,...d};
+    showToast('已删除');
+    renderAdminNotices(); renderAdminFeeds(); renderAdminSponsors(); renderAdminReplays(); renderAdminImages(); renderAll();
+  }
+});
+// 编辑状态（点编辑 → 表单进入修改模式）
+let editingAn=null, editingFd=null, editingSp=null;
+document.addEventListener('click',(e)=>{
+  const eb=e.target.closest('[data-edit]');
+  if(!eb || !ADMIN_TOKEN){ return; }
+  const kind=eb.dataset.edit, id=eb.dataset.id;
+  if(kind==='announcement'){
+    const a=(SITE_DATA.announcements||[]).find(x=>x.id===id);
+    if(!a){ return; }
+    $('#anTitle').value=a.title;
+    $('#anContent').value=a.content;
+    $('#anDate').value=a.date||'';
+    editingAn=id;
+    $('#anAddBtn').textContent='保存修改';
+    $('#anCancelBtn').style.display='';
+    $('#paneNotice .card').scrollIntoView({behavior:'smooth',block:'start'});
+  }else if(kind==='feed'){
+    const f=(SITE_DATA.feeds||[]).find(x=>x.id===id);
+    if(!f){ return; }
+    $('#fdTitle').value=f.title;
+    $('#fdContent').value=f.content;
+    $('#fdDate').value=f.date||'';
+    $('#fdPinned').checked=!!f.pinned;
+    fdImageData=null;
+    $('#fdImage').value='';
+    editingFd=id;
+    if(f.image){
+      const src=resolveImg(f.image);
+      if(src){
+        $('#fdImgPreviewImg').src=src;
+        $('#fdImgPreview').style.display='block';
+      }else{
+        $('#fdImgPreview').style.display='none';
+      }
+      $('#fdImageRef').value=f.image.startsWith('img:')?f.image:'';
+    }else{
+      $('#fdImgPreview').style.display='none';
+      $('#fdImageRef').value='';
+    }
+    $('#fdAddBtn').textContent='保存修改';
+    $('#fdCancelBtn').style.display='';
+    $('#paneFeed .card').scrollIntoView({behavior:'smooth',block:'start'});
+  }else if(kind==='sponsor'){
+    const s=(SITE_DATA.sponsors||[]).find(x=>x.id===id);
+    if(!s){ return; }
+    $('#spName').value=s.name;
+    $('#spAmount').value=s.amount;
+    editingSp=id;
+    $('#spAddBtn').textContent='保存修改';
+    $('#spCancelBtn').style.display='';
+    $('#paneSponsor .card').scrollIntoView({behavior:'smooth',block:'start'});
+  }else if(kind==='replay'){
+    const r=(SITE_DATA.replays||[]).find(x=>x.id===id);
+    if(!r){ return; }
+    $('#rpTitle').value=r.title;
+    $('#rpUrl').value=r.url;
+    $('#rpDate').value=r.date||'';
+    editingRp=id;
+    $('#rpAddBtn').textContent='保存修改';
+    $('#rpCancelBtn').style.display='';
+    $('#paneReplay .card').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+});
+function cancelAnEdit(){
+  editingAn=null;
+  $('#anAddBtn').textContent='发布公告';
+  $('#anCancelBtn').style.display='none';
+  $('#anTitle').value=''; $('#anContent').value=''; $('#anDate').value='';
+}
+function cancelFdEdit(){
+  editingFd=null;
+  $('#fdAddBtn').textContent='发布动态';
+  $('#fdCancelBtn').style.display='none';
+  $('#fdTitle').value=''; $('#fdContent').value=''; $('#fdDate').value='';
+  $('#fdPinned').checked=false; $('#fdImage').value='';
+  fdImageData=null; $('#fdImgPreview').style.display='none';
+  $('#fdImageRef').value='';
+}
+function cancelSpEdit(){
+  editingSp=null;
+  $('#spAddBtn').textContent='添加赞助记录';
+  $('#spCancelBtn').style.display='none';
+  $('#spName').value=''; $('#spAmount').value='';
+}
+let editingRp=null;
+function cancelRpEdit(){
+  editingRp=null;
+  $('#rpAddBtn').textContent='发布回放';
+  $('#rpCancelBtn').style.display='none';
+  $('#rpTitle').value=''; $('#rpUrl').value=''; $('#rpDate').value='';
+}
+$('#anCancelBtn').onclick=cancelAnEdit;
+$('#fdCancelBtn').onclick=cancelFdEdit;
+$('#spCancelBtn').onclick=cancelSpEdit;
+$('#rpCancelBtn').onclick=cancelRpEdit;
+// 发布公告 / 保存修改
+$('#anAddBtn').onclick=async()=>{
+  const title=$('#anTitle').value.trim(), content=$('#anContent').value.trim(), date=$('#anDate').value.trim();
+  if(!title||!content){ showToast('请填写标题和内容'); return; }
+  const d=editingAn
+    ? await adminApi('updateAnnouncement',{title,content,date:date||undefined},{id:editingAn})
+    : await adminApi('addAnnouncement',{title,content,date:date||undefined});
+  if(d && d.ok){
+    SITE_DATA.announcements=d.announcements;
+    const wasEdit=!!editingAn;
+    cancelAnEdit();
+    showToast(wasEdit?'公告已更新':'公告已发布');
+    renderAdminNotices(); renderAll();
+  }
+};
+// 发布动态（含图片）
+let fdImageData=null;
+$('#fdImage').addEventListener('change',(e)=>{
+  const file=e.target.files[0];
+  if(!file){ fdImageData=null; $('#fdImgPreview').style.display='none'; return; }
+  if(file.size>1.5*1024*1024){ showToast('图片超过 1.5MB，请压缩后上传'); e.target.value=''; fdImageData=null; $('#fdImgPreview').style.display='none'; return; }
+  const reader=new FileReader();
+  reader.onload=()=>{
+    fdImageData=reader.result;
+    $('#fdImgPreviewImg').src=fdImageData;
+    $('#fdImgPreview').style.display='block';
+  };
+  reader.readAsDataURL(file);
+});
+$('#fdAddBtn').onclick=async()=>{
+  const title=$('#fdTitle').value.trim(), content=$('#fdContent').value.trim();
+  const date=$('#fdDate').value.trim(), pinned=$('#fdPinned').checked;
+  const ref=$('#fdImageRef').value.trim();
+  if(!title||!content){ showToast('请填写标题和内容'); return; }
+  const imgVal=fdImageData||ref||undefined;
+  const d=editingFd
+    ? await adminApi('updateFeed',{title,content,image:imgVal,pinned,date:date||undefined},{id:editingFd})
+    : await adminApi('addFeed',{title,content,image:imgVal,pinned,date:date||undefined});
+  if(d && d.ok){
+    SITE_DATA.feeds=d.feeds;
+    const wasEdit=!!editingFd;
+    cancelFdEdit();
+    showToast(wasEdit?'动态已更新':'动态已发布');
+    renderAdminFeeds(); renderAll();
+  }
+};
+// 添加赞助 / 保存修改
+$('#spAddBtn').onclick=async()=>{
+  const name=$('#spName').value.trim(), amount=$('#spAmount').value.trim();
+  if(!name||!amount){ showToast('请填写玩家名和金额'); return; }
+  const d=editingSp
+    ? await adminApi('updateSponsor',{name,amount},{id:editingSp})
+    : await adminApi('addSponsor',{name,amount});
+  if(d && d.ok){
+    SITE_DATA.sponsors=d.sponsors;
+    const wasEdit=!!editingSp;
+    cancelSpEdit();
+    showToast(wasEdit?'赞助记录已更新':'赞助记录已添加');
+    renderAdminSponsors(); renderAll();
+  }
+};
 
-// ============================================================
-// 回到顶部（监听窗口滚动 + 公约内容滚动）
-// ============================================================
-const backTop=document.getElementById('backTop');
-const ruleScrollDomEl=document.getElementById('ruleScrollDom');
-function updateBackTop(){
-  const s=Math.max(window.scrollY||0, ruleScrollDomEl?ruleScrollDomEl.scrollTop:0);
-  if(s>300){ backTop.classList.add('show'); }
-  else{ backTop.classList.remove('show'); }
+// 赛事回放管理
+function renderAdminReplays(){
+  const list=SITE_DATA.replays||[];
+  $('#rpList').innerHTML=list.map(r=>`
+  <div class="admin-list-item">
+    <div>
+      <strong>${esc(r.title)}</strong>
+      <div class="meta">${esc(r.date||'')}</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;word-break:break-all;">${esc(r.url)}</div>
+    </div>
+    <div class="ops"><button class="btn" data-edit="replay" data-id="${esc(r.id)}">编辑</button><button class="btn btn-danger" data-del="replay" data-id="${esc(r.id)}">删除</button></div>
+  </div>`).join('')||'<div class="empty-hint">暂无赛事回放</div>';
 }
-window.addEventListener('scroll',updateBackTop,{passive:true});
-if(ruleScrollDomEl){ ruleScrollDomEl.addEventListener('scroll',updateBackTop,{passive:true}); }
-backTop.onclick=()=>{
-  window.scrollTo({top:0,behavior:'smooth'});
-  if(ruleScrollDomEl){ ruleScrollDomEl.scrollTo({top:0,behavior:'smooth'}); }
+$('#rpAddBtn').onclick=async()=>{
+  const title=$('#rpTitle').value.trim(), url=$('#rpUrl').value.trim(), date=$('#rpDate').value.trim();
+  if(!title||!url){ showToast('请填写标题和视频链接'); return; }
+  const d=editingRp
+    ? await adminApi('updateReplay',{title,url,date:date||undefined},{id:editingRp})
+    : await adminApi('addReplay',{title,url,date:date||undefined});
+  if(d && d.ok){
+    SITE_DATA.replays=d.replays;
+    const wasEdit=!!editingRp;
+    cancelRpEdit();
+    showToast(wasEdit?'回放已更新':'回放已发布');
+    renderAdminReplays(); renderAll();
+  }
 };
 
 // ============================================================
-// 快捷键：/ 聚焦全局搜索，Esc 退出输入框
+// 图片管理（上传 / 引用 / 删除）
 // ============================================================
+function resolveImg(src){
+  if(typeof src==='string' && src.startsWith('img:') && Array.isArray(SITE_DATA.images)){
+    const it=SITE_DATA.images.find(x=>x.id===src.slice(4));
+    if(it){ return it.data; }
+  }
+  return src;
+}
+function fmtSize(n){
+  if(!n){ return ''; }
+  if(n>1024*1024){ return (n/1024/1024).toFixed(1)+'MB'; }
+  if(n>1024){ return Math.round(n/1024)+'KB'; }
+  return n+'B';
+}
+function renderAdminImages(){
+  const list=SITE_DATA.images||[];
+  $('#imList').innerHTML=list.length
+    ? `<div class="img-grid">${list.map(i=>`
+      <div class="img-item">
+        <img src="${esc(i.data)}" alt="${esc(i.name)}">
+        <div class="im-name">${esc(i.name)}</div>
+        <div class="im-meta">${fmtSize(i.size)} · ${esc(i.date||'')}</div>
+        <div class="im-meta" style="word-break:break-all;">${esc('img:'+i.id)}</div>
+        <div class="im-ops">
+          <button class="btn" data-copyimg="${esc(i.id)}">复制引用</button>
+          <button class="btn btn-danger" data-delimg="${esc(i.id)}">删除</button>
+        </div>
+      </div>`).join('')}</div>`
+    : '<div class="empty-hint">暂无已上传图片</div>';
+}
+$('#imUploadBtn').onclick=async()=>{
+  const file=$('#imFile').files[0];
+  if(!file){ showToast('请先选择图片'); return; }
+  if(file.size>1.5*1024*1024){ showToast('图片超过 1.5MB'); return; }
+  const name=$('#imName').value.trim()||file.name;
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    const d=await adminApi('uploadImage',{name,data:reader.result});
+    if(d && d.ok){
+      SITE_DATA.images=d.images;
+      $('#imFile').value=''; $('#imName').value='';
+      showToast('图片已上传');
+      renderAdminImages();
+    }
+  };
+  reader.readAsDataURL(file);
+};
+document.addEventListener('click',async(e)=>{
+  const cp=e.target.closest('[data-copyimg]');
+  if(cp){
+    const ref='img:'+cp.dataset.copyimg;
+    try{
+      await navigator.clipboard.writeText(ref);
+      showToast('已复制引用：'+ref);
+    }catch(err){ showToast('复制失败，请手动复制：'+ref); }
+    return;
+  }
+  const dg=e.target.closest('[data-delimg]');
+  if(!dg || !ADMIN_TOKEN){ return; }
+  if(!confirm('确定删除这张图片吗？引用它的动态将无法显示图片。')){ return; }
+  const d=await adminApi('deleteImage',{id:dg.dataset.delimg});
+  if(d && d.ok){
+    SITE_DATA.images=d.images;
+    showToast('已删除');
+    renderAdminImages(); renderAll();
+  }
+});
+
+// ============================================================
+// 回到顶部 / 快捷键
+// ============================================================
+const backTop=$('#backTop');
+function updateBackTop(){
+  const s=Math.max(window.scrollY||0, ruleScrollDom?ruleScrollDom.scrollTop:0);
+  backTop.classList.toggle('show',s>300);
+}
+window.addEventListener('scroll',updateBackTop,{passive:true});
+if(ruleScrollDom){ ruleScrollDom.addEventListener('scroll',updateBackTop,{passive:true}); }
+backTop.onclick=()=>{
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(ruleScrollDom){ ruleScrollDom.scrollTo({top:0,behavior:'smooth'}); }
+};
 document.addEventListener('keydown',(e)=>{
   if(e.key==='/' && !e.ctrlKey && !e.metaKey && !e.altKey){
     const tag=document.activeElement&&document.activeElement.tagName;
     if(tag!=='INPUT' && tag!=='TEXTAREA'){
       e.preventDefault();
-      document.getElementById('globalSearchInput').focus();
+      $('#globalSearchInput').focus();
     }
   }else if(e.key==='Escape'){
     const ae=document.activeElement;
-    if(ae && (ae.id==='globalSearchInput' || ae.id==='ruleSearchInput')){
-      ae.blur();
-    }
+    if(ae && (ae.id==='globalSearchInput'||ae.id==='ruleSearchInput')){ ae.blur(); }
   }
 });
 
 // ============================================================
 // 初始化
 // ============================================================
-applyTheme();
-applyLang();
-buildSuggestPool();
-syncSettingsUI();
+renderRules();
+loadData();
 </script>
 </body>
 </html>
