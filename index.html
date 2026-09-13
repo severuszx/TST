@@ -377,6 +377,86 @@ margin:14px 0 2px;
 font-size:15px;
 font-weight:600;
 }
+/* 赞助排行榜 */
+.board-table{
+width:100%;
+border-collapse:collapse;
+margin-top:8px;
+}
+.board-table th,
+.board-table td{
+padding:8px 10px;
+border-bottom:1px solid var(--border);
+text-align:left;
+font-size:14px;
+}
+.board-table th{
+color:var(--text-secondary);
+font-weight:600;
+}
+.board-table td.num{
+color:var(--text-secondary);
+width:44px;
+}
+.board-table td.amount{
+text-align:right;
+font-weight:600;
+white-space:nowrap;
+}
+.board-empty{
+padding:12px 0;
+color:var(--text-secondary);
+font-size:14px;
+}
+/* 回到顶部 */
+.back-top{
+position:fixed;
+right:18px;
+bottom:24px;
+width:44px;height:44px;
+border:1px solid var(--border);
+background:var(--card-bg);
+color:var(--text);
+border-radius:50%;
+cursor:pointer;
+font-size:20px;
+line-height:1;
+display:none;
+align-items:center;
+justify-content:center;
+box-shadow:0 4px 14px var(--shadow);
+z-index:200;
+opacity:0;
+transform:translateY(8px);
+transition:opacity .2s,transform .2s;
+}
+.back-top.show{display:flex;opacity:1;transform:translateY(0);}
+.back-top:hover{background:var(--hover-bg);}
+/* Toast 轻提示 */
+.toast-wrap{
+position:fixed;
+left:50%;
+bottom:32px;
+transform:translateX(-50%);
+z-index:300;
+display:flex;
+flex-direction:column;
+gap:8px;
+align-items:center;
+pointer-events:none;
+}
+.toast{
+background:var(--text);
+color:var(--bg);
+padding:9px 16px;
+border-radius:8px;
+font-size:14px;
+box-shadow:0 4px 14px var(--shadow);
+opacity:0;
+transform:translateY(8px);
+transition:opacity .25s,transform .25s;
+}
+.toast.show{opacity:1;transform:translateY(0);}
 /* 动态栏目 */
 .feed-card{
 padding:14px;
@@ -633,7 +713,10 @@ font-weight:bold;
 <div class="qr-wrap" data-unit>
 <p data-i18n="payQr">赞助收款二维码</p>
 <img src="wechat-qrcode.jpg" alt="赞助收款码" id="payQrImg">
-<p style="margin-top:10px;font-size:14px;color:var(--text-secondary);" data-i18n="sponsorNote">谢谢喵（磕头）</p>
+</div>
+<div class="info-card" data-unit>
+<h3 data-i18n="sponsorBoardTitle">赞助名单排行榜</h3>
+<div id="sponsorBoard"></div>
 </div>
 </div>
 <div id="rule" class="page">
@@ -651,6 +734,7 @@ font-weight:bold;
 <footer>
 <p data-i18n="footer">© 2026 The Slow Tide TST服务器</p>
 </footer>
+<button class="back-top" id="backTop" title="回到顶部" aria-label="回到顶部">↑</button>
 </div>
 <script>
 // ============================================================
@@ -705,7 +789,7 @@ cdkey_title:'兑换码',
 noCdkey:'ILOVEWYJ',
 sponsor_title:'服务器赞助',
 payQr:'赞助收款二维码',
-sponsorNote:'谢谢喵（磕头）',
+sponsorBoardTitle:'赞助名单排行榜',
 rule_title:'玩家公约',
 tip_input_kw:'请输入搜索关键词',
 tip_found:'已定位关键词：{kw}',
@@ -961,8 +1045,15 @@ img:'dt1.jpg',
 text:'捷报！玩家 极岚 在矿洞中发现了连续 28 枚钻石的矿脉，创下服务器新纪录，目前位居全服第一！',
 date:'2026-09-05'
 }
-],
+]
 };
+
+// ============================================================
+// 赞助名单数据
+// ============================================================
+const SPONSORS = [
+{name:'极嵐', amount:'5.00'}
+];
 
 // ============================================================
 // 状态
@@ -1101,6 +1192,20 @@ function renderFeed(){
   }
   dom.innerHTML=html;
 }
+function renderSponsors(){
+  const dom=document.getElementById('sponsorBoard');
+  if(!dom){ return; }
+  if(!SPONSORS.length){
+    dom.innerHTML='<p class="board-empty">暂无赞助记录</p>';
+    return;
+  }
+  let html='<table class="board-table"><thead><tr><th class="num">名次</th><th>玩家</th><th class="amount">赞助金额</th></tr></thead><tbody>';
+  SPONSORS.forEach((s,i)=>{
+    html+='<tr><td class="num">'+(i+1)+'</td><td>'+s.name+'</td><td class="amount">'+s.amount+'</td></tr>';
+  });
+  html+='</tbody></table>';
+  dom.innerHTML=html;
+}
 
 function applyLang(){
   const d=I18N[lang];
@@ -1123,6 +1228,7 @@ function applyLang(){
   renderNoticeSupport();
   renderNoticeUpdate();
   renderFeed();
+  renderSponsors();
   buildSuggestPool();
   syncSettingsUI();
   updateTime();
@@ -1213,7 +1319,7 @@ copyAddrBtn.onclick=async()=>{
   const addr=document.getElementById('serverAddr').innerText;
   try{
     await navigator.clipboard.writeText(addr);
-    alert(t('copied'));
+    showToast(t('copied'));
   }catch(e){
     // 降级：选择文本
     try{
@@ -1222,9 +1328,9 @@ copyAddrBtn.onclick=async()=>{
       const sel=window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
-      alert(t('copied'));
+      showToast(t('copied'));
     }catch(e2){
-      alert(t('copyFail'));
+      showToast(t('copyFail'));
     }
   }
   setTimeout(()=>{ copyFlag=false; },1500);
@@ -1521,6 +1627,62 @@ document.querySelectorAll('.seg-btn[data-theme]').forEach(b=>{
 // 系统主题变化时，跟随系统模式下实时响应
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{
   if(themeState()==='system'){ applyTheme(); }
+});
+
+// ============================================================
+// Toast 轻提示
+// ============================================================
+function showToast(msg){
+  let wrap=document.querySelector('.toast-wrap');
+  if(!wrap){
+    wrap=document.createElement('div');
+    wrap.className='toast-wrap';
+    document.body.appendChild(wrap);
+  }
+  const t=document.createElement('div');
+  t.className='toast';
+  t.textContent=msg;
+  wrap.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{
+    t.classList.remove('show');
+    setTimeout(()=>t.remove(),300);
+  },1800);
+}
+
+// ============================================================
+// 回到顶部（监听窗口滚动 + 公约内容滚动）
+// ============================================================
+const backTop=document.getElementById('backTop');
+const ruleScrollDomEl=document.getElementById('ruleScrollDom');
+function updateBackTop(){
+  const s=Math.max(window.scrollY||0, ruleScrollDomEl?ruleScrollDomEl.scrollTop:0);
+  if(s>300){ backTop.classList.add('show'); }
+  else{ backTop.classList.remove('show'); }
+}
+window.addEventListener('scroll',updateBackTop,{passive:true});
+if(ruleScrollDomEl){ ruleScrollDomEl.addEventListener('scroll',updateBackTop,{passive:true}); }
+backTop.onclick=()=>{
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(ruleScrollDomEl){ ruleScrollDomEl.scrollTo({top:0,behavior:'smooth'}); }
+};
+
+// ============================================================
+// 快捷键：/ 聚焦全局搜索，Esc 退出输入框
+// ============================================================
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='/' && !e.ctrlKey && !e.metaKey && !e.altKey){
+    const tag=document.activeElement&&document.activeElement.tagName;
+    if(tag!=='INPUT' && tag!=='TEXTAREA'){
+      e.preventDefault();
+      document.getElementById('globalSearchInput').focus();
+    }
+  }else if(e.key==='Escape'){
+    const ae=document.activeElement;
+    if(ae && (ae.id==='globalSearchInput' || ae.id==='ruleSearchInput')){
+      ae.blur();
+    }
+  }
 });
 
 // ============================================================
