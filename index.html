@@ -1245,7 +1245,8 @@ function initSuggest(inputId,boxId,runSearch){
     const n=box.children.length;
     if(e.key==='ArrowDown'){ e.preventDefault(); setActive((active+1)%n); }
     else if(e.key==='ArrowUp'){ e.preventDefault(); setActive((active-1+n)%n); }
-    else if(e.key==='Enter'){
+    else if(e.key==='E
+            nter'){
       if(active>=0 && box.children[active]){
         e.preventDefault();
         const it=box.children[active].textContent;
@@ -1270,7 +1271,6 @@ function openAdmin(){
   if(ADMIN_TOKEN){ showAdminPanel(); } else { $('#adminLoginBox').style.display='block'; $('#adminPanel').style.display='none'; }
 }
 function closeAdmin(){ adminModal.classList.remove('open'); }
-$('#adminBtn').onclick=()=>openAdmin();
 $('#adminClose').onclick=()=>closeAdmin();
 adminModal.addEventListener('click',(e)=>{
   if(e.target===adminModal){ closeAdmin(); }
