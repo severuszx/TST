@@ -784,12 +784,6 @@ function renderNotices(){
       <div class="content">${esc(a.content)}</div>
     </div>`).join('');
   $('#noticeList').innerHTML=cards||'<div class="empty-hint">暂无公告</div>';
-  $('#homeNotices').innerHTML=list.slice(0,2).map(a=>`
-    <div class="card">
-      <h3>${esc(a.title)}</h3>
-      <div class="date">${esc(a.date||'')}</div>
-      <div class="content">${esc(a.content)}</div>
-    </div>`).join('')||'<div class="empty-hint">暂无公告</div>';
 }
 function feedCard(f){
   const img=f.image?`<img class="feed-img" src="${esc(resolveImg(f.image))}" alt="${esc(f.title)}">`:'';
@@ -805,7 +799,6 @@ function feedCard(f){
 function renderFeeds(){
   const list=SITE_DATA.feeds||[];
   $('#feedList').innerHTML=list.map(feedCard).join('')||'<div class="empty-hint">暂无动态</div>';
-  $('#homeFeeds').innerHTML=list.slice(0,2).map(feedCard).join('')||'<div class="empty-hint">暂无动态</div>';
 }
 function renderSponsors(){
   const list=SITE_DATA.sponsors||[];
@@ -1627,5 +1620,3 @@ loadData();
 </script>
 </body>
 </html>
-
-1
