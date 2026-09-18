@@ -363,11 +363,7 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <button class="nav-link" data-nav="rule">玩家公约</button>
 </nav>
 <div class="header-right">
-<div class="time-badge" title="北京时间与服务器运行时间">
-<span class="tb-time" id="bjTime">--:--:--</span>
-<span class="tb-uptime" id="runTime">--</span>
-</div>
-<a class="feedback-btn" href="profile.html">我的</a>
+.<..a class="feedback-btn" href="profile.html">我的</a>
 <a class="feedback-btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
 <a class="btn btn-primary" href="admin.html" style="text-decoration:none;display:inline-flex;align-items:center;">管理</a>
 <button class="theme-toggle" id="themeToggle" title="切换深色/浅色" aria-label="切换主题">
@@ -720,29 +716,7 @@ heroSlider.parentElement.addEventListener('mouseleave',startTimer);
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ stopTimer(); } else { startTimer(); }
 });
-
-// ============================================================
-// 时间徽章（北京时间 + 运行时间）
-// ============================================================
-const serverStart=new Date('2026-06-30T00:00:00');
-const offsetMs=120*1000;
-function updateTime(){
-  const now=new Date();
-  const hh=String(now.getHours()).padStart(2,'0');
-  const mm=String(now.getMinutes()).padStart(2,'0');
-  const ss=String(now.getSeconds()).padStart(2,'0');
-  $('#bjTime').textContent='北京时间 '+hh+':'+mm+':'+ss;
-  const diff=now.getTime()-serverStart.getTime()+offsetMs;
-  const day=Math.floor(diff/86400000);
-  const h=Math.floor((diff%86400000)/3600000);
-  if(SITE_DATA.serverStatus==='offline'){
-    \#runTime.textContent='已关闭';
-  } else {
-    \#runTime.textContent='运行 '+day+'天'+h+'时';
-  }
-}
-setInterval(updateTime,1000);
-
+.
 function applyServerStatus(){
   const online = SITE_DATA.serverStatus !== "offline";
   const dot = document.getElementById("statusDot");
@@ -753,13 +727,8 @@ function applyServerStatus(){
   } else {
     if(dot) dot.style.background = "#ef4444";
     if(txt) txt.textContent = "服务器已关闭";
-  }
-}
-updateTime();
-
-// 复制地址
-let copyFlag=false;
-$('#copyAddrBtn').onclick=async()=>{
+.// 复制地址
+.$('#copyAddrBtn').onclick=async()=>{
   if(copyFlag){ return; }
   copyFlag=true;
   try{
