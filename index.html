@@ -421,7 +421,7 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <section class="server-bar">
 <div class="container">
 <div class="server-card">
-<div class="item"><span class="status-dot"></span><strong>服务器运行中</strong></div>
+<div class="item"><span class="status-dot" id="statusDot"></span><strong id="statusText">服务器运行中</strong></div>
 <div class="item"><span class="label">地址：</span><span class="addr" id="serverAddr">mc.163.com/open/mc_realms/?realms=270239C36AD</span>
 <button class="btn" id="copyAddrBtn" style="padding:5px 10px;font-size:13px;">复制</button></div>
 <div class="item"><span class="label">QQ交流群：</span><button class="btn" id="openQQGroup" style="padding:5px 10px;font-size:13px;">833470853</button></div>
@@ -566,6 +566,7 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <button class="admin-tab" data-tab="sponsor">赞助管理</button>
 <button class="admin-tab" data-tab="replay">赛事管理</button>
 <button class="admin-tab" data-tab="image">图片管理</button>
+<button class="admin-tab" data-tab="server">服务器设置</button>
 </div>
 <div class="admin-pane active" id="paneNotice">
 <div class="card">
@@ -619,6 +620,19 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <div class="hint" style="font-size:12px;color:var(--text-secondary);margin-top:6px;">上传后点「复制引用」得到 <code>img:xxx</code>，可粘贴到动态的配图字段直接引用</div>
 </div>
 <div id="imList" style="margin-top:14px;"></div>
+</div>
+</div>
+
+<div class="admin-pane" id="paneServer">
+<div class="card">
+<div class="form-row"><label>服务器运行状态</label>
+<select id="serverStatusSelect">
+<option value="online">运行中</option>
+<option value="offline">已关闭</option>
+</select>
+</div>
+<div class="hint" style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">关闭后，玩家端状态条将显示"服务器已关闭"并停止运行计时。</div>
+<button class="btn btn-primary" id="serverStatusSaveBtn">保存</button>
 </div>
 </div>
 </div>
@@ -719,9 +733,26 @@ function updateTime(){
   const diff=now.getTime()-serverStart.getTime()+offsetMs;
   const day=Math.floor(diff/86400000);
   const h=Math.floor((diff%86400000)/3600000);
-  $('#runTime').textContent='运行 '+day+'天'+h+'时';
+  if(SITE_DATA.serverStatus==='offline'){
+    \#runTime.textContent='已关闭';
+  } else {
+    \#runTime.textContent='运行 '+day+'天'+h+'时';
+  }
 }
 setInterval(updateTime,1000);
+
+function applyServerStatus(){
+  const online = SITE_DATA.serverStatus !== "offline";
+  const dot = document.getElementById("statusDot");
+  const txt = document.getElementById("statusText");
+  if(online){
+    if(dot) dot.style.background = "#22c55e";
+    if(txt) txt.textContent = "服务器运行中";
+  } else {
+    if(dot) dot.style.background = "#ef4444";
+    if(txt) txt.textContent = "服务器已关闭";
+  }
+}
 updateTime();
 
 // 复制地址
@@ -749,13 +780,23 @@ $('#openQQGroup').onclick=()=>{
 // ============================================================
 // 数据加载（公开 API）
 // ============================================================
-let SITE_DATA={announcements:[],feeds:[],sponsors:[],images:[],replays:[]};
+let SITE_DATA={announcements:[],feeds:[],sponsors:[],images:[],replays:[],serverStatus:'online'};
 async function loadData(){
   try{
     const r=await fetch('https://tst-server-site.pages.dev/api/data');
     const d=await r.json();
     if(d.ok){
-      SITE_DATA=d;
+    SITE_DATA=d;
+    // 提取服务器状态（隐藏系统条目）
+    const sysIdx = (SITE_DATA.announcements||[]).findIndex(a=>a.id==='_sys_server_status');
+    if(sysIdx>=0){
+      try{
+        const sys = JSON.parse(SITE_DATA.announcements[sysIdx].content);
+        SITE_DATA.serverStatus = sys.status||'online';
+      }catch(e){ SITE_DATA.serverStatus='online'; }
+      SITE_DATA.announcements.splice(sysIdx,1);
+    }
+    applyServerStatus();
       renderAll();
     }
   }catch(e){
@@ -1627,6 +1668,23 @@ document.addEventListener('keydown',(e)=>{
 // ============================================================
 renderRules();
 loadData();
+</script>
+
+<!-- 生日弹窗 -->
+<div id="birthdayMask" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
+<div style="background:var(--card,#fff);border-radius:16px;padding:40px;text-align:center;max-width:400px;margin:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+<div style="font-size:48px;margin-bottom:16px;">🎂</div>
+<h2 style="margin:0 0 12px;font-size:22px;">生日快乐！</h2>
+<p style="margin:0 0 8px;font-size:16px;color:var(--text-secondary,#666);">祝</p>
+<p style="margin:0 0 20px;font-size:20px;font-weight:700;color:var(--accent,#0f172a);">KMS罒奇迹与你</p>
+<p style="margin:0 0 24px;font-size:14px;color:var(--text-secondary,#666);">在 The Slow Tide 度过快乐的一天！</p>
+<button onclick="document.getElementById('birthdayMask').style.display='none';localStorage.setItem('tst_birthday_2026_09_18',1);" style="padding:10px 32px;border:none;border-radius:8px;background:var(--accent,#0f172a);color:#fff;font-size:15px;cursor:pointer;">谢谢！</button>
+</div>
+</div>
+<script>
+if(!localStorage.getItem("tst_birthday_2026_09_18")){
+  setTimeout(()=>{document.getElementById("birthdayMask").style.display="flex";},1500);
+}
 </script>
 </body>
 </html>
