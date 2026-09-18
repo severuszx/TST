@@ -716,9 +716,7 @@ heroSlider.parentElement.addEventListener('mouseleave',startTimer);
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ stopTimer(); } else { startTimer(); }
 });
-.
-function applyServerStatus(){
-  const online = SITE_DATA.serverStatus !== "offline";
+function applyServerStatus(){  const online = SITE_DATA.serverStatus !== "offline";
   const dot = document.getElementById("statusDot");
   const txt = document.getElementById("statusText");
   if(online){
