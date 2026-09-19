@@ -106,8 +106,13 @@ color:var(--text);font-size:14px;cursor:pointer;white-space:nowrap;
 }
 .nav-link:hover{background:var(--hover);}
 .nav-link.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
-.tb-time{color:var(--primary);font-weight:600;font-variant-numeric:tabular-nums;font-size:13px;}
-.tb-uptime{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums;font-size:13px;}
+.time-badge{
+display:flex;flex-direction:column;align-items:flex-end;gap:1px;
+padding:5px 12px;border:1px solid var(--border);border-radius:6px;
+background:var(--card);font-size:12px;line-height:1.35;white-space:nowrap;
+}
+.tb-time{color:var(--primary);font-weight:600;font-variant-numeric:tabular-nums;}
+.tb-uptime{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums;}
 .header-right{
 display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;
 }
@@ -382,8 +387,10 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <button class="nav-link" data-nav="rule">玩家公约</button>
 </nav>
 <div class="header-right">
+<div class="time-badge" title="北京时间与服务器运行时间">
 <span class="tb-time" id="bjTime">--:--:--</span>
 <span class="tb-uptime" id="runTime">--</span>
+</div>
 <a class="feedback-btn" href="profile.html">我的</a>
 <a class="feedback-btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
 <a class="btn btn-primary" href="admin.html" style="text-decoration:none;display:inline-flex;align-items:center;">管理</a>
