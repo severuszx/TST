@@ -1012,7 +1012,7 @@ document.addEventListener('click',(e)=>{
 });
 // 公约搜索
 if($('#ruleSearchBtn')) $('#ruleSearchBtn').onclick=()=>doRuleSearch($('#ruleSearchInput').value);
-$('#ruleSearchInput').addEventListener('keydown',(e)=>{
+if($('#ruleSearchInput')) $('#ruleSearchInput').addEventListener('keydown',(e)=>{
   if(e.key==='Enter' && !suggestOpen('ruleSuggest')){ doRuleSearch(e.target.value); }
 });
 function doRuleSearch(kw){
@@ -1149,10 +1149,10 @@ function doGlobalSearch(kw){
   renderResults(matches,kw);
 }
 if($('#globalSearchBtn')) $('#globalSearchBtn').onclick=()=>doGlobalSearch($('#globalSearchInput').value);
-$('#globalSearchInput').addEventListener('keydown',(e)=>{
+if($('#globalSearchInput')) $('#globalSearchInput').addEventListener('keydown',(e)=>{
   if(e.key==='Enter' && !suggestOpen('globalSuggest')){ doGlobalSearch(e.target.value); }
 });
-$('#globalSearchInput').addEventListener('input',()=>hideResults());
+if($('#globalSearchInput')) $('#globalSearchInput').addEventListener('input',()=>hideResults());
 
 // ============================================================
 // 搜索联想
@@ -1251,7 +1251,7 @@ if($('#adminLoginBtn')) $('#adminLoginBtn').onclick=async()=>{
     showToast(d.error||'登录失败');
   }
 };
-$('#adminPwd').addEventListener('keydown',(e)=>{
+if($('#adminPwd')) $('#adminPwd').addEventListener('keydown',(e)=>{
   if(e.key==='Enter'){ $('#adminLoginBtn').click(); }
 });
 function showAdminPanel(){
@@ -1453,7 +1453,7 @@ if($('#anAddBtn')) $('#anAddBtn').onclick=async()=>{
 };
 // 发布动态（含图片）
 let fdImageData=null;
-$('#fdImage').addEventListener('change',(e)=>{
+if($('#fdImage')) $('#fdImage').addEventListener('change',(e)=>{
   const file=e.target.files[0];
   if(!file){ fdImageData=null; $('#fdImgPreview').style.display='none'; return; }
   if(file.size>1.5*1024*1024){ showToast('图片超过 1.5MB，请压缩后上传'); e.target.value=''; fdImageData=null; $('#fdImgPreview').style.display='none'; return; }
