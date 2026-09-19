@@ -11,6 +11,13 @@ var mode=localStorage.getItem('tst-theme');
 if(mode!=='dark' && mode!=='light'){ mode='light'; }
 document.documentElement.setAttribute('data-theme',mode);
 })();
+
+function clearLocalData(){
+  localStorage.removeItem("tst_last_checkin");
+  localStorage.removeItem("tst_checkin_days");
+  localStorage.removeItem("tst_admin_token");
+  showToast("本地数据已清除");
+}
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -494,9 +501,25 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <span style="color:var(--text-secondary);">&#8250;</span>
 </div>
 
-<div style="display:flex;align-items:center;padding:14px 0;cursor:pointer;" onclick="window.open('https://theslowtidefk.pages.dev/','_blank')">
+<div style="display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="window.open('https://theslowtidefk.pages.dev/','_blank')">
 <span style="font-size:20px;margin-right:12px;">💬</span>
 <span style="flex:1;font-size:15px;">反馈与建议</span>
+<span style="color:var(--text-secondary);">&#8250;</span>
+</div>
+<div style="display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="clearLocalData()">
+<span style="font-size:20px;margin-right:12px;">🗑️</span>
+<span style="flex:1;font-size:15px;">清除本地数据</span>
+<span style="color:var(--text-secondary);">&#8250;</span>
+</div>
+<div style="display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="location.href='index.html'">
+<span style="font-size:20px;margin-right:12px;">🏠</span>
+<span style="flex:1;font-size:15px;">回到首页</span>
+<span style="color:var(--text-secondary);">&#8250;</span>
+</div>
+<div style="display:flex;align-items:center;padding:14px 0;cursor:pointer;" onclick="showToast('TST官网 v1.0 · The Slow Tide')">
+<span style="font-size:20px;margin-right:12px;">ℹ️</span>
+<span style="flex:1;font-size:15px;">关于</span>
+<span style="color:var(--text-secondary);font-size:13px;margin-right:8px;">v1.0</span>
 <span style="color:var(--text-secondary);">&#8250;</span>
 </div>
 </div>
