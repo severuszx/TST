@@ -411,30 +411,6 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <span style="color:var(--text-secondary);">&#8250;</span>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-<div class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:18px;">
-<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-<div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;">🖥</div>
-<span style="font-size:14px;opacity:.9;">状态监控</span>
-</div>
-<div style="font-size:13px;line-height:2;">
-<div style="display:flex;justify-content:space-between;"><span>CPU</span><span id="stCpu">--</span></div>
-<div style="display:flex;justify-content:space-between;"><span>内存</span><span id="stMem">--</span></div>
-<div style="display:flex;justify-content:space-between;"><span>网络</span><span id="stNet">--</span></div>
-<div style="display:flex;justify-content:space-between;"><span>屏幕</span><span id="stScreen">--</span></div>
-</div>
-</div>
-
-<div class="card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:18px;text-align:center;display:flex;flex-direction:column;justify-content:center;">
-<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px;">
-<div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;">🕐</div>
-<span style="font-size:14px;opacity:.9;">时钟</span>
-</div>
-<div style="font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;" id="profileClock">--:--:--</div>
-<div style="font-size:13px;opacity:.85;margin-top:4px;" id="profileDate">----.--.--</div>
-</div>
-</div>
-
 <div class="card" style="background:linear-gradient(135deg,#facc15,#eab308);color:#1f2937;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
 <div style="flex:1;">
 <div style="display:flex;gap:6px;margin-bottom:8px;" id="weekDots"></div>
@@ -460,11 +436,7 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <span id="themeLabel" style="color:var(--text-secondary);font-size:13px;margin-right:8px;">浅色</span>
 <span style="color:var(--text-secondary);">&#8250;</span>
 </div>
-<div style="display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="clearBirthdayCache()">
-<span style="font-size:20px;margin-right:12px;">🎂</span>
-<span style="flex:1;font-size:15px;">重新显示生日弹窗</span>
-<span style="color:var(--text-secondary);">&#8250;</span>
-</div>
+
 <div style="display:flex;align-items:center;padding:14px 0;cursor:pointer;" onclick="window.open('https://theslowtidefk.pages.dev/','_blank')">
 <span style="font-size:20px;margin-right:12px;">💬</span>
 <span style="flex:1;font-size:15px;">反馈与建议</span>
