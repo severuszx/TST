@@ -649,6 +649,7 @@ document.querySelectorAll('[data-fnav]').forEach(b=>{
 // 轮播
 // ============================================================
 const heroSlider=$('#heroSlider');
+if(heroSlider){
 const slides=Array.from(heroSlider.querySelectorAll('.slide-item'));
 const slideDots=$('#slideDots');
 let curSlide=0,slideTimer=null;
@@ -676,6 +677,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 // ============================================================
+}
 // 时间徽章（北京时间 + 运行时间）
 // ============================================================
 const serverStart=new Date('2026-06-30T00:00:00');
