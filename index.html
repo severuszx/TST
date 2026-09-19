@@ -724,8 +724,9 @@ function applyServerStatus(){  const online = SITE_DATA.serverStatus !== "offlin
     if(txt) txt.textContent = "服务器运行中";
   } else {
     if(dot) dot.style.background = "#ef4444";
-    if(txt) txt.textContent = "服务器已关闭";
-.// 复制地址
+.    if(txt) txt.textContent = "服务器已关闭";
+  }
+}.// 复制地址
 .$('#copyAddrBtn').onclick=async()=>{
   if(copyFlag){ return; }
   copyFlag=true;
