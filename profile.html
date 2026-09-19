@@ -622,7 +622,7 @@ function applyTheme(){
   const m=themeState();
   root.setAttribute('data-theme',m);
 }
-$('#themeToggle').onclick=()=>{
+if($('#themeToggle')) $('#themeToggle').onclick=()=>{
   localStorage.setItem('tst-theme',themeState()==='dark'?'light':'dark');
   applyTheme();
 };
@@ -717,7 +717,7 @@ updateTime();
 
 // 复制地址
 let copyFlag=false;
-if($('#copyAddrBtn')) $('#copyAddrBtn').onclick=async()=>{
+if($('#copyAddrBtn')) if($('#copyAddrBtn')) $('#copyAddrBtn').onclick=async()=>{
   if(copyFlag){ return; }
   copyFlag=true;
   try{
@@ -733,7 +733,7 @@ if($('#copyAddrBtn')) $('#copyAddrBtn').onclick=async()=>{
   }
   setTimeout(()=>{ copyFlag=false; },1500);
 };
-$('#openQQGroup').onclick=()=>{
+if($('#openQQGroup')) $('#openQQGroup').onclick=()=>{
   window.location.href='mqqapi://card/show_pslcard?src_type=internal&version=1&card_type=group&uin=833470853';
 };
 
@@ -1011,7 +1011,7 @@ document.addEventListener('click',(e)=>{
   if(a){ e.preventDefault(); scrollToSec(a.getAttribute('href').substring(1)); }
 });
 // 公约搜索
-$('#ruleSearchBtn').onclick=()=>doRuleSearch($('#ruleSearchInput').value);
+if($('#ruleSearchBtn')) $('#ruleSearchBtn').onclick=()=>doRuleSearch($('#ruleSearchInput').value);
 $('#ruleSearchInput').addEventListener('keydown',(e)=>{
   if(e.key==='Enter' && !suggestOpen('ruleSuggest')){ doRuleSearch(e.target.value); }
 });
@@ -1148,7 +1148,7 @@ function doGlobalSearch(kw){
   }
   renderResults(matches,kw);
 }
-$('#globalSearchBtn').onclick=()=>doGlobalSearch($('#globalSearchInput').value);
+if($('#globalSearchBtn')) $('#globalSearchBtn').onclick=()=>doGlobalSearch($('#globalSearchInput').value);
 $('#globalSearchInput').addEventListener('keydown',(e)=>{
   if(e.key==='Enter' && !suggestOpen('globalSuggest')){ doGlobalSearch(e.target.value); }
 });
@@ -1228,12 +1228,12 @@ function openAdmin(){
   if(ADMIN_TOKEN){ showAdminPanel(); } else { $('#adminLoginBox').style.display='block'; $('#adminPanel').style.display='none'; }
 }
 function closeAdmin(){ adminModal.classList.remove('open'); }
-$('#adminBtn').onclick=()=>openAdmin();
-$('#adminClose').onclick=()=>closeAdmin();
+if($('#adminBtn')) $('#adminBtn').onclick=()=>openAdmin();
+if($('#adminClose')) $('#adminClose').onclick=()=>closeAdmin();
 adminModal.addEventListener('click',(e)=>{
   if(e.target===adminModal){ closeAdmin(); }
 });
-$('#adminLoginBtn').onclick=async()=>{
+if($('#adminLoginBtn')) $('#adminLoginBtn').onclick=async()=>{
   const pwd=$('#adminPwd').value;
   if(!pwd){ showToast('请输入密码'); return; }
   const r=await fetch('https://tst-server-site.pages.dev/api/admin',{
@@ -1432,12 +1432,12 @@ function cancelRpEdit(){
   $('#rpCancelBtn').style.display='none';
   $('#rpTitle').value=''; $('#rpUrl').value=''; $('#rpDate').value='';
 }
-$('#anCancelBtn').onclick=cancelAnEdit;
-$('#fdCancelBtn').onclick=cancelFdEdit;
-$('#spCancelBtn').onclick=cancelSpEdit;
-$('#rpCancelBtn').onclick=cancelRpEdit;
+if($('#anCancelBtn')) $('#anCancelBtn').onclick=cancelAnEdit;
+if($('#fdCancelBtn')) $('#fdCancelBtn').onclick=cancelFdEdit;
+if($('#spCancelBtn')) $('#spCancelBtn').onclick=cancelSpEdit;
+if($('#rpCancelBtn')) $('#rpCancelBtn').onclick=cancelRpEdit;
 // 发布公告 / 保存修改
-$('#anAddBtn').onclick=async()=>{
+if($('#anAddBtn')) $('#anAddBtn').onclick=async()=>{
   const title=$('#anTitle').value.trim(), content=$('#anContent').value.trim(), date=$('#anDate').value.trim();
   if(!title||!content){ showToast('请填写标题和内容'); return; }
   const d=editingAn
@@ -1465,7 +1465,7 @@ $('#fdImage').addEventListener('change',(e)=>{
   };
   reader.readAsDataURL(file);
 });
-$('#fdAddBtn').onclick=async()=>{
+if($('#fdAddBtn')) $('#fdAddBtn').onclick=async()=>{
   const title=$('#fdTitle').value.trim(), content=$('#fdContent').value.trim();
   const date=$('#fdDate').value.trim(), pinned=$('#fdPinned').checked;
   const ref=$('#fdImageRef').value.trim();
@@ -1483,7 +1483,7 @@ $('#fdAddBtn').onclick=async()=>{
   }
 };
 // 添加赞助 / 保存修改
-$('#spAddBtn').onclick=async()=>{
+if($('#spAddBtn')) $('#spAddBtn').onclick=async()=>{
   const name=$('#spName').value.trim(), amount=$('#spAmount').value.trim();
   if(!name||!amount){ showToast('请填写玩家名和金额'); return; }
   const d=editingSp
@@ -1511,7 +1511,7 @@ function renderAdminReplays(){
     <div class="ops"><button class="btn" data-edit="replay" data-id="${esc(r.id)}">编辑</button><button class="btn btn-danger" data-del="replay" data-id="${esc(r.id)}">删除</button></div>
   </div>`).join('')||'<div class="empty-hint">暂无赛事回放</div>';
 }
-$('#rpAddBtn').onclick=async()=>{
+if($('#rpAddBtn')) $('#rpAddBtn').onclick=async()=>{
   const title=$('#rpTitle').value.trim(), url=$('#rpUrl').value.trim(), date=$('#rpDate').value.trim();
   if(!title||!url){ showToast('请填写标题和视频链接'); return; }
   const d=editingRp
@@ -1558,7 +1558,7 @@ function renderAdminImages(){
       </div>`).join('')}</div>`
     : '<div class="empty-hint">暂无已上传图片</div>';
 }
-$('#imUploadBtn').onclick=async()=>{
+if($('#imUploadBtn')) $('#imUploadBtn').onclick=async()=>{
   const file=$('#imFile').files[0];
   if(!file){ showToast('请先选择图片'); return; }
   if(file.size>1.5*1024*1024){ showToast('图片超过 1.5MB'); return; }
