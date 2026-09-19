@@ -680,6 +680,7 @@ document.addEventListener('visibilitychange',()=>{
 }
 // 时间徽章（北京时间 + 运行时间）
 // ============================================================
+let SITE_DATA={announcements:[],feeds:[],sponsors:[],images:[],replays:[],serverStatus:'online'};
 const serverStart=new Date('2026-06-30T00:00:00');
 const offsetMs=120*1000;
 function updateTime(){
@@ -738,7 +739,7 @@ $('#openQQGroup').onclick=()=>{
 // ============================================================
 // 数据加载（公开 API）
 // ============================================================
-let SITE_DATA={announcements:[],feeds:[],sponsors:[],images:[],replays:[],serverStatus:'online'};
+
 async function loadData(){
   try{
     const r=await fetch('https://tst-server-site.pages.dev/api/data');
