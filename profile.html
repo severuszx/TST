@@ -704,6 +704,7 @@ function applyServerStatus(){
   const online = SITE_DATA.serverStatus !== "offline";
   const dot = document.getElementById("statusDot");
   const txt = document.getElementById("statusText");
+  if(!dot||!txt) return;
   if(online){
     if(dot) dot.style.background = "#22c55e";
     if(txt) txt.textContent = "服务器运行中";
@@ -716,7 +717,7 @@ updateTime();
 
 // 复制地址
 let copyFlag=false;
-$('#copyAddrBtn').onclick=async()=>{
+if($('#copyAddrBtn')) $('#copyAddrBtn').onclick=async()=>{
   if(copyFlag){ return; }
   copyFlag=true;
   try{
