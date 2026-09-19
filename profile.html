@@ -1675,8 +1675,6 @@ loadData();
 
 // 状态监控
 (function(){
-  const cores = navigator.hardwareConcurrency || 4;
-
   // GPU：WebGL 获取显卡型号
   function getGPU(){
     try{
@@ -1686,29 +1684,28 @@ loadData();
       const dbg = gl.getExtension("WEBGL_debug_renderer_info");
       if(dbg){
         let r = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
-        // 简化型号名
         r = r.replace(/(NVIDIA|AMD|Intel|GeForce|Radeon|Graphics)/g,"").trim();
         r = r.replace(/\s+/g," ");
         return r.length>30 ? r.substring(0,30)+"…" : r;
       }
-      return "WebGL";
+      return "未知";
     }catch(e){ return "未知"; }
   }
 
   function update(){
-    // CPU
-    const cpuPct = Math.floor(Math.random()*25+10);
+    // CPU：只显示核心数，占用率拿不到
+    const cores = navigator.hardwareConcurrency;
     const cpuEl = document.getElementById("stCpu");
     const cpuBar = document.getElementById("stCpuBar");
-    if(cpuEl) cpuEl.textContent = cores+" 核 · "+cpuPct+"%";
-    if(cpuBar) cpuBar.style.width = cpuPct+"%";
+    if(cpuEl) cpuEl.textContent = cores ? cores+" 核" : "未知";
+    if(cpuBar) cpuBar.style.width = "0%";
 
     // GPU
     const gpuEl = document.getElementById("stGpu");
     if(gpuEl) gpuEl.textContent = getGPU();
 
     // 内存
-    let memPct = 40, memText = "8 GB";
+    let memText = "未知", memPct = 0;
     if(performance.memory){
       const used = performance.memory.usedJSHeapSize;
       const limit = performance.memory.jsHeapSizeLimit;
@@ -1716,8 +1713,6 @@ loadData();
       const usedMB = (used/1048576).toFixed(0);
       const totalMB = (limit/1048576).toFixed(0);
       memText = usedMB+" / "+totalMB+" MB";
-    } else if(navigator.deviceMemory){
-      memText = navigator.deviceMemory+" GB";
     }
     const memEl = document.getElementById("stMem");
     const memBar = document.getElementById("stMemBar");
@@ -1728,7 +1723,7 @@ loadData();
     const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     const netEl = document.getElementById("stNet");
     if(conn){
-      const type = conn.effectiveType ? conn.effectiveType.toUpperCase() : "?";
+      const type = conn.effectiveType ? conn.effectiveType.toUpperCase() : "未知";
       const down = conn.downlink ? conn.downlink+" Mbps" : "";
       if(netEl) netEl.textContent = type + (down ? " · "+down : "");
     } else {
