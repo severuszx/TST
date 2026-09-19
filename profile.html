@@ -980,6 +980,7 @@ closing:'本条约目前仍在持续修订中，暂不作为最终正式版本�
 function renderRules(){
   const R=RULES;
   const dom=$('#ruleContent');
+  if(!dom) return;
   let html='';
   html+='<div class="rule-section"><h3>'+esc(R.treatyTitle)+'</h3>';
   html+='<p>'+esc(R.subTitle)+'</p>';
@@ -1002,7 +1003,7 @@ function renderRules(){
 const ruleScrollDom=$('#ruleScrollDom');
 function scrollToSec(id){
   const tar=document.getElementById(id);
-  if(!tar){ return; }
+  if(!tar||!ruleScrollDom){ return; }
   const top=tar.getBoundingClientRect().top-ruleScrollDom.getBoundingClientRect().top+ruleScrollDom.scrollTop;
   ruleScrollDom.scrollTo({top:top-16,behavior:'smooth'});
 }
