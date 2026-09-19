@@ -1157,7 +1157,7 @@ if($('#globalSearchInput')) $('#globalSearchInput').addEventListener('input',()=
 // ============================================================
 // 搜索联想
 // ============================================================
-function suggestOpen(id){ return document.getElementById(id).classList.contains('show'); }
+function suggestOpen(id){ const el=document.getElementById(id); return el?el.classList.contains('show'):false; }
 function getSuggestions(kwLow){
   const pool=['首页','公告','动态','赛事活动','兑换码','服务器赞助','玩家公约','服务器地址','QQ交流群','裂痕杯','PVP','红石','生电','建筑','领地','经济','交易','村民','外挂','赌博','赞助','运行时间','状态'];
   for(const s of RULES.sections){ pool.push(s.title); }
@@ -1166,6 +1166,7 @@ function getSuggestions(kwLow){
 function initSuggest(inputId,boxId,runSearch){
   const input=document.getElementById(inputId);
   const box=document.getElementById(boxId);
+  if(!input||!box) return;
   let active=-1;
   function close(){ box.innerHTML=''; box.classList.remove('show'); active=-1; }
   function render(items){
