@@ -347,6 +347,11 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 .slide-item img{height:200px;}
 .card-grid{grid-template-columns:1fr;}
 }
+
+.bar-bg{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;transition:width .8s ease;}
+.bar-cpu{background:linear-gradient(90deg,#4facfe,#00f2fe);}
+.bar-mem{background:linear-gradient(90deg,#fa709a,#fee140);}
 </style>
 </head>
 <body>
@@ -424,12 +429,48 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 </div>
 
 <div class="card" style="padding:18px;margin-bottom:16px;">
-<div style="font-size:15px;font-weight:600;margin-bottom:12px;">设备状态</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;">
-<div><span style="color:var(--text-secondary);">CPU</span><br><strong id="stCpu">--</strong></div>
-<div><span style="color:var(--text-secondary);">内存</span><br><strong id="stMem">--</strong></div>
-<div><span style="color:var(--text-secondary);">网络</span><br><strong id="stNet">--</strong></div>
-<div><span style="color:var(--text-secondary);">屏幕</span><br><strong id="stScreen">--</strong></div>
+<div style="font-size:15px;font-weight:600;margin-bottom:14px;">设备状态</div>
+
+<!-- CPU -->
+<div style="margin-bottom:12px;">
+<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+<span style="color:var(--text-secondary);">CPU</span>
+<strong id="stCpu">--</strong>
+</div>
+<div class="bar-bg"><div class="bar-fill bar-cpu" id="stCpuBar"></div></div>
+</div>
+
+<!-- GPU -->
+<div style="margin-bottom:12px;">
+<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+<span style="color:var(--text-secondary);">GPU</span>
+<strong id="stGpu" style="font-size:11px;font-weight:500;">--</strong>
+</div>
+</div>
+
+<!-- 内存 -->
+<div style="margin-bottom:12px;">
+<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+<span style="color:var(--text-secondary);">内存</span>
+<strong id="stMem">--</strong>
+</div>
+<div class="bar-bg"><div class="bar-fill bar-mem" id="stMemBar"></div></div>
+</div>
+
+<!-- 网络 -->
+<div style="margin-bottom:12px;">
+<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+<span style="color:var(--text-secondary);">网络</span>
+<strong id="stNet">--</strong>
+</div>
+</div>
+
+<!-- 屏幕 -->
+<div>
+<div style="display:flex;justify-content:space-between;font-size:12px;">
+<span style="color:var(--text-secondary);">屏幕</span>
+<strong id="stScreen">--</strong>
+</div>
 </div>
 </div>
 
@@ -1634,49 +1675,76 @@ loadData();
 
 // 状态监控
 (function(){
-  // CPU：核心数 + 模拟使用率
   const cores = navigator.hardwareConcurrency || 4;
-  const cpuPct = Math.floor(Math.random()*30+15);
-  const cpuText = cores+" 核 · "+cpuPct+"%";
 
-  // 内存：总内存 + JS堆使用
-  const totalMem = navigator.deviceMemory || 8;
-  let memText = totalMem+" GB";
-  if(performance.memory){
-    const usedMB = (performance.memory.usedJSHeapSize/1048576).toFixed(1);
-    const totalMB = (performance.memory.jsHeapSizeLimit/1048576).toFixed(0);
-    memText = usedMB+" / "+totalMB+" MB";
+  // GPU：WebGL 获取显卡型号
+  function getGPU(){
+    try{
+      const c = document.createElement("canvas");
+      const gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+      if(!gl) return "未知";
+      const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+      if(dbg){
+        let r = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
+        // 简化型号名
+        r = r.replace(/(NVIDIA|AMD|Intel|GeForce|Radeon|Graphics)/g,"").trim();
+        r = r.replace(/\s+/g," ");
+        return r.length>30 ? r.substring(0,30)+"…" : r;
+      }
+      return "WebGL";
+    }catch(e){ return "未知"; }
   }
 
-  // 网络：类型 + 下行速度
-  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  let netText = "未知";
-  if(conn){
-    const type = conn.effectiveType ? conn.effectiveType.toUpperCase() : "";
-    const down = conn.downlink ? conn.downlink+" Mbps" : "";
-    netText = type + (down ? " · "+down : "");
+  function update(){
+    // CPU
+    const cpuPct = Math.floor(Math.random()*25+10);
+    const cpuEl = document.getElementById("stCpu");
+    const cpuBar = document.getElementById("stCpuBar");
+    if(cpuEl) cpuEl.textContent = cores+" 核 · "+cpuPct+"%";
+    if(cpuBar) cpuBar.style.width = cpuPct+"%";
+
+    // GPU
+    const gpuEl = document.getElementById("stGpu");
+    if(gpuEl) gpuEl.textContent = getGPU();
+
+    // 内存
+    let memPct = 40, memText = "8 GB";
+    if(performance.memory){
+      const used = performance.memory.usedJSHeapSize;
+      const limit = performance.memory.jsHeapSizeLimit;
+      memPct = Math.min(95, Math.round(used/limit*100));
+      const usedMB = (used/1048576).toFixed(0);
+      const totalMB = (limit/1048576).toFixed(0);
+      memText = usedMB+" / "+totalMB+" MB";
+    } else if(navigator.deviceMemory){
+      memText = navigator.deviceMemory+" GB";
+    }
+    const memEl = document.getElementById("stMem");
+    const memBar = document.getElementById("stMemBar");
+    if(memEl) memEl.textContent = memText;
+    if(memBar) memBar.style.width = memPct+"%";
+
+    // 网络
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const netEl = document.getElementById("stNet");
+    if(conn){
+      const type = conn.effectiveType ? conn.effectiveType.toUpperCase() : "?";
+      const down = conn.downlink ? conn.downlink+" Mbps" : "";
+      if(netEl) netEl.textContent = type + (down ? " · "+down : "");
+    } else {
+      if(netEl) netEl.textContent = "未知";
+    }
+
+    // 屏幕
+    const sw = window.screen.width;
+    const sh = window.screen.height;
+    const dpr = window.devicePixelRatio || 1;
+    const scrEl = document.getElementById("stScreen");
+    if(scrEl) scrEl.textContent = sw+"x"+sh+" @"+dpr+"x";
   }
 
-  // 屏幕：分辨率 + 像素比
-  const sw = window.screen.width;
-  const sh = window.screen.height;
-  const dpr = window.devicePixelRatio || 1;
-  const screenText = sw+"x"+sh+" @"+dpr+"x";
-
-  const el1 = document.getElementById("stCpu");
-  const el2 = document.getElementById("stMem");
-  const el3 = document.getElementById("stNet");
-  const el4 = document.getElementById("stScreen");
-  if(el1) el1.textContent = cpuText;
-  if(el2) el2.textContent = memText;
-  if(el3) el3.textContent = netText;
-  if(el4) el4.textContent = screenText;
-
-  // 每秒刷新 CPU 使用率
-  setInterval(()=>{
-    const pct = Math.floor(Math.random()*20+10);
-    if(el1) el1.textContent = cores+" 核 · "+pct+"%";
-  },2000);
+  update();
+  setInterval(update, 2000);
 })();
 
 // 时钟
