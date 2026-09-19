@@ -5,6 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Slow Tide 官网</title>
 <script>
+const serverStart=new Date('2026-06-30T00:00:00');
+const offsetMs=120*1000;
+function updateTime(){
+  const now=new Date();
+  const hh=String(now.getHours()).padStart(2,'0');
+  const mm=String(now.getMinutes()).padStart(2,'0');
+  const ss=String(now.getSeconds()).padStart(2,'0');
+  const bjEl=document.getElementById('bjTime');
+  const rtEl=document.getElementById('runTime');
+  if(bjEl) bjEl.textContent='北京时间 '+hh+':'+mm+':'+ss;
+  const diff=now.getTime()-serverStart.getTime()+offsetMs;
+  const day=Math.floor(diff/86400000);
+  const h=Math.floor((diff%86400000)/3600000);
+  if(rtEl) rtEl.textContent='运行 '+day+'天'+h+'时';
+}
+setInterval(updateTime,1000);
+updateTime();
 (function(){
 // 主题：浅色 / 深色，localStorage 优先，默认浅色
 var mode=localStorage.getItem('tst-theme');
@@ -89,6 +106,8 @@ color:var(--text);font-size:14px;cursor:pointer;white-space:nowrap;
 }
 .nav-link:hover{background:var(--hover);}
 .nav-link.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+.tb-time{color:var(--primary);font-weight:600;font-variant-numeric:tabular-nums;font-size:13px;}
+.tb-uptime{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums;font-size:13px;}
 .header-right{
 display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;
 }
@@ -363,6 +382,8 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <button class="nav-link" data-nav="rule">玩家公约</button>
 </nav>
 <div class="header-right">
+<span class="tb-time" id="bjTime">--:--:--</span>
+<span class="tb-uptime" id="runTime">--</span>
 <a class="feedback-btn" href="profile.html">我的</a>
 <a class="feedback-btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
 <a class="btn btn-primary" href="admin.html" style="text-decoration:none;display:inline-flex;align-items:center;">管理</a>
