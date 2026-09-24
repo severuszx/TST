@@ -110,6 +110,10 @@ color:var(--text);font-size:14px;cursor:pointer;white-space:nowrap;
 }
 .nav-link:hover{background:var(--hover);}
 .nav-link.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+.nav-more{position:relative;}
+.more-menu{position:absolute;top:100%;left:0;min-width:150px;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:6px;display:none;z-index:200;flex-direction:column;gap:2px;}
+.nav-more.open .more-menu{display:flex;}
+.more-menu .nav-link{text-align:left;width:100%;}
 .time-badge{
 display:flex;flex-direction:column;align-items:flex-end;gap:1px;
 padding:5px 12px;border:1px solid var(--border);border-radius:6px;
@@ -385,11 +389,16 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <button class="nav-link active" data-nav="home">首页</button>
 <button class="nav-link" data-nav="notice">公告</button>
 <button class="nav-link" data-nav="feed">动态</button>
+<a class="nav-link" href="tool.html">便捷工具</a>
+<button class="nav-link" data-nav="rule">玩家公约</button>
+<div class="nav-more" id="navMore">
+<button class="nav-link" id="navMoreBtn">更多<span class="more-caret">&#9662;</span></button>
+<div class="more-menu" id="moreMenu">
 <button class="nav-link" data-nav="event">赛事活动</button>
 <button class="nav-link" data-nav="cdkey">兑换码</button>
 <button class="nav-link" data-nav="sponsor">服务器赞助</button>
-<a class="nav-link" href="tool.html">便捷工具</a>
-<button class="nav-link" data-nav="rule">玩家公约</button>
+</div>
+</div>
 </nav>
 <div class="header-right">
 <div class="time-badge" title="北京时间与服务器运行时间">
@@ -716,6 +725,17 @@ function switchPage(pid){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
+// 更多下拉
+const navMoreBtn=document.getElementById('navMoreBtn');
+const navMore=document.getElementById('navMore');
+if(navMoreBtn){
+  navMoreBtn.onclick=(e)=>{ e.stopPropagation(); navMore.classList.toggle('open'); };
+  document.addEventListener('click',(e)=>{ if(!navMore.contains(e.target)) navMore.classList.remove('open'); });
+}
+const moreMenu=document.getElementById('moreMenu');
+moreMenu.querySelectorAll('.nav-link').forEach(b=>{
+  b.onclick=()=>{ switchPage(b.dataset.nav); navMore.classList.remove('open'); };
+});
 document.querySelectorAll('[data-fnav]').forEach(b=>{
   b.onclick=()=>{ switchPage(b.dataset.fnav); window.scrollTo({top:0,behavior:'smooth'}); };
 });
@@ -1708,21 +1728,5 @@ loadData();
 })();
 </script>
 
-<!-- 生日弹窗 -->
-<div id="birthdayMask" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
-<div style="background:var(--card,#fff);border-radius:16px;padding:40px;text-align:center;max-width:400px;margin:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);">
-<div style="font-size:48px;margin-bottom:16px;">🎂</div>
-<h2 style="margin:0 0 12px;font-size:22px;">生日快乐！</h2>
-<p style="margin:0 0 8px;font-size:16px;color:var(--text-secondary,#666);">祝</p>
-<p style="margin:0 0 20px;font-size:20px;font-weight:700;color:var(--accent,#0f172a);">KMS罒奇迹与你</p>
-<p style="margin:0 0 24px;font-size:14px;color:var(--text-secondary,#666);">在 The Slow Tide 度过快乐的一天！</p>
-<button onclick="document.getElementById('birthdayMask').style.display='none';localStorage.setItem('tst_birthday_2026_09_18',1);" style="padding:10px 32px;border:none;border-radius:8px;background:var(--accent,#0f172a);color:#fff;font-size:15px;cursor:pointer;">谢谢！</button>
-</div>
-</div>
-<script>
-if(!localStorage.getItem("tst_birthday_2026_09_18")){
-  setTimeout(()=>{document.getElementById("birthdayMask").style.display="flex";},1500);
-}
-</script>
 </body>
 </html>

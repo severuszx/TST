@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>便捷工具 - The Slow Tide</title>
+<title>T显编译器 - The Slow Tide</title>
 <script>
 (function(){
 var mode=localStorage.getItem('tst-theme');
@@ -61,18 +61,11 @@ border-bottom:1px solid var(--border);
 }
 .header-inner{
 display:flex;align-items:center;gap:18px;
-min-height:62px;
-flex-wrap:wrap;
+min-height:62px;flex-wrap:wrap;
 }
 .logo{
 font-size:20px;font-weight:700;color:var(--primary);
 display:flex;align-items:center;gap:8px;white-space:nowrap;
-}
-.logo-mark{
-width:34px;height:34px;border-radius:4px;
-background:var(--hero-grad);
-color:#fff;display:flex;align-items:center;justify-content:center;
-font-size:18px;flex:none;
 }
 .logo-img{
 width:34px;height:34px;border-radius:4px;
@@ -122,7 +115,7 @@ body,.site-header,.card,.btn,.theme-toggle{
 transition:background-color .3s ease,color .3s ease,border-color .3s ease;
 }
 
-/* ===== 页面内容 ===== */
+/* ===== 页面 ===== */
 .section{padding:26px 0;}
 .section-title{
 display:flex;align-items:center;gap:10px;
@@ -140,12 +133,8 @@ transition:transform .2s ease,box-shadow .2s ease;
 .tool-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.1);}
 .tool-card h3{font-size:17px;margin-bottom:8px;}
 .tool-card p{font-size:14px;color:var(--text-secondary);}
-.tool-icon{
-width:48px;height:48px;border-radius:10px;background:var(--accent-soft);
-display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px;
-}
 
-/* ===== 编译器界面 ===== */
+/* ===== 编译器 ===== */
 .compiler-wrap{display:none;}
 .compiler-wrap.show{display:block;}
 .compiler-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
@@ -183,7 +172,7 @@ word-break:break-all;white-space:pre-wrap;
 .output-box{
 background:var(--bg);border:1px solid var(--border);border-radius:6px;
 padding:12px;font-family:ui-monospace,Consolas,monospace;font-size:13px;
-word-break:break-all;min-height:60px;color:var(--text);
+word-break:break-all;min-height:60px;color:var(--text);white-space:pre-wrap;
 }
 .btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
 .back-btn{margin-bottom:16px;}
@@ -226,9 +215,8 @@ font-size:14px;box-shadow:var(--shadow);
 <div class="section-title">便捷工具</div>
 <div class="tool-grid">
 <div class="tool-card" onclick="openCompiler()">
-<div class="tool-icon">Aa</div>
 <h3>T显编译器</h3>
-<p>编辑标题/聊天文字的颜色与样式，自动生成 Minecraft 可用的格式化代码。</p>
+<p>生成 Minecraft JSON 文本（title / tellraw 使用），支持颜色与样式。</p>
 </div>
 </div>
 </div>
@@ -243,37 +231,44 @@ font-size:14px;box-shadow:var(--shadow);
 <div class="card">
 <h3>编辑文字</h3>
 <div class="form-row">
+<label>目标版本</label>
+<div class="style-row">
+<button class="style-btn active" data-ver="java" onclick="setVersion(this)">Java 版</button>
+<button class="style-btn" data-ver="netease" onclick="setVersion(this)">网易版</button>
+</div>
+</div>
+<div class="form-row">
 <label>输入文字</label>
 <textarea id="inputText" placeholder="输入要显示的文字..." oninput="updatePreview()">欢迎来到 The Slow Tide</textarea>
 </div>
 <div class="form-row">
 <label>颜色</label>
 <div class="color-row" id="colorRow">
-<div class="color-chip selected" data-color="f" style="background:#ffffff;" title="白色"></div>
-<div class="color-chip" data-color="0" style="background:#000000;" title="黑色"></div>
-<div class="color-chip" data-color="1" style="background:#0000aa;" title="深蓝"></div>
-<div class="color-chip" data-color="2" style="background:#00aa00;" title="深绿"></div>
-<div class="color-chip" data-color="3" style="background:#00aaaa;" title="深蓝绿"></div>
-<div class="color-chip" data-color="4" style="background:#aa0000;" title="深红"></div>
-<div class="color-chip" data-color="5" style="background:#aa00aa;" title="紫色"></div>
-<div class="color-chip" data-color="6" style="background:#ffaa00;" title="金色"></div>
-<div class="color-chip" data-color="7" style="background:#aaaaaa;" title="灰色"></div>
-<div class="color-chip" data-color="8" style="background:#555555;" title="深灰"></div>
-<div class="color-chip" data-color="9" style="background:#5555ff;" title="蓝色"></div>
-<div class="color-chip" data-color="a" style="background:#55ff55;" title="绿色"></div>
-<div class="color-chip" data-color="b" style="background:#55ffff;" title="天蓝"></div>
-<div class="color-chip" data-color="c" style="background:#ff5555;" title="红色"></div>
-<div class="color-chip" data-color="d" style="background:#ff55ff;" title="粉色"></div>
-<div class="color-chip" data-color="e" style="background:#ffff55;" title="黄色"></div>
+<div class="color-chip selected" data-color="white" style="background:#ffffff;" title="白色"></div>
+<div class="color-chip" data-color="black" style="background:#000000;" title="黑色"></div>
+<div class="color-chip" data-color="dark_blue" style="background:#0000aa;" title="深蓝"></div>
+<div class="color-chip" data-color="dark_green" style="background:#00aa00;" title="深绿"></div>
+<div class="color-chip" data-color="dark_aqua" style="background:#00aaaa;" title="深青"></div>
+<div class="color-chip" data-color="dark_red" style="background:#aa0000;" title="深红"></div>
+<div class="color-chip" data-color="dark_purple" style="background:#aa00aa;" title="紫色"></div>
+<div class="color-chip" data-color="gold" style="background:#ffaa00;" title="金色"></div>
+<div class="color-chip" data-color="gray" style="background:#aaaaaa;" title="灰色"></div>
+<div class="color-chip" data-color="dark_gray" style="background:#555555;" title="深灰"></div>
+<div class="color-chip" data-color="blue" style="background:#5555ff;" title="蓝色"></div>
+<div class="color-chip" data-color="green" style="background:#55ff55;" title="绿色"></div>
+<div class="color-chip" data-color="aqua" style="background:#55ffff;" title="天蓝"></div>
+<div class="color-chip" data-color="red" style="background:#ff5555;" title="红色"></div>
+<div class="color-chip" data-color="light_purple" style="background:#ff55ff;" title="粉色"></div>
+<div class="color-chip" data-color="yellow" style="background:#ffff55;" title="黄色"></div>
 </div>
 </div>
 <div class="form-row">
 <label>样式</label>
 <div class="style-row">
-<button class="style-btn" data-style="l" onclick="toggleStyle(this)">粗体</button>
-<button class="style-btn" data-style="m" onclick="toggleStyle(this)">删除线</button>
-<button class="style-btn" data-style="n" onclick="toggleStyle(this)">下划线</button>
-<button class="style-btn" data-style="o" onclick="toggleStyle(this)">斜体</button>
+<button class="style-btn" data-style="bold" onclick="toggleStyle(this)">粗体</button>
+<button class="style-btn" data-style="strikethrough" onclick="toggleStyle(this)">删除线</button>
+<button class="style-btn" data-style="underlined" onclick="toggleStyle(this)">下划线</button>
+<button class="style-btn" data-style="italic" onclick="toggleStyle(this)">斜体</button>
 </div>
 </div>
 </div>
@@ -283,12 +278,12 @@ font-size:14px;box-shadow:var(--shadow);
 <h3>预览</h3>
 <div class="preview-box" id="previewBox">欢迎来到 The Slow Tide</div>
 <div class="form-row" style="margin-top:14px;">
-<label>生成的代码（复制到游戏内使用）</label>
-<div class="output-box" id="outputBox">§f欢迎来到 The Slow Tide</div>
-<div class="hint">基岩版聊天框使用 § 符号，将生成的代码直接粘贴到聊天即可。</div>
+<label>JSON 文本（复制到游戏内使用）</label>
+<div class="output-box" id="outputBox">{"text":"欢迎来到 The Slow Tide","color":"white"}</div>
+<div class="hint" id="verHint">Java 版：适用于 title / tellraw 命令的 JSON 文本。</div>
 </div>
 <div class="btn-row">
-<button class="btn btn-primary" onclick="copyCode()">复制代码</button>
+<button class="btn btn-primary" onclick="copyCode()">复制 JSON</button>
 <button class="btn" onclick="resetAll()">重置</button>
 </div>
 </div>
@@ -302,8 +297,27 @@ font-size:14px;box-shadow:var(--shadow);
 
 <script>
 const $=s=>document.querySelector(s);
-let currentColor='f';
+let currentColor='white';
 let currentStyles=new Set();
+let currentVer='java';
+
+// Java 版颜色名 -> 网易版 § 码
+const secCode={
+'white':'f','black':'0','dark_blue':'1','dark_green':'2','dark_aqua':'3',
+'dark_red':'4','dark_purple':'5','gold':'6','gray':'7','dark_gray':'8',
+'blue':'9','green':'a','aqua':'b','red':'c','light_purple':'d','yellow':'e'
+};
+const styleCode={'bold':'l','italic':'o','underlined':'n','strikethrough':'m'};
+
+function setVersion(btn){
+currentVer=btn.dataset.ver;
+document.querySelectorAll('[data-ver]').forEach(b=>b.classList.toggle('active',b===btn));
+const hint=currentVer==='java'
+  ?'Java 版：适用于 title / tellraw 命令的 JSON 文本。'
+  :'网易版：JSON 文本中颜色使用 § 格式码（如 §e 金色），样式保留 JSON 字段。';
+$('#verHint').textContent=hint;
+updatePreview();
+}
 
 function showToast(msg){
 const w=$('#toastWrap');
@@ -339,32 +353,45 @@ if(currentStyles.has(s)){ currentStyles.delete(s); } else { currentStyles.add(s)
 updatePreview();
 }
 
-function getCodePrefix(){
-let pre='§'+currentColor;
-currentStyles.forEach(s=>{ pre+='§'+s; });
-return pre;
-}
-
 function getCssColor(){
 const map={
-'0':'#000','1':'#00a','2':'#0a0','3':'#0aa','4':'#a00','5':'#a0a',
-'6':'#fa0','7':'#aaa','8':'#555','9':'#55f','a':'#5f5','b':'#5ff',
-'c':'#f55','d':'#f5f','e':'#ff5','f':'#fff'
+'black':'#000','dark_blue':'#00a','dark_green':'#0a0','dark_aqua':'#0aa',
+'dark_red':'#a00','dark_purple':'#a0a','gold':'#fa0','gray':'#aaa',
+'dark_gray':'#555','blue':'#55f','green':'#5f5','aqua':'#5ff',
+'red':'#f55','light_purple':'#f5f','yellow':'#ff5','white':'#fff'
 };
 return map[currentColor]||'#fff';
 }
 
+function buildJson(){
+const text=$('#inputText').value||' ';
+const obj={};
+if(currentVer==='netease'){
+  let codes='§'+secCode[currentColor];
+  ['bold','italic','underlined','strikethrough'].forEach(s=>{
+    if(currentStyles.has(s)) codes+='§'+styleCode[s];
+  });
+  obj.text=codes+text;
+}else{
+  obj.text=text;
+  obj.color=currentColor;
+  if(currentStyles.has('bold')) obj.bold=true;
+  if(currentStyles.has('italic')) obj.italic=true;
+  if(currentStyles.has('underlined')) obj.underlined=true;
+  if(currentStyles.has('strikethrough')) obj.strikethrough=true;
+}
+return JSON.stringify(obj);
+}
+
 function updatePreview(){
 const text=$('#inputText').value||' ';
-const pre=getCodePrefix();
 let styleCss='';
-if(currentStyles.has('l')) styleCss+='font-weight:bold;';
-if(currentStyles.has('o')) styleCss+='font-style:italic;';
-if(currentStyles.has('n')) styleCss+='text-decoration:underline;';
-if(currentStyles.has('m')) styleCss+='text-decoration:line-through;';
-
+if(currentStyles.has('bold')) styleCss+='font-weight:bold;';
+if(currentStyles.has('italic')) styleCss+='font-style:italic;';
+if(currentStyles.has('underlined')) styleCss+='text-decoration:underline;';
+if(currentStyles.has('strikethrough')) styleCss+='text-decoration:line-through;';
 $('#previewBox').innerHTML='<span style="color:'+getCssColor()+';'+styleCss+'">'+escapeHtml(text)+'</span>';
-$('#outputBox').textContent=pre+text;
+$('#outputBox').textContent=buildJson();
 }
 
 function escapeHtml(s){
@@ -385,7 +412,7 @@ showToast('请按 Ctrl+C 复制');
 
 function resetAll(){
 $('#inputText').value='欢迎来到 The Slow Tide';
-currentColor='f';
+currentColor='white';
 currentStyles.clear();
 document.querySelectorAll('.color-chip').forEach((c,i)=>c.classList.toggle('selected',i===0));
 document.querySelectorAll('.style-btn').forEach(b=>b.classList.remove('active'));
