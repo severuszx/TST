@@ -25,7 +25,6 @@ document.documentElement.setAttribute('data-theme',mode);
 --accent:#52525b;
 --accent-soft:rgba(82,82,91,.1);
 --shadow:0 4px 14px rgba(15,23,42,.07);
---hero-grad:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
 }
 html[data-theme="dark"]{
 --bg:#111113;
@@ -39,7 +38,6 @@ html[data-theme="dark"]{
 --accent:#a1a1aa;
 --accent-soft:rgba(161,161,170,.14);
 --shadow:0 4px 14px rgba(0,0,0,.5);
---hero-grad:linear-gradient(135deg,#0a0a0b 0%,#18181b 100%);
 }
 html[data-theme="dark"] .btn-primary{background:#71717a;}
 body{
@@ -78,8 +76,9 @@ display:flex;gap:2px;flex:1;flex-wrap:wrap;
 .nav-link{
 padding:8px 12px;border-radius:6px;border:none;background:transparent;
 color:var(--text);font-size:14px;cursor:pointer;white-space:nowrap;
+text-decoration:none;
 }
-.nav-link:hover{background:var(--hover);}
+.nav-link:hover{background:var(--hover);text-decoration:none;}
 .nav-link.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
 .header-right{
 display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;
@@ -138,7 +137,7 @@ transition:transform .2s ease,box-shadow .2s ease;
 .compiler-wrap{display:none;}
 .compiler-wrap.show{display:block;}
 .compiler-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-@media(max-width:720px){.compiler-grid{grid-template-columns:1fr;}}
+@media(max-width:760px){.compiler-grid{grid-template-columns:1fr;}}
 .card{
 background:var(--card);border:1px solid var(--border);border-radius:10px;
 padding:18px;box-shadow:var(--shadow);
@@ -146,15 +145,15 @@ padding:18px;box-shadow:var(--shadow);
 .card h3{font-size:16px;margin-bottom:14px;}
 .form-row{margin-bottom:12px;}
 .form-row label{display:block;font-size:13px;color:var(--text-secondary);margin-bottom:5px;}
-.form-row input[type="text"],.form-row textarea{
+.form-row input[type="text"],.form-row textarea,.form-row select{
 width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;
 background:var(--bg);color:var(--text);font-size:14px;outline:none;font-family:inherit;
 }
-.form-row input:focus,.form-row textarea:focus{border-color:var(--accent);}
-.form-row textarea{min-height:80px;resize:vertical;}
+.form-row input:focus,.form-row textarea:focus,.form-row select:focus{border-color:var(--accent);}
+.form-row textarea{min-height:70px;resize:vertical;}
 .color-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
 .color-chip{
-width:32px;height:32px;border-radius:6px;cursor:pointer;
+width:30px;height:30px;border-radius:6px;cursor:pointer;
 border:2px solid transparent;transition:border-color .2s;
 }
 .color-chip.selected{border-color:var(--primary);box-shadow:0 0 0 2px var(--bg);}
@@ -166,7 +165,7 @@ background:var(--bg);color:var(--text);cursor:pointer;font-size:13px;
 .style-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 .preview-box{
 background:#1a1a1a;color:#fff;padding:16px;border-radius:8px;
-min-height:80px;font-size:18px;margin-top:10px;
+min-height:90px;font-size:18px;margin-top:10px;
 word-break:break-all;white-space:pre-wrap;
 }
 .output-box{
@@ -184,6 +183,35 @@ background:var(--primary);color:var(--bg);padding:9px 18px;border-radius:6px;
 font-size:14px;box-shadow:var(--shadow);
 }
 .hint{font-size:12px;color:var(--text-secondary);margin-top:6px;}
+
+/* ===== 元素卡片 ===== */
+.elem-list{display:flex;flex-direction:column;gap:12px;margin-top:4px;}
+.elem-card{
+border:1px solid var(--border);border-radius:8px;padding:12px;
+background:var(--bg);
+}
+.elem-head{
+display:flex;align-items:center;gap:8px;margin-bottom:10px;
+}
+.elem-head select{
+padding:5px 8px;border:1px solid var(--border);border-radius:6px;
+background:var(--card);color:var(--text);font-size:13px;outline:none;font-family:inherit;
+}
+.elem-del{
+margin-left:auto;padding:4px 12px;border:none;border-radius:6px;
+background:transparent;color:var(--text-secondary);cursor:pointer;font-size:13px;
+}
+.elem-del:hover{background:var(--hover);color:var(--text);}
+.elem-num{
+font-size:13px;font-weight:600;color:var(--accent);min-width:22px;
+}
+.add-elem{
+margin-top:12px;width:100%;padding:10px;border:1px dashed var(--border);
+border-radius:8px;background:transparent;color:var(--text-secondary);
+cursor:pointer;font-size:14px;
+}
+.add-elem:hover{background:var(--hover);color:var(--text);}
+.hint-line{font-size:12px;color:var(--text-secondary);margin-top:6px;}
 </style>
 </head>
 <body>
@@ -216,7 +244,7 @@ font-size:14px;box-shadow:var(--shadow);
 <div class="tool-grid">
 <div class="tool-card" onclick="openCompiler()">
 <h3>T显编译器</h3>
-<p>生成 Minecraft JSON 文本（title / tellraw 使用），支持颜色与样式。</p>
+<p>生成 Minecraft JSON 文本，支持文本 / 选择器 / 记分板 / 翻译键元素。</p>
 </div>
 </div>
 </div>
@@ -229,7 +257,7 @@ font-size:14px;box-shadow:var(--shadow);
 <div class="compiler-grid">
 <!-- 编辑区 -->
 <div class="card">
-<h3>编辑文字</h3>
+<h3>编辑内容</h3>
 <div class="form-row">
 <label>目标版本</label>
 <div class="style-row">
@@ -237,49 +265,17 @@ font-size:14px;box-shadow:var(--shadow);
 <button class="style-btn" data-ver="netease" onclick="setVersion(this)">网易版</button>
 </div>
 </div>
-<div class="form-row">
-<label>输入文字</label>
-<textarea id="inputText" placeholder="输入要显示的文字..." oninput="updatePreview()">欢迎来到 The Slow Tide</textarea>
-</div>
-<div class="form-row">
-<label>颜色</label>
-<div class="color-row" id="colorRow">
-<div class="color-chip selected" data-color="white" style="background:#ffffff;" title="白色"></div>
-<div class="color-chip" data-color="black" style="background:#000000;" title="黑色"></div>
-<div class="color-chip" data-color="dark_blue" style="background:#0000aa;" title="深蓝"></div>
-<div class="color-chip" data-color="dark_green" style="background:#00aa00;" title="深绿"></div>
-<div class="color-chip" data-color="dark_aqua" style="background:#00aaaa;" title="深青"></div>
-<div class="color-chip" data-color="dark_red" style="background:#aa0000;" title="深红"></div>
-<div class="color-chip" data-color="dark_purple" style="background:#aa00aa;" title="紫色"></div>
-<div class="color-chip" data-color="gold" style="background:#ffaa00;" title="金色"></div>
-<div class="color-chip" data-color="gray" style="background:#aaaaaa;" title="灰色"></div>
-<div class="color-chip" data-color="dark_gray" style="background:#555555;" title="深灰"></div>
-<div class="color-chip" data-color="blue" style="background:#5555ff;" title="蓝色"></div>
-<div class="color-chip" data-color="green" style="background:#55ff55;" title="绿色"></div>
-<div class="color-chip" data-color="aqua" style="background:#55ffff;" title="天蓝"></div>
-<div class="color-chip" data-color="red" style="background:#ff5555;" title="红色"></div>
-<div class="color-chip" data-color="light_purple" style="background:#ff55ff;" title="粉色"></div>
-<div class="color-chip" data-color="yellow" style="background:#ffff55;" title="黄色"></div>
-</div>
-</div>
-<div class="form-row">
-<label>样式</label>
-<div class="style-row">
-<button class="style-btn" data-style="bold" onclick="toggleStyle(this)">粗体</button>
-<button class="style-btn" data-style="strikethrough" onclick="toggleStyle(this)">删除线</button>
-<button class="style-btn" data-style="underlined" onclick="toggleStyle(this)">下划线</button>
-<button class="style-btn" data-style="italic" onclick="toggleStyle(this)">斜体</button>
-</div>
-</div>
+<div class="elem-list" id="elemList"></div>
+<button class="add-elem" onclick="addElem()">+ 添加元素</button>
 </div>
 
 <!-- 预览区 -->
 <div class="card">
 <h3>预览</h3>
-<div class="preview-box" id="previewBox">欢迎来到 The Slow Tide</div>
+<div class="preview-box" id="previewBox"></div>
 <div class="form-row" style="margin-top:14px;">
 <label>JSON 文本（复制到游戏内使用）</label>
-<div class="output-box" id="outputBox">{"text":"欢迎来到 The Slow Tide","color":"white"}</div>
+<div class="output-box" id="outputBox"></div>
 <div class="hint" id="verHint">Java 版：适用于 title / tellraw 命令的 JSON 文本。</div>
 </div>
 <div class="btn-row">
@@ -297,8 +293,6 @@ font-size:14px;box-shadow:var(--shadow);
 
 <script>
 const $=s=>document.querySelector(s);
-let currentColor='white';
-let currentStyles=new Set();
 let currentVer='java';
 
 // Java 版颜色名 -> 网易版 § 码
@@ -308,15 +302,33 @@ const secCode={
 'blue':'9','green':'a','aqua':'b','red':'c','light_purple':'d','yellow':'e'
 };
 const styleCode={'bold':'l','italic':'o','underlined':'n','strikethrough':'m'};
+const typeNames={'text':'文本','selector':'选择器','score':'记分板','translate':'翻译键'};
+const colors=[
+['white','#ffffff','白色'],['black','#000000','黑色'],['dark_blue','#0000aa','深蓝'],
+['dark_green','#00aa00','深绿'],['dark_aqua','#00aaaa','深青'],['dark_red','#aa0000','深红'],
+['dark_purple','#aa00aa','紫色'],['gold','#ffaa00','金色'],['gray','#aaaaaa','灰色'],
+['dark_gray','#555555','深灰'],['blue','#5555ff','蓝色'],['green','#55ff55','绿色'],
+['aqua','#55ffff','天蓝'],['red','#ff5555','红色'],['light_purple','#ff55ff','粉色'],
+['yellow','#ffff55','黄色']
+];
 
-function setVersion(btn){
-currentVer=btn.dataset.ver;
-document.querySelectorAll('[data-ver]').forEach(b=>b.classList.toggle('active',b===btn));
-const hint=currentVer==='java'
-  ?'Java 版：适用于 title / tellraw 命令的 JSON 文本。'
-  :'网易版：JSON 文本中颜色使用 § 格式码（如 §e 金色），样式保留 JSON 字段。';
-$('#verHint').textContent=hint;
-updatePreview();
+// 元素模型：{type, text, selector, scoreName, scoreObj, translate, withText, color, styles:Set}
+let elems=[];
+let elemId=0;
+
+function newElem(type){
+return {
+  id:++elemId,
+  type:type||'text',
+  text:'',
+  selector:'@p',
+  scoreName:'@p',
+  scoreObj:'',
+  translate:'',
+  withText:'',
+  color:'white',
+  styles:new Set()
+};
 }
 
 function showToast(msg){
@@ -337,69 +349,249 @@ $('#compilerPage').classList.remove('show');
 $('#toolList').style.display='block';
 }
 
-document.querySelectorAll('.color-chip').forEach(chip=>{
-chip.onclick=()=>{
-document.querySelectorAll('.color-chip').forEach(c=>c.classList.remove('selected'));
-chip.classList.add('selected');
-currentColor=chip.dataset.color;
-updatePreview();
-};
-});
-
-function toggleStyle(btn){
-btn.classList.toggle('active');
-const s=btn.dataset.style;
-if(currentStyles.has(s)){ currentStyles.delete(s); } else { currentStyles.add(s); }
-updatePreview();
+function setVersion(btn){
+currentVer=btn.dataset.ver;
+document.querySelectorAll('[data-ver]').forEach(b=>b.classList.toggle('active',b===btn));
+const hint=currentVer==='java'
+  ?'Java 版：适用于 title / tellraw 命令的 JSON 文本。'
+  :'网易版：颜色用 § 格式码（如 §e 金色）嵌入文本，其他类型保留 JSON 结构。';
+$('#verHint').textContent=hint;
+updateAll();
 }
 
-function getCssColor(){
+/* ===== 渲染元素列表 ===== */
+function renderElems(){
+const box=$('#elemList');
+box.innerHTML='';
+elems.forEach((el,idx)=>{
+  const card=document.createElement('div');
+  card.className='elem-card';
+  const typeRow=document.createElement('div');
+  typeRow.className='elem-head';
+
+  const num=document.createElement('span');
+  num.className='elem-num';
+  num.textContent=(idx+1)+'.';
+  typeRow.appendChild(num);
+
+  const sel=document.createElement('select');
+  Object.keys(typeNames).forEach(t=>{
+    const opt=document.createElement('option');
+    opt.value=t;
+    opt.textContent=typeNames[t];
+    if(t===el.type) opt.selected=true;
+    sel.appendChild(opt);
+  });
+  sel.onchange=()=>{ el.type=sel.value; updateAll(); };
+  typeRow.appendChild(sel);
+
+  const del=document.createElement('button');
+  del.className='elem-del';
+  del.textContent='删除';
+  del.onclick=()=>{ elems.splice(idx,1); updateAll(); };
+  typeRow.appendChild(del);
+
+  card.appendChild(typeRow);
+
+  // 类型输入区
+  if(el.type==='text'){
+    const row=document.createElement('div');
+    row.className='form-row';
+    const lab=document.createElement('label');
+    lab.textContent='文字内容';
+    const ta=document.createElement('textarea');
+    ta.placeholder='输入要显示的文字...';
+    ta.value=el.text;
+    ta.oninput=()=>{ el.text=ta.value; updateAll(); };
+    row.appendChild(lab); row.appendChild(ta);
+    card.appendChild(row);
+  }else if(el.type==='selector'){
+    const row=document.createElement('div');
+    row.className='form-row';
+    const lab=document.createElement('label');
+    lab.textContent='选择器（如 @p、@a、@e[type=zombie]）';
+    const inp=document.createElement('input');
+    inp.type='text';
+    inp.value=el.selector;
+    inp.oninput=()=>{ el.selector=inp.value; updateAll(); };
+    row.appendChild(lab); row.appendChild(inp);
+    card.appendChild(row);
+  }else if(el.type==='score'){
+    const r1=document.createElement('div');
+    r1.className='form-row';
+    const l1=document.createElement('label');
+    l1.textContent='记分板名称（如 @p）';
+    const i1=document.createElement('input');
+    i1.type='text';
+    i1.value=el.scoreName;
+    i1.oninput=()=>{ el.scoreName=i1.value; updateAll(); };
+    r1.appendChild(l1); r1.appendChild(i1);
+    card.appendChild(r1);
+    const r2=document.createElement('div');
+    r2.className='form-row';
+    const l2=document.createElement('label');
+    l2.textContent='计分板目标（如 kills）';
+    const i2=document.createElement('input');
+    i2.type='text';
+    i2.value=el.scoreObj;
+    i2.oninput=()=>{ el.scoreObj=i2.value; updateAll(); };
+    r2.appendChild(l2); r2.appendChild(i2);
+    card.appendChild(r2);
+  }else if(el.type==='translate'){
+    const r1=document.createElement('div');
+    r1.className='form-row';
+    const l1=document.createElement('label');
+    l1.textContent='翻译键（如 item.minecraft.diamond）';
+    const i1=document.createElement('input');
+    i1.type='text';
+    i1.value=el.translate;
+    i1.oninput=()=>{ el.translate=i1.value; updateAll(); };
+    r1.appendChild(l1); r1.appendChild(i1);
+    card.appendChild(r1);
+    const r2=document.createElement('div');
+    r2.className='form-row';
+    const l2=document.createElement('label');
+    l2.textContent='with 参数（可选，逗号分隔多个文本）';
+    const i2=document.createElement('input');
+    i2.type='text';
+    i2.value=el.withText;
+    i2.oninput=()=>{ el.withText=i2.value; updateAll(); };
+    r2.appendChild(l2); r2.appendChild(i2);
+    card.appendChild(r2);
+  }
+
+  // 颜色
+  const cRow=document.createElement('div');
+  cRow.className='form-row';
+  const cLab=document.createElement('label');
+  cLab.textContent='颜色';
+  const chips=document.createElement('div');
+  chips.className='color-row';
+  colors.forEach(([name,hex,title])=>{
+    const c=document.createElement('div');
+    c.className='color-chip'+(el.color===name?' selected':'');
+    c.style.background=hex;
+    c.title=title;
+    c.onclick=()=>{ el.color=name; updateAll(); };
+    chips.appendChild(c);
+  });
+  cRow.appendChild(cLab); cRow.appendChild(chips);
+  card.appendChild(cRow);
+
+  // 样式
+  const sRow=document.createElement('div');
+  sRow.className='form-row';
+  const sLab=document.createElement('label');
+  sLab.textContent='样式';
+  const btns=document.createElement('div');
+  btns.className='style-row';
+  [['bold','粗体'],['strikethrough','删除线'],['underlined','下划线'],['italic','斜体']].forEach(([k,label])=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='style-btn'+(el.styles.has(k)?' active':'');
+    b.textContent=label;
+    b.onclick=()=>{
+      if(el.styles.has(k)){ el.styles.delete(k); } else { el.styles.add(k); }
+      updateAll();
+    };
+    btns.appendChild(b);
+  });
+  sRow.appendChild(sLab); sRow.appendChild(btns);
+  card.appendChild(sRow);
+
+  box.appendChild(card);
+});
+}
+
+function addElem(){
+elems.push(newElem('text'));
+renderElems();
+}
+
+/* ===== 生成 JSON ===== */
+function elemToJson(el){
+const obj={};
+if(currentVer==='netease' && el.type==='text'){
+  let codes='§'+secCode[el.color];
+  ['bold','italic','underlined','strikethrough'].forEach(s=>{
+    if(el.styles.has(s)) codes+='§'+styleCode[s];
+  });
+  obj.text=codes+(el.text||' ');
+  return obj;
+}
+if(el.type==='text'){
+  obj.text=el.text||' ';
+}else if(el.type==='selector'){
+  obj.selector=el.selector||'@p';
+}else if(el.type==='score'){
+  obj.score={name:el.scoreName||'@p',objective:el.scoreObj||''};
+}else if(el.type==='translate'){
+  obj.translate=el.translate||'';
+  if(el.withText.trim()){
+    obj.with=el.withText.split(/[,，]/).map(s=>s.trim()).filter(s=>s).map(s=>({text:s}));
+  }
+}
+// 颜色与样式（网易版仅 text 走 § 码，其他类型不带 color 字段）
+if(currentVer==='java'){
+  obj.color=el.color;
+  if(el.styles.has('bold')) obj.bold=true;
+  if(el.styles.has('italic')) obj.italic=true;
+  if(el.styles.has('underlined')) obj.underlined=true;
+  if(el.styles.has('strikethrough')) obj.strikethrough=true;
+}
+return obj;
+}
+
+function buildJson(){
+if(elems.length===0) return '';
+const list=elems.map(elemToJson);
+return JSON.stringify(list.length===1?list[0]:list);
+}
+
+/* ===== 预览 ===== */
+function getCssColor(name){
 const map={
 'black':'#000','dark_blue':'#00a','dark_green':'#0a0','dark_aqua':'#0aa',
 'dark_red':'#a00','dark_purple':'#a0a','gold':'#fa0','gray':'#aaa',
 'dark_gray':'#555','blue':'#55f','green':'#5f5','aqua':'#5ff',
 'red':'#f55','light_purple':'#f5f','yellow':'#ff5','white':'#fff'
 };
-return map[currentColor]||'#fff';
+return map[name]||'#fff';
 }
 
-function buildJson(){
-const text=$('#inputText').value||' ';
-const obj={};
-if(currentVer==='netease'){
-  let codes='§'+secCode[currentColor];
-  ['bold','italic','underlined','strikethrough'].forEach(s=>{
-    if(currentStyles.has(s)) codes+='§'+styleCode[s];
-  });
-  obj.text=codes+text;
-}else{
-  obj.text=text;
-  obj.color=currentColor;
-  if(currentStyles.has('bold')) obj.bold=true;
-  if(currentStyles.has('italic')) obj.italic=true;
-  if(currentStyles.has('underlined')) obj.underlined=true;
-  if(currentStyles.has('strikethrough')) obj.strikethrough=true;
+function elemPreviewHtml(el){
+let text;
+if(el.type==='text'){
+  text=el.text||' ';
+}else if(el.type==='selector'){
+  text='['+el.selector+']';
+}else if(el.type==='score'){
+  text='['+(el.scoreName||'@p')+' · '+(el.scoreObj||'?')+']';
+}else if(el.type==='translate'){
+  text='[翻译: '+(el.translate||'?')+']';
 }
-return JSON.stringify(obj);
-}
-
-function updatePreview(){
-const text=$('#inputText').value||' ';
-let styleCss='';
-if(currentStyles.has('bold')) styleCss+='font-weight:bold;';
-if(currentStyles.has('italic')) styleCss+='font-style:italic;';
-if(currentStyles.has('underlined')) styleCss+='text-decoration:underline;';
-if(currentStyles.has('strikethrough')) styleCss+='text-decoration:line-through;';
-$('#previewBox').innerHTML='<span style="color:'+getCssColor()+';'+styleCss+'">'+escapeHtml(text)+'</span>';
-$('#outputBox').textContent=buildJson();
+let css='color:'+getCssColor(el.color)+';';
+if(el.styles.has('bold')) css+='font-weight:bold;';
+if(el.styles.has('italic')) css+='font-style:italic;';
+if(el.styles.has('underlined')) css+='text-decoration:underline;';
+if(el.styles.has('strikethrough')) css+='text-decoration:line-through;';
+return '<span style="'+css+'">'+escapeHtml(text)+'</span>';
 }
 
 function escapeHtml(s){
 return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function updateAll(){
+renderElems();
+$('#previewBox').innerHTML=elems.map(elemPreviewHtml).join('');
+$('#outputBox').textContent=buildJson();
+}
+
+/* ===== 复制 / 重置 ===== */
 function copyCode(){
 const code=$('#outputBox').textContent;
+if(!code) return;
 navigator.clipboard.writeText(code).then(()=>showToast('已复制到剪贴板')).catch(()=>{
 const r=document.createRange();
 r.selectNodeContents($('#outputBox'));
@@ -411,12 +603,9 @@ showToast('请按 Ctrl+C 复制');
 }
 
 function resetAll(){
-$('#inputText').value='欢迎来到 The Slow Tide';
-currentColor='white';
-currentStyles.clear();
-document.querySelectorAll('.color-chip').forEach((c,i)=>c.classList.toggle('selected',i===0));
-document.querySelectorAll('.style-btn').forEach(b=>b.classList.remove('active'));
-updatePreview();
+elems=[newElem('text')];
+elems[0].text='欢迎来到 The Slow Tide';
+updateAll();
 }
 
 $('#themeToggle').onclick=()=>{
@@ -426,7 +615,8 @@ localStorage.setItem('tst-theme',next);
 document.documentElement.setAttribute('data-theme',next);
 };
 
-updatePreview();
+// 初始化
+resetAll();
 </script>
 </body>
 </html>
