@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>便捷工具 - The Slow Tide</title>
+<script>
+(function(){
+var mode=localStorage.getItem('tst-theme');
+if(mode!=='dark' && mode!=='light'){ mode='light'; }
+document.documentElement.setAttribute('data-theme',mode);
+})();
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+--bg:#f3f5f8;
+--text:#1f2937;
+--text-secondary:#5b6675;
+--border:#e2e8f0;
+--card:#ffffff;
+--hover:#eef2f7;
+--header-bg:rgba(255,255,255,.92);
+--primary:#0f172a;
+--accent:#52525b;
+--accent-soft:rgba(82,82,91,.1);
+--shadow:0 4px 14px rgba(15,23,42,.07);
+--hero-grad:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
+}
+html[data-theme="dark"]{
+--bg:#111113;
+--text:#e5e5e7;
+--text-secondary:#9a9aa0;
+--border:#26262b;
+--card:#18181b;
+--hover:#222226;
+--header-bg:rgba(17,17,19,.92);
+--primary:#f4f4f5;
+--accent:#a1a1aa;
+--accent-soft:rgba(161,161,170,.14);
+--shadow:0 4px 14px rgba(0,0,0,.5);
+--hero-grad:linear-gradient(135deg,#0a0a0b 0%,#18181b 100%);
+}
+html[data-theme="dark"] .btn-primary{background:#71717a;}
+body{
+background:var(--bg);
+color:var(--text);
+font-family:system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.65;
+}
+.container{max-width:1140px;margin:0 auto;padding:0 16px;}
+a{color:var(--accent);text-decoration:none;}
+button{font-family:inherit;}
+
+/* ===== 顶部导航 ===== */
+.site-header{
+position:sticky;top:0;z-index:100;
+background:var(--header-bg);
+backdrop-filter:blur(10px);
+border-bottom:1px solid var(--border);
+}
+.header-inner{
+display:flex;align-items:center;gap:18px;
+min-height:62px;
+flex-wrap:wrap;
+}
+.logo{
+font-size:20px;font-weight:700;color:var(--primary);
+display:flex;align-items:center;gap:8px;white-space:nowrap;
+}
+.logo-mark{
+width:34px;height:34px;border-radius:4px;
+background:var(--hero-grad);
+color:#fff;display:flex;align-items:center;justify-content:center;
+font-size:18px;flex:none;
+}
+.logo-img{
+width:34px;height:34px;border-radius:4px;
+object-fit:cover;flex:none;display:block;
+}
+html[data-theme="dark"] .logo-img{filter:invert(1);}
+.main-nav{
+display:flex;gap:2px;flex:1;flex-wrap:wrap;
+}
+.nav-link{
+padding:8px 12px;border-radius:6px;border:none;background:transparent;
+color:var(--text);font-size:14px;cursor:pointer;white-space:nowrap;
+}
+.nav-link:hover{background:var(--hover);}
+.nav-link.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+.header-right{
+display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;
+}
+.btn{
+padding:8px 14px;border-radius:6px;border:1px solid var(--border);
+background:var(--card);color:var(--text);cursor:pointer;font-size:14px;white-space:nowrap;
+}
+.btn:hover{background:var(--hover);}
+.btn-primary{
+background:#52525b;
+border:none;color:#fff;font-weight:600;
+}
+.btn-primary:hover{filter:brightness(1.06);}
+.theme-toggle{
+position:relative;width:54px;height:28px;flex:none;
+border:1px solid var(--border);background:var(--card);
+border-radius:14px;cursor:pointer;padding:0;overflow:hidden;
+}
+.theme-toggle .tt-ic{
+position:absolute;top:50%;transform:translateY(-50%);
+font-size:13px;line-height:1;pointer-events:none;
+}
+.theme-toggle .tt-sun{left:8px;opacity:.75;}
+.theme-toggle .tt-moon{right:8px;opacity:.75;}
+.theme-toggle .tt-thumb{
+position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
+background:var(--accent);display:flex;align-items:center;justify-content:center;
+font-size:11px;color:#fff;transition:left .28s cubic-bezier(.4,0,.2,1),background-color .28s;
+}
+html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
+body,.site-header,.card,.btn,.theme-toggle{
+transition:background-color .3s ease,color .3s ease,border-color .3s ease;
+}
+
+/* ===== 页面内容 ===== */
+.section{padding:26px 0;}
+.section-title{
+display:flex;align-items:center;gap:10px;
+font-size:21px;font-weight:700;margin-bottom:18px;color:var(--primary);
+}
+.section-title::before{
+content:'';width:5px;height:22px;border-radius:0;background:var(--accent);
+}
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.tool-card{
+background:var(--card);border:1px solid var(--border);border-radius:10px;
+padding:20px;box-shadow:var(--shadow);cursor:pointer;
+transition:transform .2s ease,box-shadow .2s ease;
+}
+.tool-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.1);}
+.tool-card h3{font-size:17px;margin-bottom:8px;}
+.tool-card p{font-size:14px;color:var(--text-secondary);}
+.tool-icon{
+width:48px;height:48px;border-radius:10px;background:var(--accent-soft);
+display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px;
+}
+
+/* ===== 编译器界面 ===== */
+.compiler-wrap{display:none;}
+.compiler-wrap.show{display:block;}
+.compiler-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:720px){.compiler-grid{grid-template-columns:1fr;}}
+.card{
+background:var(--card);border:1px solid var(--border);border-radius:10px;
+padding:18px;box-shadow:var(--shadow);
+}
+.card h3{font-size:16px;margin-bottom:14px;}
+.form-row{margin-bottom:12px;}
+.form-row label{display:block;font-size:13px;color:var(--text-secondary);margin-bottom:5px;}
+.form-row input[type="text"],.form-row textarea{
+width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;
+background:var(--bg);color:var(--text);font-size:14px;outline:none;font-family:inherit;
+}
+.form-row input:focus,.form-row textarea:focus{border-color:var(--accent);}
+.form-row textarea{min-height:80px;resize:vertical;}
+.color-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.color-chip{
+width:32px;height:32px;border-radius:6px;cursor:pointer;
+border:2px solid transparent;transition:border-color .2s;
+}
+.color-chip.selected{border-color:var(--primary);box-shadow:0 0 0 2px var(--bg);}
+.style-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.style-btn{
+padding:6px 14px;border:1px solid var(--border);border-radius:6px;
+background:var(--bg);color:var(--text);cursor:pointer;font-size:13px;
+}
+.style-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.preview-box{
+background:#1a1a1a;color:#fff;padding:16px;border-radius:8px;
+min-height:80px;font-size:18px;margin-top:10px;
+word-break:break-all;white-space:pre-wrap;
+}
+.output-box{
+background:var(--bg);border:1px solid var(--border);border-radius:6px;
+padding:12px;font-family:ui-monospace,Consolas,monospace;font-size:13px;
+word-break:break-all;min-height:60px;color:var(--text);
+}
+.btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.back-btn{margin-bottom:16px;}
+.toast-wrap{
+position:fixed;left:50%;bottom:34px;transform:translateX(-50%);z-index:300;
+}
+.toast-item{
+background:var(--primary);color:var(--bg);padding:9px 18px;border-radius:6px;
+font-size:14px;box-shadow:var(--shadow);
+}
+.hint{font-size:12px;color:var(--text-secondary);margin-top:6px;}
+</style>
+</head>
+<body>
+<header class="site-header">
+<div class="container header-inner">
+<div class="logo"><img src="logo.jpg" alt="The Slow Tide" class="logo-img"> The Slow Tide</div>
+<nav class="main-nav" id="mainNav">
+<a class="nav-link" href="index.html">首页</a>
+<a class="nav-link" href="index.html#notice">公告</a>
+<a class="nav-link active" href="tool.html">便捷工具</a>
+<a class="nav-link" href="profile.html">我的</a>
+</nav>
+<div class="header-right">
+<a class="nav-link" href="index.html" style="font-size:14px;">返回官网</a>
+<button class="theme-toggle" id="themeToggle" title="切换主题">
+<span class="tt-ic tt-sun">☀</span>
+<span class="tt-ic tt-moon">☾</span>
+<span class="tt-thumb" id="themeThumb"></span>
+</button>
+</div>
+</div>
+</header>
+
+<section class="section">
+<div class="container">
+
+<!-- 工具列表 -->
+<div id="toolList">
+<div class="section-title">便捷工具</div>
+<div class="tool-grid">
+<div class="tool-card" onclick="openCompiler()">
+<div class="tool-icon">Aa</div>
+<h3>T显编译器</h3>
+<p>编辑标题/聊天文字的颜色与样式，自动生成 Minecraft 可用的格式化代码。</p>
+</div>
+</div>
+</div>
+
+<!-- 编译器 -->
+<div id="compilerPage" class="compiler-wrap">
+<button class="btn back-btn" onclick="backToList()">← 返回工具列表</button>
+<div class="section-title">T显编译器</div>
+
+<div class="compiler-grid">
+<!-- 编辑区 -->
+<div class="card">
+<h3>编辑文字</h3>
+<div class="form-row">
+<label>输入文字</label>
+<textarea id="inputText" placeholder="输入要显示的文字..." oninput="updatePreview()">欢迎来到 The Slow Tide</textarea>
+</div>
+<div class="form-row">
+<label>颜色</label>
+<div class="color-row" id="colorRow">
+<div class="color-chip selected" data-color="f" style="background:#ffffff;" title="白色"></div>
+<div class="color-chip" data-color="0" style="background:#000000;" title="黑色"></div>
+<div class="color-chip" data-color="1" style="background:#0000aa;" title="深蓝"></div>
+<div class="color-chip" data-color="2" style="background:#00aa00;" title="深绿"></div>
+<div class="color-chip" data-color="3" style="background:#00aaaa;" title="深蓝绿"></div>
+<div class="color-chip" data-color="4" style="background:#aa0000;" title="深红"></div>
+<div class="color-chip" data-color="5" style="background:#aa00aa;" title="紫色"></div>
+<div class="color-chip" data-color="6" style="background:#ffaa00;" title="金色"></div>
+<div class="color-chip" data-color="7" style="background:#aaaaaa;" title="灰色"></div>
+<div class="color-chip" data-color="8" style="background:#555555;" title="深灰"></div>
+<div class="color-chip" data-color="9" style="background:#5555ff;" title="蓝色"></div>
+<div class="color-chip" data-color="a" style="background:#55ff55;" title="绿色"></div>
+<div class="color-chip" data-color="b" style="background:#55ffff;" title="天蓝"></div>
+<div class="color-chip" data-color="c" style="background:#ff5555;" title="红色"></div>
+<div class="color-chip" data-color="d" style="background:#ff55ff;" title="粉色"></div>
+<div class="color-chip" data-color="e" style="background:#ffff55;" title="黄色"></div>
+</div>
+</div>
+<div class="form-row">
+<label>样式</label>
+<div class="style-row">
+<button class="style-btn" data-style="l" onclick="toggleStyle(this)">粗体</button>
+<button class="style-btn" data-style="m" onclick="toggleStyle(this)">删除线</button>
+<button class="style-btn" data-style="n" onclick="toggleStyle(this)">下划线</button>
+<button class="style-btn" data-style="o" onclick="toggleStyle(this)">斜体</button>
+</div>
+</div>
+</div>
+
+<!-- 预览区 -->
+<div class="card">
+<h3>预览</h3>
+<div class="preview-box" id="previewBox">欢迎来到 The Slow Tide</div>
+<div class="form-row" style="margin-top:14px;">
+<label>生成的代码（复制到游戏内使用）</label>
+<div class="output-box" id="outputBox">§f欢迎来到 The Slow Tide</div>
+<div class="hint">基岩版聊天框使用 § 符号，将生成的代码直接粘贴到聊天即可。</div>
+</div>
+<div class="btn-row">
+<button class="btn btn-primary" onclick="copyCode()">复制代码</button>
+<button class="btn" onclick="resetAll()">重置</button>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</section>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+let currentColor='f';
+let currentStyles=new Set();
+
+function showToast(msg){
+const w=$('#toastWrap');
+const d=document.createElement('div');
+d.className='toast-item';
+d.textContent=msg;
+w.appendChild(d);
+setTimeout(()=>d.remove(),2000);
+}
+
+function openCompiler(){
+$('#toolList').style.display='none';
+$('#compilerPage').classList.add('show');
+}
+function backToList(){
+$('#compilerPage').classList.remove('show');
+$('#toolList').style.display='block';
+}
+
+document.querySelectorAll('.color-chip').forEach(chip=>{
+chip.onclick=()=>{
+document.querySelectorAll('.color-chip').forEach(c=>c.classList.remove('selected'));
+chip.classList.add('selected');
+currentColor=chip.dataset.color;
+updatePreview();
+};
+});
+
+function toggleStyle(btn){
+btn.classList.toggle('active');
+const s=btn.dataset.style;
+if(currentStyles.has(s)){ currentStyles.delete(s); } else { currentStyles.add(s); }
+updatePreview();
+}
+
+function getCodePrefix(){
+let pre='§'+currentColor;
+currentStyles.forEach(s=>{ pre+='§'+s; });
+return pre;
+}
+
+function getCssColor(){
+const map={
+'0':'#000','1':'#00a','2':'#0a0','3':'#0aa','4':'#a00','5':'#a0a',
+'6':'#fa0','7':'#aaa','8':'#555','9':'#55f','a':'#5f5','b':'#5ff',
+'c':'#f55','d':'#f5f','e':'#ff5','f':'#fff'
+};
+return map[currentColor]||'#fff';
+}
+
+function updatePreview(){
+const text=$('#inputText').value||' ';
+const pre=getCodePrefix();
+let styleCss='';
+if(currentStyles.has('l')) styleCss+='font-weight:bold;';
+if(currentStyles.has('o')) styleCss+='font-style:italic;';
+if(currentStyles.has('n')) styleCss+='text-decoration:underline;';
+if(currentStyles.has('m')) styleCss+='text-decoration:line-through;';
+
+$('#previewBox').innerHTML='<span style="color:'+getCssColor()+';'+styleCss+'">'+escapeHtml(text)+'</span>';
+$('#outputBox').textContent=pre+text;
+}
+
+function escapeHtml(s){
+return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyCode(){
+const code=$('#outputBox').textContent;
+navigator.clipboard.writeText(code).then(()=>showToast('已复制到剪贴板')).catch(()=>{
+const r=document.createRange();
+r.selectNodeContents($('#outputBox'));
+const sel=window.getSelection();
+sel.removeAllRanges();
+sel.addRange(r);
+showToast('请按 Ctrl+C 复制');
+});
+}
+
+function resetAll(){
+$('#inputText').value='欢迎来到 The Slow Tide';
+currentColor='f';
+currentStyles.clear();
+document.querySelectorAll('.color-chip').forEach((c,i)=>c.classList.toggle('selected',i===0));
+document.querySelectorAll('.style-btn').forEach(b=>b.classList.remove('active'));
+updatePreview();
+}
+
+$('#themeToggle').onclick=()=>{
+const cur=localStorage.getItem('tst-theme')||'light';
+const next=cur==='dark'?'light':'dark';
+localStorage.setItem('tst-theme',next);
+document.documentElement.setAttribute('data-theme',next);
+};
+
+updatePreview();
+</script>
+</body>
+</html>
