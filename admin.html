@@ -260,7 +260,7 @@ async function renderLottery(){
   if(!d)return;
   if(!d.ok){el.innerHTML='<div class="empty-hint">'+(d.error==='bad_password'?'密码错误':'加载失败')+'</div>';return;}
   const list=d.codes||[];
-  el.innerHTML=list.map(c=>'<div class="admin-list-item"><div><strong>'+esc(c.prize)+'</strong> <span class="meta">#'+esc(c.seq)+'</span><div class="meta">码：'+esc(c.code)+' · 权重 '+esc(c.weight)+'</div>'+(c.claimed?'<div class="meta" style="color:#b91c1c;">已使用'+(c.claimed_at_cn?' · '+esc(c.claimed_at_cn):'')+'</div>':'<div class="meta" style="color:#047857;">未使用</div>')+'</div><div class="ops">'<button class="btn btn-sm" data-lt-w="'+esc(c.id)+'">改权重</button><button class="btn btn-sm" data-lt-p="'+esc(c.id)+'">改奖品</button><button class="btn btn-sm btn-danger" data-lt-del="'+esc(c.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无兑换码</div>';
+  el.innerHTML=list.map(c=>'<div class="admin-list-item"><div><strong>'+esc(c.prize)+'</strong> <span class="meta">#'+esc(c.seq)+'</span><div class="meta">码：'+esc(c.code)+' · 权重 '+esc(c.weight)+'</div>'+(c.claimed?'<div class="meta" style="color:#b91c1c;">已使用'+(c.claimed_at_cn?' · '+esc(c.claimed_at_cn):'')+'</div>':'<div class="meta" style="color:#047857;">未使用</div>')+'</div><div class="ops"><button class="btn btn-sm" data-lt-w="'+esc(c.id)+'">改权重</button><button class="btn btn-sm" data-lt-p="'+esc(c.id)+'">改奖品</button><button class="btn btn-sm btn-danger" data-lt-del="'+esc(c.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无兑换码</div>';
 }
 $('#ltRefreshBtn').onclick=renderLottery;
 $('#ltAddBtn').onclick=async()=>{
