@@ -379,6 +379,27 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 .slide-item img{height:200px;}
 .card-grid{grid-template-columns:1fr;}
 }
+/* 登录弹窗 */
+.auth-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:500;}
+.auth-modal.open{display:flex;}
+.auth-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;width:340px;max-width:92vw;box-shadow:var(--shadow);position:relative;}
+.auth-close{position:absolute;top:10px;right:14px;background:none;border:none;font-size:22px;color:var(--text-secondary);cursor:pointer;line-height:1;}
+.auth-box h3{margin-bottom:12px;font-size:18px;color:var(--primary);}
+.auth-tabs{display:flex;gap:4px;margin-bottom:14px;background:var(--bg);border-radius:8px;padding:4px;}
+.auth-tab{flex:1;padding:7px;border:none;border-radius:6px;background:transparent;color:var(--text-secondary);cursor:pointer;font-size:14px;}
+.auth-tab.active{background:var(--card);color:var(--accent);font-weight:600;box-shadow:var(--shadow);}
+.auth-tip{font-size:13px;color:var(--text-secondary);margin:8px 0;min-height:18px;}
+.auth-tip.err{color:#dc2626;}
+.auth-tip.ok{color:#16a34a;}
+.auth-submit{width:100%;margin-top:4px;}
+@media(max-width:480px){.auth-box{width:92vw;}}
+
+/* 活动页 */
+.activity-card{display:flex;flex-direction:column;gap:8px;}
+.activity-meta{font-size:13px;color:var(--text-secondary);}
+.activity-join{margin-top:4px;}
+.activity-joined{background:#ecfdf5;border-color:#a7f3d0;color:#047857;font-weight:600;}
+html[data-theme="dark"] .activity-joined{background:rgba(4,120,87,.18);color:#6ee7b7;}
 </style>
 </head>
 <body>
@@ -389,6 +410,7 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <button class="nav-link active" data-nav="home">首页</button>
 <button class="nav-link" data-nav="notice">公告</button>
 <button class="nav-link" data-nav="feed">动态</button>
+<button class="nav-link" data-nav="activity">活动</button>
 <a class="nav-link" href="tool.html">便捷工具</a>
 <button class="nav-link" data-nav="rule">玩家公约</button>
 <div class="nav-more" id="navMore">
@@ -407,6 +429,7 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 </div>
 <a class="feedback-btn" href="profile.html">我的</a>
 <a class="feedback-btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
+<button class="btn btn-primary" id="loginBtn">登录</button>
 <a class="btn btn-primary" href="admin.html" style="text-decoration:none;display:inline-flex;align-items:center;">管理</a>
 <button class="theme-toggle" id="themeToggle" title="切换深色/浅色" aria-label="切换主题">
 <span class="tt-ic tt-sun">☀</span>
@@ -483,6 +506,14 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <div class="container">
 <div class="section-title">服务器动态</div>
 <div id="feedList"></div>
+</div>
+</section>
+
+<!-- 活动 -->
+<section id="activity" class="page">
+<div class="container">
+<div class="section-title">活动</div>
+<div id="activityList" class="card-grid"></div>
 </div>
 </section>
 
@@ -1726,7 +1757,224 @@ loadData();
     btn.disabled=false; btn.textContent="保存";
   };
 })();
+// ============================================================
+// 登录 / 注册（Supabase Auth）
+// ============================================================
+var SUPABASE_CFG = {
+  url: '/api',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs'
+};
+var AUTH_MODE = 'login';
+var AUTH_SESSION_KEY = 'tst_auth_session';
+var authSession = null;
+try { authSession = JSON.parse(localStorage.getItem(AUTH_SESSION_KEY) || 'null'); } catch(e){ authSession = null; }
+
+function authHeaders(){
+  return {
+    'apikey': SUPABASE_CFG.anonKey,
+    'Authorization': 'Bearer ' + (authSession ? authSession.access_token : SUPABASE_CFG.anonKey),
+    'Content-Type': 'application/json'
+  };
+}
+function authFetch(path, opts){
+  return fetch(SUPABASE_CFG.url + '/auth/v1' + path, opts).then(function(r){
+    return r.text().then(function(t){
+      var data = null;
+      try { data = JSON.parse(t); } catch(e){}
+      if(!r.ok){
+        var msg = (data && data.msg) || (data && data.error_description) || (data && data.message) || ('HTTP ' + r.status);
+        var e = new Error(msg); e.status = r.status; e.data = data; throw e;
+      }
+      return data;
+    });
+  });
+}
+
+function doLogin(){
+  var email = document.getElementById('authEmail').value.trim();
+  var pwd = document.getElementById('authPwd').value;
+  var tip = document.getElementById('authTip');
+  tip.className = 'auth-tip'; tip.textContent = '';
+  if(!email || !pwd){ tip.className='auth-tip err'; tip.textContent='请输入邮箱和密码'; return; }
+  var btn = document.getElementById('authSubmit');
+  btn.disabled = true; btn.textContent = '登录中...';
+  authFetch('/token?grant_type=password', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ email: email, password: pwd })
+  }).then(function(data){
+    authSession = { access_token: data.access_token, refresh_token: data.refresh_token, user: data.user };
+    try { localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(authSession)); } catch(e){}
+    applyAuthUI();
+    closeAuthModal();
+    showToast('登录成功');
+    renderActivities();
+  }).catch(function(e){
+    tip.className='auth-tip err'; tip.textContent = '登录失败：' + e.message;
+  }).finally(function(){
+    btn.disabled = false; btn.textContent = AUTH_MODE === 'login' ? '登录' : '注册';
+  });
+}
+
+function doRegister(){
+  var email = document.getElementById('authEmail').value.trim();
+  var pwd = document.getElementById('authPwd').value;
+  var nick = document.getElementById('authNick').value.trim();
+  var tip = document.getElementById('authTip');
+  tip.className = 'auth-tip'; tip.textContent = '';
+  if(!email || !pwd){ tip.className='auth-tip err'; tip.textContent='请输入邮箱和密码'; return; }
+  if(pwd.length < 6){ tip.className='auth-tip err'; tip.textContent='密码至少 6 位'; return; }
+  var btn = document.getElementById('authSubmit');
+  btn.disabled = true; btn.textContent = '注册中...';
+  authFetch('/signup', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ email: email, password: pwd, data: { nick: nick || '' } })
+  }).then(function(data){
+    if(data && data.access_token){
+      authSession = { access_token: data.access_token, refresh_token: data.refresh_token, user: data.user };
+      try { localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(authSession)); } catch(e){}
+      applyAuthUI();
+      closeAuthModal();
+      showToast('注册成功');
+      renderActivities();
+    } else {
+      tip.className='auth-tip ok';
+      tip.textContent = '注册成功，请前往邮箱完成验证后登录';
+      setAuthMode('login');
+    }
+  }).catch(function(e){
+    tip.className='auth-tip err'; tip.textContent = '注册失败：' + e.message;
+  }).finally(function(){
+    btn.disabled = false; btn.textContent = AUTH_MODE === 'login' ? '登录' : '注册';
+  });
+}
+
+function setAuthMode(mode){
+  AUTH_MODE = mode;
+  document.getElementById('authTitle').textContent = mode === 'login' ? '登录' : '注册';
+  document.getElementById('authSubmit').textContent = mode === 'login' ? '登录' : '注册';
+  document.getElementById('authNickRow').style.display = mode === 'register' ? 'block' : 'none';
+  document.querySelectorAll('.auth-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.mode === mode); });
+  document.getElementById('authTip').textContent = '';
+}
+
+function openAuthModal(mode){
+  setAuthMode(mode || 'login');
+  document.getElementById('authModal').classList.add('open');
+}
+function closeAuthModal(){
+  document.getElementById('authModal').classList.remove('open');
+}
+function logoutUser(){
+  authSession = null;
+  try { localStorage.removeItem(AUTH_SESSION_KEY); } catch(e){}
+  applyAuthUI();
+  renderActivities();
+  showToast('已退出登录');
+}
+
+function applyAuthUI(){
+  var btn = document.getElementById('loginBtn');
+  if(authSession && authSession.user){
+    var nick = (authSession.user.user_metadata && authSession.user.user_metadata.nick) || authSession.user.email;
+    btn.textContent = nick;
+    btn.onclick = function(){ logoutUser(); };
+  } else {
+    btn.textContent = '登录';
+    btn.onclick = function(){ openAuthModal('login'); };
+  }
+}
+
+function initAuth(){
+  var modal = document.getElementById('authModal');
+  if(!modal) return;
+  document.getElementById('authClose').onclick = closeAuthModal;
+  modal.addEventListener('click', function(e){ if(e.target === modal) closeAuthModal(); });
+  document.getElementById('authSubmit').onclick = function(){ AUTH_MODE === 'login' ? doLogin() : doRegister(); };
+  document.getElementById('authPwd').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ AUTH_MODE === 'login' ? doLogin() : doRegister(); } });
+  document.getElementById('authEmail').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ AUTH_MODE === 'login' ? doLogin() : doRegister(); } });
+  applyAuthUI();
+}
+
+// ============================================================
+// 活动
+// ============================================================
+var ACTIVITIES = [
+  { id: 'act1', title: 'S1 裂痕杯 · 报名', desc: '服务器首个官方 PVP 赛事，单人淘汰制，自备装备。报名需登录。', status: '筹备中', join: true, start: '待定' },
+  { id: 'act2', title: '中秋签到活动', desc: '活动期间每日登录服务器签到，累计可获得限定纪念品。', status: '进行中', join: true, start: '2026-09-25' }
+];
+var JOINED_KEY = 'tst_joined_activities';
+var joinedActs = new Set();
+try { JSON.parse(localStorage.getItem(JOINED_KEY) || '[]').forEach(function(id){ joinedActs.add(id); }); } catch(e){}
+
+function renderActivities(){
+  var wrap = document.getElementById('activityList');
+  if(!wrap) return;
+  if(ACTIVITIES.length === 0){ wrap.innerHTML = '<p class="empty-hint">暂无活动</p>'; return; }
+  wrap.innerHTML = ACTIVITIES.map(function(a){
+    var joined = joinedActs.has(a.id);
+    var btnHtml = '';
+    if(a.join){
+      if(joined){
+        btnHtml = '<button class="btn activity-joined" disabled>已参与</button>';
+      } else {
+        btnHtml = '<button class="btn btn-primary activity-join" data-act="' + a.id + '">参与</button>';
+      }
+    }
+    return '<div class="card activity-card">' +
+      '<h3>' + a.title + '</h3>' +
+      '<p class="date">状态：' + a.status + (a.start ? ' ｜ 开始：' + a.start : '') + '</p>' +
+      '<div class="content">' + a.desc + '</div>' +
+      btnHtml +
+      '</div>';
+  }).join('');
+  wrap.querySelectorAll('.activity-join').forEach(function(b){
+    b.onclick = function(){
+      if(!authSession){
+        showToast('请先登录后再参与活动');
+        openAuthModal('login');
+        return;
+      }
+      var id = b.dataset.act;
+      joinedActs.add(id);
+      try { localStorage.setItem(JOINED_KEY, JSON.stringify(Array.from(joinedActs))); } catch(e){}
+      b.outerHTML = '<button class="btn activity-joined" disabled>已参与</button>';
+      showToast('参与成功');
+    };
+  });
+}
+
+function initAuthDeferred(){ initAuth(); renderActivities(); }
+if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', initAuthDeferred); } else { initAuthDeferred(); }
+
 </script>
+
+<!-- 登录 / 注册弹窗 -->
+<div class="auth-modal" id="authModal">
+<div class="auth-box">
+<button class="auth-close" id="authClose" title="关闭">&times;</button>
+<h3 id="authTitle">登录</h3>
+<div class="auth-tabs" id="authTabs">
+<button class="auth-tab active" data-mode="login" onclick="setAuthMode('login')">登录</button>
+<button class="auth-tab" data-mode="register" onclick="setAuthMode('register')">注册</button>
+</div>
+<div class="form-row">
+<label>邮箱</label>
+<input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
+</div>
+<div class="form-row">
+<label>密码</label>
+<input type="password" id="authPwd" placeholder="至少 6 位" autocomplete="current-password">
+</div>
+<div class="form-row" id="authNickRow" style="display:none;">
+<label>游戏ID（选填）</label>
+<input type="text" id="authNick" placeholder="游戏内昵称" autocomplete="nickname">
+</div>
+<div class="auth-tip" id="authTip"></div>
+<button class="btn btn-primary auth-submit" id="authSubmit">登录</button>
+</div>
+</div>
 
 </body>
 </html>
