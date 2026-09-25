@@ -2018,7 +2018,7 @@ function doLottery(){
   fetch('/api/rest/rpc/draw_lottery',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({device:getDeviceId()})
+    body:JSON.stringify({p_device:getDeviceId()})
   }).then(function(res){return res.json();}).then(function(res){
     if(res && res.ok){
       var p=LOTTERY_PRIZES[(res.seq-1+LOTTERY_PRIZES.length)%LOTTERY_PRIZES.length];

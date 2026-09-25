@@ -250,7 +250,7 @@ async function refreshLists(){await loadData();renderNotices();renderFeeds();ren
 function lotteryApi(action,payload){
   const pwd=$('#ltPwd').value.trim();
   if(!pwd){showToast('请输入管理员密码');return Promise.resolve(null);}
-  return fetch('/api/rest/rpc/admin_lottery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pwd,action,payload:payload||{}})}).then(r=>r.json()).catch(()=>{showToast('请求失败');return null;});
+  return fetch('/api/rest/rpc/admin_lottery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({p_pwd:pwd,p_action:action,p_payload:payload||{}})}).then(r=>r.json()).catch(()=>{showToast('请求失败');return null;});
 }
 async function renderLottery(){
   const el=$('#ltList');if(!el)return;
