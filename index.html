@@ -672,7 +672,7 @@ html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
 <li>QQ交流群：833470853</li>
 <li>服务器：mc.163.com/open/mc_realms/?realms=270239C36AD</li>
 <li><a href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">问题反馈</a></li>
-<li><a href="https://github.com/severuszx/TST" target="_blank" rel="noopener" title="开源：源代码公开，任何人可查看、学习或改进，这是本站源码仓库">开源仓库</a></li>
+<li><a href="https://github.com/severuszx/TST" target="_blank" rel="noopener" title="开源：源代码公开，任何人可查看、学习或改进，这是本站源码仓库" onclick="openOs();return false;">开源仓库</a></li>
 </ul>
 </div>
 </div>
@@ -683,6 +683,19 @@ html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
 <button class="back-top" id="backTop" title="回到顶部">↑</button>
 <div class="toast-wrap" id="toastWrap"></div>
 
+
+<!-- 开源说明弹窗 -->
+<div class="modal-mask" id="osModal">
+<div class="modal">
+<button class="modal-close" id="osClose">✕</button>
+<h2>开源仓库</h2>
+<p style="font-size:14px;line-height:1.9;color:var(--text);">开源就是源代码公开：任何人都可以查看、学习甚至改进这套代码。本站的全部源代码托管在 GitHub 上，点下方按钮即可前往查看。</p>
+<div style="display:flex;gap:10px;margin-top:18px;">
+<button class="btn btn-primary" id="osGo">前往查看</button>
+<button class="btn" id="osCancel">知道了</button>
+</div>
+</div>
+</div>
 
 <!-- 管理面板 -->
 <div class="modal-mask" id="adminModal">
@@ -1387,6 +1400,13 @@ initSuggest('ruleSearchInput','ruleSuggest',(kw)=>doRuleSearch(kw));
 // ============================================================
 // 管理员面板
 // ============================================================
+const osModal=$('#osModal');
+function openOs(){ if(osModal) osModal.classList.add('open'); }
+function closeOs(){ if(osModal) osModal.classList.remove('open'); }
+$('#osClose').onclick=closeOs;
+$('#osCancel').onclick=closeOs;
+$('#osGo').onclick=()=>{ closeOs(); window.open('https://github.com/severuszx/TST','_blank'); };
+osModal.addEventListener('click',(e)=>{ if(e.target===osModal){ closeOs(); } });
 let ADMIN_TOKEN=sessionStorage.getItem('tst_admin_token')||'';
 const adminModal=$('#adminModal');
 function openAdmin(){

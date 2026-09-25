@@ -194,7 +194,7 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 <button class="btn btn-primary" id="ltAddBtn">添加</button>
 </div>
 </div>
-<div class="hint" style="font-size:12px;color:var(--text-secondary);margin-top:6px;">权重越小越难抽中。已使用的兑换码不可删除，仅可查看。</div>
+<div class="hint" style="font-size:12px;color:var(--text-secondary);margin-top:6px;">权重越小越难抽中。已使用的兑换码同样可删除。</div>
 <button class="btn" id="ltRefreshBtn" style="margin-top:10px;">刷新列表</button>
 </div>
 <div id="ltList"></div>
@@ -260,7 +260,7 @@ async function renderLottery(){
   if(!d)return;
   if(!d.ok){el.innerHTML='<div class="empty-hint">'+(d.error==='bad_password'?'密码错误':'加载失败')+'</div>';return;}
   const list=d.codes||[];
-  el.innerHTML=list.map(c=>'<div class="admin-list-item"><div><strong>'+esc(c.prize)+'</strong> <span class="meta">#'+esc(c.seq)+'</span><div class="meta">码：'+esc(c.code)+' · 权重 '+esc(c.weight)+'</div>'+(c.claimed?'<div class="meta" style="color:#b91c1c;">已使用'+(c.claimed_at_cn?' · '+esc(c.claimed_at_cn):'')+'</div>':'<div class="meta" style="color:#047857;">未使用</div>')+'</div><div class="ops">'+(c.claimed?'<button class="btn btn-sm" disabled>已使用</button>':'<button class="btn btn-sm" data-lt-w="'+esc(c.id)+'">改权重</button><button class="btn btn-sm" data-lt-p="'+esc(c.id)+'">改奖品</button><button class="btn btn-sm btn-danger" data-lt-del="'+esc(c.id)+'">删除</button>')+'</div></div>').join('')||'<div class="empty-hint">暂无兑换码</div>';
+  el.innerHTML=list.map(c=>'<div class="admin-list-item"><div><strong>'+esc(c.prize)+'</strong> <span class="meta">#'+esc(c.seq)+'</span><div class="meta">码：'+esc(c.code)+' · 权重 '+esc(c.weight)+'</div>'+(c.claimed?'<div class="meta" style="color:#b91c1c;">已使用'+(c.claimed_at_cn?' · '+esc(c.claimed_at_cn):'')+'</div>':'<div class="meta" style="color:#047857;">未使用</div>')+'</div><div class="ops">'<button class="btn btn-sm" data-lt-w="'+esc(c.id)+'">改权重</button><button class="btn btn-sm" data-lt-p="'+esc(c.id)+'">改奖品</button><button class="btn btn-sm btn-danger" data-lt-del="'+esc(c.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无兑换码</div>';
 }
 $('#ltRefreshBtn').onclick=renderLottery;
 $('#ltAddBtn').onclick=async()=>{
@@ -278,7 +278,7 @@ document.addEventListener('click',async e=>{
   const p=e.target.closest('[data-lt-p]');
   if(p){const v=prompt('输入新奖品名');if(v===null)return;const s=v.trim();if(!s){showToast('奖品名不能为空');return;}const d=await lotteryApi('update_prize',{id:p.dataset.ltP,prize:s});if(d&&d.ok){showToast('奖品已更新');renderLottery();}else if(d){showToast(d.error==='bad_password'?'密码错误':'更新失败');}return;}
   const del=e.target.closest('[data-lt-del]');
-  if(del){if(!confirm('确定删除此兑换码？'))return;const d=await lotteryApi('delete',{id:del.dataset.ltDel});if(d&&d.ok){showToast('已删除');renderLottery();}else if(d){showToast(d.error==='already_claimed'?'该码已使用，无法删除':(d.error==='bad_password'?'密码错误':'删除失败'));}return;}
+  if(del){if(!confirm('确定删除此兑换码？'))return;const d=await lotteryApi('delete',{id:del.dataset.ltDel});if(d&&d.ok){showToast('已删除');renderLottery();}else if(d){showToast(d.error==='bad_password'?'密码错误':'删除失败');}return;}
 });
 function renderNotices(){const list=SITE_DATA.announcements||[];$('#anList').innerHTML=list.map(a=>'<div class="admin-list-item"><div><strong>'+esc(a.title)+'</strong><div class="meta">'+esc(a.date||'')+'</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">'+esc(a.content)+'</div></div><div class="ops"><button class="btn btn-sm" data-edit="announcement" data-id="'+esc(a.id)+'">编辑</button><button class="btn btn-sm btn-danger" data-del="announcement" data-id="'+esc(a.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无公告</div>';}
 function renderFeeds(){const list=SITE_DATA.feeds||[];$('#fdList').innerHTML=list.map(f=>'<div class="admin-list-item"><div><strong>'+esc(f.title)+(f.pinned?' <span style="color:#b91c1c;">置顶</span>':'')+'</strong><div class="meta">'+esc(f.date||'')+'</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">'+esc(f.content)+'</div>'+(f.image?'<img src="'+esc(resolveImg(f.image))+'" alt="">':'')+'</div><div class="ops"><button class="btn btn-sm" data-edit="feed" data-id="'+esc(f.id)+'">编辑</button><button class="btn btn-sm btn-danger" data-del="feed" data-id="'+esc(f.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无动态</div>';}
