@@ -394,26 +394,25 @@ html[data-theme="dark"] .activity-joined{background:rgba(4,120,87,.18);color:#6e
 .lottery-hero-text h3{font-size:26px;font-weight:800;letter-spacing:4px;margin:0 0 6px;background:linear-gradient(180deg,#fff 0%,#fde68a 55%,#f59e0b 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 6px rgba(0,0,0,.55));}
 .lottery-hero-text p{margin:0;font-size:14px;font-weight:600;letter-spacing:2px;opacity:.96;text-shadow:0 1px 6px rgba(0,0,0,.4);}
 .lottery-main{display:flex;gap:24px;align-items:center;flex-wrap:wrap;justify-content:center;}
-.box-stage{position:relative;width:300px;height:300px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;}
+.pick-stage{position:relative;width:340px;min-height:300px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;}
 .moon-rabbit{position:absolute;left:0;bottom:22px;width:96px;z-index:3;pointer-events:none;}
 .moon-rabbit img{width:100%;display:block;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25));}
-.chest{position:relative;width:190px;height:190px;z-index:4;cursor:pointer;filter:drop-shadow(0 10px 22px rgba(0,0,0,.35));}
-.chest-lid{position:absolute;left:0;top:0;width:190px;height:84px;background:url('https://aka.doubaocdn.com/s/2bDTP1Qvvt') center top/190px 190px no-repeat;transform-origin:50% 100%;transition:transform .5s cubic-bezier(.34,1.4,.44,1);}
-.chest-lid::before,.chest-lid::after,.chest-body::before,.chest-body::after{display:none;}
-.chest-body{position:absolute;left:0;top:84px;width:190px;height:106px;background:url('https://aka.doubaocdn.com/s/2bDTP1Qvvt') center bottom/190px 190px no-repeat;}
-.chest-lock{display:none;}
-.box-stage.opening .chest-lid{transform:rotateX(-72deg);}
-.box-stage.opening .chest{animation:chestShake .5s ease;}
-@keyframes chestShake{0%,100%{transform:rotate(0);}20%{transform:rotate(-4deg);}40%{transform:rotate(4deg);}60%{transform:rotate(-3deg);}80%{transform:rotate(3deg);}}
-.light-beam{position:absolute;left:50%;bottom:52%;transform:translateX(-50%);width:44px;height:0;background:linear-gradient(180deg,rgba(253,224,71,.95),rgba(253,224,71,.45),rgba(253,224,71,0));border-radius:22px;z-index:6;pointer-events:none;opacity:0;filter:blur(1px);}
-.box-stage.opening .light-beam{animation:beamUp 1.6s ease .15s forwards;}
-@keyframes beamUp{0%{height:0;opacity:0;}25%{opacity:1;}100%{height:210px;opacity:0;}}
-.prize-card{position:absolute;left:50%;bottom:46%;transform:translate(-50%,0) scale(0);width:220px;background:linear-gradient(180deg,#fef9c3,#fff7ed);border:2px solid #d97706;border-radius:14px;padding:18px 14px;text-align:center;box-shadow:0 12px 30px rgba(146,64,14,.35);z-index:8;}
-.box-stage.reveal .prize-card{animation:cardPop .7s cubic-bezier(.2,1.6,.35,1) forwards;}
-@keyframes cardPop{0%{transform:translate(-50%,40px) scale(0);opacity:0;}60%{transform:translate(-50%,-6px) scale(1.06);opacity:1;}100%{transform:translate(-50%,0) scale(1);opacity:1;}}
-.prize-card .pc-label{font-size:13px;color:#92400e;margin-bottom:6px;}
-.prize-card .pc-name{font-size:21px;font-weight:800;color:#b45309;letter-spacing:1px;}
-.prize-card .pc-sub{font-size:12px;color:#a16207;margin-top:8px;line-height:1.5;}
+.pick-cards{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;}
+.pick-card{position:relative;width:118px;height:170px;}
+.pick-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,1.25,.3,1);}
+.pick-card.flipped .pick-inner{transform:rotateY(180deg);}
+.pc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:2px solid var(--border);box-shadow:var(--shadow);}
+.pc-back{background:linear-gradient(165deg,#1e293b 0%,#0f172a 100%);overflow:hidden;}
+.pc-back::after{content:'';position:absolute;inset:6px;border:1px solid rgba(255,255,255,.14);border-radius:10px;pointer-events:none;}
+.pc-back img{width:62px;height:62px;object-fit:contain;filter:drop-shadow(0 5px 12px rgba(0,0,0,.5));}
+.pick-card.active .pick-inner{transform:translateY(-8px) rotateZ(2deg);box-shadow:0 0 0 3px rgba(251,191,36,.55),0 14px 30px rgba(0,0,0,.25);}
+.pick-card.active.flipped .pick-inner{transform:rotateY(180deg) translateY(-6px);}
+.pc-front{transform:rotateY(180deg);background:var(--card);}
+.pf-label{font-size:12px;color:var(--text-secondary);}
+.pf-name{font-size:16px;font-weight:800;text-align:center;padding:0 8px;line-height:1.35;color:var(--text);}
+.pick-glow{position:absolute;left:50%;top:50%;width:0;height:0;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(253,224,71,.9),rgba(253,224,71,0) 70%);z-index:5;pointer-events:none;opacity:0;}
+.pick-glow.on{animation:pickGlow 1s ease forwards;}
+@keyframes pickGlow{0%{width:0;height:0;opacity:0;}30%{opacity:1;}100%{width:380px;height:380px;opacity:0;}}
 .lottery-info{flex:1;min-width:230px;text-align:center;}
 .lottery-tip{font-size:14px;color:var(--text-secondary);margin:0 0 16px;line-height:1.8;}
 #lotteryBtn{min-width:150px;font-size:15px;}
@@ -564,23 +563,18 @@ html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
     </div>
   </div>
   <div class="lottery-main">
-    <div class="box-stage" id="boxStage">
+    <div class="pick-stage" id="pickStage">
       <div class="moon-rabbit"><img src="https://aka.doubaocdn.com/s/GU6Q3dCPeI" alt=""></div>
-      <div class="light-beam"></div>
-      <div class="chest" id="chest">
-        <div class="chest-lid"></div>
-        <div class="chest-body"></div>
-        <div class="chest-lock"></div>
-      </div>
-      <div class="prize-card" id="prizeCard">
-        <div class="pc-label">恭喜获得</div>
-        <div class="pc-name" id="prizeCardName"></div>
-        <div class="pc-sub">兑换码见下方</div>
+      <div class="pick-glow" id="pickGlow"></div>
+      <div class="pick-cards" id="pickCards">
+        <div class="pick-card" id="pickCard0"><div class="pick-inner"><div class="pc-face pc-back"><img src="https://aka.doubaocdn.com/s/GU6Q3dCPeI" alt=""></div><div class="pc-face pc-front"><div class="pf-label">恭喜获得</div><div class="pf-name"></div></div></div></div>
+        <div class="pick-card" id="pickCard1"><div class="pick-inner"><div class="pc-face pc-back"><img src="https://aka.doubaocdn.com/s/GU6Q3dCPeI" alt=""></div><div class="pc-face pc-front"><div class="pf-label">恭喜获得</div><div class="pf-name"></div></div></div></div>
+        <div class="pick-card" id="pickCard2"><div class="pick-inner"><div class="pc-face pc-back"><img src="https://aka.doubaocdn.com/s/GU6Q3dCPeI" alt=""></div><div class="pc-face pc-front"><div class="pf-label">恭喜获得</div><div class="pf-name"></div></div></div></div>
       </div>
     </div>
     <div class="lottery-info">
       <p class="lottery-tip">中秋专属抽奖，最高奖励：全套龙套。<br>每台设备每日限抽 1 次，兑换码仅可使用一次。<br>活动时间：2026-09-25 至 2026-09-27。</p>
-      <button id="lotteryBtn" class="btn btn-primary">开启宝箱</button>
+      <button id="lotteryBtn" class="btn btn-primary">开始抽奖</button>
       <div id="lotteryResult"></div>
     </div>
   </div>
@@ -678,7 +672,7 @@ html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
 <li>QQ交流群：833470853</li>
 <li>服务器：mc.163.com/open/mc_realms/?realms=270239C36AD</li>
 <li><a href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">问题反馈</a></li>
-<li><a href="https://github.com/severuszx/TST" target="_blank" rel="noopener">开源仓库</a></li>
+<li><a href="https://github.com/severuszx/TST" target="_blank" rel="noopener" title="开源：源代码公开，任何人可查看、学习或改进，这是本站源码仓库">开源仓库</a></li>
 </ul>
 </div>
 </div>
@@ -1861,20 +1855,43 @@ function todayStr(){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 
-/* —— 开箱抽奖 —— */
-function setPrizeCard(name){
-  var el=document.getElementById('prizeCardName');
-  if(el) el.textContent=name;
+/* —— 翻牌抽奖 —— */
+function pickIndex(seq){ return ((seq-1)%3+3)%3; }
+function setPickFront(seq){
+  var idx=pickIndex(seq);
+  var p=null;
+  for(var i=0;i<LOTTERY_PRIZES.length;i++){ if(LOTTERY_PRIZES[i].seq===seq){ p=LOTTERY_PRIZES[i]; break; } }
+  var card=document.querySelectorAll('.pick-card')[idx];
+  if(card){
+    var nm=card.querySelector('.pf-name');
+    if(nm) nm.textContent=p?p.name:'';
+    card.classList.add('flipped');
+  }
 }
-function openChest(done){
-  var stage=document.getElementById('boxStage');
-  if(!stage){ if(done) done(); return; }
-  stage.classList.add('opening');
-  setTimeout(function(){
-    stage.classList.remove('opening');
-    stage.classList.add('reveal');
-    if(done) done();
-  },1000);
+function pickAnim(finalIdx, done){
+  var cards=document.querySelectorAll('.pick-card');
+  if(!cards.length){ if(done) done(); return; }
+  var count=0, total=11, cur=-1;
+  var iv=setInterval(function(){
+    if(cur>=0){ cards[cur].classList.remove('active'); }
+    cur=(cur+1)%cards.length;
+    cards[cur].classList.add('active');
+    count++;
+    if(count>=total){
+      clearInterval(iv);
+      cards.forEach(function(c){ c.classList.remove('active'); });
+      setTimeout(function(){
+        cards[finalIdx].classList.add('active');
+        setTimeout(function(){
+          cards[finalIdx].classList.add('flipped');
+          cards[finalIdx].classList.remove('active');
+          var glow=document.getElementById('pickGlow');
+          if(glow){ glow.classList.remove('on'); void glow.offsetWidth; glow.classList.add('on'); }
+          if(done) done();
+        },230);
+      },220);
+    }
+  },125);
 }
 function grandEffect(){
   var cv=document.createElement('canvas');
@@ -1987,9 +2004,7 @@ function checkLotteryState(){
   if(saved && saved.date===todayStr()){
     if(btn){ btn.disabled=true; btn.textContent='今日已抽'; }
     var p=LOTTERY_PRIZES[(saved.seq-1+LOTTERY_PRIZES.length)%LOTTERY_PRIZES.length];
-    if(p){ setPrizeCard(p.name); }
-    var stage=document.getElementById('boxStage');
-    if(stage){ stage.classList.add('reveal'); }
+    if(p){ setPickFront(saved.seq); }
     renderAlready(saved.prize||(p?p.name:''),saved.code,saved.seq);
   }
 }
@@ -1999,7 +2014,7 @@ function doLottery(){
   var now=new Date();
   if(now<LOTTERY_START || now>LOTTERY_END){ showToast('活动已结束'); return; }
   spinning=true;
-  btn.disabled=true; btn.textContent='开启中...';
+  btn.disabled=true; btn.textContent='抽奖中...';
   fetch('/api/rest/rpc/draw_lottery',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -2008,8 +2023,8 @@ function doLottery(){
     if(res && res.ok){
       var p=LOTTERY_PRIZES[(res.seq-1+LOTTERY_PRIZES.length)%LOTTERY_PRIZES.length];
       var pname=p?p.name:res.prize;
-      openChest(function(){
-        setPrizeCard(pname);
+      pickAnim(pickIndex(res.seq), function(){
+        setPickFront(res.seq);
         renderLotteryResult(pname,res.code,res.seq);
         if(res.seq===1){ grandEffect(); }
         btn.textContent='今日已抽';
@@ -2018,12 +2033,9 @@ function doLottery(){
     } else {
       spinning=false;
       if(res && res.error==='already_drawn' && res.prize){
-        openChest(function(){
-          var p2=LOTTERY_PRIZES[(res.seq-1+LOTTERY_PRIZES.length)%LOTTERY_PRIZES.length];
-          setPrizeCard(p2?p2.name:res.prize);
-          renderAlready(res.prize,res.code,res.seq);
-          btn.textContent='今日已抽';
-        });
+        setPickFront(res.seq);
+        renderAlready(res.prize,res.code,res.seq);
+        btn.textContent='今日已抽';
       } else {
         if(res && res.error==='sold_out'){
           renderSoldOut();
@@ -2032,13 +2044,13 @@ function doLottery(){
         }
         var msg=({not_in_window:'活动已结束',retry:'手气不佳，请再试一次',bad_device:'设备标识异常'}[res&&res.error])||'抽奖失败，请稍后再试';
         showToast(msg);
-        btn.disabled=false; btn.textContent='开启宝箱';
+        btn.disabled=false; btn.textContent='开始抽奖';
       }
     }
   }).catch(function(){
     spinning=false;
     showToast('网络错误');
-    btn.disabled=false; btn.textContent='开启宝箱';
+    btn.disabled=false; btn.textContent='开始抽奖';
   });
 }
 (function(){
