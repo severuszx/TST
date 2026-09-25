@@ -1808,7 +1808,7 @@ function doLogin(){
     applyAuthUI();
     closeAuthModal();
     showToast('登录成功');
-    renderActivities();
+    loadJoinedActivities();
   }).catch(function(e){
     tip.className='auth-tip err'; tip.textContent = '登录失败：' + e.message;
   }).finally(function(){
@@ -1837,7 +1837,7 @@ function doRegister(){
       applyAuthUI();
       closeAuthModal();
       showToast('注册成功');
-      renderActivities();
+      loadJoinedActivities();
     } else {
       tip.className='auth-tip ok';
       tip.textContent = '注册成功，请前往邮箱完成验证后登录';
@@ -1870,7 +1870,7 @@ function logoutUser(){
   authSession = null;
   try { localStorage.removeItem(AUTH_SESSION_KEY); } catch(e){}
   applyAuthUI();
-  renderActivities();
+  loadJoinedActivities();
   showToast('已退出登录');
 }
 
@@ -1908,6 +1908,20 @@ var JOINED_KEY = 'tst_joined_activities';
 var joinedActs = new Set();
 try { JSON.parse(localStorage.getItem(JOINED_KEY) || '[]').forEach(function(id){ joinedActs.add(id); }); } catch(e){}
 
+function loadJoinedActivities(){
+  if(!authSession){ renderActivities(); return; }
+  fetch(SUPABASE_CFG.url + '/rest/v1/activity_participants?select=activity_id&user_id=eq.' + encodeURIComponent(authSession.user.id), {
+    headers: authHeaders()
+  }).then(function(r){ return r.json(); }).then(function(rows){
+    if(Array.isArray(rows)){
+      joinedActs = new Set();
+      rows.forEach(function(row){ if(row && row.activity_id) joinedActs.add(row.activity_id); });
+      try { localStorage.setItem(JOINED_KEY, JSON.stringify(Array.from(joinedActs))); } catch(e){}
+    }
+    renderActivities();
+  }).catch(function(){ renderActivities(); });
+}
+
 function renderActivities(){
   var wrap = document.getElementById('activityList');
   if(!wrap) return;
@@ -1937,15 +1951,30 @@ function renderActivities(){
         return;
       }
       var id = b.dataset.act;
-      joinedActs.add(id);
-      try { localStorage.setItem(JOINED_KEY, JSON.stringify(Array.from(joinedActs))); } catch(e){}
-      b.outerHTML = '<button class="btn activity-joined" disabled>已参与</button>';
-      showToast('参与成功');
+      b.disabled = true; b.textContent = '参与中...';
+      fetch(SUPABASE_CFG.url + '/rest/v1/activity_participants', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ activity_id: id, user_id: authSession.user.id })
+      }).then(function(r){
+        if(r.status >= 200 && r.status < 300){
+          joinedActs.add(id);
+          try { localStorage.setItem(JOINED_KEY, JSON.stringify(Array.from(joinedActs))); } catch(e){}
+          b.outerHTML = '<button class="btn activity-joined" disabled>已参与</button>';
+          showToast('参与成功');
+        } else {
+          b.disabled = false; b.textContent = '参与';
+          showToast('参与失败，请重试');
+        }
+      }).catch(function(){
+        b.disabled = false; b.textContent = '参与';
+        showToast('参与失败，请重试');
+      });
     };
   });
 }
 
-function initAuthDeferred(){ initAuth(); renderActivities(); }
+function initAuthDeferred(){ initAuth(); loadJoinedActivities(); }
 if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', initAuthDeferred); } else { initAuthDeferred(); }
 
 </script>
