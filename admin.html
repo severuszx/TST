@@ -129,6 +129,7 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 <button class="admin-tab" data-tab="sponsor">赞助管理</button>
 <button class="admin-tab" data-tab="replay">赛事管理</button>
 <button class="admin-tab" data-tab="image">图片管理</button>
+<button class="admin-tab" data-tab="lottery">抽奖管理</button>
 </div>
 <div class="admin-pane active" id="paneNotice">
 <div class="card">
@@ -182,6 +183,22 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 </div>
 <div id="imList"></div>
 </div>
+<div class="admin-pane" id="paneLottery">
+<div class="card">
+<div class="form-row"><label>管理员密码（后端校验）</label><input type="password" id="ltPwd" placeholder="请输入管理员密码"></div>
+<div class="form-row"><label>新增兑换码</label>
+<div style="display:flex;gap:8px;flex-wrap:wrap;">
+<input type="text" id="ltCode" placeholder="兑换码（8位字母）" style="flex:1;min-width:110px;">
+<input type="text" id="ltPrize" placeholder="奖品名" style="flex:1;min-width:110px;">
+<input type="text" id="ltWeight" placeholder="权重（越小越稀有）" style="width:110px;">
+<button class="btn btn-primary" id="ltAddBtn">添加</button>
+</div>
+</div>
+<div class="hint" style="font-size:12px;color:var(--text-secondary);margin-top:6px;">权重越小越难抽中。已使用的兑换码不可删除，仅可查看。</div>
+<button class="btn" id="ltRefreshBtn" style="margin-top:10px;">刷新列表</button>
+</div>
+<div id="ltList"></div>
+</div>
 </div>
 </div>
 </main>
@@ -229,7 +246,40 @@ $('#adminPwd').addEventListener('keydown',e=>{if(e.key==='Enter')$('#adminLoginB
 function showAdminPanel(){$('#loginBox').style.display='none';$('#adminPanel').style.display='block';refreshLists();}
 document.querySelectorAll('.admin-tab').forEach(t=>{t.onclick=()=>{document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.admin-pane').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#pane'+t.dataset.tab.charAt(0).toUpperCase()+t.dataset.tab.slice(1)).classList.add('active');};});
 function resolveImg(src){if(typeof src==='string'&&src.startsWith('img:')&&Array.isArray(SITE_DATA.images)){const it=SITE_DATA.images.find(x=>x.id===src.slice(4));if(it)return it.data;}return src;}
-async function refreshLists(){await loadData();renderNotices();renderFeeds();renderSponsors();renderReplays();renderImages();}
+async function refreshLists(){await loadData();renderNotices();renderFeeds();renderSponsors();renderReplays();renderImages();renderLottery();}
+function lotteryApi(action,payload){
+  const pwd=$('#ltPwd').value.trim();
+  if(!pwd){showToast('请输入管理员密码');return Promise.resolve(null);}
+  return fetch('/api/rest/rpc/admin_lottery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pwd,action,payload:payload||{}})}).then(r=>r.json()).catch(()=>{showToast('请求失败');return null;});
+}
+async function renderLottery(){
+  const el=$('#ltList');if(!el)return;
+  const pwd=$('#ltPwd').value.trim();
+  if(!pwd){el.innerHTML='<div class="empty-hint">输入管理员密码后点「刷新列表」查看兑换码池</div>';return;}
+  const d=await lotteryApi('list');
+  if(!d)return;
+  if(!d.ok){el.innerHTML='<div class="empty-hint">'+(d.error==='bad_password'?'密码错误':'加载失败')+'</div>';return;}
+  const list=d.codes||[];
+  el.innerHTML=list.map(c=>'<div class="admin-list-item"><div><strong>'+esc(c.prize)+'</strong> <span class="meta">#'+esc(c.seq)+'</span><div class="meta">码：'+esc(c.code)+' · 权重 '+esc(c.weight)+'</div>'+(c.claimed?'<div class="meta" style="color:#b91c1c;">已使用'+(c.claimed_at_cn?' · '+esc(c.claimed_at_cn):'')+'</div>':'<div class="meta" style="color:#047857;">未使用</div>')+'</div><div class="ops">'+(c.claimed?'<button class="btn btn-sm" disabled>已使用</button>':'<button class="btn btn-sm" data-lt-w="'+esc(c.id)+'">改权重</button><button class="btn btn-sm" data-lt-p="'+esc(c.id)+'">改奖品</button><button class="btn btn-sm btn-danger" data-lt-del="'+esc(c.id)+'">删除</button>')+'</div></div>').join('')||'<div class="empty-hint">暂无兑换码</div>';
+}
+$('#ltRefreshBtn').onclick=renderLottery;
+$('#ltAddBtn').onclick=async()=>{
+  const code=$('#ltCode').value.trim(),prize=$('#ltPrize').value.trim(),weight=$('#ltWeight').value.trim();
+  if(!code||!prize||!weight){showToast('请填写码、奖品名和权重');return;}
+  const d=await lotteryApi('add',{code,prize,weight:parseInt(weight,10)});
+  if(!d)return;
+  if(!d.ok){showToast(d.error==='code_exists'?'兑换码已存在':(d.error==='bad_password'?'密码错误':'添加失败'));return;}
+  $('#ltCode').value='';$('#ltPrize').value='';$('#ltWeight').value='';
+  showToast('已添加');renderLottery();
+};
+document.addEventListener('click',async e=>{
+  const w=e.target.closest('[data-lt-w]');
+  if(w){const v=prompt('输入新权重（越小越稀有）');if(v===null)return;const n=parseInt(v,10);if(!(n>0)){showToast('权重需为正整数');return;}const d=await lotteryApi('update_weight',{id:w.dataset.ltW,weight:n});if(d&&d.ok){showToast('权重已更新');renderLottery();}else if(d){showToast(d.error==='bad_password'?'密码错误':'更新失败');}return;}
+  const p=e.target.closest('[data-lt-p]');
+  if(p){const v=prompt('输入新奖品名');if(v===null)return;const s=v.trim();if(!s){showToast('奖品名不能为空');return;}const d=await lotteryApi('update_prize',{id:p.dataset.ltP,prize:s});if(d&&d.ok){showToast('奖品已更新');renderLottery();}else if(d){showToast(d.error==='bad_password'?'密码错误':'更新失败');}return;}
+  const del=e.target.closest('[data-lt-del]');
+  if(del){if(!confirm('确定删除此兑换码？'))return;const d=await lotteryApi('delete',{id:del.dataset.ltDel});if(d&&d.ok){showToast('已删除');renderLottery();}else if(d){showToast(d.error==='already_claimed'?'该码已使用，无法删除':(d.error==='bad_password'?'密码错误':'删除失败'));}return;}
+});
 function renderNotices(){const list=SITE_DATA.announcements||[];$('#anList').innerHTML=list.map(a=>'<div class="admin-list-item"><div><strong>'+esc(a.title)+'</strong><div class="meta">'+esc(a.date||'')+'</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">'+esc(a.content)+'</div></div><div class="ops"><button class="btn btn-sm" data-edit="announcement" data-id="'+esc(a.id)+'">编辑</button><button class="btn btn-sm btn-danger" data-del="announcement" data-id="'+esc(a.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无公告</div>';}
 function renderFeeds(){const list=SITE_DATA.feeds||[];$('#fdList').innerHTML=list.map(f=>'<div class="admin-list-item"><div><strong>'+esc(f.title)+(f.pinned?' <span style="color:#b91c1c;">置顶</span>':'')+'</strong><div class="meta">'+esc(f.date||'')+'</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">'+esc(f.content)+'</div>'+(f.image?'<img src="'+esc(resolveImg(f.image))+'" alt="">':'')+'</div><div class="ops"><button class="btn btn-sm" data-edit="feed" data-id="'+esc(f.id)+'">编辑</button><button class="btn btn-sm btn-danger" data-del="feed" data-id="'+esc(f.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无动态</div>';}
 function renderSponsors(){const list=SITE_DATA.sponsors||[];$('#spList').innerHTML=list.map(s=>'<div class="admin-list-item"><div><strong>'+esc(s.name)+'</strong> <span class="meta">赞助 '+esc(s.amount)+'</span></div><div class="ops"><button class="btn btn-sm" data-edit="sponsor" data-id="'+esc(s.id)+'">编辑</button><button class="btn btn-sm btn-danger" data-del="sponsor" data-id="'+esc(s.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无赞助记录</div>';}
