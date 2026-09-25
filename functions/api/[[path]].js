@@ -18,7 +18,14 @@ export async function onRequest(context) {
 
   // 仅代理 /api/auth/* 与 /api/rest/*
   if (path.startsWith('/api/auth/') || path.startsWith('/api/rest/')) {
-    const target = SUPABASE_URL + path.replace(/^\/api/, '') + url.search;
+    let target;
+    if (path.startsWith('/api/rest/')) {
+      // /api/rest/rpc/xxx -> /rest/v1/rpc/xxx
+      target = SUPABASE_URL + '/rest/v1' + path.slice('/api/rest'.length) + url.search;
+    } else {
+      // /api/auth/xxx -> /auth/v1/xxx
+      target = SUPABASE_URL + '/auth/v1' + path.slice('/api/auth'.length) + url.search;
+    }
     const headers = new Headers(request.headers);
     headers.delete('host');
 
