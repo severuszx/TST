@@ -386,6 +386,30 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 .activity-join{margin-top:4px;}
 .activity-joined{background:#ecfdf5;border-color:#a7f3d0;color:#047857;font-weight:600;}
 html[data-theme="dark"] .activity-joined{background:rgba(4,120,87,.18);color:#6ee7b7;}
+/* 中秋专属抽奖 */
+.lottery-card{overflow:hidden;}
+.lottery-hero{position:relative;border-radius:12px;overflow:hidden;margin-bottom:18px;}
+.lottery-hero img{width:100%;display:block;max-height:150px;object-fit:cover;}
+.lottery-hero-text{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;background:linear-gradient(180deg,rgba(10,10,20,.15) 0%,rgba(10,10,20,.65) 100%);color:#fff;text-align:center;}
+.lottery-hero-text h3{font-size:24px;letter-spacing:6px;margin:0 0 6px;text-shadow:0 2px 8px rgba(0,0,0,.4);}
+.lottery-hero-text p{margin:0;font-size:14px;letter-spacing:3px;opacity:.95;text-shadow:0 1px 6px rgba(0,0,0,.4);}
+.lottery-main{display:flex;gap:24px;align-items:center;flex-wrap:wrap;justify-content:center;}
+.wheel-box{position:relative;width:280px;height:280px;flex:0 0 auto;}
+.wheel-box canvas{width:100%;height:100%;display:block;}
+.wheel-pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid #dc2626;z-index:5;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));}
+.wheel-pointer::after{content:'';position:absolute;top:-28px;left:-5px;width:10px;height:10px;border-radius:50%;background:#dc2626;}
+.lottery-info{flex:1;min-width:230px;text-align:center;}
+.lottery-tip{font-size:14px;color:var(--text-secondary);margin:0 0 16px;line-height:1.8;}
+#lotteryBtn{min-width:150px;font-size:15px;}
+.lottery-result{margin-top:16px;padding:18px 14px;border:1px solid var(--border);border-radius:12px;background:var(--card);text-align:center;}
+.lr-prize{font-size:16px;color:var(--text);margin-bottom:12px;}
+.lr-prize b{color:#d97706;}
+.lr-code{font-size:24px;letter-spacing:3px;font-weight:700;background:#fef3c7;color:#92400e;padding:8px 16px;border-radius:8px;display:inline-block;font-family:Consolas,Menlo,monospace;word-break:break-all;}
+html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
+.lr-copy{margin-top:12px;}
+.lr-note{font-size:12px;color:var(--text-secondary);margin-top:10px;line-height:1.6;}
+.lr-already{font-size:14px;color:var(--text-secondary);margin-bottom:10px;line-height:1.7;}
+.lr-already b{color:var(--text);}
 </style>
 </head>
 <body>
@@ -498,7 +522,26 @@ html[data-theme="dark"] .activity-joined{background:rgba(4,120,87,.18);color:#6e
 <section id="activity" class="page">
 <div class="container">
 <div class="section-title">活动</div>
-<div id="activityList" class="card-grid"></div>
+<div class="card lottery-card">
+  <div class="lottery-hero">
+    <img src="https://aka.doubaocdn.com/s/uxV7X6LSqH" alt="中秋月夜">
+    <div class="lottery-hero-text">
+      <h3>中秋专属抽奖</h3>
+      <p>最高奖励：全套龙套</p>
+    </div>
+  </div>
+  <div class="lottery-main">
+    <div class="wheel-box" id="wheelBox">
+      <div class="wheel-pointer"></div>
+      <canvas id="lotteryCanvas" width="600" height="600"></canvas>
+    </div>
+    <div class="lottery-info">
+      <p class="lottery-tip">中秋专属抽奖，最高奖励：全套龙套。<br>每台设备每日限抽 1 次，兑换码仅可使用一次。<br>活动时间：2026-09-25 至 2026-09-27。</p>
+      <button id="lotteryBtn" class="btn btn-primary">开始抽奖</button>
+      <div id="lotteryResult"></div>
+    </div>
+  </div>
+</div>
 </div>
 </section>
 
@@ -1744,46 +1787,185 @@ loadData();
 })();
 // ============================================================
 // ============================================================
-// 活动（本地记录，无需登录）
+// 中秋专属抽奖（服务端数据库函数 draw_lottery 保证原子性）
 // ============================================================
-var ACTIVITIES = [
-  { id: 'act1', title: 'S1 裂痕杯 · 报名', desc: '服务器首个官方 PVP 赛事，单人淘汰制，自备装备。', status: '筹备中', join: true, start: '待定' },
-  { id: 'act2', title: '中秋签到活动', desc: '活动期间每日登录服务器签到，累计可获得限定纪念品。', status: '进行中', join: true, start: '2026-09-25' }
+function getDeviceId(){
+  var k='tst_device_id';
+  var id=null;
+  try{ id=localStorage.getItem(k); }catch(e){}
+  if(id) return id;
+  id='dev-'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-6);
+  try{ localStorage.setItem(k,id); }catch(e){}
+  return id;
+}
+var LOTTERY_PRIZES=[
+  {seq:1,name:'全套龙套',short:'全套龙套',color:'#f59e0b'},
+  {seq:2,name:'稀有皮肤礼包',short:'稀有皮肤',color:'#d946ef'},
+  {seq:3,name:'限定称号「中秋月兔」',short:'中秋月兔',color:'#8b5cf6'},
+  {seq:4,name:'游戏道具礼包',short:'道具礼包',color:'#06b6d4'},
+  {seq:5,name:'纪念头像框',short:'头像框',color:'#10b981'},
+  {seq:6,name:'参与奖',short:'参与奖',color:'#64748b'}
 ];
-var JOINED_KEY = 'tst_joined_activities';
-var joinedActs = new Set();
-try { JSON.parse(localStorage.getItem(JOINED_KEY) || '[]').forEach(function(id){ joinedActs.add(id); }); } catch(e){}
+var LOTTERY_KEY='tst_lottery';
+var LOTTERY_START=new Date(2026,8,25);
+var LOTTERY_END=new Date(2026,8,27,23,59,59);
+var wheelDeg=0;
+var spinning=false;
 
-function renderActivities(){
-  var wrap = document.getElementById('activityList');
-  if(!wrap) return;
-  if(ACTIVITIES.length === 0){ wrap.innerHTML = '<p class="empty-hint">暂无活动</p>'; return; }
-  wrap.innerHTML = ACTIVITIES.map(function(a){
-    var joined = joinedActs.has(a.id);
-    var btnHtml = '';
-    if(a.join){
-      btnHtml = joined ? '<button class="btn activity-joined" disabled>已参与</button>'
-                       : '<button class="btn btn-primary activity-join" data-act="' + a.id + '">参与</button>';
+function todayStr(){
+  var d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function drawWheel(){
+  var c=document.getElementById('lotteryCanvas');
+  if(!c) return;
+  var ctx=c.getContext('2d');
+  var W=c.width,H=c.height,cx=W/2,cy=H/2,R=W/2-8;
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.rotate(-Math.PI/2);
+  var n=LOTTERY_PRIZES.length, arc=Math.PI*2/n;
+  for(var i=0;i<n;i++){
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.arc(0,0,R,i*arc,(i+1)*arc);
+    ctx.closePath();
+    ctx.fillStyle=LOTTERY_PRIZES[i].color;
+    ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.85)';
+    ctx.lineWidth=3;
+    ctx.stroke();
+    ctx.save();
+    ctx.rotate(i*arc+arc/2);
+    ctx.textAlign='right';
+    ctx.fillStyle='#fff';
+    ctx.font='bold 17px "Microsoft YaHei",sans-serif';
+    ctx.shadowColor='rgba(0,0,0,.4)';
+    ctx.shadowBlur=4;
+    ctx.fillText(LOTTERY_PRIZES[i].short,R-20,6);
+    ctx.restore();
+  }
+  ctx.beginPath();
+  ctx.arc(0,0,36,0,Math.PI*2);
+  ctx.fillStyle='#0f172a';
+  ctx.fill();
+  ctx.strokeStyle='#fbbf24';
+  ctx.lineWidth=3;
+  ctx.stroke();
+  ctx.fillStyle='#fff';
+  ctx.font='bold 16px "Microsoft YaHei",sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('抽奖',0,6);
+  ctx.restore();
+}
+function wheelTargetDeg(seq){
+  var idx=(seq-1+LOTTERY_PRIZES.length)%LOTTERY_PRIZES.length;
+  return 360-idx*60-30;
+}
+function setWheelStatic(seq){
+  var canvas=document.getElementById('lotteryCanvas');
+  if(!canvas) return;
+  wheelDeg=Math.floor(wheelDeg/360)*360;
+  canvas.style.transition='none';
+  canvas.style.transform='rotate('+(wheelDeg+wheelTargetDeg(seq))+'deg)';
+}
+function spinTo(seq,done){
+  var canvas=document.getElementById('lotteryCanvas');
+  if(!canvas){ if(done) done(); return; }
+  wheelDeg+=360*3+wheelTargetDeg(seq);
+  canvas.style.transition='transform 3.2s cubic-bezier(.17,.67,.12,.99)';
+  canvas.style.transform='rotate('+wheelDeg+'deg)';
+  setTimeout(done||function(){},3300);
+}
+function renderLotteryResult(prize,code,seq){
+  var r=document.getElementById('lotteryResult');
+  if(!r) return;
+  r.innerHTML='<div class="lottery-result">'+
+    '<div class="lr-prize">恭喜获得：<b>'+prize+'</b></div>'+
+    '<div class="lr-code">'+code+'</div>'+
+    '<button class="btn lr-copy" id="lrCopyBtn">复制兑换码</button>'+
+    '<p class="lr-note">兑换码仅可使用一次，请尽快在游戏内兑换</p>'+
+    '</div>';
+  var btn=document.getElementById('lrCopyBtn');
+  if(btn) btn.onclick=function(){
+    var t=document.createElement('textarea');
+    t.value=code;
+    t.style.position='fixed'; t.style.opacity='0';
+    document.body.appendChild(t);
+    t.select();
+    try{ document.execCommand('copy'); showToast('兑换码已复制'); }catch(e){}
+    document.body.removeChild(t);
+  };
+  try{ localStorage.setItem(LOTTERY_KEY,JSON.stringify({date:todayStr(),prize:prize,code:code,seq:seq})); }catch(e){}
+}
+function renderAlready(prize,code,seq){
+  var r=document.getElementById('lotteryResult');
+  if(!r) return;
+  r.innerHTML='<div class="lottery-result">'+
+    '<div class="lr-already">今日已抽过，奖品：<b>'+prize+'</b></div>'+
+    '<div class="lr-code">'+code+'</div>'+
+    '<p class="lr-note">明日可再次参与</p>'+
+    '</div>';
+}
+function checkLotteryState(){
+  var btn=document.getElementById('lotteryBtn');
+  var now=new Date();
+  if(now<LOTTERY_START || now>LOTTERY_END){
+    if(btn){ btn.disabled=true; btn.textContent='活动已结束'; }
+  }
+  var saved=null;
+  try{ saved=JSON.parse(localStorage.getItem(LOTTERY_KEY)||'null'); }catch(e){}
+  if(saved && saved.date===todayStr()){
+    if(btn){ btn.disabled=true; btn.textContent='今日已抽'; }
+    setWheelStatic(saved.seq);
+    renderAlready(saved.prize,saved.code,saved.seq);
+  }
+}
+function doLottery(){
+  var btn=document.getElementById('lotteryBtn');
+  if(spinning) return;
+  var now=new Date();
+  if(now<LOTTERY_START || now>LOTTERY_END){ showToast('活动已结束'); return; }
+  spinning=true;
+  btn.disabled=true; btn.textContent='抽奖中...';
+  fetch('/api/rest/rpc/draw_lottery',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({device:getDeviceId()})
+  }).then(function(res){return res.json();}).then(function(res){
+    if(res && res.ok){
+      spinTo(res.seq, function(){
+        renderLotteryResult(res.prize,res.code,res.seq);
+        btn.textContent='今日已抽';
+        spinning=false;
+      });
+    } else {
+      spinning=false;
+      if(res && res.error==='already_drawn' && res.prize){
+        spinTo(res.seq, function(){
+          renderAlready(res.prize,res.code,res.seq);
+          btn.textContent='今日已抽';
+        });
+      } else {
+        var msg=({not_in_window:'活动已结束',sold_out:'兑换码已全部抽完',retry:'手气不佳，请再试一次',bad_device:'设备标识异常'}[res&&res.error])||'抽奖失败，请稍后再试';
+        showToast(msg);
+        btn.disabled=false; btn.textContent='开始抽奖';
+      }
     }
-    return '<div class="card activity-card">' +
-      '<h3>' + a.title + '</h3>' +
-      '<p class="date">状态：' + a.status + (a.start ? ' ｜ 开始：' + a.start : '') + '</p>' +
-      '<div class="content">' + a.desc + '</div>' +
-      btnHtml +
-      '</div>';
-  }).join('');
-  wrap.querySelectorAll('.activity-join').forEach(function(b){
-    b.onclick = function(){
-      var id = b.dataset.act;
-      b.disabled = true; b.textContent = '参与中...';
-      joinedActs.add(id);
-      try { localStorage.setItem(JOINED_KEY, JSON.stringify(Array.from(joinedActs))); } catch(e){}
-      b.outerHTML = '<button class="btn activity-joined" disabled>已参与</button>';
-      showToast('参与成功');
-    };
+  }).catch(function(){
+    spinning=false;
+    showToast('网络错误');
+    btn.disabled=false; btn.textContent='开始抽奖';
   });
 }
-renderActivities();
+(function(){
+  var btn=document.getElementById('lotteryBtn');
+  drawWheel();
+  if(btn) btn.onclick=doLottery;
+  checkLotteryState();
+})();
 
 </script>
 
