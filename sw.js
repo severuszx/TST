@@ -1,5 +1,5 @@
 // The Slow Tide 官网 Service Worker - 简易离线缓存
-const CACHE = 'tst-cache-v2';
+const CACHE = 'tst-cache-v3';
 const CORE = ['/', '/index.html', '/profile.html', '/tool.html', '/admin.html', '/manifest.json', '/logo.jpg', '/ad1.jpg', '/ad2.jpg', '/ad3.jpg'];
 
 self.addEventListener('install', (e) => {
@@ -23,6 +23,24 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
   if (url.pathname.startsWith('/api/')) return; // API 不缓存
+
+  // 页面导航（HTML）：网络优先，避免缓存/旧响应导致 ERR_FAILED 或显示旧页面
+  if (req.mode === 'navigate' || (url.pathname !== '/' && /\.html$/.test(url.pathname))) {
+    e.respondWith(
+      fetch(req).then((res) => {
+        if (res.ok) {
+          const copy = res.clone();
+          caches.put(req, copy);
+        }
+        return res;
+      }).catch(() =>
+        caches.match(req).then((hit) => hit || caches.match('/'))
+      )
+    );
+    return;
+  }
+
+  // 其余静态资源：缓存优先，后台更新
   e.respondWith(
     caches.match(req).then((hit) => {
       if (hit) {
