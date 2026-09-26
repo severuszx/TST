@@ -1,6 +1,6 @@
 // The Slow Tide 官网 Service Worker - 简易离线缓存
-const CACHE = 'tst-cache-v1';
-const CORE = ['/', '/index.html', '/profile.html', '/tool.html', '/manifest.json', '/logo.jpg', '/ad1.jpg', '/ad2.jpg', '/ad3.jpg'];
+const CACHE = 'tst-cache-v2';
+const CORE = ['/', '/index.html', '/profile.html', '/tool.html', '/admin.html', '/manifest.json', '/logo.jpg', '/ad1.jpg', '/ad2.jpg', '/ad3.jpg'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(

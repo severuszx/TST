@@ -125,6 +125,7 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 <div id="adminPanel" style="display:none;">
 <div class="admin-tabs">
 <button class="admin-tab active" data-tab="notice">公告管理</button>
+<button class="admin-tab" data-tab="history">历史管理</button>
 <button class="admin-tab" data-tab="feed">动态管理</button>
 <button class="admin-tab" data-tab="sponsor">赞助管理</button>
 <button class="admin-tab" data-tab="replay">赛事管理</button>
@@ -140,6 +141,15 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 <button class="btn" id="anCancelBtn" style="display:none;">取消编辑</button>
 </div>
 <div id="anList"></div>
+</div>
+<div class="admin-pane" id="paneHistory">
+<div class="card">
+<div class="form-row"><label>历史日期</label><input type="text" id="hyDate" placeholder="如 2026-06-30"></div>
+<div class="form-row"><label>历史内容</label><input type="text" id="hyText" placeholder="该日期发生的事件"></div>
+<button class="btn btn-primary" id="hyAddBtn">添加历史</button>
+<button class="btn" id="hyCancelBtn" style="display:none;">取消编辑</button>
+</div>
+<div id="hyList" style="margin-top:14px;"></div>
 </div>
 <div class="admin-pane" id="paneFeed">
 <div class="card">
@@ -246,7 +256,7 @@ $('#adminPwd').addEventListener('keydown',e=>{if(e.key==='Enter')$('#adminLoginB
 function showAdminPanel(){$('#loginBox').style.display='none';$('#adminPanel').style.display='block';refreshLists();}
 document.querySelectorAll('.admin-tab').forEach(t=>{t.onclick=()=>{document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.admin-pane').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#pane'+t.dataset.tab.charAt(0).toUpperCase()+t.dataset.tab.slice(1)).classList.add('active');};});
 function resolveImg(src){if(typeof src==='string'&&src.startsWith('img:')&&Array.isArray(SITE_DATA.images)){const it=SITE_DATA.images.find(x=>x.id===src.slice(4));if(it)return it.data;}return src;}
-async function refreshLists(){await loadData();renderNotices();renderFeeds();renderSponsors();renderReplays();renderImages();renderLottery();}
+async function refreshLists(){await loadData();renderAdminHistory();renderNotices();renderFeeds();renderSponsors();renderReplays();renderImages();renderLottery();}
 function lotteryApi(action,payload){
   const pwd=$('#ltPwd').value.trim();
   if(!pwd){showToast('请输入管理员密码');return Promise.resolve(null);}
@@ -280,6 +290,11 @@ document.addEventListener('click',async e=>{
   const del=e.target.closest('[data-lt-del]');
   if(del){if(!confirm('确定删除此兑换码？'))return;const d=await lotteryApi('delete',{id:del.dataset.ltDel});if(d&&d.ok){showToast('已删除');renderLottery();}else if(d){showToast(d.error==='bad_password'?'密码错误':'删除失败');}return;}
 });
+function histItems(){ return (SITE_DATA.announcements||[]).filter(a=>String(a.title||'').startsWith('hist:')); }
+function renderAdminHistory(){
+  const list=histItems();
+  $('#hyList').innerHTML=list.map(a=>'<div class="admin-list-item"><div><strong>'+esc(String(a.title).replace(/^hist:/,''))+'</strong><div class="meta">'+esc(a.date||'')+'</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">'+esc(a.content)+'</div></div><div class="ops"><button class="btn btn-sm" data-edit="history" data-id="'+esc(a.id)+'">编辑</button><button class="btn btn-sm btn-danger" data-del="history" data-id="'+esc(a.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无历史，可添加后展示在首页</div>';
+}
 function renderNotices(){const list=SITE_DATA.announcements||[];$('#anList').innerHTML=list.map(a=>'<div class="admin-list-item"><div><strong>'+esc(a.title)+'</strong><div class="meta">'+esc(a.date||'')+'</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">'+esc(a.content)+'</div></div><div class="ops"><button class="btn btn-sm" data-edit="announcement" data-id="'+esc(a.id)+'">编辑</button><button class="btn btn-sm btn-danger" data-del="announcement" data-id="'+esc(a.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无公告</div>';}
 function renderFeeds(){const list=SITE_DATA.feeds||[];$('#fdList').innerHTML=list.map(f=>'<div class="admin-list-item"><div><strong>'+esc(f.title)+(f.pinned?' <span style="color:#b91c1c;">置顶</span>':'')+'</strong><div class="meta">'+esc(f.date||'')+'</div><div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">'+esc(f.content)+'</div>'+(f.image?'<img src="'+esc(resolveImg(f.image))+'" alt="">':'')+'</div><div class="ops"><button class="btn btn-sm" data-edit="feed" data-id="'+esc(f.id)+'">编辑</button><button class="btn btn-sm btn-danger" data-del="feed" data-id="'+esc(f.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无动态</div>';}
 function renderSponsors(){const list=SITE_DATA.sponsors||[];$('#spList').innerHTML=list.map(s=>'<div class="admin-list-item"><div><strong>'+esc(s.name)+'</strong> <span class="meta">赞助 '+esc(s.amount)+'</span></div><div class="ops"><button class="btn btn-sm" data-edit="sponsor" data-id="'+esc(s.id)+'">编辑</button><button class="btn btn-sm btn-danger" data-del="sponsor" data-id="'+esc(s.id)+'">删除</button></div></div>').join('')||'<div class="empty-hint">暂无赞助记录</div>';}
@@ -287,21 +302,24 @@ function renderReplays(){const list=SITE_DATA.replays||[];$('#rpList').innerHTML
 function renderImages(){const list=SITE_DATA.images||[];$('#imList').innerHTML='<div class="img-grid">'+list.map(im=>'<div class="img-item"><img src="'+esc(im.data)+'" alt=""><div class="im-name">'+esc(im.name||im.id)+'</div><div class="im-meta">'+esc(im.id)+'</div><div style="display:flex;gap:5px;"><button class="btn btn-sm" data-copy="img:'+esc(im.id)+'">复制引用</button><button class="btn btn-sm btn-danger" data-del-img="'+esc(im.id)+'">删除</button></div></div>').join('')+'</div>';}
 document.addEventListener('click',async e=>{
 const del=e.target.closest('[data-del]');
-if(del&&ADMIN_TOKEN){const kind=del.dataset.del,id=del.dataset.id;const action=kind==='announcement'?'deleteAnnouncement':kind==='feed'?'deleteFeed':kind==='sponsor'?'deleteSponsor':'deleteReplay';if(!confirm('确定删除？'))return;const d=await adminApi(action,{id});if(d&&d.ok){if(d.announcements)SITE_DATA.announcements=d.announcements;if(d.feeds)SITE_DATA.feeds=d.feeds;if(d.sponsors)SITE_DATA.sponsors=d.sponsors;if(d.replays)SITE_DATA.replays=d.replays;showToast('已删除');refreshLists();}return;}
+if(del&&ADMIN_TOKEN){const kind=del.dataset.del,id=del.dataset.id;const action=kind==='announcement'||kind==='history'?'deleteAnnouncement':kind==='feed'?'deleteFeed':kind==='sponsor'?'deleteSponsor':'deleteReplay';if(!confirm('确定删除？'))return;const d=await adminApi(action,{id});if(d&&d.ok){if(d.announcements)SITE_DATA.announcements=d.announcements;if(d.feeds)SITE_DATA.feeds=d.feeds;if(d.sponsors)SITE_DATA.sponsors=d.sponsors;if(d.replays)SITE_DATA.replays=d.replays;showToast('已删除');refreshLists();}return;}
 const delImg=e.target.closest('[data-del-img]');
 if(delImg&&ADMIN_TOKEN){if(!confirm('确定删除这张图片？'))return;const d=await adminApi('deleteImage',{id:delImg.dataset.delImg});if(d&&d.ok){SITE_DATA.images=d.images||[];showToast('图片已删除');renderImages();}return;}
 const copy=e.target.closest('[data-copy]');
 if(copy){navigator.clipboard.writeText(copy.dataset.copy).then(()=>showToast('已复制: '+copy.dataset.copy));return;}
 });
-let editingAn=null,editingFd=null,editingSp=null,editingRp=null;
+let editingAn=null,editingHy=null,editingFd=null,editingSp=null,editingRp=null;
 document.addEventListener('click',e=>{
 const eb=e.target.closest('[data-edit]');if(!eb||!ADMIN_TOKEN)return;const kind=eb.dataset.edit,id=eb.dataset.id;
 if(kind==='announcement'){const a=SITE_DATA.announcements.find(x=>x.id===id);if(!a)return;$('#anTitle').value=a.title;$('#anContent').value=a.content;$('#anDate').value=a.date||'';editingAn=id;$('#anAddBtn').textContent='保存修改';$('#anCancelBtn').style.display='';}
+else if(kind==='history'){const a=SITE_DATA.announcements.find(x=>x.id===id&&String(x.title||'').startsWith('hist:'));if(!a)return;$('#hyDate').value=String(a.title).replace(/^hist:/,'');$('#hyText').value=a.content;editingHy=id;$('#hyAddBtn').textContent='保存修改';$('#hyCancelBtn').style.display='';}
 else if(kind==='feed'){const f=SITE_DATA.feeds.find(x=>x.id===id);if(!f)return;$('#fdTitle').value=f.title;$('#fdContent').value=f.content;$('#fdDate').value=f.date||'';$('#fdPinned').checked=!!f.pinned;$('#fdImage').value='';fdImageData=null;if(f.image){$('#fdImgPreviewImg').src=resolveImg(f.image);$('#fdImgPreview').style.display='block';$('#fdImageRef').value=f.image.startsWith('img:')?f.image:'';}else{$('#fdImgPreview').style.display='none';$('#fdImageRef').value='';}editingFd=id;$('#fdAddBtn').textContent='保存修改';$('#fdCancelBtn').style.display='';}
 else if(kind==='sponsor'){const s=SITE_DATA.sponsors.find(x=>x.id===id);if(!s)return;$('#spName').value=s.name;$('#spAmount').value=s.amount;editingSp=id;$('#spAddBtn').textContent='保存修改';$('#spCancelBtn').style.display='';}
 else if(kind==='replay'){const r=SITE_DATA.replays.find(x=>x.id===id);if(!r)return;$('#rpTitle').value=r.title;$('#rpUrl').value=r.url;$('#rpDate').value=r.date||'';editingRp=id;$('#rpAddBtn').textContent='保存修改';$('#rpCancelBtn').style.display='';}
 });
 $('#anCancelBtn').onclick=()=>{editingAn=null;$('#anAddBtn').textContent='发布公告';$('#anCancelBtn').style.display='none';$('#anTitle').value='';$('#anContent').value='';$('#anDate').value='';};
+$('#hyCancelBtn').onclick=()=>{editingHy=null;$('#hyAddBtn').textContent='添加历史';$('#hyCancelBtn').style.display='none';$('#hyDate').value='';$('#hyText').value='';};
+$('#hyAddBtn').onclick=async()=>{const date=$('#hyDate').value.trim(),text=$('#hyText').value.trim();if(!date||!text){showToast('请填写历史日期和内容');return;}const title='hist:'+date;const d=editingHy?await adminApi('updateAnnouncement',{title,content:text,date:date||undefined},{id:editingHy}):await adminApi('addAnnouncement',{title,content:text,date:date||undefined});if(d&&d.ok){SITE_DATA.announcements=d.announcements;$('#hyCancelBtn').click();showToast('历史已保存');renderAdminHistory();}};
 $('#anAddBtn').onclick=async()=>{const title=$('#anTitle').value.trim(),content=$('#anContent').value.trim(),date=$('#anDate').value.trim();if(!title||!content){showToast('请填写标题和内容');return;}const d=editingAn?await adminApi('updateAnnouncement',{title,content,date:date||undefined},{id:editingAn}):await adminApi('addAnnouncement',{title,content,date:date||undefined});if(d&&d.ok){SITE_DATA.announcements=d.announcements;$('#anCancelBtn').click();showToast(editingAn?'公告已更新':'公告已发布');renderNotices();}};
 let fdImageData=null;
 $('#fdImage').addEventListener('change',e=>{const file=e.target.files[0];if(!file){fdImageData=null;$('#fdImgPreview').style.display='none';return;}if(file.size>1.5*1024*1024){showToast('图片超过1.5MB');e.target.value='';return;}const reader=new FileReader();reader.onload=()=>{fdImageData=reader.result;$('#fdImgPreviewImg').src=fdImageData;$('#fdImgPreview').style.display='block';};reader.readAsDataURL(file);});
