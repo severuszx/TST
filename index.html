@@ -239,6 +239,12 @@ html[data-theme="dark"] .pinned-tag{background:#71717a;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
 
 /* ===== 搜索 ===== */
+.notice-ticker{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin:12px 0 0;}
+.ticker-label{flex:none;font-size:13px;font-weight:700;color:var(--accent);}
+.ticker-viewport{flex:1;overflow:hidden;height:20px;line-height:20px;position:relative;}
+.ticker-track{white-space:nowrap;font-size:14px;color:var(--text);transition:opacity .3s ease;cursor:pointer;}
+.ticker-track .tt-item:hover{color:var(--accent);}
+@media(max-width:960px){.notice-ticker{padding:7px 10px;gap:8px;}.ticker-label{font-size:12px;}.ticker-track{font-size:13px;}}
 .search-row{
 position:relative;display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px;
 }
@@ -492,6 +498,10 @@ html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
 
 
 
+<div class="notice-ticker" id="noticeTicker" style="display:none;">
+<span class="ticker-label">最新公告</span>
+<div class="ticker-viewport"><div class="ticker-track" id="tickerTrack"></div></div>
+</div>
 <section class="section">
 <div class="container">
 <div class="search-row">
@@ -957,11 +967,45 @@ async function loadData(){
     }
     applyServerStatus();
       renderAll();
+      renderTicker();
     }
   }catch(e){
     var nlEl = document.getElementById('noticeList');
     if (nlEl) { nlEl.innerHTML='<div class="empty-hint">数据加载失败，请刷新重试</div>'; }
   }
+}
+var tickerIdx=0, tickerTimer=null;
+function renderTicker(){
+  var box=document.getElementById('noticeTicker');
+  var track=document.getElementById('tickerTrack');
+  if(!box||!track) return;
+  var list=SITE_DATA.announcements||[];
+  if(!list.length){ box.style.display='none'; return; }
+  box.style.display='flex';
+  var items=list.slice(0,5);
+  function show(i){
+    track.style.opacity='0';
+    setTimeout(function(){
+      var a=items[i];
+      track.innerHTML='<span class="tt-item" data-uid="notice-'+esc(a.id)+'">'+esc(a.title)+'</span>';
+      track.style.opacity='1';
+      var el=track.querySelector('.tt-item');
+      if(el){ el.onclick=function(){
+        var nav=document.querySelector('[data-nav="notice"]');
+        if(nav) nav.click();
+        setTimeout(function(){
+          var target=document.getElementById('notice-'+a.id);
+          if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+        },120);
+      }; }
+    },300);
+  }
+  show(0);
+  if(tickerTimer) clearInterval(tickerTimer);
+  tickerTimer=setInterval(function(){
+    tickerIdx=(tickerIdx+1)%items.length;
+    show(tickerIdx);
+  },4200);
 }
 function renderAll(){
   renderNotices();
@@ -1878,6 +1922,8 @@ function getDeviceId(){
     try{ parts.push(String(new Date().getTimezoneOffset())); }catch(e){}
     try{ parts.push(screen.width+'x'+screen.height+'x'+screen.colorDepth); }catch(e){}
     try{ parts.push(navigator.platform||''); }catch(e){}
+    try{ parts.push('t'+String(navigator.maxTouchPoints||0)); }catch(e){}
+    try{ parts.push('dpr'+String(window.devicePixelRatio||1)); }catch(e){}
     if(navigator.hardwareConcurrency) parts.push('c'+navigator.hardwareConcurrency);
     if(navigator.deviceMemory) parts.push('m'+navigator.deviceMemory);
     try{
@@ -1912,12 +1958,21 @@ function getDeviceId(){
     }
     return 'dev-'+Math.abs(h1).toString(36)+Math.abs(h2).toString(36);
   }catch(e){
-    var id=null;
-    try{ id=localStorage.getItem('tst_device_id'); }catch(e2){}
-    if(id) return id;
-    id='dev-'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-6);
-    try{ localStorage.setItem('tst_device_id',id); }catch(e3){}
-    return id;
+    // fallback：用 UA+屏幕+时区等稳定特征生成指纹，避免纯随机被清理 localStorage 绕过
+    var parts2=[];
+    try{ parts2.push(navigator.userAgent||''); }catch(e2){}
+    try{ parts2.push(navigator.language||''); }catch(e2){}
+    try{ parts2.push(String(new Date().getTimezoneOffset())); }catch(e2){}
+    try{ parts2.push(screen.width+'x'+screen.height+'x'+screen.colorDepth); }catch(e2){}
+    try{ parts2.push(navigator.platform||''); }catch(e2){}
+    var s2=parts2.join('|');
+    var h3=5381, h4=2166136261;
+    for(var i2=0;i2<s2.length;i2++){
+      var c2=s2.charCodeAt(i2);
+      h3=((h3<<5)+h3+c2)|0;
+      h4=(h4^c2)*16777619|0;
+    }
+    return 'dev-'+Math.abs(h3).toString(36)+Math.abs(h4).toString(36);
   }
 }
 var LOTTERY_PRIZES=[
@@ -2044,8 +2099,8 @@ function renderLotteryResult(prize,code,seq){
   var r=document.getElementById('lotteryResult');
   if(!r) return;
   r.innerHTML='<div class="lottery-result">'+
-    '<div class="lr-prize">恭喜获得：<b>'+prize+'</b></div>'+
-    '<div class="lr-code">'+code+'</div>'+
+    '<div class="lr-prize">恭喜获得：<b>'+esc(prize)+'</b></div>'+
+    '<div class="lr-code">'+esc(code)+'</div>'+
     '<button class="btn lr-copy" id="lrCopyBtn">复制兑换码</button>'+
     '<p class="lr-note">兑换码仅可使用一次，请尽快在游戏内兑换</p>'+
     '</div>';
@@ -2060,13 +2115,19 @@ function renderLotteryResult(prize,code,seq){
     document.body.removeChild(t);
   };
   try{ localStorage.setItem(LOTTERY_KEY,JSON.stringify({date:todayStr(),prize:prize,code:code,seq:seq})); }catch(e){}
+  try{
+    var hist=JSON.parse(localStorage.getItem('tst_lottery_history')||'[]');
+    hist.push({date:todayStr(),prize:prize,code:code,seq:seq});
+    if(hist.length>50){ hist=hist.slice(-50); }
+    localStorage.setItem('tst_lottery_history',JSON.stringify(hist));
+  }catch(e){}
 }
 function renderAlready(prize,code,seq){
   var r=document.getElementById('lotteryResult');
   if(!r) return;
   r.innerHTML='<div class="lottery-result">'+
-    '<div class="lr-already">今日已抽过，奖品：<b>'+prize+'</b></div>'+
-    '<div class="lr-code">'+code+'</div>'+
+    '<div class="lr-already">今日已抽过，奖品：<b>'+esc(prize)+'</b></div>'+
+    '<div class="lr-code">'+esc(code)+'</div>'+
     '<p class="lr-note">明日可再次参与</p>'+
     '</div>';
 }
@@ -2131,9 +2192,12 @@ function doLottery(){
         btn.disabled=false; btn.textContent='开始抽奖';
       }
     }
-  }).catch(function(){
+  }).catch(function(e){
     spinning=false;
-    showToast('网络错误');
+    var emsg='网络异常，请检查网络后重试';
+    if(navigator.onLine===false){ emsg='当前无网络连接，请检查网络'; }
+    else if(e && e.name==='TypeError'){ emsg='网络超时或无法连接服务器，请稍后重试'; }
+    showToast(emsg);
     btn.disabled=false; btn.textContent='开始抽奖';
   });
 }
