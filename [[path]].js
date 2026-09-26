@@ -3,16 +3,14 @@
 // /api/data、/api/admin -> 转发到数据服务站点（解决前端写死域名问题，K27JL4）
 // 抽奖加固（表3）：draw_lottery IP 每日限速 + 服务端时间窗校验 + serverDate 注入 + 状态查询
 // CORS 仅放行本站与反馈站（299K8H）
-
+// 修复：非 /api 路径放行给静态资源（tool.html/profile.html/admin.html 被 catch-all 拦截 → ERR_FAILED/404）
 const SUPABASE_URL = 'https://jilcbcodphxpasicjghv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs';
 const DATA_ORIGIN = 'https://tst-server-site.pages.dev';
-
 // 抽奖 IP 每日限速表（isolate 内存；无 KV 绑定的尽力方案，配合服务端数据库去重共同防刷）
 const LOTTERY_IP_MAP = new Map();
 const LOTTERY_START = new Date(2026, 8, 25, 0, 0, 0);   // 2026-09-25 00:00
 const LOTTERY_END = new Date(2026, 8, 27, 23, 59, 59);  // 2026-09-27 23:59:59
-
 function allowedOrigin(req) {
   const origin = req.headers.get('Origin') || '';
   const ok = ['https://theslowtide.pages.dev', 'https://theslowtidefk.pages.dev', 'http://localhost', 'http://127.0.0.1', 'null'];
@@ -40,7 +38,6 @@ function todayStr(d) {
 function clientIp(req) {
   return req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For') || 'unknown';
 }
-
 async function proxyFetch(target, request) {
   const headers = new Headers(request.headers);
   headers.delete('host');
@@ -50,16 +47,17 @@ async function proxyFetch(target, request) {
   respHeaders.set('Access-Control-Allow-Origin', allowedOrigin(request) || 'https://theslowtide.pages.dev');
   return new Response(upstream.body, { status: upstream.status, headers: respHeaders });
 }
-
 export async function onRequest(context) {
-  const { request } = context;
+  const { request, next } = context;
   const url = new URL(request.url);
   const path = url.pathname;
-
+  // ===== 静态资源放行：非 /api 路径直接交给 Pages 静态服务（修复 tool/profile/admin 子页面被 catch-all 拦截）=====
+  if (!path.startsWith('/api/')) {
+    return next();
+  }
   if (request.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders(request) });
   }
-
   // ===== 抽奖状态查询（KKE58L：状态不再只依赖 localStorage）=====
   if (path === '/api/lottery/state' && request.method === 'GET') {
     const ip = clientIp(request);
@@ -73,7 +71,6 @@ export async function onRequest(context) {
       serverDate: todayStr(new Date()),
     }, 200, request);
   }
-
   // ===== 抽奖接口加固（表3：ZXEHVW/N2U9QF/RCNY7C/CPUY9G/WNG6WE/Q92XS4/69G5XT/7P9HW4）=====
   if (path === '/api/rest/rpc/draw_lottery' && request.method === 'POST') {
     const now = new Date();
@@ -127,7 +124,6 @@ export async function onRequest(context) {
     respHeaders2.set('Access-Control-Allow-Origin', allowedOrigin(request) || 'https://theslowtide.pages.dev');
     return new Response(JSON.stringify(out), { status: 200, headers: respHeaders2 });
   }
-
   // 数据/管理接口：转发到数据服务站点（同域化，前端不再写死域名）
   if (path === '/api/data' || path.startsWith('/api/data/')) {
     return proxyFetch(DATA_ORIGIN + '/api/data' + url.search, request);
@@ -135,7 +131,6 @@ export async function onRequest(context) {
   if (path === '/api/admin' || path.startsWith('/api/admin/')) {
     return proxyFetch(DATA_ORIGIN + '/api/admin' + url.search, request);
   }
-
   // 仅代理 /api/auth/* 与 /api/rest/*（去掉 /api 前缀直达 Supabase 同路径；补 /v1）
   if (path.startsWith('/api/auth/') || path.startsWith('/api/rest/')) {
     let p = path.slice('/api'.length); // /rest/v1/... 或 /rest/rpc/...
@@ -147,7 +142,6 @@ export async function onRequest(context) {
     headers.delete('host');
     if (!headers.get('apikey')) headers.set('apikey', SUPABASE_ANON);
     if (!headers.get('authorization')) headers.set('authorization', 'Bearer ' + SUPABASE_ANON);
-
     let body = ['GET', 'HEAD'].includes(request.method) ? undefined : await request.arrayBuffer();
     // 活动参与落库时注入真实客户端 IP（防多账号重复领取）
     if (request.method === 'POST' && path.includes('/activity_participants') && body && body.byteLength) {
@@ -158,7 +152,6 @@ export async function onRequest(context) {
         body = new TextEncoder().encode(JSON.stringify(obj));
       } catch (e) { /* 非 JSON 原样转发 */ }
     }
-
     const upstream = await fetch(target, {
       method: request.method,
       headers: headers,
@@ -172,6 +165,5 @@ export async function onRequest(context) {
       headers: respHeaders
     });
   }
-
   return new Response('Not found', { status: 404 });
 }
