@@ -253,7 +253,7 @@ body:JSON.stringify({action,data,...(extra||{})})});}catch(err){showToast('网�
 if(r.status===503||r.status===502||r.status===504){showToast('数据服务暂时不可用，请稍后重试');return null;}
 let d;
 try{d=await r.json();}catch(err){showToast('服务响应异常，请重试');return null;}
-if(!d.ok&&r.status===401){ADMIN_TOKEN='';sessionStorage.removeItem('tst_admin_token');showToast('登录已过期');#loginBox.style.display='block';#adminPanel.style.display='none';return null;}
+if(!d.ok&&r.status===401){ADMIN_TOKEN='';sessionStorage.removeItem('tst_admin_token');showToast('登录已过期');document.getElementById('loginBox').style.display='block';document.getElementById('adminPanel').style.display='none';return null;}
 if(!d.ok){showToast(d.error||d.msg||'操作失败，请重试');return null;}
 return d;
 }
