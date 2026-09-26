@@ -49,14 +49,9 @@ export async function onRequest(context) {
     return proxyFetch(DATA_ORIGIN + '/api/admin' + url.search, request);
   }
 
-  // 仅代理 /api/auth/* 与 /api/rest/*
+  // 仅代理 /api/auth/* 与 /api/rest/*（去掉 /api 前缀直达 Supabase 同路径）
   if (path.startsWith('/api/auth/') || path.startsWith('/api/rest/')) {
-    let target;
-    if (path.startsWith('/api/rest/')) {
-      target = SUPABASE_URL + '/rest/v1' + path.slice('/api/rest'.length) + url.search;
-    } else {
-      target = SUPABASE_URL + '/auth/v1' + path.slice('/api/auth'.length) + url.search;
-    }
+    const target = SUPABASE_URL + path.slice('/api'.length) + url.search;
     const headers = new Headers(request.headers);
     headers.delete('host');
     if (!headers.get('apikey')) headers.set('apikey', SUPABASE_ANON);
