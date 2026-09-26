@@ -36,6 +36,7 @@ document.documentElement.setAttribute('data-theme',mode);
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
+color-scheme:light;
 --bg:#f3f5f8;
 --text:#1f2937;
 --text-secondary:#5b6675;
@@ -50,6 +51,7 @@ document.documentElement.setAttribute('data-theme',mode);
 --hero-grad:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
 }
 html[data-theme="dark"]{
+color-scheme:dark;
 --bg:#111113;
 --text:#e5e5e7;
 --text-secondary:#9a9aa0;
@@ -100,7 +102,7 @@ font-size:18px;flex:none;
 width:34px;height:34px;border-radius:4px;
 object-fit:cover;flex:none;display:block;
 }
-html[data-theme="dark"] .logo-img{filter:invert(1);}
+html[data-theme="dark"] .logo-img{filter:invert(1);mix-blend-mode:screen;}
 .main-nav{
 display:flex;gap:2px;flex:1;flex-wrap:nowrap;min-width:0;
 }
@@ -836,6 +838,16 @@ function switchPage(pid){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
+
+// hash 路由：index.html#notice 等直达对应页
+(function(){
+  function applyHash(){
+    var h=(location.hash||'').replace('#','');
+    if(h && document.getElementById(h)){ switchPage(h); }
+  }
+  window.addEventListener('hashchange', applyHash);
+  applyHash();
+})();
 // 更多下拉
 const navMoreBtn=document.getElementById('navMoreBtn');
 const navMore=document.getElementById('navMore');

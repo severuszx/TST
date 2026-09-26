@@ -22,6 +22,7 @@ function clearLocalData(){
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
+color-scheme:light;
 --bg:#f3f5f8;
 --text:#1f2937;
 --text-secondary:#5b6675;
@@ -35,7 +36,8 @@ function clearLocalData(){
 --shadow:0 4px 14px rgba(15,23,42,.07);
 --hero-grad:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
 }
-html[data-theme="dark"]{
+html[data-theme="dark"]{`r
+color-scheme:dark;
 --bg:#111113;
 --text:#e5e5e7;
 --text-secondary:#9a9aa0;
@@ -692,9 +694,13 @@ function switchPage(pid){
   if(t){ t.classList.add('active'); }
   window.scrollTo({top:0,behavior:'smooth'});
 }
-navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
+navBtns.forEach(b=>{ b.onclick=()=>{
+  location.href = b.dataset.nav==='home' ? 'index.html' : ('index.html#'+b.dataset.nav);
+}; });
 document.querySelectorAll('[data-fnav]').forEach(b=>{
-  b.onclick=()=>{ switchPage(b.dataset.fnav); window.scrollTo({top:0,behavior:'smooth'}); };
+  b.onclick=()=>{
+  location.href = b.dataset.fnav==='home' ? 'index.html' : ('index.html#'+b.dataset.fnav);
+};
 });
 
 // ============================================================
