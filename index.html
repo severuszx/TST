@@ -1849,13 +1849,56 @@ loadData();
 // 中秋专属抽奖（服务端数据库函数 draw_lottery 保证原子性）
 // ============================================================
 function getDeviceId(){
-  var k='tst_device_id';
-  var id=null;
-  try{ id=localStorage.getItem(k); }catch(e){}
-  if(id) return id;
-  id='dev-'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-6);
-  try{ localStorage.setItem(k,id); }catch(e){}
-  return id;
+  // 硬件指纹：canvas + WebGL + UA + 屏幕 + 时区等组合，清缓存/无痕模式下保持不变，
+  // 防止同一台设备通过清理 localStorage 重复抽奖
+  try{
+    var parts=[];
+    try{ parts.push(navigator.userAgent); }catch(e){}
+    try{ parts.push(navigator.language||''); }catch(e){}
+    try{ parts.push(String(new Date().getTimezoneOffset())); }catch(e){}
+    try{ parts.push(screen.width+'x'+screen.height+'x'+screen.colorDepth); }catch(e){}
+    try{ parts.push(navigator.platform||''); }catch(e){}
+    if(navigator.hardwareConcurrency) parts.push('c'+navigator.hardwareConcurrency);
+    if(navigator.deviceMemory) parts.push('m'+navigator.deviceMemory);
+    try{
+      var c=document.createElement('canvas'); c.width=240; c.height=60;
+      var ctx=c.getContext('2d');
+      ctx.textBaseline='top';
+      ctx.font='14px Arial';
+      ctx.fillStyle='#f60';
+      ctx.fillRect(0,0,240,60);
+      ctx.fillStyle='#069';
+      ctx.fillText('TheSlowTide|fp|abcdefg123',2,15);
+      ctx.fillStyle='rgba(102,204,0,0.7)';
+      ctx.fillText('TST-LOTTERY-2026',4,30);
+      parts.push(c.toDataURL());
+    }catch(e){ parts.push('nofp'); }
+    try{
+      var gl=document.createElement('canvas').getContext('webgl');
+      if(gl){
+        var ext=gl.getExtension('WEBGL_debug_renderer_info');
+        if(ext){
+          parts.push(String(gl.getParameter(ext.UNMASKED_VENDOR_WEBGL)));
+          parts.push(String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)));
+        }
+      }
+    }catch(e){}
+    var s=parts.join('|');
+    var h1=5381, h2=2166136261;
+    for(var i=0;i<s.length;i++){
+      var ch=s.charCodeAt(i);
+      h1=((h1<<5)+h1+ch)|0;
+      h2=(h2^ch)*16777619|0;
+    }
+    return 'dev-'+Math.abs(h1).toString(36)+Math.abs(h2).toString(36);
+  }catch(e){
+    var id=null;
+    try{ id=localStorage.getItem('tst_device_id'); }catch(e2){}
+    if(id) return id;
+    id='dev-'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-6);
+    try{ localStorage.setItem('tst_device_id',id); }catch(e3){}
+    return id;
+  }
 }
 var LOTTERY_PRIZES=[
   {seq:1,name:'全套龙套',short:'龙套',color:'#f59e0b',color2:'#fbbf24'},
