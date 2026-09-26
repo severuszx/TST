@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>The Slow Tide 更新日志</title>
+<link>https://theslowtide.pages.dev/</link>
+<description>TST 服务器公告与更新日志订阅</description>
+<language>zh-CN</language>
+<lastBuildDate>Sat, 26 Sep 2026 04:38:27 GMT</lastBuildDate>
+<atom:link href="https://theslowtide.pages.dev/rss.xml" rel="self" type="application/rss+xml"/>
+<item>
+<title>关于服务器经济系统重构与存量资产重锚的官方说明</title>
+<link>https://theslowtide.pages.dev/</link>
+<guid>https://theslowtide.pages.dev/#notice-2026-09-24</guid>
+<pubDate>2026-09-24T00:00:00+08:00</pubDate>
+<description>关于服务器经济系统重构与存量资产重锚的官方说明（更新于 2026-09-24）</description>
+</item>
+<item>
+<title>经济系统优化征集公告</title>
+<link>https://theslowtide.pages.dev/</link>
+<guid>https://theslowtide.pages.dev/#notice-2026-09-22</guid>
+<pubDate>2026-09-22T00:00:00+08:00</pubDate>
+<description>经济系统优化征集公告（更新于 2026-09-22）</description>
+</item>
+<item>
+<title>服务器百天庆典公告</title>
+<link>https://theslowtide.pages.dev/</link>
+<guid>https://theslowtide.pages.dev/#notice-2026-09-21</guid>
+<pubDate>2026-09-21T00:00:00+08:00</pubDate>
+<description>服务器百天庆典公告（更新于 2026-09-21）</description>
+</item>
+<item>
+<title>赛事公告</title>
+<link>https://theslowtide.pages.dev/</link>
+<guid>https://theslowtide.pages.dev/#notice-2026-09-14</guid>
+<pubDate>2026-09-14T00:00:00+08:00</pubDate>
+<description>赛事公告（更新于 2026-09-14）</description>
+</item>
+<item>
+<title>版本更新</title>
+<link>https://theslowtide.pages.dev/</link>
+<guid>https://theslowtide.pages.dev/#notice-2026-09-13</guid>
+<pubDate>2026-09-13T00:00:00+08:00</pubDate>
+<description>版本更新（更新于 2026-09-13）</description>
+</item>
+</channel></rss>
