@@ -2093,8 +2093,11 @@ var LOTTERY_START=new Date(2026,8,25);
 var LOTTERY_END=new Date(2026,8,27,23,59,59);
 var wheelDeg=0;
 var spinning=false;
+// 服务端日期（HCYA2X：防止改本地系统时间绕过每日限制；由 /api/lottery/state 或 draw_lottery 响应提供）
+var serverToday=null;
 
 function todayStr(){
+  if(serverToday) return serverToday;
   var d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
@@ -2249,6 +2252,26 @@ function checkLotteryState(){
   if(now<LOTTERY_START || now>LOTTERY_END){
     if(btn){ btn.disabled=true; btn.textContent='活动已结束'; }
   }
+  // 服务端状态查询（KKE58L）：即使本地被清空，也能恢复"今日已抽"
+  try{
+    fetch('/api/lottery/state').then(function(r){return r.json();}).then(function(st){
+      if(st && st.serverDate) serverToday=st.serverDate;
+      if(st && st.drawn){
+        if(btn){ btn.disabled=true; btn.textContent='今日已抽'; }
+        if(st.seq){ setPickFront(st.seq); }
+        renderAlready(st.prize||'已抽奖', st.code||'', st.seq||0);
+      } else if(st && st.serverDate){
+        var saved=null;
+        try{ saved=JSON.parse(localStorage.getItem(LOTTERY_KEY)||'null'); }catch(e){}
+        if(saved && saved.date===serverToday){
+          if(btn){ btn.disabled=true; btn.textContent='今日已抽'; }
+          var p=LOTTERY_PRIZES[(saved.seq-1+LOTTERY_PRIZES.length)%LOTTERY_PRIZES.length];
+          if(p){ setPickFront(saved.seq); }
+          renderAlready(saved.prize||(p?p.name:''),saved.code,saved.seq);
+        }
+      }
+    }).catch(function(){});
+  }catch(e){}
   var saved=null;
   try{ saved=JSON.parse(localStorage.getItem(LOTTERY_KEY)||'null'); }catch(e){}
   if(saved && saved.date===todayStr()){
@@ -2271,8 +2294,9 @@ function doLottery(){
     body:JSON.stringify({p_device:getDeviceId()})
   }).then(function(res){return res.json();}).then(function(res){
     if(res && res.ok){
+      if(res.serverDate) serverToday=res.serverDate;
       var p=LOTTERY_PRIZES[(res.seq-1+LOTTERY_PRIZES.length)%LOTTERY_PRIZES.length];
-      var pname=p?p.name:res.prize;
+      var pname=(res.prize&&String(res.prize).trim())?res.prize:(p?p.name:'未知奖品');
       pickAnim(pickIndex(res.seq), function(){
         setPickFront(res.seq);
         renderLotteryResult(pname,res.code,res.seq);
@@ -2292,7 +2316,7 @@ function doLottery(){
           if(btn){ btn.disabled=true; btn.textContent='已全部抽完'; }
           return;
         }
-        var msg=({not_in_window:'活动已结束',retry:'手气不佳，请再试一次',bad_device:'设备标识异常'}[res&&res.error])||'抽奖失败，请稍后再试';
+        var msg=({not_in_window:'活动已结束',retry:'手气不佳，今日次数已用尽，明日再来',bad_device:'设备标识异常'}[res&&res.error])||'抽奖失败，请稍后再试';
         showToast(msg);
         btn.disabled=false; btn.textContent='开始抽奖';
       }
