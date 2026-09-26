@@ -1107,7 +1107,7 @@ function renderNotices(){
   list.forEach(a=>{
     const bx=document.getElementById('nbox-'+a.id);
     const btn=bx?bx.nextElementSibling:null;
-    if(bx&&btn&&bx.scrollHeight>150){
+    if(bx&&btn&&String(a.content||'').length>90){
       btn.style.display='block';
       btn.onclick=function(){
         const open=bx.classList.toggle('open');
@@ -1595,21 +1595,28 @@ document.querySelectorAll('.admin-tab').forEach(t=>{
   };
 });
 async function adminApi(action,data,extra){
-  const r=await fetch('https://tst-server-site.pages.dev/api/admin',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+ADMIN_TOKEN},
-    body:JSON.stringify({action,data,...(extra||{})})
-  });
-  const d=await r.json();
+  let r;
+  try{
+    r=await fetch('https://tst-server-site.pages.dev/api/admin',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+ADMIN_TOKEN},
+      body:JSON.stringify({action,data,...(extra||{})})
+    });
+  }catch(err){ showToast('网络错误：数据服务暂时不可用，请稍后重试'); return null; }
+  if(r.status===503||r.status===502||r.status===504){ showToast('数据服务暂时不可用，请稍后重试'); return null; }
+  let d;
+  try{ d=await r.json(); }catch(err){ showToast('服务响应异常，请重试'); return null; }
   if(!d.ok && r.status===401){
     ADMIN_TOKEN='';
     sessionStorage.removeItem('tst_admin_token');
     showToast('登录已过期，请重新登录');
-    $('#adminLoginBox').style.display='block';
-    $('#adminPanel').style.display='none';
+    #adminLoginBox.style.display='block';
+    #adminPanel.style.display='none';
     return null;
   }
+  if(!d.ok){ showToast(d.error||d.msg||'操作失败，请重试'); return null; }
   return d;
+}
 }
 async function refreshAdminLists(){
   if(ADMIN_TOKEN){
