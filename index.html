@@ -36,6 +36,10 @@ function updateTime(){
 }
 setInterval(updateTime,1000);
 updateTime();
+(function(){try{
+  if(location.search.indexOf('glass')>-1)localStorage.setItem('tst-theme','glass');
+  if(location.search.indexOf('light')>-1)localStorage.setItem('tst-theme','light');
+}catch(e){}})();
 (function(){
 // 主题：浅色 / 深色，localStorage 优先，默认浅色
 var mode=localStorage.getItem('tst-theme');
@@ -501,22 +505,25 @@ color-scheme:light;
 --accent-soft:rgba(79,99,216,.12);
 --shadow:0 20px 60px rgba(70,90,160,.16);
 --hero-grad:linear-gradient(135deg,#dbe4ff,#e9e2ff);
---go1:.55;--go2:.18;--go3:.28;   /* 卡片渐变三段透明度 */
---gn1:.4;                        /* 导航透明度 */
---gb1:.62;--gb2:.22;             /* 按钮透明度 */
---gsh1:40px;--gsh2:.16;--gsh3:12px;  /* 阴影扩展/强度/偏移 */
+--go1:.24;--go2:.08;--go3:.13;    /* 卡片渐变三段透明度（通透液态玻璃） */
+--gn1:.24;                       /* 导航透明度 */
+--gb1:.42;--gb2:.12;             /* 按钮透明度 */
+--gsh1:30px;--gsh2:.12;--gsh3:10px;  /* 阴影扩展/强度/偏移 */
 }
 /* 背景：干净 iOS 壁纸渐变（无杂乱光斑） */
 html[data-theme="glass"] body{
-background:linear-gradient(165deg,#dce7ff 0%,#e6e2ff 28%,#f4e8fb 52%,#dff0ff 76%,#eef2fb 100%);
+background:linear-gradient(160deg,#dee9ff 0%,#eaf2ff 26%,#e6efff 48%,#e5eeff 72%,#eef3ff 100%);
 background-attachment:fixed;
 }
 /* 顶部柔和透亮光 */
 html[data-theme="glass"] body::before{
 content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-background:radial-gradient(1000px 700px at 15% -5%,rgba(255,255,255,.6),transparent 60%),
-radial-gradient(900px 650px at 90% 105%,rgba(255,255,255,.5),transparent 60%);
-animation:glassBreath 14s ease-in-out infinite alternate;
+background:radial-gradient(1200px 800px at 10% -10%,rgba(130,185,255,.78),transparent 60%),
+radial-gradient(1000px 740px at 90% 110%,rgba(115,165,255,.72),transparent 58%),
+radial-gradient(780px 580px at 68% 26%,rgba(140,205,255,.68),transparent 62%),
+radial-gradient(620px 500px at 26% 58%,rgba(195,160,255,.58),transparent 60%),
+radial-gradient(540px 440px at 84% 42%,rgba(130,225,240,.52),transparent 58%),
+radial-gradient(440px 380px at 52% 90%,rgba(255,190,215,.45),transparent 60%);
 }
 @keyframes glassBreath{0%{opacity:.88;}100%{opacity:1;}}
 html[data-theme="glass"] .site-header,
@@ -525,10 +532,10 @@ html[data-theme="glass"] .container,
 html[data-theme="glass"] .site-footer{position:relative;z-index:1;}
 /* 导航液态玻璃 */
 html[data-theme="glass"] .site-header{
-background:rgba(255,255,255,var(--gn1,.4));
-backdrop-filter:blur(42px) saturate(190%);
-border-bottom:1px solid rgba(255,255,255,.6);
-box-shadow:0 10px 40px rgba(70,90,160,.1),inset 0 1px 0 rgba(255,255,255,.9);
+background:linear-gradient(180deg,rgba(255,255,255,calc(var(--gn1,.16)*1.35)) 0%,rgba(255,255,255,var(--gn1,.16)) 100%);
+backdrop-filter:saturate(250%) contrast(1.04);
+border-bottom:1px solid rgba(255,255,255,.75);
+box-shadow:0 10px 36px rgba(90,110,170,.1),inset 0 1px 0 rgba(255,255,255,.95),inset 0 -14px 30px rgba(255,255,255,.18);
 }
 html[data-theme="glass"] .logo{text-shadow:0 0 20px rgba(79,99,216,.3);}
 html[data-theme="glass"] .logo-img{filter:none;}
@@ -540,29 +547,29 @@ html[data-theme="glass"] .main-nav button:hover{color:#4f63d8;text-shadow:0 0 16
 html[data-theme="glass"] .card,
 html[data-theme="glass"] .server-card,
 html[data-theme="glass"] .notice-ticker,
-html[data-theme="glass"] .hero-slider-wrap{position:relative;z-index:0;
-background:linear-gradient(180deg,rgba(255,255,255,var(--go1,.55)) 0%,rgba(255,255,255,var(--go2,.18)) 45%,rgba(255,255,255,var(--go3,.28)) 100%);
-backdrop-filter:blur(26px) saturate(180%);
-border:1px solid rgba(255,255,255,.65);
+html[data-theme="glass"] .hero-slider-wrap{position:relative;z-index:130;
+background:linear-gradient(180deg,rgba(255,255,255,var(--go1,.12)) 0%,rgba(255,255,255,var(--go2,.04)) 50%,rgba(255,255,255,var(--go3,.07)) 100%);
+backdrop-filter:saturate(300%) contrast(1.06) brightness(1.06);
+border:1px solid rgba(255,255,255,.7);
 border-radius:22px;
 box-shadow:
-0 0 0 1px rgba(255,255,255,.18),
-0 var(--gsh3,12px) var(--gsh1,40px) rgba(70,90,160,var(--gsh2,.16)),
+0 0 0 1px rgba(140,160,210,.16),
+0 var(--gsh3,12px) var(--gsh1,36px) rgba(90,110,170,var(--gsh2,.1)),
+0 0 26px rgba(160,190,255,.14),
 inset 0 1px 0 rgba(255,255,255,.95),
-inset 0 -1px 0 rgba(255,255,255,.25);
+inset 0 -22px 36px rgba(255,255,255,.32);
 transition:transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .4s ease,background .3s ease,border-color .3s ease;
 }
 html[data-theme="glass"] .card:hover,
 html[data-theme="glass"] .server-card:hover{
 transform:translateY(-6px) scale(1.015);
-background:linear-gradient(180deg,rgba(255,255,255,calc(var(--go1,.55)*1.35)) 0%,rgba(255,255,255,calc(var(--go2,.18)*1.6)) 45%,rgba(255,255,255,calc(var(--go3,.28)*1.5)) 100%);
-border-color:rgba(255,255,255,.9);
+background:linear-gradient(180deg,rgba(255,255,255,calc(var(--go1,.24)*1.4)) 0%,rgba(255,255,255,calc(var(--go2,.08)*1.6)) 50%,rgba(255,255,255,calc(var(--go3,.13)*1.5)) 100%);
+border-color:rgba(255,255,255,.95);
 box-shadow:
 0 0 0 1px rgba(255,255,255,.3),
-0 calc(var(--gsh3,12px)*2) calc(var(--gsh1,40px)*1.5) rgba(70,90,160,calc(var(--gsh2,.16)*1.4)),
-0 0 30px rgba(140,165,255,.16),
-inset 0 1px 0 rgba(255,255,255,1),
-inset 0 -1px 0 rgba(255,255,255,.35);
+0 calc(var(--gsh3,12px)*2) calc(var(--gsh1,36px)*1.5) rgba(90,110,170,calc(var(--gsh2,.12)*1.4)),
+0 0 30px rgba(160,190,255,.14),
+inset 0 1px 0 rgba(255,255,255,1);
 }
 /* 卡片入场 */
 @keyframes cardIn{0%{opacity:0;transform:translateY(18px) scale(.97);}100%{opacity:1;transform:none;}}
@@ -576,12 +583,12 @@ html[data-theme="glass"] .card-grid .card:nth-child(6){animation-delay:.3s;}
 html[data-theme="glass"] .btn-primary,
 html[data-theme="glass"] .feedback-btn,
 html[data-theme="glass"] .collapse-btn{
-background:linear-gradient(180deg,rgba(255,255,255,var(--gb1,.62)) 0%,rgba(255,255,255,var(--gb2,.22)) 100%);
-backdrop-filter:blur(20px) saturate(180%);
-border:1px solid rgba(255,255,255,.7);
+background:linear-gradient(180deg,rgba(255,255,255,var(--gb1,.5)) 0%,rgba(255,255,255,var(--gb2,.16)) 100%);
+backdrop-filter:blur(14px) saturate(270%) contrast(1.05);
+border:1px solid rgba(255,255,255,.9);
 border-radius:999px;
 color:#111827;
-box-shadow:0 6px 20px rgba(70,90,160,.14),inset 0 1px 0 rgba(255,255,255,.95);
+box-shadow:0 6px 18px rgba(90,110,170,.13),inset 0 1px 0 rgba(255,255,255,1),inset 0 -10px 20px rgba(255,255,255,.25);
 transition:transform .35s cubic-bezier(.34,1.56,.64,1),background .25s ease,box-shadow .35s ease;
 }
 html[data-theme="glass"] .btn-primary:hover,
@@ -599,11 +606,11 @@ html[data-theme="glass"] input[type="text"],
 html[data-theme="glass"] input[type="search"],
 html[data-theme="glass"] textarea,
 html[data-theme="glass"] select{
-background:rgba(255,255,255,.4);
-backdrop-filter:blur(16px) saturate(170%);
-border:1px solid rgba(255,255,255,.6);
+background:rgba(255,255,255,.16);
+backdrop-filter:saturate(260%) contrast(1.05);
+border:1px solid rgba(255,255,255,.65);
 border-radius:12px;
-box-shadow:0 4px 16px rgba(70,90,160,.1),inset 0 1px 0 rgba(255,255,255,.85);
+box-shadow:0 4px 14px rgba(90,110,170,.08),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -10px 22px rgba(255,255,255,.14);
 transition:border-color .25s ease,box-shadow .35s ease;
 }
 html[data-theme="glass"] input:focus,
@@ -615,7 +622,7 @@ box-shadow:0 0 0 3px rgba(79,99,216,.12),0 10px 30px rgba(70,90,160,.14);
 /* 时间徽章 */
 html[data-theme="glass"] .time-badge{
 background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,.2));
-backdrop-filter:blur(18px) saturate(170%);
+backdrop-filter:saturate(170%);
 border:1px solid rgba(255,255,255,.6);
 border-radius:999px;
 box-shadow:0 4px 16px rgba(70,90,160,.1),inset 0 1px 0 rgba(255,255,255,.9);
@@ -631,17 +638,18 @@ html[data-theme="glass"] mark{background:rgba(250,204,21,.5);color:#111827;}
 html[data-theme="glass"] .activity-joined{background:rgba(4,120,87,.12);color:#047857;}
 html[data-theme="glass"] .lr-code{background:rgba(217,119,6,.12);color:#b45309;}
 html[data-theme="glass"] .site-footer{border-top:1px solid rgba(255,255,255,.55);}
-/* 可拖动角标（仅玻璃主题） */
-html[data-theme="glass"] .card-grid .card::before{
-content:'可拖动';position:absolute;top:10px;right:14px;font-size:10px;letter-spacing:.5px;
-color:rgba(31,41,55,.35);opacity:0;transition:opacity .25s ease;z-index:2;pointer-events:none;
-}
-html[data-theme="glass"] .card-grid .card:hover::before{opacity:1;}
 html[data-theme="glass"] .card-grid .card.drag-ready{cursor:grab;}
 html[data-theme="glass"] .card-grid .card.dragging{
-cursor:grabbing;transition:none;transform:scale(1.045) rotate(1.2deg);z-index:60;
+cursor:grabbing;transition:none!important;will-change:transform;z-index:60;
 background:linear-gradient(180deg,rgba(255,255,255,.8),rgba(255,255,255,.4));
 box-shadow:0 30px 70px rgba(70,90,160,.3),0 0 0 1px rgba(255,255,255,.4),inset 0 1px 0 rgba(255,255,255,1);
+}
+@keyframes dropBounce{
+0%{transform:scale(1.12)}
+32%{transform:scale(.965)}
+58%{transform:scale(1.045)}
+80%{transform:scale(.992)}
+100%{transform:scale(1)}
 }
 /* 壁纸自选 */
 html[data-theme="glass"][data-gb="aurora"] body{background:linear-gradient(165deg,#d3f8f5 0%,#e0f2fe 30%,#ede9fe 60%,#dff0ff 100%);}
@@ -649,6 +657,8 @@ html[data-theme="glass"][data-gb="sunset"] body{background:linear-gradient(165de
 html[data-theme="glass"][data-gb="mint"] body{background:linear-gradient(165deg,#d8f8e4 0%,#d9f4f2 30%,#dff0ff 65%,#e8f2ff 100%);}
 html[data-theme="glass"][data-gb="custom"] body{background:linear-gradient(165deg,var(--gb-c1,#dce7ff) 0%,var(--gb-c2,#f4e8fb) 100%);}
 /* 色板按钮与浮层 */
+.glass-bg-picker{display:none;}
+html[data-theme="glass"] .glass-bg-picker{display:block;}
 html[data-theme="glass"] .glass-bg-btn{
 width:34px;height:34px;border-radius:50%;
 background:linear-gradient(135deg,#dce7ff,#e6e2ff,#f4e8fb);
@@ -665,8 +675,8 @@ html[data-theme="glass"] .glass-bg-btn:hover{transform:scale(1.12) rotate(10deg)
 html[data-theme="glass"] .glass-bg-btn:active{transform:scale(.9);}
 html[data-theme="glass"] .glass-bg-picker{
 position:absolute;top:52px;right:8px;z-index:120;
-background:rgba(255,255,255,.6);
-backdrop-filter:blur(30px) saturate(180%);
+background:rgba(255,255,255,.52);
+backdrop-filter:blur(28px) saturate(260%) contrast(1.05);
 border:1px solid rgba(255,255,255,.75);
 border-radius:18px;
 box-shadow:0 20px 60px rgba(70,90,160,.25),inset 0 1px 0 rgba(255,255,255,.95);
@@ -687,12 +697,12 @@ transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease;
 html[data-theme="glass"] .glass-bg-picker.hidden{display:none;}
 /* 玻璃实验室（仅玻璃主题的专属功能） */
 html[data-theme="glass"] .glass-bg-picker{
-position:absolute;top:52px;right:8px;z-index:600;width:256px;
-background:rgba(255,255,255,.6);
-backdrop-filter:blur(30px) saturate(180%);
-border:1px solid rgba(255,255,255,.75);
-border-radius:18px;
-box-shadow:0 20px 60px rgba(70,90,160,.25),inset 0 1px 0 rgba(255,255,255,.95);
+position:fixed;top:64px;right:18px;z-index:850;width:256px;
+background:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.12) 100%);
+backdrop-filter:saturate(210%);
+border:1px solid rgba(255,255,255,.8);
+border-radius:20px;
+box-shadow:0 24px 60px rgba(90,110,170,.18),inset 0 1px 0 rgba(255,255,255,.95),inset 0 -18px 38px rgba(255,255,255,.22);
 padding:14px;
 }
 .lab-section{margin-top:14px;}
@@ -714,20 +724,208 @@ html[data-theme="glass"] .glass-bg-picker.hidden{display:none;}
 /* 调试入口 */
 .tst-debug-link{font-size:11px;color:var(--text-secondary);opacity:.55;cursor:pointer;margin-left:12px;text-decoration:none;transition:opacity .2s ease;}
 .tst-debug-link:hover{opacity:1;}
-.tst-debug-mask{position:fixed;inset:0;z-index:500;background:rgba(17,24,39,.35);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;}
+.tst-debug-mask{position:fixed;inset:0;z-index:900;background:rgba(17,24,39,.35);backdrop-filter:none;display:flex;align-items:center;justify-content:center;}
 .tst-debug-mask.hidden{display:none;}
-.tst-debug-box{width:300px;background:rgba(255,255,255,.7);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.8);border-radius:20px;box-shadow:0 30px 80px rgba(70,90,160,.3),inset 0 1px 0 rgba(255,255,255,.95);padding:22px;}
+.tst-debug-box{width:300px;background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px;}
+html[data-theme="glass"] .tst-debug-box{background:rgba(255,255,255,.55);backdrop-filter:saturate(180%);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 80px rgba(70,90,160,.25),inset 0 1px 0 rgba(255,255,255,.9);}
 .db-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;}
-.db-desc{font-size:12px;line-height:1.7;color:var(--text-secondary);background:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.55);border-radius:12px;padding:9px 12px;margin-bottom:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8);}
-#debugInput{width:100%;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.5);font-size:14px;color:var(--text);outline:none;box-shadow:0 4px 16px rgba(70,90,160,.12),inset 0 1px 0 rgba(255,255,255,.85);}
+.db-desc{font-size:12px;line-height:1.7;color:var(--text-secondary);background:var(--hover);border:1px solid var(--border);border-radius:12px;padding:9px 12px;margin-bottom:12px;}
+html[data-theme="glass"] .db-desc{background:rgba(255,255,255,.4);border-color:rgba(255,255,255,.5);}
+#debugInput{width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--hover);font-size:14px;color:var(--text);outline:none;}
+html[data-theme="glass"] #debugInput{background:rgba(255,255,255,.42);border-color:rgba(255,255,255,.6);box-shadow:0 4px 16px rgba(70,90,160,.1),inset 0 1px 0 rgba(255,255,255,.85);}
 .db-btns{display:flex;gap:10px;margin-top:14px;}
-.db-btns button{flex:1;padding:9px 0;border-radius:999px;border:1px solid rgba(255,255,255,.7);font-size:13px;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.3));box-shadow:0 4px 14px rgba(70,90,160,.14),inset 0 1px 0 rgba(255,255,255,.95);color:var(--text);transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
+.db-btns button{flex:1;padding:9px 0;border-radius:999px;border:1px solid var(--border);font-size:13px;cursor:pointer;background:var(--card);box-shadow:var(--shadow);color:var(--text);transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
+html[data-theme="glass"] .db-btns button{background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.3));border-color:rgba(255,255,255,.7);box-shadow:0 4px 14px rgba(70,90,160,.14),inset 0 1px 0 rgba(255,255,255,.95);}
 .db-btns button:hover{transform:scale(1.05);}
 #debugOk{color:#fff!important;background:linear-gradient(180deg,#4f63d8,#3b4fd0)!important;border-color:rgba(79,99,216,.6)!important;}
-#debugHint{font-size:11px;color:#9ca3af;margin-top:10px;}/* 滚动条 */
+#debugHint{font-size:11px;color:var(--text-secondary);margin-top:10px;}/* 滚动条 */
 html[data-theme="glass"] ::-webkit-scrollbar{width:10px;height:10px;}
 html[data-theme="glass"] ::-webkit-scrollbar-thumb{background:rgba(31,41,55,.2);border-radius:8px;border:2px solid transparent;background-clip:content-box;}
-html[data-theme="glass"] ::-webkit-scrollbar-track{background:transparent;}</style>
+html[data-theme="glass"] ::-webkit-scrollbar-track{background:transparent;}
+/* ===== 液态玻璃特效层（往死里叠）===== */
+/* 1.背景光斑漂移+呼吸 */
+html[data-theme="glass"] body::before{
+  animation:gbGlowDrift 16s ease-in-out infinite alternate;
+}
+@keyframes gbGlowDrift{
+  0%{transform:translate(0,0) scale(1);opacity:.85}
+  50%{transform:translate(4%,3%) scale(1.14);opacity:1}
+  100%{transform:translate(-3%,-2%) scale(.94);opacity:.8}
+}
+html[data-theme="glass"] body::after{
+  content:'';position:fixed;inset:-25%;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(950px 620px at 72% 18%,rgba(255,255,255,.55),transparent 62%),
+    radial-gradient(820px 560px at 18% 82%,rgba(180,210,255,.5),transparent 60%);
+  animation:gbGlowDrift2 22s ease-in-out infinite alternate;
+}
+@keyframes gbGlowDrift2{
+  0%{transform:translate(0,0) rotate(0deg);opacity:.7}
+  100%{transform:translate(3%,-3%) rotate(3deg);opacity:1}
+}
+/* 2.标题流光渐变文字 */
+html[data-theme="glass"] .section-title{
+  background:linear-gradient(90deg,#3b4bd8,#8a63ff,#3b4bd8,#8a63ff);
+  background-size:300% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:gbTitleFlow 6s linear infinite;
+}
+@keyframes gbTitleFlow{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+/* 3.卡片逐张弹入 */
+html[data-theme="glass"] .card-grid .card{animation:gbCardIn .8s cubic-bezier(.34,1.56,.64,1) backwards,gbCardBreathe 5s ease-in-out 1.6s infinite;}
+html[data-theme="glass"] .card-grid .card:nth-child(1){animation-delay:.06s,1.6s}
+html[data-theme="glass"] .card-grid .card:nth-child(2){animation-delay:.16s,1.6s}
+html[data-theme="glass"] .card-grid .card:nth-child(3){animation-delay:.26s,1.6s}
+html[data-theme="glass"] .card-grid .card:nth-child(4){animation-delay:.36s,1.6s}
+@keyframes gbCardIn{0%{opacity:0;transform:translateY(30px) scale(.9)}55%{opacity:1;transform:translateY(-6px) scale(1.04)}75%{transform:translateY(2px) scale(.99)}100%{opacity:1;transform:none}}
+/* 4.卡片常驻呼吸光晕 */
+@keyframes gbCardBreathe{
+  0%,100%{box-shadow:0 0 0 1px rgba(140,160,210,.16),0 14px 40px rgba(90,110,170,.12),inset 0 1px 0 rgba(255,255,255,.85)}
+  50%{box-shadow:0 0 0 1px rgba(140,160,210,.24),0 16px 50px rgba(110,140,220,.2),0 0 30px rgba(160,190,255,.22),inset 0 1px 0 rgba(255,255,255,.92)}
+}
+/* 5.卡片 hover 大弹跳 + 流光扫过 */
+html[data-theme="glass"] .card-grid .card::after{
+  content:'';position:absolute;top:0;left:-80%;width:55%;height:100%;pointer-events:none;z-index:1;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.6),transparent);
+  transform:skewX(-16deg);opacity:0;
+}
+html[data-theme="glass"] .card-grid .card:hover{animation:gbHoverPop .55s cubic-bezier(.34,1.56,.64,1);}
+html[data-theme="glass"] .card-grid .card:hover::after{animation:gbShine .95s ease forwards;}
+@keyframes gbHoverPop{
+  0%{transform:scale(1)}
+  38%{transform:scale(1.065) rotate(-.8deg)}
+  68%{transform:scale(.975) rotate(.3deg)}
+  100%{transform:scale(1.025) rotate(0deg)}
+}
+@keyframes gbShine{0%{left:-80%;opacity:0}28%{opacity:1}100%{left:135%;opacity:0}}
+/* 6.卡片反光跟随鼠标（--mx/--my 由 JS 注入） */
+html[data-theme="glass"] .card-grid .card{
+  background:
+    radial-gradient(240px 240px at var(--mx,50%) var(--my,18%),rgba(255,255,255,.5),transparent 72%),
+    linear-gradient(180deg,rgba(255,255,255,.85) 0%,rgba(255,255,255,0) 12%),
+    linear-gradient(0deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,0) 14%),
+    linear-gradient(180deg,rgba(255,255,255,var(--go1,.24)) 0%,rgba(255,255,255,var(--go2,.08)) 46%,rgba(255,255,255,var(--go3,.13)) 100%);
+  border:1px solid rgba(255,255,255,.85);
+  box-shadow:
+    0 0 0 1px rgba(140,160,210,.22),
+    0 14px 40px rgba(90,110,170,.16),
+    0 1px 0 rgba(255,110,150,.16),
+    0 -1px 0 rgba(110,150,255,.16),
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 -20px 44px rgba(255,255,255,.3);
+  backdrop-filter:saturate(300%) contrast(1.06) brightness(1.06);
+}
+/* 7.导航 hover 弹跳 */
+html[data-theme="glass"] .main-nav .nav-link{transition:transform .4s cubic-bezier(.34,1.56,.64,1),color .25s ease,background .25s ease;}
+html[data-theme="glass"] .main-nav .nav-link:hover{transform:translateY(-2px) scale(1.1);}
+html[data-theme="glass"] .main-nav .nav-link:active{transform:scale(.94);}
+/* 8.按钮 hover 弹跳+光晕 */
+html[data-theme="glass"] .btn-primary,
+html[data-theme="glass"] .feedback-btn,
+html[data-theme="glass"] .collapse-btn{transition:transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .35s ease,background .3s ease;}
+html[data-theme="glass"] .btn-primary:hover,
+html[data-theme="glass"] .feedback-btn:hover,
+html[data-theme="glass"] .collapse-btn:hover{animation:gbBtnPop .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 14px 34px rgba(90,110,170,.25),0 0 26px rgba(160,190,255,.3),inset 0 1px 0 rgba(255,255,255,1);}
+@keyframes gbBtnPop{0%{transform:scale(1)}45%{transform:scale(1.15)}70%{transform:scale(.95)}100%{transform:scale(1.07)}}
+/* 9.轮播图呼吸光晕 */
+html[data-theme="glass"] .hero-slider-wrap{animation:gbHeroBreathe 6s ease-in-out 1.2s infinite;}
+@keyframes gbHeroBreathe{0%,100%{box-shadow:0 18px 46px rgba(90,110,170,.14),inset 0 1px 0 rgba(255,255,255,.95)}50%{box-shadow:0 18px 60px rgba(110,140,220,.22),0 0 40px rgba(160,190,255,.25),inset 0 1px 0 rgba(255,255,255,1)}}
+/* 10.搜索框聚焦微弹 */
+html[data-theme="glass"] input[type="search"]:focus,
+html[data-theme="glass"] input[type="text"]:focus,
+html[data-theme="glass"] textarea:focus{transform:scale(1.015);box-shadow:0 8px 28px rgba(90,110,170,.16),0 0 0 3px rgba(79,99,216,.2),inset 0 1px 0 rgba(255,255,255,.9);}
+/* 11.滚动渐入 */
+html[data-theme="glass"] .gb-wait{opacity:0;transform:translateY(34px) scale(.96);transition:opacity .75s ease,transform .9s cubic-bezier(.34,1.56,.64,1);}
+html[data-theme="glass"] .gb-in{opacity:1;transform:none;}
+/* 12.玻璃实验室面板弹入 */
+html[data-theme="glass"] .glass-bg-picker{animation:gbPanelIn .6s cubic-bezier(.34,1.56,.64,1);transform-origin:top right;}
+@keyframes gbPanelIn{0%{opacity:0;transform:scale(.85) translateY(-14px)}60%{opacity:1;transform:scale(1.03) translateY(2px)}100%{opacity:1;transform:none}}
+
+
+/* ===== 卡片自由拖动（玻璃主题·拖到哪放哪）===== */
+html[data-theme="glass"] .card-grid{
+  display:block;position:relative;
+}
+html[data-theme="glass"] .card-grid .card{
+  position:absolute;margin:0;top:0;left:0;
+  will-change:left,top;
+}
+html[data-theme="glass"] .card-grid .card.dragging{
+  cursor:grabbing;transition:none!important;z-index:60;
+  background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.32));
+  box-shadow:0 30px 70px rgba(70,90,160,.28),0 0 0 1px rgba(255,255,255,.4),inset 0 1px 0 rgba(255,255,255,1);
+  transform:scale(1.06) rotate(.8deg);
+}
+
+
+/* ===== 导航全套动画（玻璃主题）===== */
+/* 导航栏整体滑入 */
+html[data-theme="glass"] .site-header{animation:gbNavIn .7s cubic-bezier(.34,1.56,.64,1);}
+@keyframes gbNavIn{0%{opacity:0;transform:translateY(-46px)}100%{opacity:1;transform:none}}
+/* 导航链接逐个错峰弹入 */
+html[data-theme="glass"] .main-nav .nav-link{animation:gbNavLinkIn .6s cubic-bezier(.34,1.56,.64,1) backwards;}
+html[data-theme="glass"] .main-nav .nav-link:nth-child(1){animation-delay:.08s}
+html[data-theme="glass"] .main-nav .nav-link:nth-child(2){animation-delay:.15s}
+html[data-theme="glass"] .main-nav .nav-link:nth-child(3){animation-delay:.22s}
+html[data-theme="glass"] .main-nav .nav-link:nth-child(4){animation-delay:.29s}
+html[data-theme="glass"] .main-nav .nav-link:nth-child(5){animation-delay:.36s}
+html[data-theme="glass"] .main-nav .nav-link:nth-child(6){animation-delay:.43s}
+html[data-theme="glass"] .main-nav .nav-link:nth-child(7){animation-delay:.5s}
+@keyframes gbNavLinkIn{0%{opacity:0;transform:translateY(-16px) scale(.7)}60%{opacity:1;transform:translateY(3px) scale(1.12)}100%{opacity:1;transform:none}}
+/* hover 增强：上浮+光晕 */
+html[data-theme="glass"] .main-nav .nav-link:hover{transform:translateY(-4px) scale(1.16);box-shadow:0 10px 22px rgba(79,99,216,.28),0 0 18px rgba(140,160,255,.35);}
+/* 导航底部流光循环扫过 */
+html[data-theme="glass"] .site-header::after{
+  content:'';position:absolute;left:-60%;bottom:0;height:2px;width:40%;
+  background:linear-gradient(90deg,transparent,rgba(140,160,255,.9),transparent);
+  animation:gbNavShine 4.5s linear infinite;
+  pointer-events:none;
+}
+@keyframes gbNavShine{0%{left:-60%}100%{left:120%}}
+
+
+/* ===== 玩家公约页玻璃化+动画 ===== */
+html[data-theme="glass"] .rule-scroll{
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(14px) saturate(260%) contrast(1.04);
+  border:1px solid rgba(255,255,255,.45);
+  border-radius:16px;
+  box-shadow:0 12px 34px rgba(90,110,170,.1),inset 0 1px 0 rgba(255,255,255,.7);
+}
+html[data-theme="glass"] .rule-section{
+  background:linear-gradient(180deg,rgba(255,255,255,var(--go1,.12)) 0%,rgba(255,255,255,var(--go2,.04)) 50%,rgba(255,255,255,var(--go3,.07)) 100%);
+  backdrop-filter:blur(16px) saturate(300%) contrast(1.06);
+  border:1px solid rgba(255,255,255,.5);
+  border-radius:16px;
+  box-shadow:0 8px 24px rgba(90,110,170,.1),inset 0 1px 0 rgba(255,255,255,.8);
+  animation:gbRuleIn .7s cubic-bezier(.34,1.56,.64,1) backwards;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .35s ease;
+}
+html[data-theme="glass"] .rule-section:nth-child(1){animation-delay:.05s}
+html[data-theme="glass"] .rule-section:nth-child(2){animation-delay:.14s}
+html[data-theme="glass"] .rule-section:nth-child(3){animation-delay:.23s}
+html[data-theme="glass"] .rule-section:nth-child(4){animation-delay:.32s}
+html[data-theme="glass"] .rule-section:nth-child(5){animation-delay:.41s}
+html[data-theme="glass"] .rule-section:nth-child(6){animation-delay:.5s}
+html[data-theme="glass"] .rule-section:nth-child(7){animation-delay:.59s}
+html[data-theme="glass"] .rule-section:nth-child(8){animation-delay:.68s}
+@keyframes gbRuleIn{0%{opacity:0;transform:translateX(-28px) scale(.95)}60%{opacity:1;transform:translateX(4px) scale(1.02)}100%{opacity:1;transform:none}}
+html[data-theme="glass"] .rule-section:hover{transform:translateX(6px);box-shadow:0 12px 30px rgba(90,110,170,.16),0 0 22px rgba(160,190,255,.22),inset 0 1px 0 rgba(255,255,255,.9);}
+html[data-theme="glass"] .rule-section h3{color:#4f63d8;}
+html[data-theme="glass"] .rule-section p strong{color:#4f63d8;}
+
+
+/* ===== 拖动模式分段开关 ===== */
+html[data-theme="glass"] .gb-seg{display:flex;gap:6px;}
+html[data-theme="glass"] .gb-seg-btn{
+  flex:1;padding:6px 8px;font-size:12px;border-radius:10px;cursor:pointer;
+  background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.7);
+  color:#1f2937;font-weight:500;transition:all .3s cubic-bezier(.34,1.56,.64,1);
+}
+html[data-theme="glass"] .gb-seg-btn.active{background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.6));box-shadow:0 6px 16px rgba(90,110,170,.18),inset 0 1px 0 #fff;}
+html[data-theme="glass"] .gb-seg-btn:active{transform:scale(.92);}
+
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -757,9 +955,18 @@ html[data-theme="glass"] ::-webkit-scrollbar-track{background:transparent;}</sty
 <a class="feedback-btn" href="profile.html">我的</a>
 <a class="feedback-btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
 
-<button class="glass-bg-btn" id="glassBgBtn" title="玻璃实验室" aria-label="玻璃实验室"></button>
+<button class="glass-bg-btn" id="glassBgBtn" title="液态玻璃实验室" aria-label="液态玻璃实验室"></button>
+<button class="theme-toggle" id="themeToggle" title="切换主题（浅色/深色/液态玻璃）" aria-label="切换主题">
+<span class="tt-ic tt-sun">☀</span>
+<span class="tt-ic tt-moon">☾</span>
+<span class="tt-thumb" id="themeThumb"></span>
+</button>
+</div>
+</div>
+</header>
+
 <div class="glass-bg-picker hidden" id="glassBgPicker">
-<div class="gb-picker-title">玻璃实验室</div>
+<div class="gb-picker-title">液态玻璃实验室</div>
 <div class="lab-section">
 <div class="lab-title">背景壁纸</div>
 <div class="lab-row">
@@ -777,8 +984,8 @@ html[data-theme="glass"] ::-webkit-scrollbar-track{background:transparent;}</sty
 <div class="lab-section">
 <div class="lab-title">UI 透明度</div>
 <div class="lab-slider">
-<label><span>通透</span><span id="opVal">38%</span></label>
-<input type="range" id="gbOpacity" min="15" max="85" value="38">
+<label><span>通透</span><span id="opVal">18%</span></label>
+<input type="range" id="gbOpacity" min="4" max="100" value="18">
 </div>
 </div>
 <div class="lab-section">
@@ -796,17 +1003,14 @@ html[data-theme="glass"] ::-webkit-scrollbar-track{background:transparent;}</sty
 <input type="range" id="gbSh3" min="-20" max="44" value="12">
 </div>
 </div>
+<div class="lab-section">
+<div class="lab-title">拖动模式</div>
+<div class="gb-seg" id="gbDragSeg">
+<button class="gb-seg-btn active" data-drag="grid">网格排序</button>
+<button class="gb-seg-btn" data-drag="free">自由摆放</button>
 </div>
-<button class="theme-toggle" id="themeToggle" title="切换深色/浅色" aria-label="切换主题">
-<span class="tt-ic tt-sun">☀</span>
-<span class="tt-ic tt-moon">☾</span>
-<span class="tt-thumb" id="themeThumb"></span>
-</button>
 </div>
 </div>
-</header>
-
-
 
 <div class="notice-ticker" id="noticeTicker" style="display:none;">
 <span class="ticker-label">最新公告</span>
@@ -1164,8 +1368,16 @@ function applyTheme(){
   root.setAttribute('data-theme',m);
 }
 $('#themeToggle').onclick=()=>{
-  localStorage.setItem('tst-theme',themeState()==='glass'?'light':(themeState()==='dark'?'light':'dark'));
+  const cur=themeState();
+  const next=cur==='light'?'dark':(cur==='dark'?'glass':'light');
+  if(next==='glass'){
+    const mask=document.getElementById('gbConfirmMask');
+    if(mask){mask.classList.remove('hidden');const inp=document.getElementById('gbConfirmInput');if(inp){inp.value='';inp.style.borderColor='';setTimeout(function(){inp.focus();},80);}}
+    return;
+  }
+  localStorage.setItem('tst-theme',next);
   applyTheme();
+  if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 };
 applyTheme();
 if(typeof syncGlassBgUI==='function')syncGlassBgUI();
@@ -1195,7 +1407,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   }
   function applyGlassSliders(){
     const root=document.documentElement;
-    const op=parseFloat(localStorage.getItem('tst-glass-op')||'38');
+    const op=parseFloat(localStorage.getItem('tst-glass-op')||'18');
     const sh1=parseFloat(localStorage.getItem('tst-glass-sh1')||'40');
     const sh2=parseFloat(localStorage.getItem('tst-glass-sh2')||'16');
     const sh3=parseFloat(localStorage.getItem('tst-glass-sh3')||'12');
@@ -1303,7 +1515,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   });
 })();
 
-// ===== 卡片自由拖动（仅玻璃主题启用）=====
+// ===== 卡片拖动（双模式：网格排序 / 自由摆放，玩家自选）=====
 (function(){
   const grid=document.querySelector('.card-grid');
   if(!grid)return;
@@ -1311,70 +1523,209 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   if(!cards.length)return;
   cards.forEach(function(card,i){card.setAttribute('data-card-id','sc'+i);});
   function isGlass(){return themeState()==='glass';}
-  function restoreOrder(){
-    try{
-      const saved=JSON.parse(localStorage.getItem('tst-card-order')||'null');
-      if(saved&&Array.isArray(saved)&&saved.length){
-        saved.forEach(function(id){
-          const el=grid.querySelector("[data-card-id='"+id+"']");
-          if(el)grid.appendChild(el);
-        });
-      }
-    }catch(e){}
+  function dragMode(){return localStorage.getItem('tst-drag-mode')||'grid';}
+  const GAP=16;
+  let initDone=false,order=[],freePos={};
+  function cols(){return grid.clientWidth>=700?2:1;}
+  function cardWidth(){const gw=grid.clientWidth;return gw>=700?(gw-GAP)/2:gw;}
+  function posOf(i){const c=cols(),cw=cardWidth(),ch=(cards[0]&&cards[0].offsetHeight)?cards[0].offsetHeight:118;return {x:(i%c)*(cw+GAP),y:Math.floor(i/c)*(ch+GAP)};}
+  function clampPos(x,y){const gw=grid.clientWidth,cw=cardWidth();return {x:Math.max(0,Math.min(gw-cw,x)),y:Math.max(0,y)};}
+  function layoutInit(){
+    if(initDone)return;
+    initDone=true;
+    if(dragMode()==='free'){
+      try{freePos=JSON.parse(localStorage.getItem('tst-card-free')||'null');}catch(e){}
+      if(!freePos)freePos={};
+      cards.forEach(function(card,i){
+        const id=card.getAttribute('data-card-id');
+        card.style.width=cardWidth()+'px';
+        if(freePos[id]){card.style.left=freePos[id][0]+'px';card.style.top=freePos[id][1]+'px';}
+        else{const p=posOf(i);card.style.left=p.x+'px';card.style.top=p.y+'px';}
+      });
+    }else{
+      try{order=JSON.parse(localStorage.getItem('tst-card-order')||'null');}catch(e){}
+      if(!Array.isArray(order)||order.length!==cards.length){order=cards.map(function(c){return c.getAttribute('data-card-id');});}
+      applyOrder();
+    }
+    updateH();
   }
-  restoreOrder();
-  let dragEl=null,startX=0,startY=0,origRect=null,dragging=false;
+  function applyOrder(){
+    cards.forEach(function(card){
+      const i=order.indexOf(card.getAttribute('data-card-id'));
+      const p=posOf(i);
+      card.style.width=cardWidth()+'px';
+      card.style.left=p.x+'px';card.style.top=p.y+'px';
+    });
+    updateH();
+  }
+  function updateH(){
+    let maxB=0;
+    cards.forEach(function(card){const b=card.offsetTop+card.offsetHeight;if(b>maxB)maxB=b;});
+    grid.style.height=(maxB+GAP)+'px';
+  }
+  let dragEl=null,startX=0,startY=0,startIdx=-1,curIdx=-1,dragging=false;
   grid.addEventListener('pointerdown',function(e){
     if(!isGlass())return;
     const card=e.target.closest('.card');
     if(!card||card.parentNode!==grid)return;
     if(e.target.closest('a,button,input,textarea,select'))return;
     dragEl=card;dragging=false;
-    origRect=card.getBoundingClientRect();
     startX=e.clientX;startY=e.clientY;
-    card.classList.add('drag-ready');
+    startIdx=order.length?order.indexOf(card.getAttribute('data-card-id')):cards.indexOf(card);
+    if(startIdx<0)startIdx=0;
+    curIdx=startIdx;
   });
   grid.addEventListener('pointermove',function(e){
     if(!dragEl)return;
     const dx=e.clientX-startX,dy=e.clientY-startY;
-    if(!dragging&&Math.hypot(dx,dy)<8)return;
-    if(!dragging){
-      dragging=true;
-      dragEl.classList.remove('drag-ready');
-      dragEl.classList.add('dragging');
-      dragEl.style.left=origRect.left+'px';
-      dragEl.style.top=origRect.top+'px';
-      dragEl.style.width=origRect.width+'px';
-      dragEl.style.height=origRect.height+'px';
-      dragEl.style.position='fixed';
-      dragEl.style.margin='0';
+    if(!dragging&&Math.hypot(dx,dy)<6)return;
+    if(!dragging){dragging=true;dragEl.classList.add('dragging');dragEl.style.zIndex='70';}
+    if(dragMode()==='free'){
+      const baseX=parseFloat(dragEl.style.left)||dragEl.offsetLeft;
+      const baseY=parseFloat(dragEl.style.top)||dragEl.offsetTop;
+      const np=clampPos(baseX+dx,baseY+dy);
+      dragEl.style.left=np.x+'px';dragEl.style.top=np.y+'px';
+    }else{
+      const sp=posOf(startIdx);
+      dragEl.style.left=(sp.x+dx)+'px';dragEl.style.top=(sp.y+dy)+'px';
+      const c=cols(),cw=cardWidth(),ch=cards[0]?cards[0].offsetHeight:0;
+      const col=Math.round(dx/(cw+GAP))+(startIdx%c);
+      const row=Math.round(dy/(ch+GAP))+Math.floor(startIdx/c);
+      const ni=Math.max(0,Math.min(cards.length-1,row*c+col));
+      if(ni!==curIdx){
+        curIdx=ni;
+        const id=dragEl.getAttribute('data-card-id');
+        const from=order.indexOf(id);
+        order.splice(from,1);order.splice(ni,0,id);
+        cards.forEach(function(card){
+          if(card===dragEl)return;
+          const pi=order.indexOf(card.getAttribute('data-card-id'));
+          const p=posOf(pi);
+          card.style.transition='left .4s cubic-bezier(.34,1.56,.64,1),top .4s cubic-bezier(.34,1.56,.64,1)';
+          card.style.left=p.x+'px';card.style.top=p.y+'px';
+        });
+      }
     }
-    dragEl.style.transform='translate('+dx+'px,'+dy+'px)';
-    const cx=e.clientX,cy=e.clientY;
-    const others=[].slice.call(grid.children).filter(function(c){return c!==dragEl;});
-    let before=null;
-    for(let i=0;i<others.length;i++){
-      const r=others[i].getBoundingClientRect();
-      if(cx<r.left+r.width/2&&cy<r.top+r.height/2){before=others[i];break;}
-    }
-    if(before)grid.insertBefore(dragEl,before);
-    else grid.appendChild(dragEl);
   });
   function endDrag(){
     if(!dragEl)return;
     const card=dragEl;
     dragEl=null;
-    if(!dragging){card.classList.remove('drag-ready');return;}
+    if(!dragging)return;
     dragging=false;
     card.classList.remove('dragging');
-    card.style.position='';
-    card.style.left='';card.style.top='';card.style.width='';card.style.height='';card.style.margin='';
-    card.style.transform='';
-    const order=[].slice.call(grid.children).map(function(c){return c.getAttribute('data-card-id');});
-    localStorage.setItem('tst-card-order',JSON.stringify(order));
+    card.style.zIndex='';
+    if(dragMode()==='free'){
+      const saved=JSON.parse(localStorage.getItem('tst-card-free')||'{}')||{};
+      cards.forEach(function(c){saved[c.getAttribute('data-card-id')]=[Math.round(c.offsetLeft),Math.round(c.offsetTop)];});
+      localStorage.setItem('tst-card-free',JSON.stringify(saved));
+    }else{
+      card.style.transition='left .4s cubic-bezier(.34,1.56,.64,1),top .4s cubic-bezier(.34,1.56,.64,1)';
+      const pi=order.indexOf(card.getAttribute('data-card-id'));
+      const p=posOf(pi);
+      card.style.left=p.x+'px';card.style.top=p.y+'px';
+      localStorage.setItem('tst-card-order',JSON.stringify(order));
+      setTimeout(function(){cards.forEach(function(c){c.style.transition='';});card.style.transition='';},450);
+    }
+    updateH();
+    card.style.animation='none';void card.offsetWidth;
+    card.style.animation='dropBounce .6s cubic-bezier(.34,1.56,.64,1)';
+    setTimeout(function(){card.style.animation='';},700);
   }
   grid.addEventListener('pointerup',endDrag);
   grid.addEventListener('pointercancel',endDrag);
+  function resetCardFree(){
+    initDone=false;order=[];freePos={};
+    cards.forEach(function(card){
+      card.style.left='';card.style.top='';card.style.width='';card.style.transition='';card.style.zIndex='';
+      card.classList.remove('dragging');
+    });
+    grid.style.height='';
+  }
+  window.resetCardFree=resetCardFree;
+  window.applyDragMode=function(){
+    resetCardFree();
+    if(isGlass())layoutInit();
+  };
+  if(isGlass())layoutInit();
+  const mo=new MutationObserver(function(){
+    if(isGlass()&&!initDone)layoutInit();
+    if(!isGlass()&&initDone)resetCardFree();
+  });
+  mo.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-gb']});
+  window.addEventListener('resize',function(){
+    if(!isGlass()||!initDone)return;
+    if(dragMode()==='free'){
+      cards.forEach(function(card){card.style.width=cardWidth()+'px';});
+    }else applyOrder();
+  });
+})();
+
+
+// ===== 拖动模式切换（玻璃实验室面板）=====
+(function(){
+  var seg=document.getElementById('gbDragSeg');
+  if(!seg)return;
+  var btns=seg.querySelectorAll('.gb-seg-btn');
+  function sync(){
+    var m=localStorage.getItem('tst-drag-mode')||'grid';
+    btns.forEach(function(b){b.classList.toggle('active',b.getAttribute('data-drag')===m);});
+  }
+  function tip(text){
+    var t=document.createElement('div');
+    t.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:999;padding:11px 20px;border-radius:14px;background:rgba(255,255,255,.85);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.75);box-shadow:0 16px 50px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,.9);color:#1f2937;font-size:14px;opacity:0;transition:opacity .4s ease,transform .45s cubic-bezier(.34,1.56,.64,1);pointer-events:none;';
+    t.textContent=text;
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';});
+    setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';setTimeout(function(){t.remove();},450);},1800);
+  }
+  seg.addEventListener('click',function(e){
+    var b=e.target.closest('.gb-seg-btn');
+    if(!b)return;
+    var m=b.getAttribute('data-drag');
+    localStorage.setItem('tst-drag-mode',m);
+    sync();
+    if(window.applyDragMode)applyDragMode();
+    tip(m==='free'?'已切换：自由摆放（拖到哪放哪）':'已切换：网格排序（自动对齐）');
+  });
+  sync();
+})();
+
+// ===== 液态玻璃特效：鼠标光晕 + 卡片反光 + 滚动渐入 =====
+(function(){
+  function gs(){return themeState()==='glass';}
+  var m=document.createElement('div');
+  m.style.cssText='position:fixed;left:0;top:0;width:340px;height:340px;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle,rgba(255,255,255,.3),transparent 66%);mix-blend-mode:screen;transform:translate(-50%,-50%);opacity:0;transition:opacity .5s ease;';
+  document.body.appendChild(m);
+  var shown=false;
+  document.addEventListener('mousemove',function(e){
+    if(!gs()){m.style.opacity='0';return;}
+    if(!shown){shown=true;m.style.opacity='1';}
+    m.style.left=e.clientX+'px';m.style.top=e.clientY+'px';
+  });
+  function bindCard(card){
+    card.addEventListener('mousemove',function(e){
+      var r=card.getBoundingClientRect();
+      var x=((e.clientX-r.left)/r.width*100).toFixed(1),y=((e.clientY-r.top)/r.height*100).toFixed(1);
+      card.style.setProperty('--mx',x+'%');card.style.setProperty('--my',y+'%');
+    });
+  }
+  var cards=document.querySelectorAll('.card-grid .card');
+  for(var i=0;i<cards.length;i++)bindCard(cards[i]);
+  var els=[].slice.call(document.querySelectorAll('.section-title,.card-grid,.notice-ticker,.hero-slider-wrap,.server-card'));
+  els.forEach(function(el){el.classList.add('gb-wait');});
+  var io=null;
+  if('IntersectionObserver' in window){
+    io=new IntersectionObserver(function(es){
+      es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('gb-in');io.unobserve(en.target);}});
+    },{threshold:.05});
+    els.forEach(function(el){io.observe(el);});
+  }
+  // 兜底：1.2s 后仍未进入视口的元素强制显示，避免卡白
+  setTimeout(function(){
+    els.forEach(function(el){el.classList.add('gb-in');});
+    if(io)io.disconnect();
+  },1200);
 })();
 
 // 首次玻璃主题提示：小卡片可自由拖动
@@ -1387,7 +1738,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     localStorage.setItem('tst-card-drag-hint','1');
     const tip=document.createElement('div');
     tip.id='glassDragTip';
-    tip.textContent='玻璃主题下，亮点小卡片可自由拖动排列';
+    tip.textContent='液态玻璃主题下，亮点小卡片可自由拖动排列';
     tip.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:999;padding:11px 20px;border-radius:14px;background:rgba(255,255,255,.7);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.75);box-shadow:0 16px 50px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,.9);color:#1f2937;font-size:14px;opacity:0;transition:opacity .4s ease,transform .45s cubic-bezier(.34,1.56,.64,1);pointer-events:none;';
     document.body.appendChild(tip);
     requestAnimationFrame(function(){tip.style.opacity='1';tip.style.transform='translateX(-50%) translateY(0)';});
@@ -2955,6 +3306,38 @@ function doLottery(){
 
 </script>
 
+<div class="tst-debug-mask hidden" id="gbConfirmMask">
+<div class="tst-debug-box" style="width:340px;">
+<div class="db-title">切换液态玻璃主题</div>
+<div class="db-desc">液态玻璃主题对设备配置要求较高，可能影响流畅度。请输入「我确认」三个字后继续切换。</div>
+<input type="text" id="gbConfirmInput" placeholder="输入：我确认" autocomplete="off" style="background:rgba(255,255,255,.5);">
+<div class="db-btns"><button id="gbConfirmOk">确认切换</button><button id="gbConfirmCancel">取消</button></div>
+</div>
+</div>
+<script>
+(function(){
+  const mask=document.getElementById('gbConfirmMask');
+  if(!mask)return;
+  const input=document.getElementById('gbConfirmInput');
+  const ok=document.getElementById('gbConfirmOk');
+  const cancel=document.getElementById('gbConfirmCancel');
+  function close(){mask.classList.add('hidden');}
+  function doSwitch(){
+    if(input.value.trim()==='我确认'){
+      localStorage.setItem('tst-theme','glass');
+      applyTheme();
+      if(typeof syncGlassBgUI==='function')syncGlassBgUI();
+    }else{
+      input.style.borderColor='#ef4444';input.focus();return;
+    }
+    close();
+  }
+  ok.onclick=doSwitch;
+  cancel.onclick=close;
+  input.onkeydown=function(e){if(e.key==='Enter')doSwitch();};
+  mask.onclick=function(e){if(e.target===mask)close();};
+})();
+</script>
 <div class="tst-debug-mask hidden" id="debugMask">
 <div class="tst-debug-box">
 <div class="db-title">调试控制台</div>
