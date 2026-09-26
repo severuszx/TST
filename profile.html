@@ -482,6 +482,7 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 <strong id="stScreen">--</strong>
 </div>
 </div>
+<div style="font-size:12px;color:var(--text-secondary);margin-top:12px;line-height:1.6;">以上设备信息仅在本机检测显示，不会上传服务器。</div>
 </div>
 
 <div class="card" style="padding:18px;margin-bottom:16px;text-align:center;">
@@ -783,12 +784,16 @@ if($('#copyAddrBtn')) if($('#copyAddrBtn')) $('#copyAddrBtn').onclick=async()=>{
     await navigator.clipboard.writeText($('#serverAddr').textContent);
     showToast('服务器地址已复制');
   }catch(e){
-    const range=document.createRange();
-    range.selectNodeContents($('#serverAddr'));
-    const sel=window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-    showToast('服务器地址已复制');
+    try{
+      const range=document.createRange();
+      range.selectNodeContents($('#serverAddr'));
+      const sel=window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      const ok = document.execCommand && document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      if(ok){ showToast('服务器地址已复制'); } else { showToast('复制失败，请手动复制'); }
+    }catch(e2){ showToast('复制失败，请手动复制'); }
   }
   setTimeout(()=>{ copyFlag=false; },1500);
 };
