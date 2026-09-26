@@ -212,6 +212,15 @@ cursor:pointer;font-size:14px;
 }
 .add-elem:hover{background:var(--hover);color:var(--text);}
 .hint-line{font-size:12px;color:var(--text-secondary);margin-top:6px;}
+
+/* 移动端导航（2A2MF6） */
+@media(max-width:960px){
+.header-inner{gap:8px;flex-wrap:wrap;}
+.main-nav{order:3;flex-basis:100%;display:flex;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap;padding-bottom:2px;}
+.main-nav::-webkit-scrollbar{display:none;}
+.header-right{margin-left:0;flex-wrap:nowrap;}
+.nav-link{font-size:13px;padding:7px 10px;}
+}
 </style>
 </head>
 <body>

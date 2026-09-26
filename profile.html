@@ -807,7 +807,7 @@ if($('#openQQGroup')) $('#openQQGroup').onclick=()=>{
 
 async function loadData(){
   try{
-    const r=await fetch('https://tst-server-site.pages.dev/api/data');
+    const r=await fetch('/api/data');
     const d=await r.json();
     if(d.ok){
     SITE_DATA=d;
@@ -1304,7 +1304,7 @@ adminModal.addEventListener('click',(e)=>{
 if($('#adminLoginBtn')) $('#adminLoginBtn').onclick=async()=>{
   const pwd=$('#adminPwd').value;
   if(!pwd){ showToast('请输入密码'); return; }
-  const r=await fetch('https://tst-server-site.pages.dev/api/admin',{
+  const r=await fetch('/api/admin',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({action:'login',password:pwd})
@@ -1337,7 +1337,7 @@ document.querySelectorAll('.admin-tab').forEach(t=>{
   };
 });
 async function adminApi(action,data,extra){
-  const r=await fetch('https://tst-server-site.pages.dev/api/admin',{
+  const r=await fetch('/api/admin',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+ADMIN_TOKEN},
     body:JSON.stringify({action,data,...(extra||{})})

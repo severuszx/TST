@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://theslowtide.pages.dev/sitemap.xml

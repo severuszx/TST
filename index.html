@@ -4,9 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Slow Tide 官网</title>
+<meta name="description" content="The Slow Tide 我的世界基岩版生存服务器官网：公告、动态、活动、玩家公约与便捷工具。">
+<meta name="keywords" content="The Slow Tide,我的世界,MC服务器,基岩版,生存服务器,网易">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="The Slow Tide 官网">
+<meta property="og:type" content="website">
+<meta property="og:description" content="The Slow Tide 我的世界基岩版生存服务器官网">
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f5f8" media="(prefers-color-scheme: light)">
+<link rel="icon" href="logo.jpg" type="image/jpeg">
+<link rel="manifest" href="manifest.json">
 <script>
 const serverStart=new Date('2026-06-30T00:00:00');
-const offsetMs=120*1000;
+const offsetMs=120*1000; // 服务器启动时间校准偏移：serverStart 比实际开服晚 2 分钟，此处补回（单位毫秒）
 function updateTime(){
   const now=new Date();
   const hh=String(now.getHours()).padStart(2,'0');
@@ -457,6 +467,23 @@ html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
 .fx-ring{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:0;height:0;border:3px solid rgba(253,224,71,.85);border-radius:50%;z-index:9998;pointer-events:none;opacity:0;}
 .fx-ring.on{animation:ringExpand 1.6s ease-out forwards;}
 @keyframes ringExpand{0%{width:0;height:0;opacity:1;}100%{width:120vmax;height:120vmax;opacity:0;}}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--border);cursor:pointer;transition:transform .15s;}
+.dot:hover{transform:scale(1.25);}
+.dot.active{background:var(--accent);}
+.btn:active,.nav-link:active,.feedback-btn:active,.theme-toggle:active,.more-menu .nav-link:active,.back-top:active{opacity:.72;transform:scale(.97);}
+input,textarea,select{font-size:16px;}
+.collapse-box{max-height:150px;overflow:hidden;position:relative;}
+.collapse-box.open{max-height:none;}
+.collapse-btn{display:block;margin-top:8px;color:var(--accent);cursor:pointer;background:none;border:none;font-size:13px;padding:0;}
+html[data-theme="dark"]{--text-secondary:#a5a5ad;}
+img{background:var(--hover);}
+@media print{.site-header,.site-footer,.back-top,.notice-ticker,#backTop,.modal-mask{display:none!important;}body{background:#fff!important;color:#000!important;}}
+.history-timeline{border-left:2px solid var(--border);padding-left:20px;margin-top:10px;}
+.history-item{position:relative;padding:7px 0;font-size:14px;}
+.history-item::before{content:'';position:absolute;left:-25px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--accent);}
+.history-item .hi-date{font-weight:700;color:var(--accent);margin-right:8px;}
+.copy-ok{background:#22c55e!important;color:#fff!important;}
+@media(max-width:960px){.dot{width:13px;height:13px;}}
 </style>
 </head>
 <body>
@@ -521,9 +548,9 @@ html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
 <div class="container">
 <div class="hero-slider-wrap">
 <div class="hero-slider" id="heroSlider">
-<div class="slide-item"><img src="ad1.jpg" alt="轮播图1"></div>
-<div class="slide-item"><img src="ad2.jpg" alt="轮播图2"></div>
-<div class="slide-item"><img src="ad3.jpg" alt="轮播图3"></div>
+<div class="slide-item"><img src="ad1.jpg" alt="轮播图1" loading="lazy"></div>
+<div class="slide-item"><img src="ad2.jpg" alt="轮播图2" loading="lazy"></div>
+<div class="slide-item"><img src="ad3.jpg" alt="轮播图3" loading="lazy"></div>
 </div>
 </div>
 <div class="slide-dots" id="slideDots"></div>
@@ -550,7 +577,21 @@ html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
 </div>
 </div>
 </section>
+</section>
 
+<!-- 服务器历史 -->
+<section class="section">
+<div class="container">
+<div class="section-title">服务器历史</div>
+<div class="card">
+<div class="history-timeline">
+<div class="history-item"><span class="hi-date">2026-06-30</span>服务器正式开服，The Slow Tide 与玩家见面。</div>
+<div class="history-item"><span class="hi-date">2026-08</span>官网上线，支持公告、动态、赛事与便捷工具。</div>
+<div class="history-item"><span class="hi-date">2026-09</span>反馈中心上线，玩家可直接提交问题与建议。</div>
+<div class="history-item"><span class="hi-date">今天</span>持续运营中，新的版本与活动不断更新。</div>
+</div>
+</div>
+</div>
 </section>
 
 <!-- 公告 -->
@@ -692,11 +733,10 @@ html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
 <li>服务器：mc.163.com/open/mc_realms/?realms=270239C36AD</li>
 <li><a href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">问题反馈</a></li>
 <li><a href="https://github.com/severuszx/TST" target="_blank" rel="noopener" title="开源：源代码公开，任何人可查看、学习或改进，这是本站源码仓库" onclick="openOs();return false;">开源仓库</a></li>
-<li><a href="admin.html" rel="noopener">管理入口</a></li>
 </ul>
 </div>
 </div>
-<div class="footer-bottom">© 2026 The Slow Tide</div>
+<div class="footer-bottom" id="footerBottom">© 2026 The Slow Tide<span id="visitCount" style="margin-left:14px;font-size:12px;opacity:.75;"></span> · <a href="/rss.xml" style="color:var(--text-secondary);text-decoration:none;" title="订阅本站更新（RSS）">RSS 订阅</a></div>
 </div>
 </footer>
 
@@ -848,6 +888,8 @@ applyTheme();
 const navBtns=document.querySelectorAll('.nav-link');
 const pages=document.querySelectorAll('.page');
 function switchPage(pid){
+  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
+  document.title=TITLES[pid]||'The Slow Tide 官网';
   pages.forEach(p=>p.classList.remove('active'));
   navBtns.forEach(b=>b.classList.toggle('active',b.dataset.nav===pid));
   const t=document.getElementById(pid);
@@ -952,7 +994,7 @@ $('#openQQGroup').onclick=()=>{
 let SITE_DATA={announcements:[],feeds:[],sponsors:[],images:[],replays:[],serverStatus:'online'};
 async function loadData(){
   try{
-    const r=await fetch('https://tst-server-site.pages.dev/api/data');
+    const r=await fetch('/api/data');
     const d=await r.json();
     if(d.ok){
     SITE_DATA=d;
@@ -1030,15 +1072,30 @@ function renderReplays(){
     </div>`;
   }).join('')||'<div class="empty-hint">暂无赛事回放</div>';
 }
+function linkify(t){
+  return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">$1</a>');
+}
 function renderNotices(){
   const list=SITE_DATA.announcements||[];
   const cards=list.map(a=>`
     <div class="card" data-uid="notice-${esc(a.id)}">
       <h3>${esc(a.title)}</h3>
       <div class="date">${esc(a.date||'')}</div>
-      <div class="content">${esc(a.content)}</div>
+      <div class="content collapse-box" id="nbox-${esc(a.id)}">${linkify(a.content)}</div>
+      <button class="collapse-btn" data-box="nbox-${esc(a.id)}" style="display:none;">展开全部</button>
     </div>`).join('');
   $('#noticeList').innerHTML=cards||'<div class="empty-hint">暂无公告</div>';
+  list.forEach(a=>{
+    const bx=document.getElementById('nbox-'+a.id);
+    const btn=bx?bx.nextElementSibling:null;
+    if(bx&&btn&&bx.scrollHeight>150){
+      btn.style.display='block';
+      btn.onclick=function(){
+        const open=bx.classList.toggle('open');
+        btn.textContent=open?'收起':'展开全部';
+      };
+    }
+  });
 }
 function feedCard(f){
   const img=f.image?`<img class="feed-img" src="${esc(resolveImg(f.image))}" alt="${esc(f.title)}">`:'';
@@ -1047,7 +1104,7 @@ function feedCard(f){
   <div class="card" data-uid="feed-${esc(f.id)}" style="margin-bottom:14px;">
     <h3>${esc(f.title)}${pin}</h3>
     <div class="date">${esc(f.date||'')}</div>
-    <div class="content">${esc(f.content)}</div>
+    <div class="content">${linkify(f.content)}</div>
     ${img}
   </div>`;
 }
@@ -1879,6 +1936,54 @@ document.addEventListener('keydown',(e)=>{
 renderRules();
 loadData();
 
+// 旧浏览器检测（FNZ7A8）
+try{ eval('const __t=()=>1;'); }catch(e){
+  document.addEventListener('DOMContentLoaded',function(){
+    var b=document.createElement('div');
+    b.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#fbbf24;color:#1a1a1a;padding:10px 16px;font-size:13px;text-align:center;';
+    b.textContent='当前浏览器版本过旧，部分功能可能无法正常显示，建议升级到最新版 Chrome / Edge / Firefox。';
+    document.body.appendChild(b);
+  });
+}
+// 访问统计（86QECW，本地计数，仅作参考）
+(function(){
+  try{
+    var n=parseInt(localStorage.getItem('tst_visits')||'0',10)+1;
+    localStorage.setItem('tst_visits',String(n));
+    var el=document.getElementById('visitCount');
+    if(el) el.textContent='本站访问 '+n+' 次';
+  }catch(e){}
+})();
+// PWA 简易 Service Worker（2689L3/H2QK36/L9ANJD）
+(function(){
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+  }
+})();
+// 隐藏管理入口：连续点击页脚 5 次进入（UK4B38）
+(function(){
+  var fb=document.getElementById('footerBottom');
+  var cnt=0, timer=null;
+  if(fb) fb.addEventListener('click',function(){
+    cnt++;
+    if(timer) clearTimeout(timer);
+    timer=setTimeout(function(){ cnt=0; },1600);
+    if(cnt>=5){ cnt=0; location.href='admin.html'; }
+  });
+})();
+// 复制地址成功动画（PCMNY4）
+(function(){
+  var oldCopy=$('#copyAddrBtn')&&$('#copyAddrBtn').onclick;
+  var btnEl=$('#copyAddrBtn');
+  if(btnEl){
+    btnEl.addEventListener('click',function(){
+      setTimeout(function(){
+        btnEl.classList.add('copy-ok');
+        setTimeout(function(){ btnEl.classList.remove('copy-ok'); },900);
+      },80);
+    });
+  }
+})();
 // 服务器状态保存
 (function(){
   const btn=document.getElementById("serverStatusSaveBtn");
