@@ -489,7 +489,7 @@ img{background:var(--hover);}
 <body>
 <header class="site-header">
 <div class="container header-inner">
-<div class="logo"><img src="logo.jpg" alt="The Slow Tide" class="logo-img"> The Slow Tide</div>
+<div class="logo" id="brandLogo"><img src="logo.jpg" alt="The Slow Tide" class="logo-img"> The Slow Tide</div>
 <nav class="main-nav" id="mainNav">
 <button class="nav-link active" data-nav="home">首页</button>
 <button class="nav-link" data-nav="notice">公告</button>
@@ -577,21 +577,15 @@ img{background:var(--hover);}
 </div>
 </div>
 </section>
-</section>
-
-<!-- 服务器历史 -->
+<!-- 服务器历史（仅首页，后台可编辑） -->
 <section class="section">
 <div class="container">
 <div class="section-title">服务器历史</div>
 <div class="card">
-<div class="history-timeline">
-<div class="history-item"><span class="hi-date">2026-06-30</span>服务器正式开服，The Slow Tide 与玩家见面。</div>
-<div class="history-item"><span class="hi-date">2026-08</span>官网上线，支持公告、动态、赛事与便捷工具。</div>
-<div class="history-item"><span class="hi-date">2026-09</span>反馈中心上线，玩家可直接提交问题与建议。</div>
-<div class="history-item"><span class="hi-date">今天</span>持续运营中，新的版本与活动不断更新。</div>
+<div class="history-timeline" id="historyList"></div>
 </div>
 </div>
-</div>
+</section>
 </section>
 
 <!-- 公告 -->
@@ -772,6 +766,7 @@ img{background:var(--hover);}
 <div id="adminPanel" style="display:none;">
 <div class="admin-tabs">
 <button class="admin-tab active" data-tab="notice">公告管理</button>
+<button class="admin-tab" data-tab="history">历史管理</button>
 <button class="admin-tab" data-tab="feed">动态管理</button>
 <button class="admin-tab" data-tab="sponsor">赞助管理</button>
 <button class="admin-tab" data-tab="replay">赛事管理</button>
@@ -787,6 +782,15 @@ img{background:var(--hover);}
 <button class="btn" id="anCancelBtn" style="display:none;">取消编辑</button>
 </div>
 <div id="anList" style="margin-top:14px;"></div>
+</div>
+<div class="admin-pane" id="paneHistory">
+<div class="card">
+<div class="form-row"><label>历史日期</label><input type="text" id="hyDate" placeholder="如 2026-09-26 或 2026-09"></div>
+<div class="form-row"><label>历史内容</label><input type="text" id="hyText" placeholder="该日期发生的事件"></div>
+<button class="btn btn-primary" id="hyAddBtn">添加历史</button>
+<button class="btn" id="hyCancelBtn" style="display:none;">取消编辑</button>
+</div>
+<div id="hyList" style="margin-top:14px;"></div>
 </div>
 <div class="admin-pane" id="paneFeed">
 <div class="card">
@@ -1021,7 +1025,7 @@ function renderTicker(){
   var box=document.getElementById('noticeTicker');
   var track=document.getElementById('tickerTrack');
   if(!box||!track) return;
-  var list=SITE_DATA.announcements||[];
+  var list=(SITE_DATA.announcements||[]).filter(a=>!String(a.title||'').startsWith('hist:'));
   if(!list.length){ box.style.display='none'; return; }
   box.style.display='flex';
   var items=list.slice(0,5);
@@ -1049,11 +1053,26 @@ function renderTicker(){
     show(tickerIdx);
   },4200);
 }
+const DEFAULT_HISTORY=[
+  {date:'2026-06-30',text:'服务器正式开服，The Slow Tide 与玩家见面。'},
+  {date:'2026-08',text:'官网上线，支持公告、动态、赛事与便捷工具。'},
+  {date:'2026-09',text:'反馈中心上线，玩家可直接提交问题与建议。'},
+  {date:'今天',text:'持续运营中，新的版本与活动不断更新。'}
+];
+function histItems(){ return (SITE_DATA.announcements||[]).filter(a=>String(a.title||'').startsWith('hist:')); }
+function renderHistory(){
+  const el=document.getElementById('historyList');
+  if(!el) return;
+  const items=histItems().map(a=>({date:String(a.title).replace(/^hist:/,''), text:a.content}));
+  const src=items.length?items:DEFAULT_HISTORY;
+  el.innerHTML=src.map(h=>'<div class="history-item"><span class="hi-date">'+esc(h.date)+'</span>'+esc(h.text)+'</div>').join('');
+}
 function renderAll(){
   renderNotices();
   renderFeeds();
   renderSponsors();
   renderReplays();
+  renderHistory();
 }
 function isVideoUrl(u){
   return /\.(mp4|webm|ogg|mov)(\?|$)/i.test(String(u||''));
@@ -1076,7 +1095,7 @@ function linkify(t){
   return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">$1</a>');
 }
 function renderNotices(){
-  const list=SITE_DATA.announcements||[];
+  const list=(SITE_DATA.announcements||[]).filter(a=>!String(a.title||'').startsWith('hist:'));
   const cards=list.map(a=>`
     <div class="card" data-uid="notice-${esc(a.id)}">
       <h3>${esc(a.title)}</h3>
@@ -1342,7 +1361,7 @@ function searchUnits(){
   const pids=['home','notice','feed','event','cdkey','sponsor','rule'];
   const navName={home:'首页',notice:'公告',feed:'动态',event:'赛事活动',cdkey:'兑换码',sponsor:'服务器赞助',rule:'玩家公约'};
   for(const pid of pids){ units.push({page:pid, text:navName[pid], kind:'page'}); }
-  for(const a of (SITE_DATA.announcements||[])){ units.push({page:'notice', elId:'notice-'+a.id, text:a.title+' '+a.content, kind:'公告'}); }
+  for(const a of (SITE_DATA.announcements||[])){ if(!String(a.title||'').startsWith('hist:')) units.push({page:'notice', elId:'notice-'+a.id, text:a.title+' '+a.content, kind:'公告'}); }
   for(const f of (SITE_DATA.feeds||[])){ units.push({page:'feed', elId:'feed-'+f.id, text:f.title+' '+f.content, kind:'动态'}); }
   for(const s of (SITE_DATA.sponsors||[])){ units.push({page:'sponsor', text:'赞助 '+s.name+' '+s.amount, kind:'赞助'}); }
   const sections=document.querySelectorAll('.rule-section');
@@ -1597,13 +1616,14 @@ async function refreshAdminLists(){
     await loadData();
   }
   renderAdminNotices();
+  renderAdminHistory();
   renderAdminFeeds();
   renderAdminSponsors();
   renderAdminReplays();
   renderAdminImages();
 }
 function renderAdminNotices(){
-  const list=SITE_DATA.announcements||[];
+  const list=(SITE_DATA.announcements||[]).filter(a=>!String(a.title||'').startsWith('hist:'));
   $('#anList').innerHTML=list.map(a=>`
   <div class="admin-list-item">
     <div>
@@ -1613,6 +1633,18 @@ function renderAdminNotices(){
     </div>
     <div class="ops"><button class="btn" data-edit="announcement" data-id="${esc(a.id)}">编辑</button><button class="btn btn-danger" data-del="announcement" data-id="${esc(a.id)}">删除</button></div>
   </div>`).join('')||'<div class="empty-hint">暂无公告</div>';
+}
+function renderAdminHistory(){
+  const list=histItems();
+  $('#hyList').innerHTML=list.map(a=>`
+  <div class="admin-list-item">
+    <div>
+      <strong>${esc(String(a.title).replace(/^hist:/,''))}</strong>
+      <div class="meta">${esc(a.date||'')}</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">${esc(a.content)}</div>
+    </div>
+    <div class="ops"><button class="btn" data-edit="history" data-id="${esc(a.id)}">编辑</button><button class="btn btn-danger" data-del="history" data-id="${esc(a.id)}">删除</button></div>
+  </div>`).join('')||'<div class="empty-hint">暂无历史，可添加后展示在首页</div>';
 }
 function renderAdminFeeds(){
   const list=SITE_DATA.feeds||[];
@@ -1639,17 +1671,17 @@ document.addEventListener('click',async(e)=>{
   const btn=e.target.closest('[data-del]');
   if(!btn || !ADMIN_TOKEN){ return; }
   const kind=btn.dataset.del, id=btn.dataset.id;
-  const action=kind==='announcement'?'deleteAnnouncement':kind==='feed'?'deleteFeed':kind==='sponsor'?'deleteSponsor':kind==='replay'?'deleteReplay':'deleteImage';
+  const action=kind==='announcement'||kind==='history'?'deleteAnnouncement':kind==='feed'?'deleteFeed':kind==='sponsor'?'deleteSponsor':kind==='replay'?'deleteReplay':'deleteImage';
   if(!confirm('确定删除这条记录吗？')){ return; }
   const d=await adminApi(action,{id});
   if(d && d.ok){
     SITE_DATA={...SITE_DATA,...d};
     showToast('已删除');
-    renderAdminNotices(); renderAdminFeeds(); renderAdminSponsors(); renderAdminReplays(); renderAdminImages(); renderAll();
+    renderAdminNotices(); renderAdminHistory(); renderAdminFeeds(); renderAdminSponsors(); renderAdminReplays(); renderAdminImages(); renderAll();
   }
 });
 // 编辑状态（点编辑 → 表单进入修改模式）
-let editingAn=null, editingFd=null, editingSp=null;
+let editingAn=null, editingHy=null, editingFd=null, editingSp=null;
 document.addEventListener('click',(e)=>{
   const eb=e.target.closest('[data-edit]');
   if(!eb || !ADMIN_TOKEN){ return; }
@@ -1664,6 +1696,15 @@ document.addEventListener('click',(e)=>{
     $('#anAddBtn').textContent='保存修改';
     $('#anCancelBtn').style.display='';
     $('#paneNotice .card').scrollIntoView({behavior:'smooth',block:'start'});
+  }else if(kind==='history'){
+    const a=(SITE_DATA.announcements||[]).find(x=>x.id===id && String(x.title||'').startsWith('hist:'));
+    if(!a){ return; }
+    $('#hyDate').value=String(a.title).replace(/^hist:/,'');
+    $('#hyText').value=a.content;
+    editingHy=id;
+    $('#hyAddBtn').textContent='保存修改';
+    $('#hyCancelBtn').style.display='';
+    $('#paneHistory .card').scrollIntoView({behavior:'smooth',block:'start'});
   }else if(kind==='feed'){
     const f=(SITE_DATA.feeds||[]).find(x=>x.id===id);
     if(!f){ return; }
@@ -1717,6 +1758,12 @@ function cancelAnEdit(){
   $('#anCancelBtn').style.display='none';
   $('#anTitle').value=''; $('#anContent').value=''; $('#anDate').value='';
 }
+function cancelHyEdit(){
+  editingHy=null;
+  $('#hyAddBtn').textContent='添加历史';
+  $('#hyCancelBtn').style.display='none';
+  $('#hyDate').value=''; $('#hyText').value='';
+}
 function cancelFdEdit(){
   editingFd=null;
   $('#fdAddBtn').textContent='发布动态';
@@ -1740,7 +1787,23 @@ function cancelRpEdit(){
   $('#rpTitle').value=''; $('#rpUrl').value=''; $('#rpDate').value='';
 }
 $('#anCancelBtn').onclick=cancelAnEdit;
+$('#hyCancelBtn').onclick=cancelHyEdit;
 $('#fdCancelBtn').onclick=cancelFdEdit;
+$('#hyAddBtn').onclick=async()=>{
+  const date=$('#hyDate').value.trim(), text=$('#hyText').value.trim();
+  if(!date||!text){ showToast('请填写历史日期和内容'); return; }
+  const title='hist:'+date;
+  const d=editingHy
+    ? await adminApi('updateAnnouncement',{title,content:text,date:date||undefined},{id:editingHy})
+    : await adminApi('addAnnouncement',{title,content:text,date:date||undefined});
+  if(d && d.ok){
+    SITE_DATA.announcements=d.announcements;
+    const wasEdit=!!editingHy;
+    cancelHyEdit();
+    showToast(wasEdit?'历史已更新':'历史已添加');
+    renderAdminHistory(); renderAll();
+  } else { showToast('保存失败，请检查登录状态'); }
+};
 $('#spCancelBtn').onclick=cancelSpEdit;
 $('#rpCancelBtn').onclick=cancelRpEdit;
 // 发布公告 / 保存修改
@@ -1755,7 +1818,7 @@ $('#anAddBtn').onclick=async()=>{
     const wasEdit=!!editingAn;
     cancelAnEdit();
     showToast(wasEdit?'公告已更新':'公告已发布');
-    renderAdminNotices(); renderAll();
+    renderAdminNotices(); renderAdminHistory(); renderAll();
   }
 };
 // 发布动态（含图片）
@@ -1965,6 +2028,17 @@ try{ eval('const __t=()=>1;'); }catch(e){
   var fb=document.getElementById('footerBottom');
   var cnt=0, timer=null;
   if(fb) fb.addEventListener('click',function(){
+    cnt++;
+    if(timer) clearTimeout(timer);
+    timer=setTimeout(function(){ cnt=0; },1600);
+    if(cnt>=5){ cnt=0; location.href='admin.html'; }
+  });
+})();
+// Logo 连点 5 次进入管理页（与页脚入口一致）
+(function(){
+  var lg=document.getElementById('brandLogo');
+  var cnt=0, timer=null;
+  if(lg) lg.addEventListener('click',function(){
     cnt++;
     if(timer) clearTimeout(timer);
     timer=setTimeout(function(){ cnt=0; },1600);
