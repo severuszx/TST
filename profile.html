@@ -824,7 +824,9 @@ async function loadData(){
       renderAll();
     }
   }catch(e){
-    $('#noticeList').innerHTML='<div class="empty-hint">数据加载失败，请刷新重试</div>';
+    var nlEl = document.getElementById('noticeList');
+    if (nlEl) { nlEl.innerHTML='<div class="empty-hint">数据加载失败，请刷新重试</div>'; }
+    if (typeof showToast === 'function') { showToast('数据加载失败，请刷新重试'); }
   }
 }
 function renderAll(){
