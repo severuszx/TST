@@ -1638,13 +1638,12 @@ async function adminApi(action,data,extra){
     ADMIN_TOKEN='';
     sessionStorage.removeItem('tst_admin_token');
     showToast('登录已过期，请重新登录');
-    #adminLoginBox.style.display='block';
-    #adminPanel.style.display='none';
+    document.getElementById('adminLoginBox').style.display='block';
+    document.getElementById('adminPanel').style.display='none';
     return null;
   }
   if(!d.ok){ showToast(d.error||d.msg||'操作失败，请重试'); return null; }
   return d;
-}
 }
 async function refreshAdminLists(){
   if(ADMIN_TOKEN){

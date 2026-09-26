@@ -257,7 +257,6 @@ if(!d.ok&&r.status===401){ADMIN_TOKEN='';sessionStorage.removeItem('tst_admin_to
 if(!d.ok){showToast(d.error||d.msg||'操作失败，请重试');return null;}
 return d;
 }
-}
 $('#adminLoginBtn').onclick=async()=>{
 const pwd=$('#adminPwd').value;if(!pwd){showToast('请输入密码');return;}
 const r=await fetch('https://tst-server-site.pages.dev/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password:pwd})});
