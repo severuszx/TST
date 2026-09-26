@@ -1,59 +1,14 @@
-// The Slow Tide 官网 Service Worker - 简易离线缓存
-const CACHE = 'tst-cache-v3';
-const CORE = ['/', '/index.html', '/profile.html', '/tool.html', '/admin.html', '/manifest.json', '/logo.jpg', '/ad1.jpg', '/ad2.jpg', '/ad3.jpg'];
-
+// The Slow Tide 官网 Service Worker - 已停用
+// 说明：原离线缓存逻辑会在子页面（admin.html 等）被 Cloudflare 308 重定向时引发 ERR_FAILED，
+// 故停用缓存拦截，所有请求直连网络；同时清空历史缓存。
 self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(CORE)).catch(() => {})
-  );
   self.skipWaiting();
 });
-
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+      Promise.all(keys.map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
-
-self.addEventListener('fetch', (e) => {
-  const req = e.request;
-  if (req.method !== 'GET') return;
-  const url = new URL(req.url);
-  if (url.origin !== location.origin) return;
-  if (url.pathname.startsWith('/api/')) return; // API 不缓存
-
-  // 页面导航（HTML）：网络优先，避免缓存/旧响应导致 ERR_FAILED 或显示旧页面
-  if (req.mode === 'navigate' || (url.pathname !== '/' && /\.html$/.test(url.pathname))) {
-    e.respondWith(
-      fetch(req).then((res) => {
-        if (res.ok) {
-          const copy = res.clone();
-          caches.put(req, copy);
-        }
-        return res;
-      }).catch(() =>
-        caches.match(req).then((hit) => hit || caches.match('/'))
-      )
-    );
-    return;
-  }
-
-  // 其余静态资源：缓存优先，后台更新
-  e.respondWith(
-    caches.match(req).then((hit) => {
-      if (hit) {
-        fetch(req).then((fresh) => {
-          if (fresh && fresh.ok) caches.put(req, fresh);
-        }).catch(() => {});
-        return hit;
-      }
-      return fetch(req).then((res) => {
-        const copy = res.clone();
-        if (res.ok) caches.put(req, copy);
-        return res;
-      }).catch(() => caches.match('/'));
-    })
-  );
-});
+// 无 fetch 拦截：所有请求直连网络
