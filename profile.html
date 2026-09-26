@@ -13,6 +13,7 @@ document.documentElement.setAttribute('data-theme',mode);
 })();
 
 function clearLocalData(){
+  if(!confirm('确定清除本地数据吗？')) return;
   localStorage.removeItem("tst_last_checkin");
   localStorage.removeItem("tst_checkin_days");
   localStorage.removeItem("tst_admin_token");
