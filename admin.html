@@ -233,9 +233,17 @@ $('#themeToggle').onclick=()=>{localStorage.setItem('tst-theme',themeState()==='
 let SITE_DATA={announcements:[],feeds:[],sponsors:[],replays:[],images:[]};
 let ADMIN_TOKEN=sessionStorage.getItem('tst_admin_token')||'';
 async function loadData(){
-try{const r=await fetch('https://tst-server-site.pages.dev/api/data');const d=await r.json();
-SITE_DATA={announcements:d.announcements||[],feeds:d.feeds||[],sponsors:d.sponsors||[],replays:d.replays||[],images:d.images||[]};
-}catch(e){showToast('数据加载失败');}
+let lastErr=null;
+for(let attempt=0;attempt<3;attempt++){
+try{const r=await fetch('https://tst-server-site.pages.dev/api/data');
+if(r.status===503||r.status===502||r.status===504){lastErr='service_unavailable';if(attempt<2){await new Promise(res=>setTimeout(res,2000));continue;}break;}
+const d=await r.json();
+if(d&&d.ok){SITE_DATA={announcements:d.announcements||[],feeds:d.feeds||[],sponsors:d.sponsors||[],replays:d.replays||[],images:d.images||[]};try{localStorage.setItem('tst_site_cache',JSON.stringify(SITE_DATA));}catch(e){}return;}
+lastErr='bad_data';if(attempt<2){await new Promise(res=>setTimeout(res,2000));continue;}
+}catch(e){lastErr='network';if(attempt<2){await new Promise(res=>setTimeout(res,2000));continue;}}
+}
+try{const cached=localStorage.getItem('tst_site_cache');if(cached){const d=JSON.parse(cached);SITE_DATA={announcements:d.announcements||[],feeds:d.feeds||[],sponsors:d.sponsors||[],replays:d.replays||[],images:d.images||[]};return;}}catch(e){}
+showToast(lastErr==='service_unavailable'?'数据服务暂时不可用，已显示缓存数据':'数据加载失败');
 }
 async function adminApi(action,data,extra){
 let r;

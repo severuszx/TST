@@ -997,27 +997,55 @@ $('#openQQGroup').onclick=()=>{
 // ============================================================
 let SITE_DATA={announcements:[],feeds:[],sponsors:[],images:[],replays:[],serverStatus:'online'};
 async function loadData(){
-  try{
-    const r=await fetch('/api/data');
-    const d=await r.json();
-    if(d.ok){
-    SITE_DATA=d;
-    // 提取服务器状态（隐藏系统条目）
-    const sysIdx = (SITE_DATA.announcements||[]).findIndex(a=>a.id==='_sys_server_status');
-    if(sysIdx>=0){
-      try{
-        const sys = JSON.parse(SITE_DATA.announcements[sysIdx].content);
-        SITE_DATA.serverStatus = sys.status||'online';
-      }catch(e){ SITE_DATA.serverStatus='online'; }
-      SITE_DATA.announcements.splice(sysIdx,1);
+  let lastErr=null;
+  for(let attempt=0;attempt<3;attempt++){
+    try{
+      const r=await fetch('/api/data');
+      if(r.status===503||r.status===502||r.status===504){
+        lastErr='service_unavailable';
+        if(attempt<2){ await new Promise(res=>setTimeout(res,2000)); continue; }
+        break;
+      }
+      const d=await r.json();
+      if(d && d.ok){
+        SITE_DATA=d;
+        try{ localStorage.setItem('tst_site_cache', JSON.stringify(d)); }catch(e){}
+        const sysIdx=(SITE_DATA.announcements||[]).findIndex(a=>a.id==='_sys_server_status');
+        if(sysIdx>=0){
+          try{ const sys=JSON.parse(SITE_DATA.announcements[sysIdx].content); SITE_DATA.serverStatus=sys.status||'online'; }catch(e){ SITE_DATA.serverStatus='online'; }
+          SITE_DATA.announcements.splice(sysIdx,1);
+        }
+        applyServerStatus();
+        renderAll();
+        renderTicker();
+        return;
+      }
+      lastErr='bad_data';
+      if(attempt<2){ await new Promise(res=>setTimeout(res,2000)); continue; }
+    }catch(e){
+      lastErr='network';
+      if(attempt<2){ await new Promise(res=>setTimeout(res,2000)); continue; }
     }
-    applyServerStatus();
+  }
+  let usedCache=false;
+  try{
+    const cached=localStorage.getItem('tst_site_cache');
+    if(cached){
+      SITE_DATA=JSON.parse(cached);
+      const sysIdx=(SITE_DATA.announcements||[]).findIndex(a=>a.id==='_sys_server_status');
+      if(sysIdx>=0){
+        try{ const sys=JSON.parse(SITE_DATA.announcements[sysIdx].content); SITE_DATA.serverStatus=sys.status||'online'; }catch(e){ SITE_DATA.serverStatus='online'; }
+        SITE_DATA.announcements.splice(sysIdx,1);
+      }
+      applyServerStatus();
       renderAll();
       renderTicker();
+      usedCache=true;
     }
-  }catch(e){
+  }catch(e){}
+  if(!usedCache){
     var nlEl = document.getElementById('noticeList');
-    if (nlEl) { nlEl.innerHTML='<div class="empty-hint">数据加载失败，请刷新重试</div>'; }
+    if (nlEl) { nlEl.innerHTML='<div class="empty-hint">'+(lastErr==='service_unavailable'?'数据服务暂时不可用，请稍后刷新':'数据加载失败，请刷新重试')+'</div>'; }
   }
 }
 var tickerIdx=0, tickerTimer=null;
