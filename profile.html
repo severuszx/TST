@@ -2496,8 +2496,10 @@ function applyTheme(){
   root.setAttribute('data-theme',m);
   try{
     const c=(m==='dark')?'#0f172a':'#f3f5f8';
-    const metas=document.querySelectorAll('meta[name="theme-color"]');
-    for(let i=0;i<metas.length;i++){metas[i].setAttribute('content',c);metas[i].removeAttribute('media');}
+    const oldMetas=document.querySelectorAll('meta[name="theme-color"],meta[name="msapplication-navbutton-color"]');
+    for(let i=0;i<oldMetas.length;i++){oldMetas[i].parentNode.removeChild(oldMetas[i]);}
+    const m1=document.createElement('meta');m1.name='theme-color';m1.content=c;(document.head||document.documentElement).appendChild(m1);
+    const m2=document.createElement('meta');m2.name='msapplication-navbutton-color';m2.content=c;(document.head||document.documentElement).appendChild(m2);
   }catch(e){}
 }
 $('#themeToggle').onclick=()=>{
