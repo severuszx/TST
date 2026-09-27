@@ -136,8 +136,8 @@ color:var(--text);font-size:14px;cursor:pointer;white-space:nowrap;
 }
 .nav-link:hover{background:var(--hover);}
 .nav-link.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
-.nav-more{position:relative;}
-.more-menu{position:absolute;top:100%;left:0;min-width:150px;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:6px;display:none;z-index:200;flex-direction:column;gap:2px;}
+.nav-more{position:relative;z-index:210;}
+.more-menu{position:absolute;top:100%;left:0;min-width:150px;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:6px;display:none;z-index:1000;flex-direction:column;gap:2px;}
 .nav-more.open .more-menu{display:flex;}
 .more-menu .nav-link{text-align:left;width:100%;}
 .time-badge{
@@ -1525,6 +1525,7 @@ function themeState(){
 function applyTheme(){
   const m=themeState();
   root.setAttribute('data-theme',m);
+  document.body.classList.remove('drag-lock');
   try{
     const c=(m==='dark')?'#0f172a':'#f3f5f8';
     const oldMetas=document.querySelectorAll('meta[name="theme-color"],meta[name="msapplication-navbutton-color"]');
@@ -2074,6 +2075,8 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 const navBtns=document.querySelectorAll('.nav-link');
 const pages=document.querySelectorAll('.page');
 function switchPage(pid){
+  document.body.classList.remove('drag-lock');
+  const _nm=document.getElementById('navMore');if(_nm)_nm.classList.remove('open');
   var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
   document.title=TITLES[pid]||'The Slow Tide 官网';
   pages.forEach(p=>p.classList.remove('active'));
@@ -2098,13 +2101,18 @@ navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
 const navMoreBtn=document.getElementById('navMoreBtn');
 const navMore=document.getElementById('navMore');
 if(navMoreBtn){
-  navMoreBtn.onclick=(e)=>{ e.stopPropagation(); navMore.classList.toggle('open'); if(window.sfx)window.sfx('pop'); };
-  document.addEventListener('click',(e)=>{ if(!navMore.contains(e.target)) navMore.classList.remove('open'); });
+  document.addEventListener('click',function(e){
+    const opt=e.target.closest('#moreMenu .nav-link');
+    if(opt){ if(opt.dataset.nav)switchPage(opt.dataset.nav); navMore.classList.remove('open'); if(window.sfx)window.sfx('click'); return; }
+    if(e.target.closest('#navMoreBtn')){
+      e.stopPropagation();
+      navMore.classList.toggle('open');
+      if(window.sfx)window.sfx('pop');
+      return;
+    }
+    if(!navMore.contains(e.target))navMore.classList.remove('open');
+  },true);
 }
-const moreMenu=document.getElementById('moreMenu');
-moreMenu.querySelectorAll('.nav-link').forEach(b=>{
-  b.onclick=()=>{ switchPage(b.dataset.nav); navMore.classList.remove('open'); };
-});
 document.querySelectorAll('[data-fnav]').forEach(b=>{
   b.onclick=()=>{ switchPage(b.dataset.fnav); window.scrollTo({top:0,behavior:'smooth'}); };
 });
