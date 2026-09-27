@@ -1170,6 +1170,9 @@ html[data-theme="glass"] .team-card:hover{transform:translateY(-4px);box-shadow:
 html[data-theme="glass"][data-glass-dark] .team-card{background:rgba(40,52,84,.45);border-color:rgba(255,255,255,.12);}
 body.glass-off html[data-theme="glass"] .team-card{background:rgba(255,255,255,.96)!important;backdrop-filter:none!important;}
 body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:rgba(24,30,48,.97)!important;backdrop-filter:none!important;}
+.team-note{font-size:12px;color:var(--text-secondary);margin:0 0 12px;}
+.team-avatar.noimg{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8ecf4,#d6dceb);color:#5b6675;font-size:26px;font-weight:700;}
+html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.25));color:#4f63d8;}
 @media(max-width:900px){.team-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:560px){.team-grid{grid-template-columns:1fr;}.team-avatar{width:56px;height:56px;}}
 </style>
@@ -1361,14 +1364,18 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <section class="section">
 <div class="container">
 <button class="team-toggle" id="teamToggle" type="button"><span class="team-title">管理团队</span><span class="team-hint">（展开查看）</span><span class="team-chev">&#9660;</span></button>
-<div class="team-block" id="teamBlock"><div class="team-grid">
+<div class="team-block" id="teamBlock"><div class="team-note">排名按照贡献顺序</div><div class="team-grid">
 <div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/UABlJYXIsk" alt="执又之贤" loading="lazy"></div><div class="team-info"><div class="team-name">执又之贤 <span class="team-tag">服主</span></div><div class="team-role">服务器服主</div></div></div>
+<div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/fzoajsKe5q" alt="心就像你一样温柔" loading="lazy"></div><div class="team-info"><div class="team-name">心就像你一样温柔</div><div class="team-role">管理团队成员</div></div></div>
 <div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/1ylJ7wV4P4" alt="轩哥" loading="lazy"></div><div class="team-info"><div class="team-name">轩哥</div><div class="team-role">管理团队成员</div></div></div>
+<div class="team-card"><div class="team-avatar noimg">Z</div><div class="team-info"><div class="team-name">Z次了</div><div class="team-role">已退出管理，曾作出重大贡献</div></div></div>
 <div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/VYzjV9saFb" alt="奇迹与你" loading="lazy"></div><div class="team-info"><div class="team-name">奇迹与你</div><div class="team-role">管理团队成员</div></div></div>
 <div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/hmznziWG1y" alt="子博" loading="lazy"></div><div class="team-info"><div class="team-name">子博</div><div class="team-role">管理团队成员</div></div></div>
 <div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/fIM7hynJsS" alt="董伟晨晨" loading="lazy"></div><div class="team-info"><div class="team-name">董伟晨晨</div><div class="team-role">管理团队成员</div></div></div>
 <div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/6tnUhV5bJF" alt="牢大" loading="lazy"></div><div class="team-info"><div class="team-name">牢大</div><div class="team-role">管理团队成员</div></div></div>
 <div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/wcDniRNl6C" alt="周封国" loading="lazy"></div><div class="team-info"><div class="team-name">周封国</div><div class="team-role">管理团队成员</div></div></div>
+<div class="team-card"><div class="team-avatar noimg">是</div><div class="team-info"><div class="team-name">是星哦</div><div class="team-role">管理团队成员</div></div></div>
+</div>
 </div>
 
 </div>
