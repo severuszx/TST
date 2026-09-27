@@ -1803,6 +1803,13 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   });
   window.resetCardFree=function(){allGrids().forEach(function(g){resetCardFree(g);});};
   window.applyDragMode=function(){allGrids().forEach(function(g){resetCardFree(g);});refreshAll();};
+  // 切页后重新布局（修复：隐藏页容器宽度为 0 导致玻璃卡片重叠）
+  window.refreshGlassLayout=function(){
+    if(!isGlass())return;
+    allGrids().forEach(function(g){
+      if(g.clientWidth>0){tagCards(g);layoutInit(g);}
+    });
+  };
 })();
 
 
@@ -1903,6 +1910,7 @@ function switchPage(pid){
   const t=document.getElementById(pid);
   if(t){ t.classList.add('active'); }
   window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(function(){ if(window.refreshGlassLayout) window.refreshGlassLayout(); }, 80);
 }
 navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
 

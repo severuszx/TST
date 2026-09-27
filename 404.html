@@ -20,6 +20,7 @@ a.btn:hover{filter:brightness(1.1);}
 
 
 
+
 /* ===== 液态玻璃主题 v8（iOS 27 液态玻璃·管理员内测）===== */
 html[data-theme="glass"]{
 color-scheme:light;
@@ -535,6 +536,8 @@ html[data-theme="glass"] .tool-grid .tool-card{touch-action:none;}
 
 
 
+
+
 <button class="glass-bg-btn" style="position:fixed;top:78px;right:92px;z-index:400;" id="glassBgBtn" title="液态玻璃实验室" aria-label="液态玻璃实验室"></button>
 <div class="glass-bg-picker hidden" id="glassBgPicker">
 <div class="gb-picker-title">液态玻璃实验室</div>
@@ -998,6 +1001,13 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   });
   window.resetCardFree=function(){allGrids().forEach(function(g){resetCardFree(g);});};
   window.applyDragMode=function(){allGrids().forEach(function(g){resetCardFree(g);});refreshAll();};
+  // 切页后重新布局（修复：隐藏页容器宽度为 0 导致玻璃卡片重叠）
+  window.refreshGlassLayout=function(){
+    if(!isGlass())return;
+    allGrids().forEach(function(g){
+      if(g.clientWidth>0){tagCards(g);layoutInit(g);}
+    });
+  };
 })();
 
 
