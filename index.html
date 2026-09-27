@@ -1049,11 +1049,24 @@ html[data-theme="glass"] .stick-pair{animation:gbStick .34s cubic-bezier(.34,1.5
   80%{transform:scale(0.98,1.04) translateX(2px);}
   100%{transform:scale(1);}
 }
-html[data-theme="glass"][data-gb="plain"] body{background:#ffffff;}
-html[data-theme="glass"][data-gb="transparent"] body{background:transparent;}
+html[data-theme="glass"][data-gb="plain"],
+html[data-theme="glass"][data-gb="transparent"]{
+  background:#ffffff!important;
+  background-color:#ffffff!important;
+  color-scheme:light!important;
+}
+html[data-theme="glass"][data-gb="plain"] body,
+html[data-theme="glass"][data-gb="transparent"] body{
+  background:#ffffff!important;
+  background-image:none!important;
+  background-color:#ffffff!important;
+}
+html[data-theme="glass"][data-gb="plain"] body::before,
+html[data-theme="glass"][data-gb="transparent"] body::before{display:none!important;}
 html[data-theme="glass"][data-gb="plain"] .page-wrap,
-html[data-theme="glass"][data-gb="transparent"] .page-wrap{background:transparent;}
+html[data-theme="glass"][data-gb="transparent"] .page-wrap{background:#ffffff!important;}
 </style>
+<meta name="color-scheme" content="light">
 </head>
 <body>
 <header class="site-header">
