@@ -1149,6 +1149,24 @@ html[data-theme="glass"] .results-box,
 html[data-theme="glass"] .hero-slider-wrap,
 html[data-theme="glass"] .notice-card{background:rgba(255,255,255,.3);backdrop-filter:blur(24px) saturate(220%);border:1px solid rgba(255,255,255,.55);}
 html[data-theme="glass"] .search-row input{color:#1f2937;}
+
+/* ===== 管理团队 ===== */
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;}
+.team-card{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;transition:transform .25s ease,box-shadow .25s ease;}
+.team-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(70,90,150,.14);}
+.team-avatar{width:64px;height:64px;border-radius:50%;overflow:hidden;flex:none;border:2px solid rgba(255,255,255,.65);background:#fff;}
+.team-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+.team-info{min-width:0;}
+.team-name{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;}
+.team-role{font-size:12px;color:var(--text-secondary);margin-top:3px;}
+.team-tag{font-size:10px;padding:2px 7px;border-radius:8px;background:linear-gradient(135deg,#f6c453,#f49e4c);color:#5b3a00;font-weight:700;letter-spacing:.5px;white-space:nowrap;}
+html[data-theme="glass"] .team-card{background:rgba(255,255,255,.3);backdrop-filter:blur(24px) saturate(220%);border:1px solid rgba(255,255,255,.55);box-shadow:0 12px 34px rgba(70,90,160,.12);}
+html[data-theme="glass"] .team-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(90,110,170,.18);}
+html[data-theme="glass"][data-glass-dark] .team-card{background:rgba(40,52,84,.45);border-color:rgba(255,255,255,.12);}
+body.glass-off html[data-theme="glass"] .team-card{background:rgba(255,255,255,.96)!important;backdrop-filter:none!important;}
+body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:rgba(24,30,48,.97)!important;backdrop-filter:none!important;}
+@media(max-width:900px){.team-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.team-grid{grid-template-columns:1fr;}.team-avatar{width:56px;height:56px;}}
 </style>
 <meta name="color-scheme" content="light">
 </head>
@@ -1308,12 +1326,20 @@ html[data-theme="glass"] .search-row input{color:#1f2937;}
 
 
 <div class="container">
-<div class="section-title">服务器亮点</div>
+<div class="section-title">管理团队</div>
 <div class="card-grid">
 <div class="card"><h3>生存世界</h3><div class="content">经典基岩版生存，自由探索、建造与合作，定期新增遗迹与玩法。</div></div>
 <div class="card"><h3>赛事活动</h3><div class="content">定期举办裂痕杯等赛事，官方统一发放装备，公平竞技赢取奖励。</div></div>
 <div class="card"><h3>活跃社区</h3><div class="content">QQ交流群 833470853，玩家互助、交流心得、参与日常讨论。</div></div>
 <div class="card"><h3>公平规则</h3><div class="content">严格执行玩家公约，禁止作弊与破坏，维护良好游戏环境。</div></div>
+</div>
+<div class="team-grid">
+<div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/UABlJYXIsk" alt="执又之贤" loading="lazy"></div><div class="team-info"><div class="team-name">执又之贤 <span class="team-tag">服主</span></div><div class="team-role">服务器服主</div></div></div>
+<div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/1ylJ7wV4P4" alt="轩哥" loading="lazy"></div><div class="team-info"><div class="team-name">轩哥</div><div class="team-role">管理团队成员</div></div></div>
+<div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/VYzjV9saFb" alt="奇迹与你" loading="lazy"></div><div class="team-info"><div class="team-name">奇迹与你</div><div class="team-role">管理团队成员</div></div></div>
+<div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/hmznziWG1y" alt="子博" loading="lazy"></div><div class="team-info"><div class="team-name">子博</div><div class="team-role">管理团队成员</div></div></div>
+<div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/fIM7hynJsS" alt="董伟晨晨" loading="lazy"></div><div class="team-info"><div class="team-name">董伟晨晨</div><div class="team-role">管理团队成员</div></div></div>
+<div class="team-card"><div class="team-avatar"><img src="https://aka.doubaocdn.com/s/6tnUhV5bJF" alt="牢大" loading="lazy"></div><div class="team-info"><div class="team-name">牢大</div><div class="team-role">管理团队成员</div></div></div>
 </div>
 </div>
 <section class="server-bar">
