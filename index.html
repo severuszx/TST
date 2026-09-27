@@ -989,6 +989,56 @@ html[data-theme="glass"] .tool-grid .tool-card{touch-action:none;}
   html[data-theme="glass"] .tool-grid .tool-card p{font-size:13.5px;line-height:1.6;}
   html[data-theme="glass"] .tool-grid{min-height:40px;}
 }
+
+/* ===== 拖动 Q弹动效（玻璃主题）：换位弹跳 / 碰壁震动 ===== */
+html[data-theme="glass"] .swap-bounce{animation:gbSwapBounce .34s cubic-bezier(.34,1.56,.64,1);}
+html[data-theme="glass"] .edge-shake{animation:gbEdgeShake .24s ease;}
+@keyframes gbSwapBounce{0%{transform:scale(.86);}55%{transform:scale(1.07);}100%{transform:scale(1);}}
+@keyframes gbEdgeShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px) scale(1.02);}75%{transform:translateX(5px) scale(1.02);}}
+
+/* ===== 手机渲染修复：锁滚动仅 body（防 iOS 视口缩放闪烁）+ 无 backdrop 降级 + 调试台按钮统一玻璃风 ===== */
+body.drag-lock{overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important;}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  html[data-theme="glass"] .card-grid .card,
+  html[data-theme="glass"] #feedList .card,
+  html[data-theme="glass"] .tool-grid .tool-card{
+    background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(255,255,255,.58));
+  }
+}
+html[data-theme="glass"] #debugOk{
+  background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.32))!important;
+  color:var(--text)!important;
+  border-color:rgba(255,255,255,.72)!important;
+  box-shadow:0 4px 14px rgba(70,90,160,.14),inset 0 1px 0 rgba(255,255,255,.95)!important;
+}
+
+/* ===== 卡片纯透明（液态玻璃：无杂色底色，仅模糊+极淡描边；拖动用强阴影辨识）===== */
+html[data-theme="glass"] .card-grid .card,
+html[data-theme="glass"] #feedList .card,
+html[data-theme="glass"] .tool-grid .tool-card{
+  background:transparent!important;
+  background-image:none!important;
+  border:1px solid rgba(255,255,255,.38);
+  box-shadow:0 10px 30px rgba(70,90,160,.12);
+  backdrop-filter:blur(30px) saturate(220%);
+  -webkit-backdrop-filter:blur(30px) saturate(220%);
+}
+html[data-theme="glass"] .card-grid .card:hover,
+html[data-theme="glass"] #feedList .card:hover,
+html[data-theme="glass"] .tool-grid .tool-card:hover{
+  background:transparent!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.6);
+  box-shadow:0 16px 42px rgba(70,90,160,.2),0 0 0 1px rgba(255,255,255,.25);
+}
+html[data-theme="glass"] .card-grid .card.dragging,
+html[data-theme="glass"] #feedList .card.dragging,
+html[data-theme="glass"] .tool-grid .tool-card.dragging{
+  background:transparent!important;
+  background-image:none!important;
+  border-color:rgba(255,255,255,.75);
+  box-shadow:0 30px 70px rgba(70,90,160,.35),0 0 0 1.5px rgba(255,255,255,.5);
+}
 </style>
 </head>
 <body>
@@ -1441,6 +1491,7 @@ $('#themeToggle').onclick=()=>{
   const next=cur==='light'?'dark':'light';
   localStorage.setItem('tst-theme',next);
   applyTheme();
+  if(window.sfx)window.sfx('toggle');
   if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 };
 applyTheme();
@@ -1654,29 +1705,48 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   function allGrids(){return [].slice.call(document.querySelectorAll('.card-grid,#feedList,.tool-grid')).filter(function(g){return g.clientWidth;});}
   function refreshAll(){allGrids().forEach(function(g){if(isGlass())layoutInit(g);else resetCardFree(g);});}
 
-  // ===== q弹音效（Web Audio 合成，无外部文件；仅玻璃主题播放）=====
-  var actx=null,lastSwap=0;
+  // ===== q弹音效（Web Audio 合成，无外部文件；圆润正弦波+果冻扫频，仅玻璃主题播放）=====
+  var actx=null,lastSwap=0,sfxThrottle=0,lastDragMove=0,lastEdgeSfx=0;
   function sfx(kind){
     if(!isGlass())return;
+    var now=Date.now();
+    if(now-sfxThrottle<40)return;
+    sfxThrottle=now;
     try{
       if(!actx){actx=new (window.AudioContext||window.webkitAudioContext)();}
       if(actx.state==='suspended'){actx.resume();}
       var t=actx.currentTime;
-      function tone(f0,f1,dur,vol,type,delay){
-        var o=actx.createOscillator(),g=actx.createGain();
-        o.type=type||'sine';
+      function tone(f0,f1,dur,vol,delay){
+        var o=actx.createOscillator(),g=actx.createGain(),lp=actx.createBiquadFilter();
+        o.type='sine';
         o.frequency.setValueAtTime(f0,t+delay);
         o.frequency.exponentialRampToValueAtTime(Math.max(1,f1),t+delay+dur);
-        g.gain.setValueAtTime(vol,t+delay);
+        g.gain.setValueAtTime(0.0001,t+delay);
+        g.gain.exponentialRampToValueAtTime(vol,t+delay+0.008);
         g.gain.exponentialRampToValueAtTime(0.0001,t+delay+dur);
-        o.connect(g);g.connect(actx.destination);
-        o.start(t+delay);o.stop(t+delay+dur+0.03);
+        lp.type='lowpass';lp.frequency.value=4200;
+        o.connect(lp);lp.connect(g);g.connect(actx.destination);
+        o.start(t+delay);o.stop(t+delay+dur+0.04);
       }
-      if(kind==='grab'){tone(330,470,0.07,0.11,'square',0);}
-      else if(kind==='swap'){tone(520,350,0.08,0.14,'square',0);tone(690,420,0.09,0.09,'sine',0.01);}
-      else if(kind==='drop'){tone(300,70,0.2,0.28,'sine',0);tone(160,55,0.28,0.2,'triangle',0.02);tone(520,900,0.1,0.07,'sine',0.13);}
+      if(kind==='grab'){tone(300,620,0.09,0.13,0);tone(880,1260,0.05,0.045,0.02);}
+      else if(kind==='swap'){tone(620,940,0.07,0.09,0);tone(940,1280,0.06,0.06,0.05);tone(520,760,0.05,0.045,0.1);}
+      else if(kind==='drop'){tone(420,170,0.1,0.12,0);tone(150,90,0.09,0.065,0.07);tone(90,60,0.08,0.045,0.14);}
+      else if(kind==='edge'){tone(220,140,0.07,0.08,0);}
+      else if(kind==='click'){tone(840,1120,0.05,0.06,0);}
+      else if(kind==='pop'){tone(440,980,0.13,0.1,0);tone(980,1240,0.08,0.045,0.04);}
+      else if(kind==='toggle'){tone(520,820,0.07,0.08,0);tone(820,620,0.08,0.06,0.05);}
+      else if(kind==='success'){tone(523,660,0.1,0.08,0);tone(784,900,0.11,0.08,0.09);tone(1047,1180,0.14,0.08,0.18);}
     }catch(e){}
   }
+  window.sfx=sfx;
+  // 全局按钮音效（玻璃主题下按钮/导航/折叠/背景选项统一 Q弹反馈；拖动刚结束时静默防误触）
+  document.addEventListener('click',function(e){
+    if(!isGlass())return;
+    var t=e.target.closest('button,a,[data-nav],.collapse-btn,.gb-opt,.more-toggle');
+    if(!t)return;
+    if(Date.now()-lastDragMove<380)return;
+    sfx('click');
+  },true);
 
   let dragEl=null,dragGrid=null,startX=0,startY=0,startIdx=-1,curIdx=-1,dragging=false,dragFrozen=false;
   document.addEventListener('pointerdown',function(e){
@@ -1707,8 +1777,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
       dragging=true;card.classList.add('dragging');
       card.style.transition='none';
       if(!dragFrozen){
-        document.body.style.overflow='hidden';
-        document.documentElement.style.overflow='hidden';
+        document.body.classList.add('drag-lock');
         dragFrozen=true;
       }
       sfx('grab');
@@ -1719,15 +1788,27 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
       const baseY=parseFloat(card.style.top)||card.offsetTop;
       const gw=g.clientWidth,cw=cardWidth(g);
       const np={x:Math.max(0,Math.min(gw-cw,baseX+dx)),y:Math.max(0,baseY+dy)};
+      if((np.x<=0.5||np.x>=gw-cw-0.5)&&Date.now()-lastEdgeSfx>420){
+        sfx('edge');lastEdgeSfx=Date.now();
+        card.classList.add('edge-shake');
+        setTimeout(function(){card.classList.remove('edge-shake');},240);
+      }
       card.style.left=np.x+'px';card.style.top=np.y+'px';
     }else{
       const c=cols(g),cw=cardWidth(g),ch=cards[0]?cards[0].offsetHeight:0;
       const sp=posOf(g,startIdx);
       // 跟手用 transform（GPU 丝滑），释放后过渡归位
-      card.style.transform='translate('+dx+'px,'+dy+'px)';
+      card.style.transform='translate('+dx+'px,'+dy+'px) translateZ(0) scale(1.02) rotate('+(dx*0.0012)+'deg)';
+      lastDragMove=Date.now();
       const col=Math.round(dx/(cw+GAP))+(startIdx%c);
       const row=Math.round(dy/(ch+GAP))+Math.floor(startIdx/c);
-      const ni=Math.max(0,Math.min(cards.length-1,row*c+col));
+      const rawNi=row*c+col;
+      const ni=Math.max(0,Math.min(cards.length-1,rawNi));
+      if(ni!==rawNi&&Date.now()-lastEdgeSfx>420){
+        sfx('edge');lastEdgeSfx=Date.now();
+        card.classList.add('edge-shake');
+        setTimeout(function(){card.classList.remove('edge-shake');},240);
+      }
       if(ni!==curIdx){
         curIdx=ni;
         const id=card.getAttribute('data-card-id');
@@ -1741,6 +1822,8 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
           const p=posOf(g,pi);
           c.style.transition='left .38s cubic-bezier(.34,1.56,.64,1),top .38s cubic-bezier(.34,1.56,.64,1)';
           c.style.left=p.x+'px';c.style.top=p.y+'px';
+          c.classList.add('swap-bounce');
+          setTimeout(function(){c.classList.remove('swap-bounce');},340);
         });
         if(Date.now()-lastSwap>90){sfx('swap');lastSwap=Date.now();}
       }
@@ -1753,8 +1836,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     if(!dragging)return;
     dragging=false;
     if(dragFrozen){
-      document.body.style.overflow='';
-      document.documentElement.style.overflow='';
+      document.body.classList.remove('drag-lock');
       dragFrozen=false;
     }
     card.classList.remove('dragging');card.style.zIndex='';
@@ -1927,7 +2009,7 @@ navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
 const navMoreBtn=document.getElementById('navMoreBtn');
 const navMore=document.getElementById('navMore');
 if(navMoreBtn){
-  navMoreBtn.onclick=(e)=>{ e.stopPropagation(); navMore.classList.toggle('open'); };
+  navMoreBtn.onclick=(e)=>{ e.stopPropagation(); navMore.classList.toggle('open'); if(window.sfx)window.sfx('pop'); };
   document.addEventListener('click',(e)=>{ if(!navMore.contains(e.target)) navMore.classList.remove('open'); });
 }
 const moreMenu=document.getElementById('moreMenu');
