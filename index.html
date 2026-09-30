@@ -4042,6 +4042,9 @@ function checkLotteryState(){
     if(el) el.textContent='活动已结束';
     return;
   }
+  // 活动进行中：倒计时区显示已开放
+  var cdEl=document.getElementById('lotteryCountdown');
+  if(cdEl){ cdEl.textContent='活动已开放，快来参与！'; cdEl.classList.add('open'); }
   // 服务端状态查询（KKE58L）：即使本地被清空，也能恢复"今日已抽"
   try{
     fetch('/api/lottery/state?device='+encodeURIComponent(getDeviceId())).then(function(r){return r.json();}).then(function(st){
