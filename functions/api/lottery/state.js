@@ -42,7 +42,7 @@ async function adminLottery(action, payload) {
 async function fetchUnclaimedCodes() {
   const res = await adminLottery('list', {});
   if (!res || !res.ok || !Array.isArray(res.codes)) return null;
-  return res.codes.filter(c => !String(c.code || '').startsWith('DC:') && c.code !== '08952870' && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
+  return res.codes.filter(c => !String(c.code || '').startsWith('DC') && c.code !== '08952870' && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
 }
 function clientIp(req) {
   return req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For') || 'unknown';
@@ -75,10 +75,11 @@ export async function onRequestGet(context) {
   for (let i = 0; i < rawFp.length; i++) { fp = ((fp << 5) + fp + rawFp.charCodeAt(i)) >>> 0; }
   const fkey = 'DC:' + fp + ':' + sdate;
   const dkey = 'DC:dev:' + device + ':' + sdate;
+  const ikey = 'DCIP:' + ip + ':' + sdate;
   const list = await adminLottery('list', {});
   let rec = null;
   if (list && list.ok && Array.isArray(list.codes)) {
-    rec = list.codes.find(c => c.code === fkey || c.code === dkey) || null;
+    rec = list.codes.find(c => c.code === fkey || c.code === dkey || c.code === ikey) || null;
   }
   const codes = await fetchUnclaimedCodes();
   return json({
