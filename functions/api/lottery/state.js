@@ -70,6 +70,7 @@ export async function onRequestGet(context) {
   const rec = (device && DRAW_DEV_MAP.get(dkey)) || DRAW_IP_MAP.get(ikey) || null;
   const codes = await fetchUnclaimedCodes();
   return json({
+    sv: 'state-file',
     drawn: !!rec,
     prize: rec ? rec.prize : null,
     code: rec ? rec.code : null,

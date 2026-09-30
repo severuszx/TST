@@ -64,7 +64,7 @@ export async function onRequestPost(context) {
   const now = new Date();
   const sdate = cnDate(now);
   if (now < L_START || now > L_END) {
-    return json({ ok: false, error: 'not_in_window', serverDate: sdate }, 200, request);
+    return json({ sv: 'draw-file', ok: false, error: 'not_in_window', serverDate: sdate }, 200, request);
   }
   let body = {};
   try { body = await request.json(); } catch (e) { body = {}; }
