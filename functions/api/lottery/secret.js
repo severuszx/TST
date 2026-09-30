@@ -2,7 +2,7 @@
 // 密钥 8952870 -> 兑换码 YBTYNGXDJJM（神秘礼包）；仅一人可领取
 const SECRET_KEY = '8952870';
 const SECRET_CODE = 'YBTYNGXDJJM';
-const L_START = new Date('2026-10-01T12:00:00+08:00');
+const L_START = new Date('2026-10-01T00:30:00+08:00');
 const L_END = new Date('2026-10-08T23:59:59+08:00');
 const CLAIMED = new Set(); // isolate 内存：已领取标记
 

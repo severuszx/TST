@@ -4,7 +4,7 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 // 管理员口令：注意公开仓库可见，后续需改为环境变量并在数据库侧改密
 // 管理员口令：优先读环境变量 ADMIN_PWD（Cloudflare Pages Secret），未配置时回退内置
 const ADMIN_PWD = (typeof context !== 'undefined' && context.env && context.env.ADMIN_PWD) ? context.env.ADMIN_PWD : 'WYJQQNDYWHM';
-const L_START = new Date('2026-10-01T12:00:00+08:00');
+const L_START = new Date('2026-10-01T00:30:00+08:00');
 const L_END = new Date('2026-10-08T23:59:59+08:00');
 const DRAW_DEV_MAP = new Map();
 const DRAW_IP_MAP = new Map();
