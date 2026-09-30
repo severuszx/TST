@@ -2,8 +2,9 @@
 const SUPABASE_URL = 'https://jilcbcodphxpasicjghv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs';
 // 管理员口令：注意公开仓库可见，后续需改为环境变量并在数据库侧改密
-const ADMIN_PWD = 'WYJQQNDYWHM';
-const L_START = new Date('2026-10-01T00:00:00+08:00');
+// 管理员口令：优先读环境变量 ADMIN_PWD（Cloudflare Pages Secret），未配置时回退内置
+const ADMIN_PWD = (typeof context !== 'undefined' && context.env && context.env.ADMIN_PWD) ? context.env.ADMIN_PWD : 'WYJQQNDYWHM';
+const L_START = new Date('2026-10-01T12:00:00+08:00');
 const L_END = new Date('2026-10-08T23:59:59+08:00');
 const DRAW_DEV_MAP = new Map();
 const DRAW_IP_MAP = new Map();
@@ -41,7 +42,7 @@ async function adminLottery(action, payload) {
 async function fetchUnclaimedCodes() {
   const res = await adminLottery('list', {});
   if (!res || !res.ok || !Array.isArray(res.codes)) return null;
-  return res.codes.filter(c => !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
+  return res.codes.filter(c => c.code !== '8952870' && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
 }
 function clientIp(req) {
   return req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For') || 'unknown';
@@ -73,9 +74,15 @@ export async function onRequestPost(context) {
   const device = String(body.p_device || '').slice(0, 80);
   if (!device) return json({ ok: false, error: 'bad_device', serverDate: sdate }, 200, request);
   const ip = clientIp(request);
+  // 服务端指纹：IP+UA+平台头+前端指纹 组合（防单点伪造；NAT 同 IP 不同设备不互锁）
+  const ua = String(request.headers.get('User-Agent') || '');
+  const secUa = String(request.headers.get('Sec-CH-UA-Platform') || request.headers.get('Sec-CH-UA') || '');
+  const rawFp = ip + '|' + ua + '|' + secUa + '|' + device;
+  let fp = 5381;
+  for (let i = 0; i < rawFp.length; i++) { fp = ((fp << 5) + fp + rawFp.charCodeAt(i)) >>> 0; }
+  const fkey = 'fp:' + fp + ':' + sdate;
   const dkey = 'dev:' + device + ':' + sdate;
-  const ikey = 'ip:' + ip + ':' + sdate;
-  const rec = DRAW_DEV_MAP.get(dkey) || DRAW_IP_MAP.get(ikey);
+  const rec = DRAW_DEV_MAP.get(fkey) || DRAW_DEV_MAP.get(dkey);
   if (rec) {
     return json({ ok: false, error: 'already_drawn', prize: rec.prize, code: rec.code, seq: rec.seq, serverDate: sdate }, 200, request);
   }
