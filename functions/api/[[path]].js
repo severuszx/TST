@@ -8,6 +8,8 @@
 const SUPABASE_URL = 'https://jilcbcodphxpasicjghv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs';
 const DATA_ORIGIN = 'https://tst-server-site.pages.dev';
+// 管理员口令：注意此文件在公开仓库，密码会随源码可见；后续需改为环境变量+数据库侧改密
+const ADMIN_PWD = 'WYJQQNDYWHM';
 
 // ===== 国庆&开服100天双庆抽奖（时区：北京时间 UTC+8）=====
 const L_START = new Date('2026-10-01T00:00:00+08:00');  // 2026-10-01 00:00 正式开放
@@ -35,17 +37,24 @@ async function sbFetch(path, opts) {
   try { body = text ? JSON.parse(text) : null; } catch (e) { body = text; }
   return { status: res.status, body: body, text: text };
 }
-async function fetchUnclaimedCodes() {
-  const r = await sbFetch('/rest/v1/lottery_codes?select=id,code,prize,weight,seq&claimed=eq.false&order=seq.asc', { method: 'GET' });
-  return Array.isArray(r.body) ? r.body : null;
-}
-async function claimCode(id, device, now) {
-  const r = await sbFetch('/rest/v1/lottery_codes?id=eq.' + id + '&claimed=eq.false', {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-    body: JSON.stringify({ claimed: true, claimed_device: device, claimed_at: now.toISOString() }),
+async function adminLottery(action, payload) {
+  const r = await sbFetch('/rest/rpc/admin_lottery', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_pwd: ADMIN_PWD, p_action: action, p_payload: payload || {} }),
   });
-  return Array.isArray(r.body) && r.body.length > 0;
+  return r.body;
+}
+async function fetchUnclaimedCodes() {
+  const res = await adminLottery('list', {});
+  if (!res || !res.ok || !Array.isArray(res.codes)) return null;
+  return res.codes.filter(c => !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
+}
+// 核销：把奖品名标记为【已使用】+原名（数据库侧无 claimed 更新通道，用 prize 前缀做已使用标记；
+// 后台管理员列表会显示【已使用】提示，仍可 delete 删除）
+async function claimCode(id, prize, device, now) {
+  const res = await adminLottery('update_prize', { id: String(id), prize: '【已使用】' + (prize || '') });
+  return !!(res && res.ok);
 }
 
 function allowedOrigin(req) {
@@ -144,7 +153,7 @@ export async function onRequest(context) {
     let picked = null;
     for (let i = 0; i < 6; i++) {
       const c = pickWeighted(codes);
-      const claimed = await claimCode(c.id, device, now);
+      const claimed = await claimCode(c.id, c.prize, device, now);
       if (claimed) { picked = c; break; }
       codes = await fetchUnclaimedCodes();
       if (!codes || codes.length === 0) break;
