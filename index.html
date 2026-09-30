@@ -470,6 +470,12 @@ html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
 .fx-flash.on{animation:fxFlash 1.4s ease forwards;}
 @keyframes fxFlash{0%{opacity:0;transform:scale(.3);}20%{opacity:1;}100%{opacity:0;transform:scale(1.4);}}
 .fx-shake{animation:fxShake .6s ease;}
+.lottery-countdown{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(10,10,25,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(253,224,71,.45);border-radius:999px;padding:7px 20px;font-size:13px;font-weight:700;color:#fde68a;letter-spacing:2px;text-shadow:0 0 10px rgba(245,158,11,.7);white-space:nowrap;z-index:3;box-shadow:0 4px 24px rgba(0,0,0,.35);}
+.lottery-countdown.open{color:#86efac;border-color:rgba(134,239,172,.5);}
+.fx-pillar{position:fixed;left:50%;top:0;width:120px;height:100%;transform:translateX(-50%) scaleX(0);background:linear-gradient(180deg,rgba(253,224,71,0) 0%,rgba(253,224,71,.85) 45%,rgba(245,158,11,.9) 100%);filter:blur(30px);z-index:9995;pointer-events:none;opacity:0;}
+.fx-pillar.on{animation:pillarIn 1.2s ease-out forwards;}
+@keyframes pillarIn{0%{transform:translateX(-50%) scaleX(0);opacity:0}40%{opacity:.85}100%{transform:translateX(-50%) scaleX(1);opacity:0}}
+.fx-grand-text .gt3{display:block;font-size:14px;font-weight:600;color:rgba(255,255,255,.92);letter-spacing:4px;margin-top:14px;text-shadow:0 0 14px rgba(245,158,11,.8);}
 @keyframes fxShake{0%,100%{transform:translate(0,0);}15%{transform:translate(-8px,4px);}35%{transform:translate(7px,-5px);}55%{transform:translate(-6px,-4px);}75%{transform:translate(5px,5px);}}
 .fx-grand-text{position:fixed;left:50%;top:34%;transform:translate(-50%,-50%) scale(.4);z-index:10000;text-align:center;pointer-events:none;opacity:0;text-shadow:0 0 30px rgba(251,191,36,.9),0 0 60px rgba(251,191,36,.6);}
 .fx-grand-text .gt1{display:block;font-size:44px;font-weight:900;color:#fbbf24;letter-spacing:10px;}
@@ -1404,24 +1410,25 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 <div class="section-title">活动</div>
 <div class="card lottery-card">
   <div class="lottery-hero">
-    <img src="https://aka.doubaocdn.com/s/uxV7X6LSqH" alt="中秋月夜">
+    <img src="https://aka.doubaocdn.com/s/0maBqLwE4X" alt="中秋月夜">
     <div class="lottery-hero-text">
-      <h3>中秋专属抽奖</h3>
-      <p>最高奖励：全套龙套</p>
+      <h3>国庆盛典 · 开服100天</h3>
+      <p>双庆狂欢抽奖 · 最高奖励：全套龙套</p>
     </div>
+    <div class="lottery-countdown" id="lotteryCountdown">距开放还有 --:--:--</div>
   </div>
   <div class="lottery-main">
     <div class="pick-stage" id="pickStage">
-      <div class="moon-rabbit"><img src="https://aka.doubaocdn.com/s/GU6Q3dCPeI" alt=""></div>
+      <div class="moon-rabbit"><img src="https://aka.doubaocdn.com/s/j4J8uUfxrg" alt=""></div>
       <div class="pick-glow" id="pickGlow"></div>
       <div class="pick-cards" id="pickCards">
-        <div class="pick-card" id="pickCard0"><div class="pick-inner"><div class="pc-face pc-back"><img src="https://aka.doubaocdn.com/s/GU6Q3dCPeI" alt=""></div><div class="pc-face pc-front"><div class="pf-label">恭喜获得</div><div class="pf-name"></div></div></div></div>
-        <div class="pick-card" id="pickCard1"><div class="pick-inner"><div class="pc-face pc-back"><img src="https://aka.doubaocdn.com/s/GU6Q3dCPeI" alt=""></div><div class="pc-face pc-front"><div class="pf-label">恭喜获得</div><div class="pf-name"></div></div></div></div>
-        <div class="pick-card" id="pickCard2"><div class="pick-inner"><div class="pc-face pc-back"><img src="https://aka.doubaocdn.com/s/GU6Q3dCPeI" alt=""></div><div class="pc-face pc-front"><div class="pf-label">恭喜获得</div><div class="pf-name"></div></div></div></div>
+        <div class="pick-card" id="pickCard0"><div class="pick-inner"><div class="pc-face pc-back"><img src="https://aka.doubaocdn.com/s/j4J8uUfxrg" alt=""></div><div class="pc-face pc-front"><div class="pf-label">恭喜获得</div><div class="pf-name"></div></div></div></div>
+        <div class="pick-card" id="pickCard1"><div class="pick-inner"><div class="pc-face pc-back"><img src="https://aka.doubaocdn.com/s/j4J8uUfxrg" alt=""></div><div class="pc-face pc-front"><div class="pf-label">恭喜获得</div><div class="pf-name"></div></div></div></div>
+        <div class="pick-card" id="pickCard2"><div class="pick-inner"><div class="pc-face pc-back"><img src="https://aka.doubaocdn.com/s/j4J8uUfxrg" alt=""></div><div class="pc-face pc-front"><div class="pf-label">恭喜获得</div><div class="pf-name"></div></div></div></div>
       </div>
     </div>
     <div class="lottery-info">
-      <p class="lottery-tip">中秋专属抽奖，最高奖励：全套龙套。<br>每台设备每日限抽 1 次，兑换码仅可使用一次。<br>活动时间：2026-09-25 至 2026-09-27。</p>
+      <p class="lottery-tip">国庆盛典&amp;开服100天双庆抽奖，最高奖励：全套龙套。<br>每台设备每日限抽 1 次，兑换码仅可使用一次。<br>活动时间：2026-10-01 00:00 至 2026-10-08 23:59。</p>
       <button id="lotteryBtn" class="btn btn-primary">开始抽奖</button>
       <div id="lotteryResult"></div>
     </div>
@@ -3610,7 +3617,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
 })();
 // ============================================================
 // ============================================================
-// 中秋专属抽奖（服务端数据库函数 draw_lottery 保证原子性）
+// 国庆&开服100天双庆抽奖（服务端 Functions 加权随机+原子核销+每日限抽）
 // ============================================================
 function getDeviceId(){
   // 硬件指纹：canvas + WebGL + UA + 屏幕 + 时区等组合，清缓存/无痕模式下保持不变，
@@ -3678,14 +3685,14 @@ function getDeviceId(){
 var LOTTERY_PRIZES=[
   {seq:1,name:'全套龙套',short:'龙套',color:'#f59e0b',color2:'#fbbf24'},
   {seq:2,name:'稀有皮肤礼包',short:'皮肤礼包',color:'#a855f7',color2:'#d946ef'},
-  {seq:3,name:'中秋限定称号「月兔」',short:'月兔称号',color:'#6366f1',color2:'#8b5cf6'},
+  {seq:3,name:'国庆限定称号「盛世」',short:'盛世称号',color:'#ef4444',color2:'#f97316'},
   {seq:4,name:'游戏道具礼包',short:'道具礼包',color:'#06b6d4',color2:'#22d3ee'},
-  {seq:5,name:'纪念头像框',short:'头像框',color:'#10b981',color2:'#34d399'},
+  {seq:5,name:'百日纪念头像框',short:'百日头像框',color:'#10b981',color2:'#34d399'},
   {seq:6,name:'参与奖',short:'参与奖',color:'#6b7280',color2:'#9ca3af'}
 ];
 var LOTTERY_KEY='tst_lottery';
-var LOTTERY_START=new Date(2026,8,25);
-var LOTTERY_END=new Date(2026,8,27,23,59,59);
+var LOTTERY_START=new Date('2026-10-01T00:00:00+08:00');
+var LOTTERY_END=new Date('2026-10-08T23:59:59+08:00');
 var wheelDeg=0;
 var spinning=false;
 // 服务端日期（HCYA2X：防止改本地系统时间绕过每日限制；由 /api/lottery/state 或 draw_lottery 响应提供）
@@ -3736,39 +3743,51 @@ function pickAnim(finalIdx, done){
   },125);
 }
 function grandEffect(){
+  // 光柱（light pillar）
+  var pillar=document.createElement('div');
+  pillar.className='fx-pillar';
+  document.body.appendChild(pillar);
+  requestAnimationFrame(function(){ pillar.classList.add('on'); });
+  setTimeout(function(){ if(pillar.parentNode) pillar.parentNode.removeChild(pillar); },2200);
+  // 主粒子爆发 + 彩带
   var cv=document.createElement('canvas');
   cv.className='fx-canvas';
   document.body.appendChild(cv);
   var ctx=cv.getContext('2d');
   cv.width=window.innerWidth; cv.height=window.innerHeight;
-  var colors=['#fbbf24','#fcd34d','#fef3c7','#f59e0b','#fff7ed'];
-  var ps=[];
+  var colors=['#fbbf24','#fcd34d','#fef3c7','#f59e0b','#fff7ed','#ef4444','#f97316'];
+  var ps=[], rs=[];
   var cx=cv.width/2, cy=cv.height/2;
-  for(var i=0;i<180;i++){
-    ps.push({
-      x:cx, y:cy,
-      vx:(Math.random()-.5)*18,
-      vy:(Math.random()-.5)*18-6,
-      life:0, max:55+Math.random()*45,
-      r:1.5+Math.random()*3.5,
-      c:colors[i%colors.length]
-    });
+  for(var i=0;i<220;i++){
+    ps.push({x:cx,y:cy,vx:(Math.random()-.5)*20,vy:(Math.random()-.5)*20-7,life:0,max:60+Math.random()*50,r:1.6+Math.random()*3.8,c:colors[i%colors.length]});
+  }
+  for(var j=0;j<60;j++){
+    rs.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*0.4,vy:2+Math.random()*4,rot:Math.random()*Math.PI,vr:(Math.random()-.5)*.3,w:6+Math.random()*8,h:10+Math.random()*10,c:colors[j%colors.length]});
   }
   function tick(){
     ctx.clearRect(0,0,cv.width,cv.height);
     var alive=false;
     for(var i=0;i<ps.length;i++){
-      var p=ps[i];
-      p.life++;
+      var p=ps[i]; p.life++;
       if(p.life>p.max) continue;
       alive=true;
       p.x+=p.vx; p.y+=p.vy; p.vy+=0.16;
       var a=1-p.life/p.max;
       ctx.globalAlpha=a;
       ctx.fillStyle=p.c;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r*(1-p.life/p.max*0.5),0,Math.PI*2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r*(1-p.life/p.max*0.5),0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    for(var k=0;k<rs.length;k++){
+      var rb=rs[k];
+      rb.y+=rb.vy; rb.rot+=rb.vr;
+      if(rb.y>cv.height+30){ rb.y=-20; rb.x=Math.random()*cv.width; }
+      alive=true;
+      ctx.save(); ctx.translate(rb.x,rb.y); ctx.rotate(rb.rot);
+      ctx.globalAlpha=0.9;
+      ctx.fillStyle=rb.c;
+      ctx.fillRect(-rb.w/2,-rb.h/2,rb.w,rb.h);
+      ctx.restore();
     }
     ctx.globalAlpha=1;
     if(alive) requestAnimationFrame(tick);
@@ -3785,18 +3804,55 @@ function grandEffect(){
   document.body.appendChild(rg);
   requestAnimationFrame(function(){ rg.classList.add('on'); });
   setTimeout(function(){ if(rg.parentNode) rg.parentNode.removeChild(rg); },1800);
+  var rg2=document.createElement('div');
+  rg2.className='fx-ring';
+  rg2.style.animationDelay='.35s';
+  document.body.appendChild(rg2);
+  requestAnimationFrame(function(){ rg2.classList.add('on'); });
+  setTimeout(function(){ if(rg2.parentNode) rg2.parentNode.removeChild(rg2); },2200);
   var gt=document.createElement('div');
   gt.className='fx-grand-text';
-  gt.innerHTML='<span class="gt1">恭喜获得</span><span class="gt2">全套龙套</span>';
+  gt.innerHTML='<span class="gt1">恭 喜 获 得</span><span class="gt2">全套龙套</span><span class="gt3">国庆盛典 · 开服100天 限定大奖</span>';
   document.body.appendChild(gt);
   requestAnimationFrame(function(){ gt.classList.add('on'); });
-  setTimeout(function(){ gt.classList.add('off'); },2700);
-  setTimeout(function(){ if(gt.parentNode) gt.parentNode.removeChild(gt); },3600);
+  setTimeout(function(){ gt.classList.add('off'); },3200);
+  setTimeout(function(){ if(gt.parentNode) gt.parentNode.removeChild(gt); },4100);
   var card=document.querySelector('.lottery-card');
   if(card){
     card.classList.add('fx-shake');
-    setTimeout(function(){ card.classList.remove('fx-shake'); },700);
+    setTimeout(function(){ card.classList.remove('fx-shake'); },800);
   }
+  // 第二波延迟粒子爆发
+  setTimeout(function(){
+    var cv2=document.createElement('canvas');
+    cv2.className='fx-canvas';
+    document.body.appendChild(cv2);
+    var ctx2=cv2.getContext('2d');
+    cv2.width=window.innerWidth; cv2.height=window.innerHeight;
+    var ps2=[];
+    var cx2=cv2.width/2, cy2=cv2.height/2;
+    for(var i2=0;i2<120;i2++){
+      ps2.push({x:cx2,y:cy2,vx:(Math.random()-.5)*26,vy:(Math.random()-.5)*26-8,life:0,max:50+Math.random()*40,r:2+Math.random()*4,c:colors[i2%colors.length]});
+    }
+    (function tick2(){
+      ctx2.clearRect(0,0,cv2.width,cv2.height);
+      var alive2=false;
+      for(var i3=0;i3<ps2.length;i3++){
+        var p2=ps2[i3];
+        p2.life++;
+        if(p2.life>p2.max) continue;
+        alive2=true;
+        p2.x+=p2.vx; p2.y+=p2.vy; p2.vy+=0.18;
+        var a2=1-p2.life/p2.max;
+        ctx2.globalAlpha=a2;
+        ctx2.fillStyle=p2.c;
+        ctx2.beginPath(); ctx2.arc(p2.x,p2.y,p2.r*(1-p2.life/p2.max*0.5),0,Math.PI*2); ctx2.fill();
+      }
+      ctx2.globalAlpha=1;
+      if(alive2) requestAnimationFrame(tick2);
+      else if(cv2.parentNode) cv2.parentNode.removeChild(cv2);
+    })();
+  },900);
 }
 function renderLotteryResult(prize,code,seq){
   var r=document.getElementById('lotteryResult');
@@ -3841,15 +3897,42 @@ function renderSoldOut(){
     '<div class="lr-already">兑换码已全部抽完，感谢参与</div>'+
     '</div>';
 }
+function startLotteryCountdown(){
+  var el=document.getElementById('lotteryCountdown');
+  if(!el) return;
+  function tick(){
+    var diff=LOTTERY_START.getTime()-new Date().getTime();
+    if(diff<=0){
+      el.textContent='活动已开放，快来参与！';
+      el.classList.add('open');
+      var btn=document.getElementById('lotteryBtn');
+      if(btn){ btn.disabled=false; btn.textContent='开始抽奖'; }
+      checkLotteryState();
+      return;
+    }
+    var d=Math.floor(diff/86400000), h=Math.floor(diff%86400000/3600000), m=Math.floor(diff%3600000/60000), s=Math.floor(diff%60000/1000);
+    el.textContent=(d>0?d+'天 ':'')+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+  tick();
+  setInterval(tick,1000);
+}
 function checkLotteryState(){
   var btn=document.getElementById('lotteryBtn');
   var now=new Date();
-  if(now<LOTTERY_START || now>LOTTERY_END){
+  if(now<LOTTERY_START){
+    if(btn){ btn.disabled=true; btn.textContent='未开放'; }
+    startLotteryCountdown();
+    return;
+  }
+  if(now>LOTTERY_END){
     if(btn){ btn.disabled=true; btn.textContent='活动已结束'; }
+    var el=document.getElementById('lotteryCountdown');
+    if(el) el.textContent='活动已结束';
+    return;
   }
   // 服务端状态查询（KKE58L）：即使本地被清空，也能恢复"今日已抽"
   try{
-    fetch('/api/lottery/state').then(function(r){return r.json();}).then(function(st){
+    fetch('/api/lottery/state?device='+encodeURIComponent(getDeviceId())).then(function(r){return r.json();}).then(function(st){
       if(st && st.serverDate) serverToday=st.serverDate;
       if(st && st.drawn){
         if(btn){ btn.disabled=true; btn.textContent='今日已抽'; }
@@ -3883,7 +3966,7 @@ function doLottery(){
   if(now<LOTTERY_START || now>LOTTERY_END){ showToast('活动已结束'); return; }
   spinning=true;
   btn.disabled=true; btn.textContent='抽奖中...';
-  fetch('/api/rest/rpc/draw_lottery',{
+  fetch('/api/lottery/draw',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({p_device:getDeviceId()})
