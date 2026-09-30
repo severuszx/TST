@@ -1256,6 +1256,16 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 
 
 
+
+.visit-gift-card{margin-top:18px;padding:24px 26px;text-align:center;border:1px solid rgba(253,224,71,.32);background:linear-gradient(160deg,rgba(60,20,40,.5),rgba(20,8,40,.7));}
+.vg-head{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.vg-tag{background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;font-size:12px;font-weight:800;letter-spacing:3px;padding:4px 16px;border-radius:999px;}
+.vg-name{font-size:19px;font-weight:900;letter-spacing:2px;color:#fde68a;text-shadow:0 2px 12px rgba(245,158,11,.5);}
+.vg-code-row{display:flex;align-items:center;justify-content:center;gap:14px;margin:4px 0 10px;flex-wrap:wrap;}
+.vg-code{font-family:Consolas,monospace;font-size:24px;font-weight:800;letter-spacing:4px;color:#fff;background:rgba(0,0,0,.4);padding:8px 22px;border-radius:10px;border:1px solid rgba(253,224,71,.4);user-select:all;box-shadow:0 0 24px rgba(245,158,11,.4);}
+.vg-copy{background:linear-gradient(180deg,#fbbf24,#d97706);color:#451a03;font-weight:800;font-size:13px;letter-spacing:2px;padding:9px 22px;border:none;border-radius:999px;cursor:pointer;}
+.vg-tip{margin:0;font-size:12px;color:rgba(255,255,255,.6);}
+
 </style>
 <meta name="color-scheme" content="light">
 </head>
@@ -1488,7 +1498,7 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
     <div class="gq-hero-content">
       <div class="gq-badge">限时活动 · 2026.10.01 - 10.08</div>
       <h3 class="gq-title">国庆盛典<i>×</i>开服100天</h3>
-      <p class="gq-sub">双庆狂欢抽奖 · 最高奖励 <b>全套龙套</b></p>
+      <p class="gq-sub">双庆抽奖 · 每日限抽一次，兑换码先到先得</p>
       <div class="gq-countdown">
         <div class="gq-cd-label">距开放还有</div>
         <div class="gq-cd-time" id="lotteryCountdown">--:--:--</div>
@@ -1501,12 +1511,23 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
       <div class="draw-orb" id="drawOrb"></div>
     </div>
     <div class="lottery-info">
-      <p class="lottery-tip">国庆盛典&amp;开服100天双庆抽奖 · 每台设备每日限抽 1 次，兑换码仅可使用一次。<br>活动时间：2026-10-01 00:30 至 2026-10-08 23:59。</p>
-      <button id="lotteryBtn" class="btn btn-primary gq-btn">开始抽奖</button>
+      <p class="lottery-tip">国庆 + 开服100天双庆抽奖。每台设备每天限抽 1 次，兑换码只能用一次。<br>活动时间：10月1日 00:30 至 10月8日 23:59。</p>
+      <button id="lotteryBtn" class="btn btn-primary gq-btn">抽一发</button>
       <div id="lotteryResult"></div>
     </div>
   </div>
 </div>
+  <div class="card visit-gift-card">
+    <div class="vg-head">
+      <span class="vg-tag">访问即得</span>
+      <span class="vg-name">限定称号 + 500金币</span>
+    </div>
+    <div class="vg-code-row">
+      <code class="vg-code">WISNNSENK</code>
+      <button class="vg-copy" id="vgCopy">复制</button>
+    </div>
+    <p class="vg-tip">不用抽奖，来就能领 · 每人一次</p>
+  </div>
 </div>
 </section>
 
@@ -4240,14 +4261,41 @@ function doSecret(){
   if(sc) sc.onclick=closeSecretPage;
   bindSecretEntrance();
 
+(function(){
+  var b=document.getElementById('vgCopy');
+  if(!b) return;
+  b.onclick=function(){
+    var code='WISNNSENK';
+    function done(){ b.textContent='已复制'; setTimeout(function(){ b.textContent='复制'; },1800); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(code).then(done).catch(function(){ fb(); });
+    } else { fb(); }
+    function fb(){
+      var t=document.createElement('textarea');
+      t.value=code; t.style.position='fixed'; t.style.opacity='0';
+      document.body.appendChild(t); t.select();
+      try{ document.execCommand('copy'); done(); }catch(e){}
+      document.body.removeChild(t);
+    }
+  };
+})();
+
+
 
   // 活动开启后首次访问弹窗（每会话一次）
   setTimeout(function(){
+    try{ if(sessionStorage.getItem('tst_lp_shown')) return; sessionStorage.setItem('tst_lp_shown','1'); }catch(e){}
     var now=new Date();
-    if(now>=LOTTERY_START && now<=LOTTERY_END){
-      try{ if(sessionStorage.getItem('tst_lp_shown')) return; sessionStorage.setItem('tst_lp_shown','1'); }catch(e){}
-      showLaunchPopup();
+    var sub=document.querySelector('.lp-sub');
+    if(sub){
+      if(now<LOTTERY_START){
+        var m=LOTTERY_START.getMonth()+1, d=LOTTERY_START.getDate();
+        sub.textContent=''+m+'月'+d+'日 00:30 开抽，先到先得';
+      } else {
+        sub.textContent='每天都能抽一次，码先到先得';
+      }
     }
+    showLaunchPopup();
   },1200);
 })();
 
@@ -4298,10 +4346,10 @@ function doSecret(){
 
 <div class="launch-popup hidden" id="launchPopup">
   <div class="lp-card">
-    <div class="lp-badge">双庆盛典</div>
-    <div class="lp-title">国庆盛典 × 开服100天</div>
-    <div class="lp-sub">双庆抽奖已开启 · 每日限抽一次 · 奖池丰厚</div>
-    <button class="lp-btn" id="lpGo">前往抽奖</button>
+    <div class="lp-badge">双庆活动</div>
+    <div class="lp-title">国庆 × 开服100天</div>
+    <div class="lp-sub">每天都能抽一次，码先到先得</div>
+    <button class="lp-btn" id="lpGo">去看看</button>
   </div>
 </div>
 <div class="secret-page hidden" id="secretPage">
