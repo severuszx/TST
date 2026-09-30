@@ -10,8 +10,8 @@ const DATA_ORIGIN = 'https://tst-server-site.pages.dev';
 
 // 抽奖 IP 每日限速表（isolate 内存；无 KV 绑定的尽力方案，配合服务端数据库去重共同防刷）
 const LOTTERY_IP_MAP = new Map();
-const LOTTERY_START = new Date(2026, 8, 25, 0, 0, 0);   // 2026-09-25 00:00
-const LOTTERY_END = new Date(2026, 8, 27, 23, 59, 59);  // 2026-09-27 23:59:59
+const LOTTERY_START = new Date(2026, 8, 30, 0, 0, 0);   // 2026-09-30 00:00（临时验证窗口）
+const LOTTERY_END = new Date(2026, 9, 8, 23, 59, 59);  // 2026-10-08 23:59:59
 
 function allowedOrigin(req) {
   const origin = req.headers.get('Origin') || '';
@@ -56,6 +56,8 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const path = url.pathname;
 
+  if (path === '/api/lottery/ping') { return json({ pong: 'v2-' + new Date().toISOString().slice(0,13) }, 200, request); }
+
   if (request.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders(request) });
   }
@@ -80,7 +82,7 @@ export async function onRequest(context) {
     const sdate = todayStr(now);
     // 1) 服务端时间窗校验（7P9HW4：不再只信前端时间）
     if (now < LOTTERY_START || now > LOTTERY_END) {
-      return json({ ok: false, error: 'not_in_window', serverDate: sdate }, 200, request);
+      return json({ ok: false, error: 'not_in_window', serverDate: sdate, fn_window: '9-30~10-8' }, 200, request);
     }
     // 2) IP 每日限速（ZXEHVW 等防刷：换浏览器/无痕/改参数均受 IP 兜底）
     const ip = clientIp(request);
