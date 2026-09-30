@@ -69,6 +69,7 @@ export async function onRequestGet(context) {
   const ikey = 'ip:' + ip + ':' + sdate;
   const rec = (device && DRAW_DEV_MAP.get(dkey)) || DRAW_IP_MAP.get(ikey) || null;
   const codes = await fetchUnclaimedCodes();
+  const dbg = await adminLottery('list', {});
   return json({
     sv: 'state-file',
     drawn: !!rec,
@@ -80,5 +81,6 @@ export async function onRequestGet(context) {
     startAt: L_START.toISOString(),
     endAt: L_END.toISOString(),
     remaining: Array.isArray(codes) ? codes.length : 0,
+    dbg: dbg && dbg.ok ? ('list:' + (Array.isArray(dbg.codes) ? dbg.codes.length : '?')) : JSON.stringify(dbg).slice(0, 160),
   }, 200, request);
 }
