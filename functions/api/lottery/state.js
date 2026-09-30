@@ -42,7 +42,7 @@ async function adminLottery(action, payload) {
 async function fetchUnclaimedCodes() {
   const res = await adminLottery('list', {});
   if (!res || !res.ok || !Array.isArray(res.codes)) return null;
-  return res.codes.filter(c => !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
+  return res.codes.filter(c => c.code !== '8952870' && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
 }
 function clientIp(req) {
   return req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For') || 'unknown';
@@ -72,7 +72,6 @@ export async function onRequestGet(context) {
   const ikey = 'ip:' + ip + ':' + sdate;
   const rec = (device && DRAW_DEV_MAP.get(dkey)) || DRAW_IP_MAP.get(ikey) || null;
   const codes = await fetchUnclaimedCodes();
-  const dbg = await adminLottery('list', {});
   return json({
     sv: 'state-file',
     drawn: !!rec,
@@ -84,6 +83,5 @@ export async function onRequestGet(context) {
     startAt: L_START.toISOString(),
     endAt: L_END.toISOString(),
     remaining: Array.isArray(codes) ? codes.length : 0,
-    dbg: dbg && dbg.ok ? ('list:' + (Array.isArray(dbg.codes) ? dbg.codes.length : '?')) : JSON.stringify(dbg).slice(0, 160),
   }, 200, request);
 }
