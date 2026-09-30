@@ -1236,11 +1236,6 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 .sp-close:hover{color:#fff;}
 
 
-.mini-gift{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 14px;margin:10px auto 4px;padding:12px 18px;border:1px dashed rgba(253,224,71,.4);border-radius:12px;background:rgba(245,158,11,.07);max-width:560px;}
-.mg-tag{background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;font-size:11px;font-weight:800;letter-spacing:2px;padding:3px 12px;border-radius:999px;}
-.mg-name{font-size:13px;font-weight:700;color:#fde68a;letter-spacing:1px;}
-.mg-code{font-family:Consolas,monospace;font-size:15px;font-weight:800;color:#fff;background:rgba(0,0,0,.35);padding:3px 14px;border-radius:6px;letter-spacing:2px;box-shadow:0 0 14px rgba(245,158,11,.35);user-select:all;}
-.mg-tip{width:100%;font-size:11px;color:rgba(255,255,255,.55);letter-spacing:1px;}
 
 
 .lp-card .lp-badge,.lp-card .lp-title,.lp-card .lp-sub,.lp-card .lp-btn{opacity:0;transform:translateY(18px);animation:lpSeq .7s cubic-bezier(.2,1.4,.4,1) forwards;}
@@ -1258,6 +1253,8 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 .lp-shine{position:absolute;inset:0;border-radius:24px;overflow:hidden;pointer-events:none;}
 .lp-shine::after{content:'';position:absolute;top:-60%;left:-30%;width:60%;height:220%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);transform:rotate(25deg);animation:lpShine 2.6s ease-in-out infinite;}
 @keyframes lpShine{0%,100%{transform:translateX(-60%) rotate(25deg)}50%{transform:translateX(320%) rotate(25deg)}}
+
+
 
 </style>
 <meta name="color-scheme" content="light">
@@ -1504,13 +1501,7 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
       <div class="draw-orb" id="drawOrb"></div>
     </div>
     <div class="lottery-info">
-      <p class="lottery-tip">国庆盛典&amp;开服100天双庆抽奖 · 奖池含下界合金全套装备、唱片、重锤、1000金币、薯片、烤羊腿、可乐等。<br>每台设备每日限抽 1 次，兑换码仅可使用一次。<br>活动时间：2026-10-01 00:00 至 2026-10-08 23:59。</p>
-      <div class="mini-gift">
-        <span class="mg-tag">访问即得</span>
-        <span class="mg-name">限定称号 + 500金币</span>
-        <code class="mg-code">WISNNSENK</code>
-        <span class="mg-tip">每人仅可用一次 · 无人数限制</span>
-      </div>
+      <p class="lottery-tip">国庆盛典&amp;开服100天双庆抽奖 · 每台设备每日限抽 1 次，兑换码仅可使用一次。<br>活动时间：2026-10-01 00:30 至 2026-10-08 23:59。</p>
       <button id="lotteryBtn" class="btn btn-primary gq-btn">开始抽奖</button>
       <div id="lotteryResult"></div>
     </div>
@@ -4169,7 +4160,7 @@ function bindSecretEntrance(){
   t.addEventListener('click',function(){
     _titleClicks++;
     clearTimeout(_titleTimer);
-    _titleTimer=setTimeout(function(){ _titleClicks=0; },1800);
+    _titleTimer=setTimeout(function(){ _titleClicks=0; },3000);
     if(_titleClicks>=5){
       _titleClicks=0;
       openSecretPage();
@@ -4248,6 +4239,8 @@ function doSecret(){
   var sc=document.getElementById('spClose');
   if(sc) sc.onclick=closeSecretPage;
   bindSecretEntrance();
+
+
   // 活动开启后首次访问弹窗（每会话一次）
   setTimeout(function(){
     var now=new Date();
