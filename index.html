@@ -1242,6 +1242,23 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 .mg-code{font-family:Consolas,monospace;font-size:15px;font-weight:800;color:#fff;background:rgba(0,0,0,.35);padding:3px 14px;border-radius:6px;letter-spacing:2px;box-shadow:0 0 14px rgba(245,158,11,.35);user-select:all;}
 .mg-tip{width:100%;font-size:11px;color:rgba(255,255,255,.55);letter-spacing:1px;}
 
+
+.lp-card .lp-badge,.lp-card .lp-title,.lp-card .lp-sub,.lp-card .lp-btn{opacity:0;transform:translateY(18px);animation:lpSeq .7s cubic-bezier(.2,1.4,.4,1) forwards;}
+.lp-card .lp-badge{animation-delay:.15s}
+.lp-card .lp-title{animation-delay:.35s}
+.lp-card .lp-sub{animation-delay:.55s}
+.lp-card .lp-btn{animation-delay:.75s}
+@keyframes lpSeq{to{opacity:1;transform:translateY(0)}}
+.lp-beam{position:absolute;top:-30%;left:50%;width:200px;height:180%;margin-left:-100px;background:linear-gradient(180deg,rgba(253,224,71,0),rgba(253,224,71,.22) 45%,rgba(245,158,11,.4) 75%,rgba(239,68,68,0));filter:blur(14px);transform:rotate(12deg);animation:lpBeam 3.5s ease-in-out infinite;pointer-events:none;}
+@keyframes lpBeam{0%,100%{transform:rotate(12deg) scaleX(1);opacity:.7}50%{transform:rotate(-8deg) scaleX(1.25);opacity:1}}
+.lp-stardust{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.9);animation:lpDust linear infinite;pointer-events:none;}
+@keyframes lpDust{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:.9}100%{transform:translateY(-140px) translateX(40px);opacity:0}}
+.lp-fire{position:absolute;width:14px;height:14px;border-radius:50%;pointer-events:none;animation:lpFire 1.6s cubic-bezier(.1,.7,.3,1) forwards;}
+@keyframes lpFire{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(.15);opacity:0}}
+.lp-shine{position:absolute;inset:0;border-radius:24px;overflow:hidden;pointer-events:none;}
+.lp-shine::after{content:'';position:absolute;top:-60%;left:-30%;width:60%;height:220%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);transform:rotate(25deg);animation:lpShine 2.6s ease-in-out infinite;}
+@keyframes lpShine{0%,100%{transform:translateX(-60%) rotate(25deg)}50%{transform:translateX(320%) rotate(25deg)}}
+
 </style>
 <meta name="color-scheme" content="light">
 </head>
@@ -3769,7 +3786,7 @@ var LOTTERY_PRIZES=[
   {seq:19,name:'可乐',short:'可乐',color:'#06b6d4',color2:'#22d3ee'}
 ];
 var LOTTERY_KEY='tst_lottery';
-var LOTTERY_START=new Date('2026-10-01T00:00:00+08:00');
+var LOTTERY_START=new Date('2026-10-01T00:30:00+08:00');
 var LOTTERY_END=new Date('2026-10-08T23:59:59+08:00');
 var wheelDeg=0;
 var spinning=false;
@@ -4091,21 +4108,53 @@ function doLottery(){
 })();
 
 // ===== 零点/访问弹窗 =====
+var _lpFireTimer=null;
+function lpFireBurst(){
+  var lp=document.getElementById('launchPopup');
+  if(!lp || lp.classList.contains('hidden')) return;
+  var card=lp.querySelector('.lp-card');
+  var n=18;
+  for(var i=0;i<n;i++){
+    var f=document.createElement('i');
+    f.className='lp-fire';
+    var a=Math.random()*Math.PI*2, d=90+Math.random()*240;
+    f.style.left='50%'; f.style.top='55%';
+    f.style.background=['#fde68a','#f59e0b','#ef4444','#fff','#fbbf24','#7dd3fc'][i%6];
+    f.style.boxShadow='0 0 18px currentColor';
+    f.style.setProperty('--dx',Math.cos(a)*d+'px');
+    f.style.setProperty('--dy',Math.sin(a)*d+'px');
+    f.style.animationDelay=(Math.random()*.35)+'s';
+    card.appendChild(f);
+    setTimeout(function(el){ el.remove(); },2200,f);
+  }
+}
 function showLaunchPopup(){
   var lp=document.getElementById('launchPopup');
   if(lp && lp.classList.contains('hidden')){
-    for(var i=0;i<26;i++){
-      var sp=document.createElement('i');
-      sp.className='lp-spark';
-      var a=Math.random()*Math.PI*2, d=80+Math.random()*260;
-      sp.style.left='50%'; sp.style.top='50%';
-      sp.style.setProperty('--dx',Math.cos(a)*d+'px');
-      sp.style.setProperty('--dy',Math.sin(a)*d+'px');
-      sp.style.animationDelay=(Math.random()*1.6)+'s';
-      lp.querySelector('.lp-card').appendChild(sp);
+    var card=lp.querySelector('.lp-card');
+    if(card){
+      var beam=document.createElement('i'); beam.className='lp-beam'; card.appendChild(beam);
+      for(var i=0;i<24;i++){
+        var d=document.createElement('i');
+        d.className='lp-stardust';
+        d.style.left=(5+Math.random()*90)+'%';
+        d.style.top=(50+Math.random()*60)+'%';
+        d.style.animationDuration=(3+Math.random()*5)+'s';
+        d.style.animationDelay=(Math.random()*4)+'s';
+        card.appendChild(d);
+      }
+      var shine=document.createElement('i'); shine.className='lp-shine'; card.appendChild(shine);
+      lpFireBurst();
+      if(_lpFireTimer) clearInterval(_lpFireTimer);
+      _lpFireTimer=setInterval(lpFireBurst,1400);
     }
     lp.classList.remove('hidden');
   }
+}
+function hideLaunchPopup(){
+  var lp=document.getElementById('launchPopup');
+  if(lp) lp.classList.add('hidden');
+  if(_lpFireTimer){ clearInterval(_lpFireTimer); _lpFireTimer=null; }
 }
 function hideLaunchPopup(){
   var lp=document.getElementById('launchPopup');
