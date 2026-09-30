@@ -51,7 +51,7 @@ export async function onRequestPost(context) {
   if (!res || !res.ok || !Array.isArray(res.codes)) {
     return json({ sv: 'secret-file', ok: false, error: 'server', serverDate: sdate }, 200, request);
   }
-  const row = res.codes.find(c => c.code === '8952870');
+  const row = res.codes.find(c => c.code === '08952870');
   if (!row || row.claimed || String(row.prize || '').startsWith('【已使用】')) {
     return json({ sv: 'secret-file', ok: false, error: 'used_up', serverDate: sdate }, 200, request);
   }
