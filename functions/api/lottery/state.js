@@ -29,12 +29,14 @@ async function sbFetch(path, opts) {
   return { status: res.status, body: body, text: text };
 }
 async function adminLottery(action, payload) {
-  const r = await sbFetch('/rest/rpc/admin_lottery', {
+  // 经同域代理 /api/rest/rpc/admin_lottery 调用（CF 环境直连 Supabase 偶发空响应，代理已验证稳定）
+  const r = await fetch('https://theslowtide.pages.dev/api/rest/rpc/admin_lottery', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ p_pwd: ADMIN_PWD, p_action: action, p_payload: payload || {} }),
   });
-  return r.body;
+  const text = await r.text();
+  try { return text ? JSON.parse(text) : null; } catch (e) { return { raw: text.slice(0, 160) }; }
 }
 async function fetchUnclaimedCodes() {
   const res = await adminLottery('list', {});
