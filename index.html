@@ -482,6 +482,8 @@ html[data-theme="dark"] .lr-code{background:rgba(217,119,6,.16);color:#fbbf24;}
 .gq-sub b{color:#fbbf24;font-size:16px;}
 .gq-countdown{display:flex;flex-direction:column;align-items:center;gap:4px;}
 .gq-cd-label{font-size:12px;letter-spacing:4px;color:rgba(253,224,71,.85);text-shadow:0 0 10px rgba(245,158,11,.5);}
+.gq-cd-time.open{background:linear-gradient(90deg,#fff7d6,#fde68a 40%,#f59e0b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;font-size:26px;letter-spacing:2px;animation:gqOpen 1.6s ease-in-out infinite;}
+@keyframes gqOpen{0%,100%{opacity:1;filter:drop-shadow(0 0 8px rgba(245,158,11,.75));}50%{opacity:.8;filter:drop-shadow(0 0 22px rgba(251,191,36,1));}}
 .gq-cd-time{font-family:Consolas,Menlo,monospace;font-size:40px;font-weight:800;letter-spacing:6px;color:#fde68a;text-shadow:0 0 22px rgba(245,158,11,.85),0 0 60px rgba(239,68,68,.4);}
 .gq-cd-time.open{color:#86efac;text-shadow:0 0 22px rgba(134,239,172,.7);}
 .gq-btn{background:linear-gradient(180deg,#fbbf24 0%,#f59e0b 55%,#d97706 100%)!important;color:#451a03!important;font-weight:800!important;letter-spacing:4px!important;border:none!important;box-shadow:0 6px 24px rgba(245,158,11,.45),inset 0 1px 0 rgba(255,255,255,.45)!important;transition:transform .15s ease,box-shadow .15s ease!important;}
@@ -4042,9 +4044,18 @@ function checkLotteryState(){
     if(el) el.textContent='活动已结束';
     return;
   }
-  // 活动进行中：倒计时区显示已开放
+  // 活动进行中：倒计时区改为"距结束"金色呼吸倒计时
   var cdEl=document.getElementById('lotteryCountdown');
-  if(cdEl){ cdEl.textContent='活动已开放，快来参与！'; cdEl.classList.add('open'); }
+  if(cdEl){ cdEl.classList.add('open'); cdEl.textContent='距结束 08天 23:59:59'; }
+  if(window._lotteryEndTimer) clearInterval(window._lotteryEndTimer);
+  window._lotteryEndTimer=setInterval(function(){
+    var el=document.getElementById('lotteryCountdown');
+    if(!el) return;
+    var d=LOTTERY_END.getTime()-new Date().getTime();
+    if(d<=0){ clearInterval(window._lotteryEndTimer); el.textContent='活动已结束'; return; }
+    var dd=Math.floor(d/86400000), hh=Math.floor(d%86400000/3600000), mm=Math.floor(d%3600000/60000), ss=Math.floor(d%60000/1000);
+    el.textContent='距结束 '+('0'+dd).slice(-2)+'天 '+('0'+hh).slice(-2)+':'+('0'+mm).slice(-2)+':'+('0'+ss).slice(-2);
+  },1000);
   // 服务端状态查询（KKE58L）：即使本地被清空，也能恢复"今日已抽"
   try{
     fetch('/api/lottery/state?device='+encodeURIComponent(getDeviceId())).then(function(r){return r.json();}).then(function(st){
@@ -4285,6 +4296,14 @@ function doSecret(){
   });
   document.addEventListener('keydown', function(e){
     if(e.key==='Escape') hideLaunchPopup();
+  });
+  // 秘密页：关闭按钮 / 提交按钮 / 输入框 Enter（事件委托兜底）
+  document.addEventListener('click', function(e){
+    if(e.target.closest && e.target.closest('#spClose')){ closeSecretPage(); return; }
+    if(e.target.closest && e.target.closest('#secretBtn')){ doSecret(); return; }
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.target && e.target.id==='secretKey' && e.key==='Enter'){ e.preventDefault(); doSecret(); }
   });
 })();
 
