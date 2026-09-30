@@ -42,7 +42,7 @@ async function adminLottery(action, payload) {
 async function fetchUnclaimedCodes() {
   const res = await adminLottery('list', {});
   if (!res || !res.ok || !Array.isArray(res.codes)) return null;
-  return res.codes.filter(c => c.code !== '8952870' && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
+  return res.codes.filter(c => !String(c.code || '').startsWith('DC:') && c.code !== '08952870' && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
 }
 function clientIp(req) {
   return req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For') || 'unknown';
@@ -68,9 +68,18 @@ export async function onRequestGet(context) {
   const sdate = cnDate(now);
   const ip = clientIp(request);
   const device = String(url.searchParams.get('device') || '').slice(0, 80);
-  const dkey = 'dev:' + device + ':' + sdate;
-  const ikey = 'ip:' + ip + ':' + sdate;
-  const rec = (device && DRAW_DEV_MAP.get(dkey)) || DRAW_IP_MAP.get(ikey) || null;
+  const ua = String(request.headers.get('User-Agent') || '');
+  const secUa = String(request.headers.get('Sec-CH-UA-Platform') || request.headers.get('Sec-CH-UA') || '');
+  const rawFp = ip + '|' + ua + '|' + secUa + '|' + device;
+  let fp = 5381;
+  for (let i = 0; i < rawFp.length; i++) { fp = ((fp << 5) + fp + rawFp.charCodeAt(i)) >>> 0; }
+  const fkey = 'DC:' + fp + ':' + sdate;
+  const dkey = 'DC:dev:' + device + ':' + sdate;
+  const list = await adminLottery('list', {});
+  let rec = null;
+  if (list && list.ok && Array.isArray(list.codes)) {
+    rec = list.codes.find(c => c.code === fkey || c.code === dkey) || null;
+  }
   const codes = await fetchUnclaimedCodes();
   return json({
     sv: 'state-file',
