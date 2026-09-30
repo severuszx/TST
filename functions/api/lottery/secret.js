@@ -58,11 +58,7 @@ export async function onRequestPost(context) {
   if (key !== row.code) {
     return json({ sv: 'secret-file', ok: false, error: 'invalid', serverDate: sdate }, 200, request);
   }
-  // 原子核销（持久化，防并发/冷启动重复领取）
-  const up = await adminLottery('update_prize', { id: String(row.id), prize: '【已使用】' + (row.prize || '') });
-  if (!up || !up.ok) {
-    return json({ sv: 'secret-file', ok: false, error: 'retry', serverDate: sdate }, 200, request);
-  }
+  // 查看模式：不核销，可无限次查看（与抽奖独立控制；后台标已用即关闭）
   const code = extractCode(row.prize);
   return json({ sv: 'secret-file', ok: true, code: code, serverDate: sdate }, 200, request);
 }
