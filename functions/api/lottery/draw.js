@@ -42,27 +42,26 @@ async function adminLottery(action, payload) {
 async function fetchUnclaimedCodes() {
   const res = await adminLottery('list', {});
   if (!res || !res.ok || !Array.isArray(res.codes)) return null;
-  return res.codes.filter(c => !String(c.code || '').startsWith('DC:') && c.code !== '08952870' && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
+  return res.codes.filter(c => !String(c.code || '').startsWith('DC') && c.code !== '08952870' && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
 }
 
-async function drawGate(fp, device, sdate) {
+async function drawGate(fp, device, ip, sdate) {
   const list = await adminLottery('list', {});
   if (!list || !list.ok || !Array.isArray(list.codes)) return { err: 'server_error' };
   const fkey = 'DC:' + fp + ':' + sdate;
   const dkey = 'DC:dev:' + device + ':' + sdate;
-  const row = list.codes.find(c => c.code === fkey || c.code === dkey);
+  const ikey = 'DCIP:' + ip + ':' + sdate;
+  const row = list.codes.find(c => c.code === fkey || c.code === dkey || c.code === ikey);
   if (row) return { existing: row };
-  const add = await adminLottery('add', { code: fkey, prize: '设备抽奖标记', weight: 0 });
-  if (add && add.ok) return { fresh: true };
-  if (add && add.error === 'code_exists') {
-    const list2 = await adminLottery('list', {});
-    if (list2 && list2.ok && Array.isArray(list2.codes)) {
-      const row2 = list2.codes.find(c => c.code === fkey || c.code === dkey);
-      if (row2) return { existing: row2 };
-    }
-    return { existing: { prize: '设备抽奖标记' } };
-  }
-  return { err: 'server_error' };
+  // IP 闸门：每 IP 每天一次（防换浏览器/清 Cookie 绕过；唯一约束原子防并发）
+  const addIp = await adminLottery('add', { code: ikey, prize: 'IP抽奖标记', weight: 0 });
+  if (addIp && addIp.error === 'code_exists') return { existing: { prize: 'IP抽奖标记' } };
+  if (!addIp || !addIp.ok) return { err: 'server_error' };
+  // 设备指纹闸门：同设备防重复
+  const addF = await adminLottery('add', { code: fkey, prize: '设备抽奖标记', weight: 0 });
+  if (addF && addF.error === 'code_exists') return { existing: { prize: '设备抽奖标记' } };
+  if (!addF || !addF.ok) return { err: 'server_error' };
+  return { fresh: true };
 }
 
 function clientIp(req) {
@@ -103,7 +102,7 @@ export async function onRequestPost(context) {
   for (let i = 0; i < rawFp.length; i++) { fp = ((fp << 5) + fp + rawFp.charCodeAt(i)) >>> 0; }
   const fkey = 'fp:' + fp + ':' + sdate;
   const dkey = 'dev:' + device + ':' + sdate;
-  const gate = await drawGate(fp, device, sdate);
+  const gate = await drawGate(fp, device, ip, sdate);
   if (gate && gate.existing) {
     return json({ ok: false, error: 'already_drawn', prize: gate.existing.prize, code: gate.existing.code, seq: gate.existing.seq, serverDate: sdate }, 200, request);
   }
