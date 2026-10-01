@@ -4355,16 +4355,14 @@ function _q6(code){
   at(11200,function(){
     if(stage) stage.className='mm-stage hidden';
     if(list){ list.classList.remove('hidden'); list.innerHTML='<div class="mm-list-title">拾光 · 服务器历史</div>'; }
-    _mmScroll(list,11700,src.length*950);
     src.forEach(function(h,i){
-      at(11700+i*950,function(){
-        if(!list) return;
-        var d=document.createElement('div');
-        d.className='mm-item';
-        d.innerHTML='<span class="mm-date">'+escTxt(h.date)+'</span><span class="mm-text">'+escTxt(h.text)+'</span>';
-        list.appendChild(d);
-      });
+      if(!list) return;
+      var d=document.createElement('div');
+      d.className='mm-item';
+      d.innerHTML='<span class="mm-date">'+escTxt(h.date)+'</span><span class="mm-text">'+escTxt(h.text)+'</span>';
+      list.appendChild(d);
     });
+    _mmScroll(list,11700,src.length*950);
   });
   var histEnd=11700+src.length*950;
   var annSrc=(anns.length?anns:[{title:'版本迭代不断',content:'服务器持续更新优化'},{title:'社区活动接连不断',content:'赛事、活动、福利轮番上阵'}]).slice(0,8);
@@ -4379,21 +4377,19 @@ function _q6(code){
   function annNote(t){ for(var i=0;i<ANN_NOTE.length;i++){ if(ANN_NOTE[i][0].test(String(t||''))) return ANN_NOTE[i][1]; } return '服务器成长的每一步，都在潮汐中留下印记。'; }
   at(histEnd+1200,function(){
     if(!list) return;
-    _mmScroll(list,histEnd+1800,annSrc.length*1000);
     var hd=document.createElement('div');
     hd.className='mm-list-title';
     hd.style.marginTop='24px';
     hd.textContent='大事记 · 公告与动态';
     list.appendChild(hd);
     annSrc.forEach(function(a,i){
-      at(histEnd+1800+i*1000,function(){
-        if(!list) return;
-        var d=document.createElement('div');
-        d.className='mm-item';
-        d.innerHTML='<span class="mm-date">'+escTxt(a.date||'')+'</span><span class="mm-text"><strong>'+escTxt(a.title)+'</strong>　'+escTxt(String(a.content||'').slice(0,70))+'<span class="mm-note">解读：'+escTxt(annNote(a.title))+'</span></span>';
-        list.appendChild(d);
-      });
+      if(!list) return;
+      var d=document.createElement('div');
+      d.className='mm-item';
+      d.innerHTML='<span class="mm-date">'+escTxt(a.date||'')+'</span><span class="mm-text"><strong>'+escTxt(a.title)+'</strong>　'+escTxt(String(a.content||'').slice(0,70))+'<span class="mm-note">解读：'+escTxt(annNote(a.title))+'</span></span>';
+      list.appendChild(d);
     });
+    _mmScroll(list,histEnd+1800,annSrc.length*1000);
   });
   var annEnd=histEnd+1800+annSrc.length*1000;
   at(annEnd+1500,function(){
@@ -4405,16 +4401,14 @@ function _q6(code){
   at(picEnd,function(){
     if(feedSrc.length){
       if(list){ list.classList.remove('hidden'); list.innerHTML='<div class="mm-list-title">此刻 · 玩家动态</div>'; }
-      _mmScroll(list,picEnd+600,feedSrc.length*900);
       feedSrc.forEach(function(f,i){
-        at(picEnd+600+i*900,function(){
-          if(!list) return;
-          var d=document.createElement('div');
-          d.className='mm-item';
-          d.innerHTML='<span class="mm-date">'+escTxt(f.date||'')+'</span><span class="mm-text"><strong>'+escTxt(f.title)+'</strong>　'+escTxt(String(f.content||f.text||'').slice(0,60))+'</span>';
-          list.appendChild(d);
-        });
+        if(!list) return;
+        var d=document.createElement('div');
+        d.className='mm-item';
+        d.innerHTML='<span class="mm-date">'+escTxt(f.date||'')+'</span><span class="mm-text"><strong>'+escTxt(f.title)+'</strong>　'+escTxt(String(f.content||f.text||'').slice(0,60))+'</span>';
+        list.appendChild(d);
       });
+      _mmScroll(list,picEnd+600,feedSrc.length*900);
     } else {
       snap('<div class="mm-title-big mm-glow" style="font-size:clamp(24px,6vw,44px);">活动时刻</div><div class="mm-sub" style="letter-spacing:4px;line-height:2;">国庆 × 开服100天 · 双庆同欢<br>抽奖、神秘潮汐、限定好礼</div>');
       _q4();
