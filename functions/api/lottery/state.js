@@ -3,7 +3,7 @@ const SUPABASE_URL = 'https://jilcbcodphxpasicjghv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs';
 // 管理员口令：注意公开仓库可见，后续需改为环境变量并在数据库侧改密
 // 管理员口令：优先读环境变量 ADMIN_PWD（Cloudflare Pages Secret），未配置时回退内置
-const ADMIN_PWD = (typeof context !== 'undefined' && context.env && context.env.ADMIN_PWD) ? context.env.ADMIN_PWD : 'WYJQQNDYWHM';
+let ADMIN_PWD = null; // 管理员口令：仅由 onRequest 从环境变量 ADMIN_PWD 注入（仓库不含口令）
 const L_START = new Date('2026-10-01T00:30:00+08:00');
 const L_END = new Date('2026-10-08T23:59:59+08:00');
 const DRAW_DEV_MAP = new Map();
@@ -30,6 +30,8 @@ async function sbFetch(path, opts) {
   return { status: res.status, body: body, text: text };
 }
 async function adminLottery(action, payload) {
+  if (!ADMIN_PWD) return { ok: false, error: 'no_pwd' };
+  if (!ADMIN_PWD) return { ok: false, error: 'no_pwd' };
   // 经同域代理 /api/rest/rpc/admin_lottery 调用（CF 环境直连 Supabase 偶发空响应，代理已验证稳定）
   const r = await fetch('https://theslowtide.pages.dev/api/rest/rpc/admin_lottery', {
     method: 'POST',
@@ -42,7 +44,7 @@ async function adminLottery(action, payload) {
 async function fetchUnclaimedCodes() {
   const res = await adminLottery('list', {});
   if (!res || !res.ok || !Array.isArray(res.codes)) return null;
-  return res.codes.filter(c => !String(c.code || '').startsWith('DC') && c.code !== '08952870' && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
+  return res.codes.filter(c => !String(c.code || '').startsWith('DC') && !String(c.prize || '').includes('神秘礼包') && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
 }
 function clientIp(req) {
   return req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For') || 'unknown';
