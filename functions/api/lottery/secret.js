@@ -34,6 +34,22 @@ function extractCode(prize) {
   const m = String(prize || '').match(/[A-Z0-9]{8,}/);
   return m ? m[0] : '';
 }
+async function secretGate(device, sdate) {
+  if (!device) return { err: 'bad_device' };
+  const list = await adminLottery('list', {});
+  if (!list || !list.ok || !Array.isArray(list.codes)) return { err: 'server_error' };
+  const base = 'SCDEV:' + device + ':' + sdate;
+  const keys = [base + ':1', base + ':2', base + ':3'];
+  const exist = new Set((list.codes || []).map(c => c.code));
+  for (let i = 0; i < 3; i++) {
+    if (exist.has(keys[i])) continue;
+    const add = await adminLottery('add', { code: keys[i], prize: '密钥输入标记', weight: 0 });
+    if (add && add.ok) return { used: i + 1 };
+    if (add && add.error === 'code_exists') continue;
+    return { err: 'server_error' };
+  }
+  return { over: true };
+}
 
 export async function onRequestPost(context) {
   if (context && context.env && context.env.ADMIN_PWD) ADMIN_PWD = context.env.ADMIN_PWD;
@@ -50,6 +66,17 @@ export async function onRequestPost(context) {
   const key = String(body.key || '').trim().slice(0, 40);
   if (!key) {
     return json({ sv: 'secret-file', ok: false, error: 'invalid', serverDate: sdate }, 200, request);
+  }
+  const device = String(body.device || '').slice(0, 80);
+  if (!device) {
+    return json({ sv: 'secret-file', ok: false, error: 'bad_device', serverDate: sdate }, 200, request);
+  }
+  const gate = await secretGate(device, sdate);
+  if (gate && gate.over) {
+    return json({ sv: 'secret-file', ok: false, error: 'no_chances', serverDate: sdate }, 200, request);
+  }
+  if (gate && gate.err) {
+    return json({ sv: 'secret-file', ok: false, error: 'server', serverDate: sdate }, 200, request);
   }
   const res = await adminLottery('list', {});
   if (!res || !res.ok || !Array.isArray(res.codes)) {
