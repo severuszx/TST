@@ -1272,6 +1272,32 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 .sp-boom{position:absolute;z-index:3;width:10px;height:10px;border-radius:50%;pointer-events:none!important;}
 .sp-back{position:absolute;top:20px;left:24px;z-index:4;color:rgba(186,230,253,.5);font-size:13px;letter-spacing:2px;text-decoration:none;cursor:pointer;transition:color .2s;}
 .sp-back:hover{color:#fff;}
+/* ===== 百天回忆录 ===== */
+.sp-mem{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 50% 110%,rgba(8,47,73,.65),transparent 60%),linear-gradient(180deg,rgba(2,6,23,.4),rgba(6,42,58,.75));pointer-events:auto!important;}
+.sp-mem.hidden{display:none!important;}
+.mm-stage{position:relative;width:100%;max-width:640px;text-align:center;pointer-events:none;}
+.mm-stage.hidden{display:none!important;}
+.mm-tip{color:rgba(186,230,253,.85);font-size:16px;letter-spacing:4px;line-height:2;animation:mmFadeUp 1.4s ease both;}
+.mm-tip-sub{display:block;font-size:12px;color:rgba(125,211,252,.6);letter-spacing:2px;margin-top:6px;}
+.mm-title-big{font-size:clamp(30px,7vw,54px);font-weight:800;letter-spacing:10px;color:#e0f2fe;text-shadow:0 0 34px rgba(56,189,248,.9),0 0 90px rgba(14,116,144,.6);animation:mmZoom 1.6s cubic-bezier(.16,1,.3,1) both;}
+.mm-sub{margin-top:14px;font-size:14px;letter-spacing:6px;color:rgba(125,211,252,.7);animation:mmFadeUp 1.8s .3s ease both;}
+.mm-glow{color:#fde68a;text-shadow:0 0 30px rgba(251,191,36,.95),0 0 100px rgba(245,158,11,.55);}
+.mm-list{position:relative;width:100%;max-width:560px;text-align:left;pointer-events:none;}
+.mm-list.hidden{display:none!important;}
+.mm-list-title{font-size:16px;letter-spacing:6px;color:rgba(186,230,253,.9);text-align:center;margin-bottom:18px;text-shadow:0 0 16px rgba(56,189,248,.5);animation:mmFadeUp .8s ease both;}
+.mm-item{position:relative;padding:10px 16px 10px 30px;margin:8px 0;border-left:2px solid rgba(56,189,248,.5);background:linear-gradient(90deg,rgba(14,116,144,.18),transparent);border-radius:0 10px 10px 0;animation:mmFadeUp .7s ease both;}
+.mm-item::before{content:'';position:absolute;left:-7px;top:16px;width:12px;height:12px;border-radius:50%;background:#7dd3fc;box-shadow:0 0 14px rgba(56,189,248,.9);}
+.mm-date{font-weight:700;color:#7dd3fc;margin-right:10px;letter-spacing:1px;font-size:13px;}
+.mm-text{color:rgba(226,232,240,.92);font-size:14px;}
+.mm-code{position:relative;text-align:center;pointer-events:auto!important;}
+.mm-code.hidden{display:none!important;}
+.mm-code-title{font-size:16px;letter-spacing:3px;color:#fde68a;text-shadow:0 0 18px rgba(251,191,36,.8);margin-bottom:14px;animation:mmFadeUp .8s ease both;}
+.mm-code-val{font-family:Consolas,monospace;font-size:clamp(24px,6vw,40px);letter-spacing:5px;color:#fde68a;text-shadow:0 0 30px rgba(245,158,11,.95),0 0 90px rgba(251,191,36,.5);animation:mmZoom 1.2s cubic-bezier(.16,1,.3,1) .2s both;}
+.mm-code-ops{margin-top:22px;display:flex;gap:14px;justify-content:center;animation:mmFadeUp .8s .6s ease both;}
+.mm-btn{padding:9px 30px;border:1px solid rgba(56,189,248,.5);border-radius:999px;background:rgba(8,47,73,.55);color:#7dd3fc;font-size:13px;letter-spacing:3px;cursor:pointer;transition:all .2s;}
+.mm-btn:hover{background:rgba(14,116,144,.6);color:#e0f2fe;box-shadow:0 0 20px rgba(56,189,248,.4);}
+@keyframes mmFadeUp{0%{opacity:0;transform:translateY(26px);filter:blur(6px)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes mmZoom{0%{opacity:0;transform:scale(.72);filter:blur(10px)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
 </style>
 <meta name="color-scheme" content="light">
 </head>
@@ -4213,6 +4239,14 @@ function _q4(){
 function _q1(){
   var sp=document.getElementById('pg9');
   if(sp) sp.classList.remove('hidden');
+  var mm=document.getElementById('mm');
+  if(mm) mm.classList.add('hidden');
+  var s=document.getElementById('mmStage');
+  if(s){ s.className='mm-stage'; s.innerHTML=''; }
+  var l=document.getElementById('mmList');
+  if(l){ l.classList.add('hidden'); l.innerHTML=''; }
+  var c=document.getElementById('mmCode');
+  if(c) c.classList.add('hidden');
   var sk=document.getElementById('k9');
   if(sk) sk.focus();
 }
@@ -4237,9 +4271,10 @@ function _q3(){
     .then(function(r){return r.json();})
     .then(function(res){
       if(res && res.ok){
-        if(msg){ msg.textContent='潮渊已开。你的一次性兑换码：'; msg.className='sp-msg win'; }
-        if(gift){ gift.textContent=res.code; gift.classList.remove('hidden'); }
-        _q4();
+        if(msg){ msg.textContent=''; msg.className='sp-msg'; }
+        if(gift){ gift.textContent=''; gift.classList.add('hidden'); }
+        _q6(res.code);
+        return;
       } else if(res && res.error==='no_chances'){
         if(msg){ msg.textContent='今日叩门次数已尽，潮汐之门暂时关闭，明日再来。'; msg.className='sp-msg err'; }
       } else if(res && res.error==='used_up'){
@@ -4249,6 +4284,48 @@ function _q3(){
       }
     })
     .catch(function(){ if(msg){ msg.textContent='潮汐信号中断，请稍后再试。'; msg.className='sp-msg err'; } });
+}
+function _q6(code){
+  var mm=document.getElementById('mm');
+  if(!mm) return;
+  mm.classList.remove('hidden');
+  var stage=document.getElementById('mmStage');
+  var list=document.getElementById('mmList');
+  var codeBox=document.getElementById('mmCode');
+  if(stage) stage.className='mm-stage';
+  if(list){ list.classList.add('hidden'); list.innerHTML=''; }
+  if(codeBox) codeBox.classList.add('hidden');
+  var items=histItems().map(function(a){return {date:String(a.title).replace(/^hist:/,''),text:a.content};});
+  var src=(items&&items.length?items:DEFAULT_HISTORY).slice(0,6);
+  if(stage) stage.innerHTML='<div class="mm-tip">百天回忆即将开启<br><span class="mm-tip-sub">建议先开启录屏，留住这一刻</span></div>';
+  setTimeout(function(){
+    if(stage) stage.innerHTML='<div class="mm-title-big">开服 · 一百天</div><div class="mm-sub">潮起潮落，与你同行</div>';
+    setTimeout(function(){
+      if(stage) stage.className='mm-stage hidden';
+      if(list){ list.classList.remove('hidden'); list.innerHTML='<div class="mm-list-title">拾光 · 服务器历史</div>'; }
+      src.forEach(function(h,i){
+        setTimeout(function(){
+          if(!list) return;
+          var d=document.createElement('div');
+          d.className='mm-item';
+          d.innerHTML='<span class="mm-date">'+esc(h.date)+'</span><span class="mm-text">'+esc(h.text)+'</span>';
+          list.appendChild(d);
+        }, 350+i*550);
+      });
+      setTimeout(function(){
+        if(list) list.classList.add('hidden');
+        if(stage){ stage.className='mm-stage'; stage.innerHTML='<div class="mm-title-big mm-glow">百日光阴 · 感谢同行</div>'; }
+        _q4();
+        setTimeout(function(){
+          if(stage) stage.classList.add('hidden');
+          if(codeBox) codeBox.classList.remove('hidden');
+          var v=document.getElementById('mmCodeVal');
+          if(v) v.textContent=code;
+          _q4();
+        }, 1700);
+      }, 350+src.length*550+300);
+    }, 2300);
+  }, 1700);
 }
 var _c9=0, _t9=null;
 function _q5(){
@@ -4271,6 +4348,10 @@ function _q5(){
     if(sk && !sk._b){ sk._b=1; sk.addEventListener('keydown',function(e){ if(e.key==='Enter') _q3(); }); }
     var bk=document.getElementById('x9');
     if(bk && !bk._b){ bk._b=1; bk.addEventListener('click',function(e){ e.preventDefault(); _q2(); }); }
+    var mc=document.getElementById('mmCopy');
+    if(mc && !mc._b){ mc._b=1; mc.onclick=function(){ try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(document.getElementById('mmCodeVal').textContent); } }catch(e){} mc.textContent='已复制'; setTimeout(function(){ mc.textContent='复制'; },1600); }; }
+    var mb=document.getElementById('mmBack');
+    if(mb && !mb._b){ mb._b=1; mb.onclick=function(){ _q2(); }; }
   }
   _bind();
   document.addEventListener('DOMContentLoaded', _bind);
@@ -4407,6 +4488,18 @@ function _q5(){
   <button class="sp-btn" id="b9">叩门</button>
   <p class="sp-msg" id="m9"></p>
   <p class="sp-gift hidden" id="g9"></p>
+  <div id="mm" class="sp-mem hidden">
+    <div id="mmStage" class="mm-stage"></div>
+    <div id="mmList" class="mm-list hidden"></div>
+    <div id="mmCode" class="mm-code hidden">
+      <div class="mm-code-title">潮渊已开。你的一次性兑换码：</div>
+      <div id="mmCodeVal" class="mm-code-val"></div>
+      <div class="mm-code-ops">
+        <button id="mmCopy" class="mm-btn">复制</button>
+        <button id="mmBack" class="mm-btn">返回</button>
+      </div>
+    </div>
+  </div>
 </div>
 </body>
 </html>
