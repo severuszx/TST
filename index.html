@@ -1273,7 +1273,7 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 .sp-back{position:absolute;top:20px;left:24px;z-index:4;color:rgba(186,230,253,.5);font-size:13px;letter-spacing:2px;text-decoration:none;cursor:pointer;transition:color .2s;}
 .sp-back:hover{color:#fff;}
 /* ===== 百天回忆录 ===== */
-.sp-mem{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 50% 110%,rgba(8,47,73,.65),transparent 60%),linear-gradient(180deg,rgba(2,6,23,.4),rgba(6,42,58,.75));pointer-events:auto!important;}
+.sp-mem{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 50% 110%,rgba(8,47,73,.55),transparent 60%),linear-gradient(180deg,#020617 0%,#062a3a 55%,#0a4a5c 100%);pointer-events:auto!important;}
 .sp-mem.hidden{display:none!important;}
 .mm-stage{position:relative;width:100%;max-width:640px;text-align:center;pointer-events:none;}
 .mm-stage.hidden{display:none!important;}
@@ -1293,6 +1293,20 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 .mm-code.hidden{display:none!important;}
 .mm-code-title{font-size:16px;letter-spacing:3px;color:#fde68a;text-shadow:0 0 18px rgba(251,191,36,.8);margin-bottom:14px;animation:mmFadeUp .8s ease both;}
 .mm-code-val{font-family:Consolas,monospace;font-size:clamp(24px,6vw,40px);letter-spacing:5px;color:#fde68a;text-shadow:0 0 30px rgba(245,158,11,.95),0 0 90px rgba(251,191,36,.5);animation:mmZoom 1.2s cubic-bezier(.16,1,.3,1) .2s both;}
+.mm-rec-hint{position:absolute;bottom:16px;right:20px;font-size:11px;letter-spacing:1px;color:rgba(125,211,252,.35);pointer-events:none;animation:mmFadeUp 1.2s 1s ease both;}
+.mm-skip{position:absolute;bottom:16px;left:20px;font-size:12px;color:rgba(125,211,252,.55);background:rgba(8,47,73,.35);border:1px solid rgba(56,189,248,.25);border-radius:20px;padding:4px 14px;cursor:pointer;pointer-events:auto!important;letter-spacing:1px;}
+.mm-skip:hover{color:#e0f2fe;background:rgba(14,116,144,.45);}
+.mm-logo-box{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.mm-logo{width:86px;height:86px;border-radius:22px;object-fit:cover;box-shadow:0 0 40px rgba(56,189,248,.6);animation:mmZoom 1.4s cubic-bezier(.16,1,.3,1) both;}
+.mm-wave-box{position:relative;width:100%;max-width:560px;height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+.mm-wave{position:absolute;left:-20%;right:-20%;height:60px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(56,189,248,.35),transparent 70%);animation:mmWave 2.6s ease-in-out infinite;}
+.mm-wave.w1{top:38%;}
+.mm-wave.w2{top:48%;animation-delay:.7s;}
+.mm-wave.w3{top:58%;animation-delay:1.4s;}
+@keyframes mmWave{0%,100%{transform:scaleX(.92) translateY(0);opacity:.7;}50%{transform:scaleX(1.08) translateY(-6px);opacity:1;}}
+.mm-pic-box{display:flex;flex-direction:column;align-items:center;gap:12px;justify-content:center;}
+.mm-pic-row{display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;}
+.mm-pic{width:170px;max-width:30vw;border-radius:12px;object-fit:cover;box-shadow:0 0 26px rgba(56,189,248,.35);animation:mmFadeUp .9s ease both;}
 .mm-code-ops{margin-top:22px;display:flex;gap:14px;justify-content:center;animation:mmFadeUp .8s .6s ease both;}
 .mm-btn{padding:9px 30px;border:1px solid rgba(56,189,248,.5);border-radius:999px;background:rgba(8,47,73,.55);color:#7dd3fc;font-size:13px;letter-spacing:3px;cursor:pointer;transition:all .2s;}
 .mm-btn:hover{background:rgba(14,116,144,.6);color:#e0f2fe;box-shadow:0 0 20px rgba(56,189,248,.4);}
@@ -2703,9 +2717,15 @@ function renderTicker(){
 }
 const DEFAULT_HISTORY=[
   {date:'2026-06-30',text:'服务器正式开服，The Slow Tide 与玩家见面。'},
+  {date:'2026-07',text:'玩家公约与社区规则确立，公平与友善成为基石。'},
   {date:'2026-08',text:'官网上线，支持公告、动态、赛事与便捷工具。'},
+  {date:'2026-08',text:'液态玻璃主题上线，自由拖动、透明质感掀起热潮。'},
   {date:'2026-09',text:'反馈中心上线，玩家可直接提交问题与建议。'},
-  {date:'今天',text:'持续运营中，新的版本与活动不断更新。'}
+  {date:'2026-09',text:'管理团队亮相，与玩家一同守护这片潮汐。'},
+  {date:'2026-09',text:'TST 便捷工具箱上线，JSON 解析等实用功能随开随用。'},
+  {date:'2026-09',text:'中秋活动登场，限定兑换码与神秘潮汐开启。'},
+  {date:'2026-10-01',text:'国庆 × 开服100天 双庆同欢，限量好礼与神秘礼包开启。'},
+  {date:'今天',text:'潮汐不止，故事仍在继续。'}
 ];
 function histItems(){ return (SITE_DATA.announcements||[]).filter(a=>String(a.title||'').startsWith('hist:')); }
 function renderHistory(){
@@ -4267,7 +4287,7 @@ function _q3(){
   var key=(inp?inp.value:'').trim();
   if(!key){ if(msg){msg.textContent='请输入密钥';msg.className='sp-msg err';} return; }
   if(msg){ msg.textContent='潮汐正在翻涌...'; msg.className='sp-msg'; }
-  fetch('/api/secret',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key})})
+  fetch('/api/secret',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key,device:(typeof getDeviceId==='function'?getDeviceId():'')})})
     .then(function(r){return r.json();})
     .then(function(res){
       if(res && res.ok){
@@ -4289,43 +4309,108 @@ function _q6(code){
   var mm=document.getElementById('mm');
   if(!mm) return;
   mm.classList.remove('hidden');
+  var gift=document.getElementById('g9');
+  if(gift){ gift.textContent=''; gift.classList.add('hidden'); }
   var stage=document.getElementById('mmStage');
   var list=document.getElementById('mmList');
   var codeBox=document.getElementById('mmCode');
   if(stage) stage.className='mm-stage';
   if(list){ list.classList.add('hidden'); list.innerHTML=''; }
   if(codeBox) codeBox.classList.add('hidden');
-  var items=histItems().map(function(a){return {date:String(a.title).replace(/^hist:/,''),text:a.content};});
-  var src=(items&&items.length?items:DEFAULT_HISTORY).slice(0,6);
-  if(stage) stage.innerHTML='<div class="mm-tip">百天回忆即将开启<br><span class="mm-tip-sub">建议先开启录屏，留住这一刻</span></div>';
-  setTimeout(function(){
-    if(stage) stage.innerHTML='<div class="mm-title-big">开服 · 一百天</div><div class="mm-sub">潮起潮落，与你同行</div>';
-    setTimeout(function(){
-      if(stage) stage.className='mm-stage hidden';
-      if(list){ list.classList.remove('hidden'); list.innerHTML='<div class="mm-list-title">拾光 · 服务器历史</div>'; }
-      src.forEach(function(h,i){
-        setTimeout(function(){
+  var hist=histItems().map(function(a){return {date:String(a.title).replace(/^hist:/,''),text:a.content};});
+  var src=(hist&&hist.length?hist:DEFAULT_HISTORY).slice(0,22);
+  var anns=(SITE_DATA.announcements||[]).filter(function(a){return !String(a.title||'').startsWith('hist:')&&a.title&&a.content;}).slice(0,14);
+  var feeds=(SITE_DATA.feeds||[]).filter(function(f){return f&&f.title;}).slice(0,5);
+  function snap(html){ if(stage) stage.innerHTML=html; }
+  function at(ms,fn){ setTimeout(fn,ms); }
+  function escTxt(s){ return esc(String(s||'')); }
+  snap('<div class="mm-tip">百天回忆即将开启</div><div class="mm-rec-hint">建议先开启录屏，留住这段潮汐</div>');
+  if(stage) stage.insertAdjacentHTML('beforeend','<button class="mm-skip" id="mmSkip">跳过回忆</button>');
+  var sk=document.getElementById('mmSkip');
+  if(sk) sk.onclick=function(){
+    if(stage) stage.classList.add('hidden');
+    if(list) list.classList.add('hidden');
+    if(codeBox){ codeBox.classList.remove('hidden'); var v=document.getElementById('mmCodeVal'); if(v) v.textContent=code; }
+    _q4();
+  };
+  at(3500,function(){ snap('<div class="mm-logo-box"><img src="logo.jpg" class="mm-logo" alt="The Slow Tide"><div class="mm-title-big">开服 · 一百天</div><div class="mm-sub">潮起潮落，与你同行</div></div>'); });
+  at(7200,function(){ snap('<div class="mm-wave-box"><div class="mm-wave w1"></div><div class="mm-wave w2"></div><div class="mm-wave w3"></div><div class="mm-title-big" style="font-size:clamp(22px,5vw,40px);">一百个日夜<br><span style="font-size:.55em;letter-spacing:8px;color:rgba(125,211,252,.75);">潮汐从未停歇</span></div></div>'); });
+  at(11200,function(){
+    if(stage) stage.className='mm-stage hidden';
+    if(list){ list.classList.remove('hidden'); list.innerHTML='<div class="mm-list-title">拾光 · 服务器历史</div>'; }
+    src.forEach(function(h,i){
+      at(11700+i*950,function(){
+        if(!list) return;
+        var d=document.createElement('div');
+        d.className='mm-item';
+        d.innerHTML='<span class="mm-date">'+escTxt(h.date)+'</span><span class="mm-text">'+escTxt(h.text)+'</span>';
+        list.appendChild(d);
+      });
+    });
+  });
+  var histEnd=11700+src.length*950;
+  var annSrc=(anns.length?anns:[{title:'版本迭代不断',content:'服务器持续更新优化'},{title:'社区活动接连不断',content:'赛事、活动、福利轮番上阵'}]).slice(0,14);
+  at(histEnd+1200,function(){
+    if(!list) return;
+    var hd=document.createElement('div');
+    hd.className='mm-list-title';
+    hd.style.marginTop='24px';
+    hd.textContent='大事记 · 公告与动态';
+    list.appendChild(hd);
+    annSrc.forEach(function(a,i){
+      at(histEnd+1800+i*1000,function(){
+        if(!list) return;
+        var d=document.createElement('div');
+        d.className='mm-item';
+        d.innerHTML='<span class="mm-date">'+escTxt(a.date||'')+'</span><span class="mm-text"><strong>'+escTxt(a.title)+'</strong>　'+escTxt(String(a.content||'').slice(0,60))+'</span>';
+        list.appendChild(d);
+      });
+    });
+  });
+  var annEnd=histEnd+1800+annSrc.length*1000;
+  at(annEnd+1500,function(){
+    if(list) list.classList.add('hidden');
+    snap('<div class="mm-pic-box"><div class="mm-pic-row"><img src="ad1.jpg" class="mm-pic" alt="" onerror="this.style.display=\'none\'"><img src="ad2.jpg" class="mm-pic" alt="" onerror="this.style.display=\'none\'"><img src="ad3.jpg" class="mm-pic" alt="" onerror="this.style.display=\'none\'"></div><div class="mm-sub">潮汐见证 · 一路同行</div></div>');
+  });
+  var picEnd=annEnd+1500+4200;
+  var feedSrc=(feeds.length?feeds:[]).slice(0,5);
+  at(picEnd,function(){
+    if(feedSrc.length){
+      if(list){ list.classList.remove('hidden'); list.innerHTML='<div class="mm-list-title">此刻 · 玩家动态</div>'; }
+      feedSrc.forEach(function(f,i){
+        at(picEnd+600+i*900,function(){
           if(!list) return;
           var d=document.createElement('div');
           d.className='mm-item';
-          d.innerHTML='<span class="mm-date">'+esc(h.date)+'</span><span class="mm-text">'+esc(h.text)+'</span>';
+          d.innerHTML='<span class="mm-date">'+escTxt(f.date||'')+'</span><span class="mm-text"><strong>'+escTxt(f.title)+'</strong>　'+escTxt(String(f.content||f.text||'').slice(0,60))+'</span>';
           list.appendChild(d);
-        }, 350+i*550);
+        });
       });
-      setTimeout(function(){
-        if(list) list.classList.add('hidden');
-        if(stage){ stage.className='mm-stage'; stage.innerHTML='<div class="mm-title-big mm-glow">百日光阴 · 感谢同行</div>'; }
-        _q4();
-        setTimeout(function(){
-          if(stage) stage.classList.add('hidden');
-          if(codeBox) codeBox.classList.remove('hidden');
-          var v=document.getElementById('mmCodeVal');
-          if(v) v.textContent=code;
-          _q4();
-        }, 1700);
-      }, 350+src.length*550+300);
-    }, 2300);
-  }, 1700);
+    } else {
+      snap('<div class="mm-title-big mm-glow" style="font-size:clamp(24px,6vw,44px);">活动时刻</div><div class="mm-sub" style="letter-spacing:4px;line-height:2;">国庆 × 开服100天 · 双庆同欢<br>抽奖、神秘潮汐、限定好礼</div>');
+      _q4();
+    }
+  });
+  var feedEnd=picEnd+(feedSrc.length?600+feedSrc.length*900:0);
+  var actT=feedEnd+1000;
+  if(feedSrc.length){
+    at(actT,function(){
+      snap('<div class="mm-title-big mm-glow" style="font-size:clamp(24px,6vw,44px);">活动时刻</div><div class="mm-sub" style="letter-spacing:4px;line-height:2;">国庆 × 开服100天 · 双庆同欢<br>抽奖、神秘潮汐、限定好礼</div>');
+      _q4();
+    });
+  }
+  var endT=actT+3600;
+  at(endT,function(){
+    snap('<div class="mm-title-big mm-glow">百日光阴 · 感谢同行</div>');
+    _q4();
+  });
+  at(endT+3000,function(){
+    if(stage) stage.classList.add('hidden');
+    if(codeBox) codeBox.classList.remove('hidden');
+    var v=document.getElementById('mmCodeVal');
+    if(v) v.textContent=code;
+    _q4();
+  });
 }
 var _c9=0, _t9=null;
 function _q5(){
