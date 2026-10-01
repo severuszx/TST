@@ -9,7 +9,7 @@ const SUPABASE_URL = 'https://jilcbcodphxpasicjghv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs';
 const DATA_ORIGIN = 'https://tst-server-site.pages.dev';
 // 管理员口令：注意此文件在公开仓库，密码会随源码可见；后续需改为环境变量+数据库侧改密
-const ADMIN_PWD = 'WYJQQNDYWHM';
+let ADMIN_PWD = null; // 管理员口令：仅由 onRequest 从环境变量 ADMIN_PWD 注入（仓库不含口令）
 
 // ===== 国庆&开服100天双庆抽奖（时区：北京时间 UTC+8）=====
 const L_START = new Date('2026-10-01T00:00:00+08:00');  // 2026-10-01 00:00 正式开放
@@ -38,6 +38,8 @@ async function sbFetch(path, opts) {
   return { status: res.status, body: body, text: text };
 }
 async function adminLottery(action, payload) {
+  if (!ADMIN_PWD) return { ok: false, error: 'no_pwd' };
+  if (!ADMIN_PWD) return { ok: false, error: 'no_pwd' };
   const r = await sbFetch('/rest/rpc/admin_lottery', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -95,6 +97,8 @@ async function proxyFetch(target, request) {
 }
 
 export async function onRequest(context) {
+  if (context && context.env && context.env.ADMIN_PWD) ADMIN_PWD = context.env.ADMIN_PWD;
+  if (context && context.env && context.env.ADMIN_PWD) ADMIN_PWD = context.env.ADMIN_PWD;
   const { request } = context;
   const url = new URL(request.url);
   const path = url.pathname;
