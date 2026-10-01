@@ -4609,6 +4609,689 @@ function _q5(){
       </div>
     </div>
   </div>
+  <!-- ===== 百日纪念日倒计时 + 密钥限流 开始 ===== -->
+<style>
+.tst-hd{margin:22px 0 6px}
+.tst-hd-card{position:relative;overflow:hidden;border:1px solid var(--border);border-radius:14px;background:linear-gradient(135deg,#0b1220,#132a3d 48%,#0a3a4a);box-shadow:0 10px 34px rgba(8,20,40,.28),inset 0 1px 0 rgba(255,255,255,.06);padding:22px 20px 20px}
+.tst-hd-card::before{content:"";position:absolute;inset:-40% -10%;pointer-events:none;background:radial-gradient(circle at 22% 18%,rgba(125,211,252,.2),transparent 42%),radial-gradient(circle at 82% 84%,rgba(251,191,36,.16),transparent 44%);animation:tstHdDrift 12s ease-in-out infinite alternate}
+@keyframes tstHdDrift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(2%,-3%) scale(1.08)}}
+.tst-hd-head{position:relative;z-index:2;text-align:center;margin-bottom:14px}
+.tst-hd-badge{display:inline-block;font-size:11px;letter-spacing:3px;padding:3px 12px;border-radius:999px;color:#fde68a;border:1px solid rgba(253,224,71,.42);background:rgba(253,224,71,.1);margin-bottom:10px}
+.tst-hd-title{margin:0;font-size:22px;font-weight:800;letter-spacing:6px;background:linear-gradient(180deg,#fff,#bae6fd 55%,#38bdf8);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.tst-hd-sub{margin:8px 0 0;font-size:12.5px;letter-spacing:1.5px;color:rgba(186,230,253,.78)}
+.tst-hd-clock{position:relative;z-index:2;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:6px}
+.tst-hd-unit{min-width:76px;padding:10px 6px;border-radius:12px;text-align:center;border:1px solid rgba(125,211,252,.22);background:rgba(2,20,38,.42);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.tst-hd-num{display:block;font-family:Consolas,Menlo,monospace;font-size:30px;font-weight:800;line-height:1.1;color:#e0f2fe;text-shadow:0 0 18px rgba(56,189,248,.55)}
+.tst-hd-lab{display:block;margin-top:4px;font-size:11px;letter-spacing:2px;color:rgba(125,211,252,.68)}
+.tst-hd-foot{position:relative;z-index:2;text-align:center;margin-top:14px}
+.tst-hd-open{font-size:15px;font-weight:800;letter-spacing:4px;color:#fde68a;text-shadow:0 0 22px rgba(245,158,11,.85);animation:tstHdPulse 1.8s ease-in-out infinite}
+@keyframes tstHdPulse{0%,100%{opacity:1;filter:drop-shadow(0 0 6px rgba(245,158,11,.6))}50%{opacity:.78;filter:drop-shadow(0 0 20px rgba(251,191,36,1))}}
+.tst-fx-cv{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+.tst-fx-ring{position:fixed;left:50%;top:50%;width:0;height:0;border-radius:50%;border:3px solid rgba(253,224,71,.85);transform:translate(-50%,-50%);pointer-events:none;z-index:9998;opacity:0;animation:tstRing 1.7s ease-out forwards}
+.tst-fx-ring.c2{border-color:rgba(125,211,252,.85);animation-delay:.3s}
+@keyframes tstRing{0%{width:0;height:0;opacity:1}100%{width:126vmax;height:126vmax;opacity:0}}
+.tst-fx-flash{position:fixed;inset:0;pointer-events:none;z-index:9997;opacity:0;background:radial-gradient(circle,rgba(253,224,71,.85),rgba(56,189,248,.3) 42%,transparent 72%);animation:tstFlash 1.5s ease forwards}
+@keyframes tstFlash{0%{opacity:0;transform:scale(.35)}22%{opacity:1}100%{opacity:0;transform:scale(1.45)}}
+.tst-fx-txt{position:fixed;left:50%;top:36%;transform:translate(-50%,-50%) scale(.45);z-index:10000;text-align:center;pointer-events:none;opacity:0}
+.tst-fx-txt.on{animation:tstTxtIn 1.1s cubic-bezier(.2,1.5,.35,1) forwards}
+.tst-fx-txt.off{animation:tstTxtOut .8s ease forwards}
+@keyframes tstTxtIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.45)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}60%{transform:translate(-50%,-50%) scale(.97)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes tstTxtOut{0%{opacity:1}100%{opacity:0;transform:translate(-50%,-64%) scale(1.18)}}
+.tst-fx-l1{display:block;font-size:clamp(30px,7vw,52px);font-weight:900;letter-spacing:12px;color:#fbbf24;text-shadow:0 0 34px rgba(251,191,36,.95),0 0 90px rgba(56,189,248,.5)}
+.tst-fx-l2{display:block;margin-top:12px;font-size:clamp(13px,3.4vw,18px);letter-spacing:6px;color:#e0f2fe;text-shadow:0 0 20px rgba(56,189,248,.8)}
+.tst-fx-l3{display:block;margin-top:14px;font-size:12px;letter-spacing:4px;color:rgba(186,230,253,.82)}
+#tstTriesNote{margin-top:12px;font-size:11.5px;letter-spacing:1px;color:rgba(125,211,252,.55);pointer-events:none;position:relative;z-index:3;text-align:center}
+#tstLockBox{position:absolute;top:30px;left:0;right:0;z-index:8;text-align:center;pointer-events:none;padding:0 16px}
+#tstLockBox.hidden{display:none!important}
+.tst-lock-title{font-size:13.5px;letter-spacing:3px;color:#fca5a5;text-shadow:0 0 14px rgba(239,68,68,.55)}
+.tst-lock-cd{margin-top:5px;font-size:12px;letter-spacing:1px;color:rgba(186,230,253,.72);font-variant-numeric:tabular-nums}
+.tst-lock-cd b{color:#7dd3fc;font-weight:700}
+#mm.tst-gate-on{display:none!important}
+#tstUnlock{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;box-sizing:border-box;background:radial-gradient(120% 90% at 50% 112%,rgba(8,47,73,.62),transparent 62%),linear-gradient(180deg,#020617,#062a3a 55%,#0a4a5c)}
+#tstUnlock.hidden{display:none!important}
+.tst-ul-badge{font-size:11.5px;letter-spacing:5px;color:rgba(125,211,252,.8);margin-bottom:16px}
+.tst-ul-title{font-size:clamp(24px,6vw,40px);font-weight:800;letter-spacing:12px;color:#e0f2fe;text-shadow:0 0 30px rgba(56,189,248,.9),0 0 80px rgba(14,116,144,.6);animation:tstUlGlow 3s ease-in-out infinite}
+@keyframes tstUlGlow{0%,100%{text-shadow:0 0 14px rgba(56,189,248,.5)}50%{text-shadow:0 0 34px rgba(125,211,252,1),0 0 70px rgba(56,189,248,.6)}}
+.tst-ul-sub{margin-top:14px;font-size:13.5px;line-height:1.9;letter-spacing:2px;color:rgba(186,230,253,.82)}
+.tst-ul-clock{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;justify-content:center}
+.tst-ul-unit{min-width:70px;padding:12px 8px;border-radius:14px;border:1px solid rgba(56,189,248,.32);background:rgba(2,6,23,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 22px rgba(56,189,248,.14)}
+.tst-ul-num{display:block;font-family:Consolas,Menlo,monospace;font-size:28px;font-weight:800;color:#7dd3fc;text-shadow:0 0 18px rgba(56,189,248,.85)}
+.tst-ul-lab{display:block;margin-top:5px;font-size:11px;letter-spacing:2px;color:rgba(125,211,252,.62)}
+.tst-ul-btn{margin-top:28px;padding:12px 40px;border-radius:999px;cursor:pointer;border:1px solid rgba(56,189,248,.55);background:rgba(8,47,73,.6);color:#7dd3fc;font-size:14px;letter-spacing:4px;transition:all .25s ease}
+.tst-ul-btn:hover{background:rgba(14,116,144,.7);color:#e0f2fe;box-shadow:0 0 26px rgba(56,189,248,.45)}
+.tst-ul-note{margin-top:18px;font-size:11px;letter-spacing:1px;color:rgba(125,211,252,.45)}
+@media(max-width:700px){.tst-hd-unit{min-width:62px;padding:8px 4px}.tst-hd-num{font-size:22px}.tst-hd-title{font-size:18px;letter-spacing:4px}.tst-ul-unit{min-width:58px;padding:10px 5px}.tst-ul-num{font-size:21px}.tst-ul-title{letter-spacing:8px}}
+</style>
+<script>
+(function(){
+'use strict';
+var CONFIG={
+  DEADLINE:new Date('2026-10-07T00:00:00+08:00'),
+  HOME_TITLE:'百日纪念日',
+  HOME_SUB_OPEN:'距「开服百日 · 潮渊之约」还有',
+  HOME_SUB_DONE:'潮起百日 · 潮渊已开',
+  LOCK_TITLE:'潮渊未开',
+  LOCK_SUB:'你的钥匙已被记录。潮门将于 10月7日 00:00 开启。',
+  UNLOCK_TEXT:'潮渊已开 · 进入回忆录',
+  MAX_TRIES:3,
+  COOLDOWN_H:0,
+  REFUND_ON_NETWORK_ERROR:false,
+  TRIES_NOTE:'每台设备每天可尝试 3 次密钥',
+  CELEBRATE:true,
+  DEBUG_FORCE_DONE:false
+};
+var STORE={unlockAt:'tst_mem_unlockat_v1',code:'tst_mem_code_v1',celebrated:'tst_hundred_celebrated_v1'};
+var LK={tries:'tst_tries',lock:'tst_tries_lock',tried:'tst_sec_tried',ok:'tst_sec_ok'};
+var HOME_SOCKETS=['#home .server-bar','#home .card-grid','#home','#home .hero'];
+var serverToday=null,clockSkew=0,serverDateFetching=false,lockBoxTimer=null;
+var homeDone=false,celebratedThisLoad=false,hdEls={};
+var gate={active:false,code:'',timer:null,observer:null,codeObserver:null,codeTimer:null,memoirTimer:null,opened:false};
+
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
+function ckGet(k){try{var m=document.cookie.match(new RegExp('(?:^|; )'+k+'=([^;]*)'));return m?decodeURIComponent(m[1]):null;}catch(e){return null;}}
+function ckSet(k,v){try{document.cookie=k+'='+encodeURIComponent(v)+'; max-age=31536000; path=/; SameSite=Lax';}catch(e){}}
+function ckDel(k){try{document.cookie=k+'=; max-age=0; path=/; SameSite=Lax';}catch(e){}}
+
+function now(){if(CONFIG.DEBUG_FORCE_DONE)return CONFIG.DEADLINE.getTime()+1000;return Date.now()+clockSkew;}
+function remainMs(){return CONFIG.DEADLINE.getTime()-now();}
+function isOpen(){return remainMs()<=0;}
+function pad2(n){return(n<10?'0':'')+n;}
+function todayKey(){
+  if(serverToday)return serverToday;
+  var d=new Date(now()+8*3600*1000);
+  return d.getUTCFullYear()+'-'+pad2(d.getUTCMonth()+1)+'-'+pad2(d.getUTCDate());
+}
+function breakdown(ms){
+  if(ms<0)ms=0;
+  var t=Math.floor(ms/1000);
+  return{d:Math.floor(t/86400),h:Math.floor(t%86400/3600),m:Math.floor(t%3600/60),s:t%60};
+}
+function syncServerDate(){
+  if(serverDateFetching)return;
+  serverDateFetching=true;
+  try{
+    fetch('/api/lottery/state',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      if(d&&d.serverDate){
+        serverToday=String(d.serverDate).slice(0,10);
+        var p=serverToday.split('-');
+        if(p.length===3){
+          var sm=new Date(Number(p[0]),Number(p[1])-1,Number(p[2]),0,0,0).getTime();
+          var lm=new Date();lm.setHours(0,0,0,0);
+          clockSkew=sm-lm.getTime();
+        }
+        triesOnNewDay();
+      }
+    }).catch(function(){}).then(function(){serverDateFetching=false;});
+  }catch(e){serverDateFetching=false;}
+}
+
+/* ---------- 密钥限流：两个存储取更大值，日期以服务端为准 ---------- */
+function toCount(v){var n=Number(v);if(!isFinite(n)||n<=0)return 0;return Math.min(CONFIG.MAX_TRIES,Math.floor(n));}
+function readOne(q){
+  var raw=q();
+  if(!raw)return null;
+  try{var o=JSON.parse(raw);if(o&&typeof o==='object')return{d:String(o.d||''),n:toCount(o.n)};}catch(e){}
+  return null;
+}
+function readTries(){
+  var a=readOne(function(){return lsGet(LK.tries);});
+  var b=readOne(function(){return ckGet(LK.tries);});
+  var day=todayKey();
+  var c=[a,b].filter(function(o){return o&&o.d===day;});
+  if(!c.length)return{d:day,n:0};
+  var n=0;c.forEach(function(o){if(o.n>n)n=o.n;});
+  return{d:day,n:Math.min(CONFIG.MAX_TRIES,n)};
+}
+function writeTries(o){var s=JSON.stringify(o);lsSet(LK.tries,s);ckSet(LK.tries,s);}
+function floorTries(){var o={d:todayKey(),n:CONFIG.MAX_TRIES};writeTries(o);return o;}
+function triesLeft(){return Math.max(0,CONFIG.MAX_TRIES-readTries().n);}
+function hasPassed(){
+  try{
+    if(lsGet(LK.ok)==='1'||ckGet(LK.ok)==='1')return true;
+    if(lsGet(STORE.code)||ckGet(STORE.code))return true;
+    return false;
+  }catch(e){return false;}
+}
+function cooldownUntil(){
+  var a=Number(lsGet(LK.lock))||0,b=Number(ckGet(LK.lock))||0,t=Math.max(a,b);
+  return(isFinite(t)&&t>0)?t:0;
+}
+function lockRemainMs(){var u=cooldownUntil();return u?Math.max(0,u-Date.now()):0;}
+function isLocked(){
+  if(hasPassed())return false;
+  var u=cooldownUntil();
+  if(!u)return false;
+  if(Date.now()>=u){unlockTries(true);return false;}
+  return true;
+}
+function paintTriesNote(){
+  var host=document.getElementById('pg9');
+  if(!host)return;
+  var el=document.getElementById('tstTriesNote');
+  if(!el){
+    el=document.createElement('div');el.id='tstTriesNote';
+    var msg=document.getElementById('m9');
+    if(msg&&msg.parentNode)msg.parentNode.insertBefore(el,msg.nextSibling);
+    else host.appendChild(el);
+  }
+  if(hasPassed()){el.textContent='';return;}
+  if(isLocked()){el.textContent='';return;}
+  var left=triesLeft();
+  el.textContent=(left>0)?(CONFIG.TRIES_NOTE+' · 今日剩余 '+left+' 次'):CONFIG.TRIES_NOTE;
+}
+function paintLockBox(){
+  var host=document.getElementById('pg9');
+  if(!host)return;
+  var box=document.getElementById('tstLockBox');
+  var locked=isLocked();
+  if(!locked){
+    if(box)box.classList.add('hidden');
+    if(lockBoxTimer){clearInterval(lockBoxTimer);lockBoxTimer=null;}
+    return;
+  }
+  if(!box){
+    box=document.createElement('div');box.id='tstLockBox';
+    box.innerHTML='<div class="tst-lock-title">潮门暂闭 · 今日叩门次数已尽</div><div class="tst-lock-cd" id="tstLockCd"></div>';
+    host.appendChild(box);
+  }
+  box.classList.remove('hidden');
+  if(!lockBoxTimer){
+    lockBoxTimer=setInterval(function(){if(isLocked())paintLockBox();else paintLimitUI();},1000);
+  }
+  var cd=document.getElementById('tstLockCd');
+  if(cd){var b=breakdown(lockRemainMs());cd.innerHTML='明日 00:00 重开 · 剩余 <b>'+pad2(b.h)+':'+pad2(b.m)+':'+pad2(b.s)+'</b>';}
+}
+function paintLimitUI(){paintTriesNote();paintLockBox();}
+function lockTries(){
+  var u=(CONFIG.COOLDOWN_H>0)?Date.now()+CONFIG.COOLDOWN_H*3600*1000:new Date().setHours(24,0,0,0);
+  lsSet(LK.lock,String(u));ckSet(LK.lock,String(u));
+  floorTries();
+  paintTriesNote();paintLockBox();
+}
+function unlockTries(resetCount){
+  lsDel(LK.lock);ckDel(LK.lock);
+  if(resetCount){var o=readTries();o.d=todayKey();o.n=0;writeTries(o);}
+  paintTriesNote();paintLockBox();
+}
+function markPassed(){lsSet(LK.ok,'1');ckSet(LK.ok,'1');lsDel(LK.lock);ckDel(LK.lock);paintLimitUI();}
+function triesOnNewDay(){
+  if(hasPassed()){paintLimitUI();return;}
+  var o=readTries();
+  if(o.n>=CONFIG.MAX_TRIES&&!cooldownUntil())lockTries();
+  paintLimitUI();
+}
+function recordTry(){
+  var o=readTries();o.d=todayKey();o.n=Math.min(CONFIG.MAX_TRIES,o.n+1);writeTries(o);
+  lsSet(LK.tried,todayKey());
+  if(o.n>=CONFIG.MAX_TRIES)lockTries();
+  paintLimitUI();
+  return o.n;
+}
+function allowTry(){
+  if(hasPassed())return true;
+  if(isLocked())return false;
+  return triesLeft()>0;
+}
+function refundTry(){
+  if(!CONFIG.REFUND_ON_NETWORK_ERROR)return false;
+  var o=readTries();
+  if(o.n<=0)return false;
+  o.n-=1;o.d=todayKey();writeTries(o);
+  paintLimitUI();
+  return true;
+}
+
+/* ---------- 在发请求之前拦下 /api/secret ---------- */
+function installFetchGuard(){
+  if(window.__tstFetchGuard||typeof window.fetch!=='function')return;
+  window.__tstFetchGuard=true;
+  var orig=window.fetch;
+  window.fetch=function(input,init){
+    var url='';
+    try{url=(typeof input==='string')?input:(input&&input.url?input.url:'');}catch(e){}
+    if(url.indexOf('/api/secret')>=0){
+      if(!allowTry()){
+        try{if(showToast)showToast('今日叩门次数已尽（'+CONFIG.MAX_TRIES+' 次），明日再来');}catch(e){}
+        paintLimitUI();
+        var fake={
+          ok:true,status:200,statusText:'OK',url:url,
+          headers:{get:function(){return 'application/json';}},
+          json:function(){return Promise.resolve({ok:false,sv:'secret-file',error:'no_chances',serverDate:serverToday||todayKey()});},
+          text:function(){return Promise.resolve(JSON.stringify({ok:false,sv:'secret-file',error:'no_chances'}));},
+          clone:function(){return fake;}
+        };
+        return Promise.resolve(fake);
+      }
+      recordTry();
+      var recorded=true;
+      return orig.apply(this,arguments).then(function(res){
+        recorded=false;
+        try{
+          res.clone().json().then(function(d){
+            if(!d)return;
+            if(d.serverDate)serverToday=String(d.serverDate).slice(0,10);
+            if(d.ok){
+              if(d.code){gate.code=String(d.code);lsSet(STORE.code,String(d.code));ckSet(STORE.code,String(d.code));}
+              markPassed();
+            }else if(d.error==='no_chances'){lockTries();}
+            else if(d.error==='invalid'){if(triesLeft()<=0)lockTries();}
+            paintLimitUI();
+          }).catch(function(){});
+        }catch(e){}
+        return res;
+      },function(err){if(recorded)refundTry();throw err;});
+    }
+    return orig.apply(this,arguments);
+  };
+}
+
+/* ---------- 首页倒计时 ---------- */
+var HOME_HTML='<div class="tst-hd" id="tstHomeHundred"><div class="container"><div class="tst-hd-card">'
++'<div class="tst-hd-head"><div class="tst-hd-badge">开服百日</div>'
++'<h3 class="tst-hd-title">'+CONFIG.HOME_TITLE+'</h3>'
++'<p class="tst-hd-sub" id="tstHdSub">'+CONFIG.HOME_SUB_OPEN+'</p></div>'
++'<div class="tst-hd-clock" id="tstHdClock">'
++'<div class="tst-hd-unit"><span class="tst-hd-num" id="tstHdD">--</span><span class="tst-hd-lab">天</span></div>'
++'<div class="tst-hd-unit"><span class="tst-hd-num" id="tstHdH">--</span><span class="tst-hd-lab">时</span></div>'
++'<div class="tst-hd-unit"><span class="tst-hd-num" id="tstHdM">--</span><span class="tst-hd-lab">分</span></div>'
++'<div class="tst-hd-unit"><span class="tst-hd-num" id="tstHdS">--</span><span class="tst-hd-lab">秒</span></div>'
++'</div><div class="tst-hd-foot" id="tstHdFoot"></div></div></div></div>';
+
+function findHomeSocket(){
+  for(var i=0;i<HOME_SOCKETS.length;i++){
+    var el=document.querySelector(HOME_SOCKETS[i]);
+    if(el)return el;
+  }
+  return null;
+}
+function mountHomeCountdown(){
+  var socket=findHomeSocket();
+  if(!socket)return;
+  var old=document.getElementById('tstHomeHundred');
+  if(old&&old.parentNode)old.parentNode.removeChild(old);
+  var wrap=document.createElement('div');
+  wrap.innerHTML=HOME_HTML;
+  socket.appendChild(wrap.firstChild);
+  hdEls={
+    d:document.getElementById('tstHdD'),h:document.getElementById('tstHdH'),
+    m:document.getElementById('tstHdM'),s:document.getElementById('tstHdS'),
+    sub:document.getElementById('tstHdSub'),foot:document.getElementById('tstHdFoot'),
+    clock:document.getElementById('tstHdClock')
+  };
+}
+function renderHomeCountdown(){
+  if(!hdEls.d)return;
+  var ms=remainMs(),b=breakdown(ms);
+  hdEls.d.textContent=String(b.d);
+  hdEls.h.textContent=pad2(b.h);
+  hdEls.m.textContent=pad2(b.m);
+  hdEls.s.textContent=pad2(b.s);
+  if(ms<=0&&!homeDone){
+    homeDone=true;
+    if(hdEls.sub)hdEls.sub.textContent=CONFIG.HOME_SUB_DONE;
+    if(hdEls.clock)hdEls.clock.style.display='none';
+    if(hdEls.foot)hdEls.foot.innerHTML='<div class="tst-hd-open">'+CONFIG.HOME_SUB_DONE+'</div>';
+    if(CONFIG.CELEBRATE)celebrateHome();
+    if(lsGet(STORE.code))mountHomeUnlockButton();
+  }
+}
+function hideLaunchPopupSafe(){var lp=document.getElementById('launchPopup');if(lp)lp.classList.add('hidden');}
+function mountHomeUnlockButton(){
+  if(!isOpen())return;
+  var foot=document.getElementById('tstHdFoot');
+  if(!foot||document.getElementById('tstHomeUnlockBtn'))return;
+  var saved=lsGet(STORE.code)||'';
+  if(!saved&&!gate.code)return;
+  var btn=document.createElement('button');
+  btn.id='tstHomeUnlockBtn';
+  btn.className='btn btn-primary';
+  btn.style.cssText='margin-top:12px;padding:9px 22px;border-radius:999px;letter-spacing:2px;';
+  btn.textContent='查看我的兑换码';
+  btn.onclick=function(){
+    if(!isOpen()){if(typeof showToast==='function')showToast('潮渊未开 · 10月7日 00:00 开启');return;}
+    hideLaunchPopupSafe();
+    var pg=document.getElementById('pg9');
+    if(!pg)return;
+    pg.classList.remove('hidden');
+    openMemoirNow();
+  };
+  foot.appendChild(btn);
+}
+
+/* ---------- 归零特效 ---------- */
+function celebrateHome(){
+  if(celebratedThisLoad)return;
+  celebratedThisLoad=true;
+  try{
+    if(localStorage.getItem(STORE.celebrated)==='1')return;
+    localStorage.setItem(STORE.celebrated,'1');
+  }catch(e){}
+  var cv=document.createElement('canvas');
+  cv.className='tst-fx-cv';
+  document.body.appendChild(cv);
+  var ctx=cv.getContext('2d');
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  var COLORS=['#fbbf24','#fde68a','#fef3c7','#38bdf8','#7dd3fc','#ffffff','#f59e0b'];
+  var parts=[],ribbons=[],cx=cv.width/2,cy=cv.height/2;
+  for(var i=0;i<240;i++){
+    parts.push({x:cx,y:cy,vx:(Math.random()-.5)*22,vy:(Math.random()-.5)*22-6,life:0,max:62+Math.random()*52,r:1.6+Math.random()*3.8,c:COLORS[i%COLORS.length]});
+  }
+  for(var j=0;j<70;j++){
+    ribbons.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.45,vy:2+Math.random()*4,rot:Math.random()*Math.PI,vr:(Math.random()-.5)*.3,w:6+Math.random()*8,h:10+Math.random()*12,c:COLORS[j%COLORS.length]});
+  }
+  var t0=Date.now();
+  (function tick(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    var alive=false;
+    for(var k=0;k<parts.length;k++){
+      var p=parts[k];p.life++;
+      if(p.life>p.max)continue;
+      alive=true;p.x+=p.vx;p.y+=p.vy;p.vy+=.16;
+      ctx.globalAlpha=1-p.life/p.max;ctx.fillStyle=p.c;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r*(1-p.life/p.max*.5),0,Math.PI*2);ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    for(var m=0;m<ribbons.length;m++){
+      var rb=ribbons[m];rb.y+=rb.vy;rb.rot+=rb.vr;
+      if(rb.y>cv.height+30){rb.y=-20;rb.x=Math.random()*cv.width;}
+      alive=true;ctx.save();ctx.translate(rb.x,rb.y);ctx.rotate(rb.rot);
+      ctx.globalAlpha=.9;ctx.fillStyle=rb.c;ctx.fillRect(-rb.w/2,-rb.h/2,rb.w,rb.h);ctx.restore();
+    }
+    ctx.globalAlpha=1;
+    if(alive&&Date.now()-t0<7000)requestAnimationFrame(tick);
+    else if(cv.parentNode)cv.parentNode.removeChild(cv);
+  })();
+  var fl=document.createElement('div');fl.className='tst-fx-flash';document.body.appendChild(fl);
+  setTimeout(function(){if(fl.parentNode)fl.parentNode.removeChild(fl);},1700);
+  var r1=document.createElement('div');r1.className='tst-fx-ring';document.body.appendChild(r1);
+  var r2=document.createElement('div');r2.className='tst-fx-ring c2';document.body.appendChild(r2);
+  setTimeout(function(){
+    if(r1.parentNode)r1.parentNode.removeChild(r1);
+    if(r2.parentNode)r2.parentNode.removeChild(r2);
+  },2400);
+  var txt=document.createElement('div');
+  txt.className='tst-fx-txt';
+  txt.innerHTML='<span class="tst-fx-l1" id="tstFxL1">潮起百日</span><span class="tst-fx-l2" id="tstFxL2">一百个日夜 · 潮汐从未停歇</span><span class="tst-fx-l3">The Slow Tide · 开服百日</span>';
+  document.body.appendChild(txt);
+  requestAnimationFrame(function(){txt.classList.add('on');});
+  var SEQ=[['潮起百日','一百个日夜 · 潮汐从未停歇'],['潮渊已开','钥匙已被潮水记下 · 回忆录静候'],['感谢同行','故事仍在继续']];
+  var idx=0;
+  var rot=setInterval(function(){
+    idx++;
+    if(idx>=SEQ.length){
+      clearInterval(rot);txt.classList.add('off');
+      setTimeout(function(){if(txt.parentNode)txt.parentNode.removeChild(txt);},900);
+      return;
+    }
+    var l1=document.getElementById('tstFxL1'),l2=document.getElementById('tstFxL2');
+    if(l1)l1.textContent=SEQ[idx][0];
+    if(l2)l2.textContent=SEQ[idx][1];
+    txt.classList.remove('on');void txt.offsetWidth;txt.classList.add('on');
+  },1900);
+  setTimeout(function(){
+    mountHomeUnlockButton();
+    if(typeof showToast==='function')showToast('百日纪念日到了 · 潮渊已开');
+  },3600);
+}
+
+/* ---------- 隐藏页闸门：先倒计时，到点才播回忆录 ---------- */
+function buildUnlockLayer(){
+  var mm=document.getElementById('mm');
+  if(!mm)return null;
+  var el=document.getElementById('tstUnlock');
+  if(el)return el;
+  el=document.createElement('div');
+  el.id='tstUnlock';
+  el.className='hidden';
+  el.innerHTML='<div class="tst-ul-badge">T H E   S L O W   T I D E</div>'
+    +'<div class="tst-ul-title" id="tstUlTitle">'+CONFIG.LOCK_TITLE+'</div>'
+    +'<div class="tst-ul-sub" id="tstUlSub">'+CONFIG.LOCK_SUB+'</div>'
+    +'<div class="tst-ul-clock" id="tstUlClock">'
+    +'<div class="tst-ul-unit"><span class="tst-ul-num" id="tstUlD">--</span><span class="tst-ul-lab">天</span></div>'
+    +'<div class="tst-ul-unit"><span class="tst-ul-num" id="tstUlH">--</span><span class="tst-ul-lab">时</span></div>'
+    +'<div class="tst-ul-unit"><span class="tst-ul-num" id="tstUlM">--</span><span class="tst-ul-lab">分</span></div>'
+    +'<div class="tst-ul-unit"><span class="tst-ul-num" id="tstUlS">--</span><span class="tst-ul-lab">秒</span></div>'
+    +'</div>'
+    +'<button class="tst-ul-btn" id="tstUlBtn" style="display:none;">'+CONFIG.UNLOCK_TEXT+'</button>'
+    +'<div class="tst-ul-note">潮门将于 10月7日 00:00 开启</div>'
+    +'<button class="tst-ul-btn" id="tstUlBack" style="margin-top:12px;padding:8px 26px;font-size:12.5px;letter-spacing:3px;opacity:.72;">‹ 返回</button>';
+  mm.appendChild(el);
+  var btn=document.getElementById('tstUlBtn');
+  btn.addEventListener('click',function(){if(btn.disabled)return;openMemoirNow();});
+  document.getElementById('tstUlBack').addEventListener('click',function(){
+    if(gate.timer){clearInterval(gate.timer);gate.timer=null;}
+    gate.active=false;
+    var layer=document.getElementById('tstUnlock');
+    if(layer)layer.classList.add('hidden');
+    var mmEl=document.getElementById('mm');
+    if(mmEl)mmEl.classList.remove('tst-gate-on');
+    if(typeof _q2==='function'){try{_q2();}catch(e){}}
+    else{var pg=document.getElementById('pg9');if(pg)pg.classList.add('hidden');}
+  });
+  return el;
+}
+function captureCode(){
+  var el=document.getElementById('mmCodeVal');
+  var v=el&&el.textContent?el.textContent.trim():'';
+  if(v){
+    gate.code=v;
+    lsSet(STORE.code,v);
+    if(gate.codeTimer){clearInterval(gate.codeTimer);gate.codeTimer=null;}
+    if(gate.codeObserver){gate.codeObserver.disconnect();gate.codeObserver=null;}
+  }
+  return v;
+}
+function renderGateCountdown(){
+  var d=document.getElementById('tstUlD');
+  if(!d)return;
+  var b=breakdown(remainMs());
+  d.textContent=String(b.d);
+  document.getElementById('tstUlH').textContent=pad2(b.h);
+  document.getElementById('tstUlM').textContent=pad2(b.m);
+  document.getElementById('tstUlS').textContent=pad2(b.s);
+  if(remainMs()<=0){
+    var clock=document.getElementById('tstUlClock');
+    if(clock)clock.style.display='none';
+    var title=document.getElementById('tstUlTitle');
+    if(title)title.textContent='潮渊已开';
+    var btn=document.getElementById('tstUlBtn');
+    var note=document.querySelector('#tstUnlock .tst-ul-note');
+    captureCode();
+    if(gate.code){
+      var s0=document.getElementById('tstUlSub');
+      if(s0)s0.textContent='钥匙已被潮水记下 · 你的回忆录已在等待';
+      if(btn){btn.style.display='';btn.disabled=false;btn.textContent=CONFIG.UNLOCK_TEXT;}
+      if(note)note.textContent='点击上方按钮开始播放';
+    }else{
+      var s1=document.getElementById('tstUlSub');
+      if(s1)s1.textContent='潮渊已开 · 正在取回你的兑换码…';
+      if(btn){btn.style.display='';btn.disabled=true;btn.textContent='正在取回兑换码…';}
+      if(note)note.textContent='若长时间无响应，请刷新页面后重新输入密钥';
+    }
+  }
+}
+function startGateTimer(){
+  if(gate.timer)clearInterval(gate.timer);
+  gate.timer=setInterval(function(){if(!gate.active)return;renderGateCountdown();},1000);
+  renderGateCountdown();
+}
+function watchCodeValue(){
+  captureCode();
+  var onChange=function(){
+    var before=gate.code;
+    captureCode();
+    if(!before&&gate.code&&gate.active)renderGateCountdown();
+  };
+  var el=document.getElementById('mmCodeVal');
+  if(el&&window.MutationObserver&&!gate.codeObserver){
+    gate.codeObserver=new MutationObserver(onChange);
+    gate.codeObserver.observe(el,{subtree:true,childList:true,characterData:true});
+  }
+  if(!gate.codeTimer)gate.codeTimer=setInterval(onChange,800);
+}
+function engageGate(){
+  if(gate.active)return;
+  var mm=document.getElementById('mm');
+  if(!mm)return;
+  gate.active=true;
+  lsSet(STORE.unlockAt,String(Date.now()));
+  var saved=lsGet(STORE.code);
+  if(saved)gate.code=saved;
+  watchCodeValue();
+  if(typeof _bgmStop==='function'){try{_bgmStop();}catch(e){}}
+  mm.classList.add('tst-gate-on');
+  var layer=buildUnlockLayer();
+  if(layer)layer.classList.remove('hidden');
+  startGateTimer();
+}
+function openMemoirNow(){
+  var mm=document.getElementById('mm');
+  if(!mm)return;
+  gate.active=false;
+  gate.opened=true;
+  if(gate.timer){clearInterval(gate.timer);gate.timer=null;}
+  mm.classList.remove('tst-gate-on');
+  mm.style.display='';
+  var layer=document.getElementById('tstUnlock');
+  if(layer)layer.classList.add('hidden');
+  var stage=document.getElementById('mmStage');
+  var list=document.getElementById('mmList');
+  var codeBox=document.getElementById('mmCode');
+  if(stage){stage.className='mm-stage';stage.innerHTML='';}
+  if(list){list.classList.add('hidden');list.innerHTML='';}
+  if(codeBox)codeBox.classList.add('hidden');
+  var pg=document.getElementById('pg9');
+  if(pg)pg.classList.remove('hidden');
+  if(typeof _q6==='function'){
+    var saved=lsGet(STORE.code)||'';
+    var payload=gate.code||saved||'已解锁 · 请查看游戏内邮件';
+    try{_q6(payload);}
+    catch(e){
+      if(codeBox){
+        codeBox.classList.remove('hidden');
+        var v=document.getElementById('mmCodeVal');
+        if(v)v.textContent=payload;
+      }
+    }
+  }
+}
+function watchMemoir(){
+  var mm=document.getElementById('mm');
+  if(!mm)return;
+  if(window.MutationObserver&&!gate.observer){
+    gate.observer=new MutationObserver(function(){
+      if(gate.active||gate.opened)return;
+      if(mm.classList.contains('hidden'))return;
+      engageGate();
+    });
+    gate.observer.observe(mm,{attributes:true,attributeFilter:['class']});
+  }
+  if(!gate.memoirTimer){
+    gate.memoirTimer=setInterval(function(){
+      if(gate.active||gate.opened)return;
+      var el=document.getElementById('mm');
+      if(!el||el.classList.contains('hidden'))return;
+      engageGate();
+    },400);
+  }
+}
+
+function selfCheck(){
+  var missing=[];
+  ['pg9','mm','mmStage','mmList','mmCode','mmCodeVal','k9','b9','m9'].forEach(function(id){
+    if(!document.getElementById(id))missing.push('#'+id);
+  });
+  ['_q6','_q2','_bgmStop'].forEach(function(fn){
+    if(typeof window[fn]!=='function')missing.push(fn+'()');
+  });
+  if(!findHomeSocket())missing.push('首页挂载点');
+  if(missing.length){
+    try{console.warn('[百日补丁] 以下依赖未找到，相关功能不会生效：\n  '+missing.join('\n  '));}catch(e){}
+  }
+  try{
+    var pk='tst_probe_v1',pv=todayKey();
+    lsSet(pk,pv);ckSet(pk,pv);
+    var okLs=lsGet(pk)===pv,okCk=ckGet(pk)===pv;
+    lsDel(pk);ckDel(pk);
+    if(!okLs&&!okCk)console.warn('[百日补丁] 浏览器禁用了本地存储，限流只能尽力而为。');
+    else if(!okCk)console.warn('[百日补丁] cookie 不可用，限流少一层保护。');
+  }catch(e){}
+  return missing;
+}
+
+function boot(){
+  selfCheck();
+  mountHomeCountdown();
+  renderHomeCountdown();
+  installFetchGuard();
+  paintLimitUI();
+  setInterval(triesOnNewDay,20*1000);
+  watchMemoir();
+  var cached=lsGet(STORE.code);
+  if(cached&&isOpen())setTimeout(mountHomeUnlockButton,1200);
+  setInterval(function(){
+    renderHomeCountdown();
+    if(gate.active)renderGateCountdown();
+  },1000);
+  syncServerDate();
+  setInterval(syncServerDate,10*60*1000);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+else boot();
+
+window.TST_HUNDRED={
+  CONFIG:CONFIG,
+  now:now,
+  remain:remainMs,
+  isOpen:isOpen,
+  forceDone:function(){
+    CONFIG.DEBUG_FORCE_DONE=true;
+    homeDone=false;
+    renderHomeCountdown();
+    if(gate.active)renderGateCountdown();
+    else if(isOpen()&&document.getElementById('pg9'))engageGate();
+  },
+  tries:function(){
+    return{today:todayKey(),serverToday:serverToday,used:readTries().n,left:triesLeft(),
+      max:CONFIG.MAX_TRIES,locked:isLocked(),lockRemainMs:lockRemainMs(),passed:hasPassed()};
+  },
+  resetTries:function(){
+    lsDel(LK.tries);ckDel(LK.tries);
+    lsDel(LK.lock);ckDel(LK.lock);
+    lsDel(LK.tried);ckDel(LK.tried);
+    lsDel(LK.ok);ckDel(LK.ok);
+    if(lockBoxTimer){clearInterval(lockBoxTimer);lockBoxTimer=null;}
+    paintLimitUI();
+    return '尝试计数已清空';
+  },
+  reset:function(){
+    lsDel(STORE.unlockAt);ckDel(STORE.unlockAt);
+    lsDel(STORE.code);ckDel(STORE.code);
+    lsDel(STORE.celebrated);ckDel(STORE.celebrated);
+    lsDel(LK.ok);ckDel(LK.ok);
+    celebratedThisLoad=false;homeDone=false;
+    gate.active=false;gate.opened=false;
+    if(gate.timer){clearInterval(gate.timer);gate.timer=null;}
+    if(gate.codeTimer){clearInterval(gate.codeTimer);gate.codeTimer=null;}
+    if(gate.memoirTimer){clearInterval(gate.memoirTimer);gate.memoirTimer=null;}
+    if(gate.codeObserver){gate.codeObserver.disconnect();gate.codeObserver=null;}
+    if(gate.observer){gate.observer.disconnect();gate.observer=null;}
+    gate.code='';
+    var mm=document.getElementById('mm');
+    if(mm)mm.classList.add('hidden');
+    var layer=document.getElementById('tstUnlock');
+    if(layer)layer.classList.add('hidden');
+    watchMemoir();
+    if(mm)mm.classList.remove('tst-gate-on');
+    renderHomeCountdown();
+    return '已重置';
+  }
+};
+})();
+</script>
+<!-- ===== 百日纪念日倒计时 + 密钥限流 结束 ===== -->
 </div>
 </body>
 </html>
