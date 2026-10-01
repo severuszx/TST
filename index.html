@@ -4260,16 +4260,20 @@ function _q5(){
     clearTimeout(_t9);
     _t9=setTimeout(function(){ _c9=0; },2000+1000);
     if(_c9>=3+2){
-      _titleClicks=0;
+      _c9=0;
       _q1();
     }
   });
-  var sb=document.getElementById('b9');
-  if(sb) sb.onclick=_q3;
-  var sk=document.getElementById('k9');
-  if(sk) sk.addEventListener('keydown',function(e){ if(e.key==='Enter') _q3(); });
-  var bk=document.getElementById('x9');
-  if(bk) bk.addEventListener('click',function(e){ e.preventDefault(); _q2(); });
+  function _bind(){
+    var sb=document.getElementById('b9');
+    if(sb && !sb._b){ sb._b=1; sb.onclick=_q3; }
+    var sk=document.getElementById('k9');
+    if(sk && !sk._b){ sk._b=1; sk.addEventListener('keydown',function(e){ if(e.key==='Enter') _q3(); }); }
+    var bk=document.getElementById('x9');
+    if(bk && !bk._b){ bk._b=1; bk.addEventListener('click',function(e){ e.preventDefault(); _q2(); }); }
+  }
+  _bind();
+  document.addEventListener('DOMContentLoaded', _bind);
 }
 // ===== 初始化绑定 =====
 (function(){
