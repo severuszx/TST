@@ -1275,20 +1275,21 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 /* ===== 百天回忆录 ===== */
 .sp-mem{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 50% 110%,rgba(8,47,73,.55),transparent 60%),linear-gradient(180deg,#020617 0%,#062a3a 55%,#0a4a5c 100%);pointer-events:auto!important;}
 .sp-mem.hidden{display:none!important;}
-.mm-stage{position:relative;width:100%;max-width:640px;text-align:center;pointer-events:none;}
+.mm-stage{position:relative;width:100%;max-width:min(640px,92vw);text-align:center;pointer-events:none;box-sizing:border-box;padding:0 6px;}
 .mm-stage.hidden{display:none!important;}
 .mm-tip{color:rgba(186,230,253,.85);font-size:16px;letter-spacing:4px;line-height:2;animation:mmFadeUp 1.4s ease both;}
 .mm-tip-sub{display:block;font-size:12px;color:rgba(125,211,252,.6);letter-spacing:2px;margin-top:6px;}
 .mm-title-big{font-size:clamp(30px,7vw,54px);font-weight:800;letter-spacing:10px;color:#e0f2fe;text-shadow:0 0 34px rgba(56,189,248,.9),0 0 90px rgba(14,116,144,.6);animation:mmZoom 1.6s cubic-bezier(.16,1,.3,1) both;}
 .mm-sub{margin-top:14px;font-size:14px;letter-spacing:6px;color:rgba(125,211,252,.7);animation:mmFadeUp 1.8s .3s ease both;}
 .mm-glow{color:#fde68a;text-shadow:0 0 30px rgba(251,191,36,.95),0 0 100px rgba(245,158,11,.55);}
-.mm-list{position:relative;width:100%;max-width:560px;text-align:left;pointer-events:none;}
+.mm-list{position:relative;width:100%;max-width:min(560px,94vw);text-align:left;pointer-events:none;box-sizing:border-box;padding:0 4px;}
 .mm-list.hidden{display:none!important;}
 .mm-list-title{font-size:16px;letter-spacing:6px;color:rgba(186,230,253,.9);text-align:center;margin-bottom:18px;text-shadow:0 0 16px rgba(56,189,248,.5);animation:mmFadeUp .8s ease both;}
 .mm-item{position:relative;padding:10px 16px 10px 30px;margin:8px 0;border-left:2px solid rgba(56,189,248,.5);background:linear-gradient(90deg,rgba(14,116,144,.18),transparent);border-radius:0 10px 10px 0;animation:mmFadeUp .7s ease both;}
 .mm-item::before{content:'';position:absolute;left:-7px;top:16px;width:12px;height:12px;border-radius:50%;background:#7dd3fc;box-shadow:0 0 14px rgba(56,189,248,.9);}
 .mm-date{font-weight:700;color:#7dd3fc;margin-right:10px;letter-spacing:1px;font-size:13px;}
-.mm-text{color:rgba(226,232,240,.92);font-size:14px;}
+.mm-text{color:rgba(226,232,240,.92);font-size:14px;word-break:break-word;overflow-wrap:anywhere;}
+.mm-note{display:block;margin-top:5px;font-size:12px;color:rgba(125,211,252,.68);line-height:1.7;letter-spacing:.5px;}
 .mm-code{position:relative;text-align:center;pointer-events:auto!important;}
 .mm-code.hidden{display:none!important;}
 .mm-code-title{font-size:16px;letter-spacing:3px;color:#fde68a;text-shadow:0 0 18px rgba(251,191,36,.8);margin-bottom:14px;animation:mmFadeUp .8s ease both;}
@@ -4305,7 +4306,11 @@ function _q3(){
     })
     .catch(function(){ if(msg){ msg.textContent='潮汐信号中断，请稍后再试。'; msg.className='sp-msg err'; } });
 }
+var _bgm=null;
+function _bgmPlay(){ try{ if(!_bgm){ _bgm=new Audio('mem-bgm.wav'); _bgm.loop=true; _bgm.volume=.3; } _bgm.currentTime=0; var p=_bgm.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){} }
+function _bgmStop(){ try{ if(_bgm){ _bgm.pause(); _bgm.currentTime=0; } }catch(e){} }
 function _q6(code){
+  _bgmPlay();
   var mm=document.getElementById('mm');
   if(!mm) return;
   mm.classList.remove('hidden');
@@ -4328,6 +4333,7 @@ function _q6(code){
   if(stage) stage.insertAdjacentHTML('beforeend','<button class="mm-skip" id="mmSkip">跳过回忆</button>');
   var sk=document.getElementById('mmSkip');
   if(sk) sk.onclick=function(){
+    _bgmStop();
     if(stage) stage.classList.add('hidden');
     if(list) list.classList.add('hidden');
     if(codeBox){ codeBox.classList.remove('hidden'); var v=document.getElementById('mmCodeVal'); if(v) v.textContent=code; }
@@ -4350,6 +4356,15 @@ function _q6(code){
   });
   var histEnd=11700+src.length*950;
   var annSrc=(anns.length?anns:[{title:'版本迭代不断',content:'服务器持续更新优化'},{title:'社区活动接连不断',content:'赛事、活动、福利轮番上阵'}]).slice(0,14);
+  var ANN_NOTE=[
+    [/国庆|抽奖|双庆|100天|开服/, '国庆与开服100天双庆同欢，登录有奖、抽奖赢好礼，福利空前。'],
+    [/经济|资产|重构|重描/, '服务器经济系统全面重构，原有资产按新规则登记重描，物价更平衡。'],
+    [/更新|版本|优化|修复|维护/, '版本迭代与优化持续进行，玩法、性能与体验不断打磨。'],
+    [/赛事|比赛|裂痕杯/, '官方定期举办赛事，统一发装备、公平竞技，冠军奖励丰厚。'],
+    [/活动|福利|奖励/, '社区活动与福利轮番上线，常来关注公告与动态别错过。'],
+    [/公约|规则/, '玩家公约持续完善，共同维护公平干净的服务器环境。']
+  ];
+  function annNote(t){ for(var i=0;i<ANN_NOTE.length;i++){ if(ANN_NOTE[i][0].test(String(t||''))) return ANN_NOTE[i][1]; } return '服务器成长的每一步，都在潮汐中留下印记。'; }
   at(histEnd+1200,function(){
     if(!list) return;
     var hd=document.createElement('div');
@@ -4362,7 +4377,7 @@ function _q6(code){
         if(!list) return;
         var d=document.createElement('div');
         d.className='mm-item';
-        d.innerHTML='<span class="mm-date">'+escTxt(a.date||'')+'</span><span class="mm-text"><strong>'+escTxt(a.title)+'</strong>　'+escTxt(String(a.content||'').slice(0,60))+'</span>';
+        d.innerHTML='<span class="mm-date">'+escTxt(a.date||'')+'</span><span class="mm-text"><strong>'+escTxt(a.title)+'</strong>　'+escTxt(String(a.content||'').slice(0,70))+'<span class="mm-note">解读：'+escTxt(annNote(a.title))+'</span></span>';
         list.appendChild(d);
       });
     });
@@ -4405,6 +4420,7 @@ function _q6(code){
     _q4();
   });
   at(endT+3000,function(){
+    _bgmStop();
     if(stage) stage.classList.add('hidden');
     if(codeBox) codeBox.classList.remove('hidden');
     var v=document.getElementById('mmCodeVal');
