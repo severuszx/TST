@@ -64,6 +64,7 @@ function json(obj, status, req) {
 }
 
 export async function onRequestGet(context) {
+  if (context && context.env && context.env.ADMIN_PWD) ADMIN_PWD = context.env.ADMIN_PWD;
   const { request } = context;
   const url = new URL(request.url);
   const now = new Date();

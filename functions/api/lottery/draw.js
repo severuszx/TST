@@ -104,8 +104,8 @@ export async function onRequestPost(context) {
   const rawFp = ip + '|' + ua + '|' + secUa + '|' + device;
   let fp = 5381;
   for (let i = 0; i < rawFp.length; i++) { fp = ((fp << 5) + fp + rawFp.charCodeAt(i)) >>> 0; }
-  const fkey = 'fp:' + fp + ':' + sdate;
-  const dkey = 'dev:' + device + ':' + sdate;
+  const fkey = 'DC:' + fp + ':' + sdate;
+  const dkey = 'DC:dev:' + device + ':' + sdate;
   const gate = await drawGate(fp, device, ip, sdate);
   if (gate && gate.existing) {
     return json({ ok: false, error: 'already_drawn', prize: gate.existing.prize, code: gate.existing.code, seq: gate.existing.seq, serverDate: sdate }, 200, request);
