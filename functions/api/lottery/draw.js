@@ -108,6 +108,14 @@ export async function onRequestPost(context) {
   const dkey = 'DC:dev:' + device + ':' + sdate;
   const gate = await drawGate(fp, device, ip, sdate);
   if (gate && gate.existing) {
+    // 防泄露：existing 是闸门标记行（prize 含「标记」/code 为 DCIP: 或 DC:）时，
+    // 绝不把标记信息（含玩家 IP）回给前端，统一返回已抽过。
+    const exP = String(gate.existing.prize || '');
+    const exC = String(gate.existing.code || '');
+    const isMarker = exP.indexOf('标记') >= 0 || exC.indexOf('DCIP:') === 0 || exC.indexOf('DC:') === 0;
+    if (isMarker) {
+      return json({ ok: false, error: 'already_drawn', serverDate: sdate }, 200, request);
+    }
     return json({ ok: false, error: 'already_drawn', prize: gate.existing.prize, code: gate.existing.code, seq: gate.existing.seq, serverDate: sdate }, 200, request);
   }
   if (gate && gate.err) {

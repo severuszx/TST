@@ -85,13 +85,23 @@ export async function onRequestGet(context) {
     rec = list.codes.find(c => c.code === fkey || c.code === dkey || c.code === ikey) || null;
   }
   const codes = await fetchUnclaimedCodes();
+  // 标记行（DCIP:/DC: 前缀或 prize 含「标记」）不对外泄露，仅表示"今日已抽"
+  let safePrize = null, safeCode = null, safeSeq = null;
+  if (rec) {
+    const rp = String(rec.prize || '');
+    const rc = String(rec.code || '');
+    if (rp.indexOf('标记') < 0 && rc.indexOf('DCIP:') !== 0 && rc.indexOf('DC:') !== 0) {
+      safePrize = rec.prize; safeCode = rec.code; safeSeq = rec.seq;
+    }
+  }
   return json({
     sv: 'state-file',
     drawn: !!rec,
-    prize: rec ? rec.prize : null,
-    code: rec ? rec.code : null,
-    seq: rec ? rec.seq : null,
+    prize: safePrize,
+    code: safeCode,
+    seq: safeSeq,
     serverDate: sdate,
+    serverTime: now.getTime(),
     open: now >= L_START && now <= L_END,
     startAt: L_START.toISOString(),
     endAt: L_END.toISOString(),
