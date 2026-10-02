@@ -47,7 +47,8 @@ async function fetchUnclaimedCodes() {
   return res.codes.filter(c => !String(c.code || '').startsWith('DC') && !String(c.prize || '').includes('神秘礼包') && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
 }
 
-async function drawGate(fp, device, ip, sdate) {
+// 只读闸门检查（不写库；命中则今日已抽过）
+async function checkGate(fp, device, ip, sdate) {
   const list = await adminLottery('list', {});
   if (!list || !list.ok || !Array.isArray(list.codes)) return { err: 'server_error' };
   const fkey = 'DC:' + fp + ':' + sdate;
@@ -55,15 +56,38 @@ async function drawGate(fp, device, ip, sdate) {
   const ikey = 'DCIP:' + ip + ':' + sdate;
   const row = list.codes.find(c => c.code === fkey || c.code === dkey || c.code === ikey);
   if (row) return { existing: row };
-  // IP 闸门：每 IP 每天一次（防换浏览器/清 Cookie 绕过；唯一约束原子防并发）
+  return { fresh: true };
+}
+// 预写闸门：IP+设备指纹标记行（唯一约束原子防并发重复发奖；先于核销）
+async function preGate(fp, device, ip, sdate) {
+  const fkey = 'DC:' + fp + ':' + sdate;
+  const ikey = 'DCIP:' + ip + ':' + sdate;
   const addIp = await adminLottery('add', { code: ikey, prize: 'IP抽奖标记', weight: 0 });
   if (addIp && addIp.error === 'code_exists') return { existing: { prize: 'IP抽奖标记' } };
   if (!addIp || !addIp.ok) return { err: 'server_error' };
-  // 设备指纹闸门：同设备防重复
   const addF = await adminLottery('add', { code: fkey, prize: '设备抽奖标记', weight: 0 });
   if (addF && addF.error === 'code_exists') return { existing: { prize: '设备抽奖标记' } };
-  if (!addF || !addF.ok) return { err: 'server_error' };
+  if (!addF || !addF.ok) {
+    // 设备行失败：回滚已写的 IP 行，避免锁死玩家
+    await rollbackGate(fp, ip, sdate);
+    return { err: 'server_error' };
+  }
   return { fresh: true };
+}
+// 回滚预写闸门：核销失败时删除标记行，玩家可重新抽（修复"被标记已抽却拿不到码"）
+async function rollbackGate(fp, ip, sdate) {
+  try {
+    const list = await adminLottery('list', {});
+    if (!list || !list.ok || !Array.isArray(list.codes)) return;
+    const fkey = 'DC:' + fp + ':' + sdate;
+    const ikey = 'DCIP:' + ip + ':' + sdate;
+    for (const row of list.codes) {
+      const c = String(row.code || '');
+      if (c === fkey || c === ikey) {
+        await adminLottery('delete', { id: String(row.id) });
+      }
+    }
+  } catch (e) { /* 回滚尽力而为 */ }
 }
 
 function clientIp(req) {
@@ -106,7 +130,7 @@ export async function onRequestPost(context) {
   for (let i = 0; i < rawFp.length; i++) { fp = ((fp << 5) + fp + rawFp.charCodeAt(i)) >>> 0; }
   const fkey = 'DC:' + fp + ':' + sdate;
   const dkey = 'DC:dev:' + device + ':' + sdate;
-  const gate = await drawGate(fp, device, ip, sdate);
+  const gate = await checkGate(fp, device, ip, sdate);
   if (gate && gate.existing) {
     // 防泄露：existing 是闸门标记行（prize 含「标记」/code 为 DCIP: 或 DC:）时，
     // 绝不把标记信息（含玩家 IP）回给前端，统一返回已抽过。
@@ -121,8 +145,17 @@ export async function onRequestPost(context) {
   if (gate && gate.err) {
     return json({ ok: false, error: gate.err, serverDate: sdate }, 200, request);
   }
+  // 预写闸门（原子防并发；若并发中他人已写则视为已抽过）
+  const pre = await preGate(fp, device, ip, sdate);
+  if (pre && pre.existing) {
+    return json({ ok: false, error: 'already_drawn', serverDate: sdate }, 200, request);
+  }
+  if (pre && pre.err) {
+    return json({ ok: false, error: pre.err, serverDate: sdate }, 200, request);
+  }
   let codes = await fetchUnclaimedCodes();
   if (!codes || codes.length === 0) {
+    await rollbackGate(fp, ip, sdate);
     return json({ ok: false, error: 'sold_out', serverDate: sdate }, 200, request);
   }
   let picked = null;
@@ -135,6 +168,8 @@ export async function onRequestPost(context) {
     if (!codes || codes.length === 0) break;
   }
   if (!picked) {
+    // 核销失败：回滚预写闸门，玩家可重新抽（不再"抽了个空气"被锁死）
+    await rollbackGate(fp, ip, sdate);
     return json({ ok: false, error: 'sold_out', serverDate: sdate }, 200, request);
   }
   const recInfo = { prize: picked.prize, code: picked.code, seq: picked.seq };
