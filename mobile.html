@@ -10,6 +10,7 @@
 :root{
   color-scheme:light;
   --bg1:#f3f5f8;--bg2:#f3f5f8;--bg3:#eef2f7;
+  --bg-grad:linear-gradient(180deg,#f6f8fc 0%,#eef2f9 50%,#e9eef8 100%);
   --card:rgba(255,255,255,.92);--card-brd:#e2e8f0;
   --txt:#1f2937;--txt2:#5b6675;--accent:#52525b;--accent2:#6b7280;
   --danger:#dc2626;--ok:#059669;
@@ -19,6 +20,7 @@
 html[data-theme="dark"]{
   color-scheme:dark;
   --bg1:#111113;--bg2:#111113;--bg3:#18181b;
+  --bg-grad:linear-gradient(180deg,#111113 0%,#14161a 60%,#181b20 100%);
   --card:rgba(24,24,27,.96);--card-brd:#26262b;
   --txt:#e5e5e7;--txt2:#9a9aa0;--accent:#a1a1aa;--accent2:#8b8b92;
   --danger:#f87171;--ok:#34d399;
@@ -26,6 +28,7 @@ html[data-theme="dark"]{
 html[data-theme="glass"]{
   color-scheme:light;
   --bg1:#dee9ff;--bg2:#eaf2ff;--bg3:#e5eefc;
+  --bg-grad:linear-gradient(160deg,#dee9ff 0%,#eaf2ff 26%,#e6efff 48%,#e5eeff 72%,#eef3ff 100%);
   --card:rgba(255,255,255,.35);--card-brd:rgba(255,255,255,.7);
   --txt:#1f2937;--txt2:#5b6675;--accent:#111827;--accent2:#4f63d8;
   --danger:#dc2626;--ok:#059669;
@@ -34,7 +37,7 @@ html[data-theme="glass"]{
 }
 html,body{height:100%;}
 html[data-theme="glass"] body{
-  background:linear-gradient(160deg,#dee9ff 0%,#eaf2ff 26%,#e6efff 48%,#e5eeff 72%,#eef3ff 100%) fixed;
+  background:var(--bg-grad) fixed;
   background-size:220% 220%;
   animation:gbFlow 26s ease-in-out infinite;
 }
@@ -50,7 +53,7 @@ html[data-theme="glass"] #waves{opacity:.18;}
 html[data-theme="glass"] .light-orb{opacity:.2;}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;
-  background:var(--bg1) fixed;
+  background:var(--bg-grad) fixed;
   color:var(--txt);overflow:hidden;touch-action:manipulation;
   -webkit-user-select:none;user-select:none;
 }
