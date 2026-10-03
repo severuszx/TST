@@ -527,7 +527,7 @@ main::-webkit-scrollbar{display:none;}
   function loadVote(){
     var box=$('#voteBody');
     box.innerHTML='<p class="empty-hint">加载中…</p>';
-    fetch(VOTE_API+'/state?topic='+voteTopic,{headers:{'X-Device-Id':devId()}})
+    fetch(VOTE_API+'/state?topic='+voteTopic+'&dev='+encodeURIComponent(devId()))
       .then(function(r){return r.json();})
       .then(function(d){
         if(!d||d.error){ box.innerHTML='<p class="empty-hint">投票暂未开放</p>'; return; }
@@ -553,7 +553,7 @@ main::-webkit-scrollbar{display:none;}
       var sel=box.querySelector('.vote-opt.sel');
       if(!sel){ toast('请先选择一个选项'); return; }
       var btn=this;btn.disabled=true;btn.textContent='提交中…';
-      fetch(VOTE_API+'/submit',{method:'POST',headers:{'Content-Type':'application/json','X-Device-Id':devId()},body:JSON.stringify({topic:voteTopic,option:Number(sel.getAttribute('data-id'))})})
+      fetch(VOTE_API+'/submit?dev='+encodeURIComponent(devId()),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic:voteTopic,option:Number(sel.getAttribute('data-id'))})})
         .then(function(r){return r.json();})
         .then(function(res){
           if(res.error==='already_voted'){ toast('你已投过票'); loadVote(); return; }

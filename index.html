@@ -6217,7 +6217,7 @@ window.TST_HUNDRED = {
     if(!box) return;
     box.innerHTML='<p class="empty-hint">加载中…</p>';
     try{
-      const res=await fetch(VOTE_API+'/state?topic='+VOTE_TOPIC,{headers:{'X-Device-Id':devId()}});
+      const res=await fetch(VOTE_API+'/state?topic='+VOTE_TOPIC+'&dev='+encodeURIComponent(devId()));
       const d=await res.json();
       if(!d||d.error){ box.innerHTML='<p class="empty-hint">投票暂未开放</p>'; return; }
       cur=d;
@@ -6246,7 +6246,7 @@ window.TST_HUNDRED = {
     const btn=document.getElementById('voteSubmitBtn');
     btn.disabled=true; btn.textContent='提交中…';
     try{
-      const res=await fetch(VOTE_API+'/submit',{method:'POST',headers:{'Content-Type':'application/json','X-Device-Id':devId()},body:JSON.stringify({topic:VOTE_TOPIC,option:Number(sel.value)})});
+      const res=await fetch(VOTE_API+'/submit?dev='+encodeURIComponent(devId()),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic:VOTE_TOPIC,option:Number(sel.value)})});
       const d=await res.json();
       if(d.error==='already_voted'){ msg.textContent='你已投过票'; loadVote(); return; }
       if(!d.ok){ msg.textContent=d.error||'提交失败'; btn.disabled=false; btn.textContent='提交投票'; return; }
