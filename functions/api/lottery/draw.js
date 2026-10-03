@@ -6,20 +6,25 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 let ADMIN_PWD = null; // 管理员口令：仅由 onRequest 从环境变量 ADMIN_PWD 注入（仓库不含口令）
 const L_START = new Date('2026-10-01T00:30:00+08:00');
 const L_END = new Date('2026-10-08T23:59:59+08:00');
-const DRAW_DEV_MAP = new Map();
-const DRAW_IP_MAP = new Map();
 
 function cnDate(d) {
   return new Date(d.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10);
 }
+// 真实奖品兑换码：仅纯大写字母+数字，6~20 位，无冒号/斜杠等分隔符。
+// 标记行（DC:/DCIP:/SCIP:）与任何含分隔符的行一律不进奖池，杜绝抽出 IP/密钥残串。
+function isRealCode(c) {
+  return /^[A-Z0-9]{6,20}$/.test(String(c || ''));
+}
 function pickWeighted(codes) {
-  const total = codes.reduce((s, c) => s + (c.weight > 0 ? c.weight : 1), 0);
+  const pool = codes.filter(c => c && c.weight > 0 && isRealCode(c.code));
+  if (!pool.length) return null;
+  const total = pool.reduce((s, c) => s + c.weight, 0);
   let r = Math.random() * total;
-  for (const c of codes) {
-    r -= (c.weight > 0 ? c.weight : 1);
+  for (const c of pool) {
+    r -= c.weight;
     if (r <= 0) return c;
   }
-  return codes[codes.length - 1];
+  return pool[pool.length - 1];
 }
 async function sbFetch(path, opts) {
   const headers = { apikey: SUPABASE_ANON, authorization: 'Bearer ' + SUPABASE_ANON, ...(opts && opts.headers ? opts.headers : {}) };
@@ -44,7 +49,16 @@ async function adminLottery(action, payload) {
 async function fetchUnclaimedCodes() {
   const res = await adminLottery('list', {});
   if (!res || !res.ok || !Array.isArray(res.codes)) return null;
-  return res.codes.filter(c => !String(c.code || '').startsWith('DC') && !String(c.prize || '').includes('神秘礼包') && !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
+  // 白名单：真实兑换码格式 + 未使用 + 权重>0；排除神秘礼包/密钥/任何标记行
+  return res.codes.filter(c => {
+    if (!c || c.claimed) return false;
+    if (String(c.prize || '').startsWith('【已使用】')) return false;
+    if (!isRealCode(c.code)) return false;
+    if (!(c.weight > 0)) return false;
+    const p = String(c.prize || '');
+    if (p.indexOf('神秘礼包') >= 0 || p.indexOf('标记') >= 0 || p.indexOf('密钥') >= 0) return false;
+    return true;
+  });
 }
 
 // 只读闸门检查（不写库；命中则今日已抽过）
@@ -173,7 +187,5 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: 'sold_out', serverDate: sdate }, 200, request);
   }
   const recInfo = { prize: picked.prize, code: picked.code, seq: picked.seq };
-  DRAW_DEV_MAP.set(dkey, recInfo);
-  DRAW_IP_MAP.set(fkey, recInfo);
   return json({ ok: true, ...recInfo, serverDate: sdate }, 200, request);
 }
