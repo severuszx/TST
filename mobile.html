@@ -8,19 +8,20 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --bg1:#0a0f15;--bg2:#101820;--bg3:#131d27;
-  --card:rgba(255,255,255,.05);--card-brd:rgba(255,255,255,.09);
-  --txt:#e8ecef;--txt2:#9aa6b3;--accent:#a1a1aa;--accent2:#7c8ba1;
-  --danger:#f87171;--ok:#34d399;
+  color-scheme:light;
+  --bg1:#f3f5f8;--bg2:#f3f5f8;--bg3:#eef2f7;
+  --card:rgba(255,255,255,.92);--card-brd:#e2e8f0;
+  --txt:#1f2937;--txt2:#5b6675;--accent:#52525b;--accent2:#6b7280;
+  --danger:#dc2626;--ok:#059669;
   --radius:14px;
   --sat:env(safe-area-inset-top,0);--sab:env(safe-area-inset-bottom,0);
 }
-html[data-theme="light"]{
-  color-scheme:light;
-  --bg1:#eef2f6;--bg2:#f4f7fa;--bg3:#e3eaf1;
-  --card:rgba(255,255,255,.72);--card-brd:rgba(15,23,42,.12);
-  --txt:#1f2937;--txt2:#5b6675;--accent:#52525b;--accent2:#6b7280;
-  --danger:#dc2626;--ok:#059669;
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg1:#111113;--bg2:#111113;--bg3:#18181b;
+  --card:rgba(24,24,27,.96);--card-brd:#26262b;
+  --txt:#e5e5e7;--txt2:#9a9aa0;--accent:#a1a1aa;--accent2:#8b8b92;
+  --danger:#f87171;--ok:#34d399;
 }
 html[data-theme="glass"]{
   color-scheme:light;
@@ -49,13 +50,13 @@ html[data-theme="glass"] #waves{opacity:.18;}
 html[data-theme="glass"] .light-orb{opacity:.2;}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;
-  background:linear-gradient(160deg,var(--bg1) 0%,var(--bg2) 55%,var(--bg3) 100%) fixed;
+  background:var(--bg1) fixed;
   color:var(--txt);overflow:hidden;touch-action:manipulation;
   -webkit-user-select:none;user-select:none;
 }
 /* ===== 潮汐动效背景 ===== */
-#waves{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.5;}
-.light-orb{position:fixed;border-radius:50%;filter:blur(60px);opacity:.28;z-index:0;pointer-events:none;animation:orbDrift 16s ease-in-out infinite;}
+#waves{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.22;}
+.light-orb{position:fixed;border-radius:50%;filter:blur(60px);opacity:.12;z-index:0;pointer-events:none;animation:orbDrift 16s ease-in-out infinite;}
 .light-orb.o1{width:340px;height:340px;background:#0ea5e9;top:-80px;right:-60px;}
 .light-orb.o2{width:300px;height:300px;background:#6366f1;bottom:-90px;left:-70px;animation-delay:-8s;}
 @keyframes orbDrift{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-40px,30px) scale(1.12);}}
@@ -64,11 +65,11 @@ body{
   position:fixed;top:0;left:0;right:0;z-index:50;
   padding:calc(var(--sat) + 10px) 16px 10px;
   display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(180deg,rgba(4,13,24,.85),transparent);
+  background:linear-gradient(180deg,var(--card),transparent);
 }
 .m-logo{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
-.m-logo img{width:30px;height:30px;border-radius:9px;object-fit:cover;box-shadow:0 0 16px rgba(56,189,248,.45);}
-.m-logo span{font-size:17px;font-weight:800;letter-spacing:.5px;background:linear-gradient(90deg,#7dd3fc,#a5b4fc);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.m-logo img{width:30px;height:30px;border-radius:9px;object-fit:cover;box-shadow:0 1px 4px rgba(15,23,42,.15);}
+.m-logo span{font-size:17px;font-weight:800;letter-spacing:.5px;color:var(--txt);}
 .m-srv{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt2);background:var(--card);border:1px solid var(--card-brd);border-radius:999px;padding:5px 11px;backdrop-filter:blur(10px);}
 .m-srv .dot{width:7px;height:7px;border-radius:50%;background:var(--txt2);}
 .m-srv.on .dot{background:var(--ok);box-shadow:0 0 8px var(--ok);animation:pulse 2s infinite;}
@@ -307,9 +308,7 @@ main::-webkit-scrollbar{display:none;}
     <div class="m-card">
       <div class="m-title"><span class="ico">◇</span>设置</div>
       <p class="m-sub">界面外观</p>
-      <button class="btn ghost" id="themeBtn" style="margin-bottom:8px;">切换深浅色</button>
-      <button class="btn ghost" id="glassBtn">开启液态玻璃</button>
-      <p class="m-sub" style="margin-top:8px;font-size:12px;opacity:.6;">液态玻璃需输入调试码激活，对设备性能要求较高。</p>
+      <button class="btn ghost" id="themeBtn">切换深浅色</button>
     </div>
 
     <div class="m-card">
@@ -671,14 +670,7 @@ main::-webkit-scrollbar{display:none;}
       toast(nv==='light'?'已切换浅色模式':'已切换深色模式');
     });
   }
-  // ===== 设置：玻璃入口（走调试码） =====
-  var glassBtn=document.getElementById('glassBtn');
-  if(glassBtn){
-    glassBtn.addEventListener('click',function(){
-      if(mDbg){ mDbg.click(); }
-    });
-  }
-  // ===== 玻璃确认框 =====
+  // ===== 玻璃确认框（仅调试码可进入） =====
   function askGlass(){
     dialog('<h3>液态玻璃</h3><p>该主题对设备性能要求较高，低配设备可能出现卡顿。<br>输入「我确认」后开启。</p><input id="cfmInput" placeholder="我确认" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--card-brd);background:rgba(255,255,255,.08);color:var(--txt);font-size:15px;margin-bottom:12px;outline:none;text-align:center;"><button class="btn" id="cfmGo">开启</button><button class="btn ghost" id="cfmCancel" style="margin-top:8px;">取消</button>');
     document.getElementById('cfmCancel').addEventListener('click',closeDialog);
