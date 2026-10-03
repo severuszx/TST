@@ -1387,6 +1387,9 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 @keyframes mmFadeUp{0%{opacity:0;transform:translateY(26px);filter:blur(6px)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
 @keyframes mmZoom{0%{opacity:0;transform:scale(.72);filter:blur(10px)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
 /* ===== 玩家投票 ===== */
+.vote-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.vote-tabs button{border:1px solid var(--border);background:var(--card);color:var(--text-secondary);padding:7px 14px;border-radius:999px;font-size:13px;cursor:pointer;transition:all .2s;}
+.vote-tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff;}
 .vote-hint{font-size:13px;color:var(--text-secondary);margin:0 0 16px;}
 .vote-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
 .vote-opt{display:flex;align-items:center;gap:11px;padding:14px 16px;border:1px solid var(--border);border-radius:14px;cursor:pointer;background:var(--card);transition:border-color .2s,background .2s,transform .2s;font-size:14px;}
@@ -1709,6 +1712,10 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <div class="container">
 <div class="section-title">玩家投票</div>
 <div class="card" id="voteCard">
+  <div class="vote-tabs" id="voteTabs">
+    <button class="on" data-topic="default">开发方向</button>
+    <button data-topic="domain">域名后缀</button>
+  </div>
   <div id="voteBody"><p class="empty-hint">加载中…</p></div>
 </div>
 </div>
@@ -6198,7 +6205,7 @@ window.TST_HUNDRED = {
 // ============================================================
 (function(){
   const VOTE_API='https://theslowtidefk.pages.dev/api/vote';
-  const VOTE_TOPIC='default';
+  let VOTE_TOPIC='default';
   function devId(){
     let d=localStorage.getItem('tst_vote_devid');
     if(!d){ d='dv-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10); localStorage.setItem('tst_vote_devid',d); }
@@ -6269,6 +6276,19 @@ window.TST_HUNDRED = {
   });
   if(location.hash==='#vote'){ setTimeout(loadVote,120); }
   setTimeout(loadVote,600); // 预加载：进入页面即拉取，切到投票页时直接显示
+
+  // 主题切换
+  const tabsBox=document.getElementById('voteTabs');
+  if(tabsBox){
+    tabsBox.addEventListener('click',function(e){
+      const b=e.target.closest('button[data-topic]');
+      if(!b) return;
+      tabsBox.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      VOTE_TOPIC=b.getAttribute('data-topic');
+      loadVote();
+    });
+  }
 
   // ===== 管理员：投票管理（反馈站后端校验）=====
   async function voteAdmin(action,payload){

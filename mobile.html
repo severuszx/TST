@@ -133,6 +133,9 @@ main::-webkit-scrollbar{display:none;}
 .quick .qn{font-size:12px;color:var(--txt);}
 .quick .qd{font-size:10px;color:var(--txt2);margin-top:2px;}
 /* ===== 投票 ===== */
+.vote-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.vote-tabs button{border:1px solid var(--card-brd);background:var(--card);color:var(--txt2);padding:7px 13px;border-radius:999px;font-size:13px;cursor:pointer;transition:all .2s;}
+.vote-tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff;}
 .vote-hint{font-size:12px;color:var(--txt2);margin:0 0 14px;}
 .vote-opts{display:flex;flex-direction:column;gap:9px;margin-bottom:16px;}
 .vote-opt{
@@ -263,6 +266,10 @@ main::-webkit-scrollbar{display:none;}
   <section class="page" id="page-vote">
     <div class="m-card">
       <div class="m-title"><span class="ico">▥</span>玩家投票</div>
+      <div class="vote-tabs" id="voteTabs">
+        <button class="on" data-topic="default">开发方向</button>
+        <button data-topic="domain">域名后缀</button>
+      </div>
       <div id="voteBody"><p class="empty-hint">加载中…</p></div>
     </div>
   </section>
@@ -275,7 +282,7 @@ main::-webkit-scrollbar{display:none;}
       <button class="btn" id="fbGo">打开反馈站</button>
     </div>
     <div class="m-card">
-      <div class="m-title"><span class="ico">📋</span>反馈说明</div>
+      <div class="m-title"><span class="ico">▦</span>反馈说明</div>
       <p class="m-sub" style="line-height:1.8;">提交后可在反馈站「我的」里看处理状态。<br>反馈编号格式：TST-XXXXXX。</p>
     </div>
   </section>
@@ -283,17 +290,17 @@ main::-webkit-scrollbar{display:none;}
   <!-- 更多 -->
   <section class="page" id="page-more">
     <div class="mlist">
-      <div class="mitem" data-go="notice"><div class="mi">📢</div><div class="mt"><b>服务器公告</b><span>官方动态与重要通知</span></div><span class="ar">›</span></div>
-      <div class="mitem" data-go="feed"><div class="mi">🌊</div><div class="mt"><b>社区动态</b><span>玩家与服务器日常</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="notice"><div class="mi">▤</div><div class="mt"><b>服务器公告</b><span>官方动态与重要通知</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="feed"><div class="mi">≋</div><div class="mt"><b>社区动态</b><span>玩家与服务器日常</span></div><span class="ar">›</span></div>
       <div class="mitem" data-go="event"><div class="mi">🏁</div><div class="mt"><b>赛事活动</b><span>官方赛事与回放</span></div><span class="ar">›</span></div>
-      <div class="mitem" data-go="activity"><div class="mi">🎁</div><div class="mt"><b>活动抽奖</b><span>国庆 × 开服100天双庆</span></div><span class="ar">›</span></div>
-      <div class="mitem" data-go="rule"><div class="mi">📜</div><div class="mt"><b>玩家公约</b><span>服务器守则</span></div><span class="ar">›</span></div>
-      <div class="mitem" data-go="sponsor"><div class="mi">💳</div><div class="mt"><b>服务器赞助</b><span>支持我们走得更远</span></div><span class="ar">›</span></div>
-      <div class="mitem" data-go="team"><div class="mi">👥</div><div class="mt"><b>管理团队</b><span>运营组与荣誉成员</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="activity"><div class="mi">◈</div><div class="mt"><b>活动抽奖</b><span>国庆 × 开服100天双庆</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="rule"><div class="mi">≡</div><div class="mt"><b>玩家公约</b><span>服务器守则</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="sponsor"><div class="mi">◉</div><div class="mt"><b>服务器赞助</b><span>支持我们走得更远</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="team"><div class="mi">◍</div><div class="mt"><b>管理团队</b><span>运营组与荣誉成员</span></div><span class="ar">›</span></div>
     </div>
 
     <div class="m-card" style="margin-top:14px;">
-      <div class="m-title" style="cursor:pointer;" id="teamHead"><span class="ico">👥</span>管理团队<span style="margin-left:auto;font-size:12px;color:var(--txt2);" id="teamArrow">展开 ▾</span></div>
+      <div class="m-title" style="cursor:pointer;" id="teamHead"><span class="ico">◍</span>管理团队<span style="margin-left:auto;font-size:12px;color:var(--txt2);" id="teamArrow">展开 ▾</span></div>
       <div class="team-box" id="teamBox"></div>
     </div>
 
@@ -358,7 +365,6 @@ main::-webkit-scrollbar{display:none;}
   var $=function(s){return document.querySelector(s);};
   var VOTE_API='https://theslowtidefk.pages.dev/api/vote';
   var DATA_API='https://tst-server-site.pages.dev/api/data';
-
   // ===== Toast =====
   var toastTimer=null;
   function toast(msg){
@@ -501,6 +507,18 @@ main::-webkit-scrollbar{display:none;}
 
   // ===== 投票 =====
   var voteTopic='default',voteDevId=null;
+  // 主题切换
+  var vTabs=document.getElementById('voteTabs');
+  if(vTabs){
+    vTabs.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-topic]');
+      if(!b)return;
+      vTabs.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      voteTopic=b.getAttribute('data-topic');
+      loadVote();
+    });
+  }
   function devId(){
     if(voteDevId)return voteDevId;
     var d=localStorage.getItem('tst_vote_devid');
