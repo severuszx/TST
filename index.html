@@ -1417,6 +1417,12 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 (function(){
   try{
     if(/[?&]m=0/.test(location.search)) return;
+    var force=localStorage.getItem('tst_force_mode');
+    if(force==='mobile'){
+      if(location.pathname.indexOf('mobile.html')<0) location.replace('mobile.html'+(location.search||''));
+      return;
+    }
+    if(force==='desktop') return;
     var ua=navigator.userAgent;
     var isMob=/Android|iPhone|iPad|iPod|Mobile/i.test(ua)||(navigator.maxTouchPoints>1&&window.innerWidth<1024);
     if(isMob&&location.pathname.indexOf('mobile.html')<0){
@@ -2230,18 +2236,58 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     const hint=document.getElementById('debugHint');
     if(!input||!ok||!cancel||!hint)return;
     function close(){const mask=document.getElementById('debugMask');if(mask)mask.classList.add('hidden');}
+    function showInfo(title,body){
+      const el=document.getElementById('infoTitle');if(el)el.textContent=title;
+      const b=document.getElementById('infoBody');if(b)b.innerHTML=body;
+      const m=document.getElementById('infoMask');if(m)m.classList.remove('hidden');
+    }
+    function gpuName(){
+      try{
+        const gl=document.createElement('canvas').getContext('webgl');
+        if(!gl)return '未知';
+        const ext=gl.getExtension('WEBGL_debug_renderer_info');
+        return ext?String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||'未知'):'未知';
+      }catch(e){return '未知';}
+    }
+    function perfData(){
+      const mem=navigator.deviceMemory?String(navigator.deviceMemory)+' GB':'未知';
+      const conn=navigator.connection||{};
+      const net=String(conn.effectiveType||'未知')+(conn.downlink?(' · '+conn.downlink+'Mbps'):'');
+      return '<b>处理器核心：</b>'+String(navigator.hardwareConcurrency||'未知')+' 核<br><b>设备内存：</b>'+mem+'<br><b>显卡：</b>'+gpuName()+'<br><b>网络：</b>'+net+'<br><b>屏幕：</b>'+screen.width+'×'+screen.height;
+    }
+    function devData(){
+      return '<b>UA：</b>'+navigator.userAgent.slice(0,150)+'…<br><b>窗口：</b>'+innerWidth+'×'+innerHeight+' · DPR '+devicePixelRatio+'<br><b>语言：</b>'+navigator.language+'<br><b>当前主题：</b>'+themeState()+'<br><b>强制模式：</b>'+(localStorage.getItem('tst_force_mode')||'自动');
+    }
     function submit(){
       const code=(input.value||'').trim().toUpperCase();
-      if(code==='TST-GLASS'){
-        const mask=document.getElementById('gbConfirmMask');
-        if(mask){mask.classList.remove('hidden');const inp=document.getElementById('gbConfirmInput');if(inp){inp.value='';inp.style.borderColor='';setTimeout(function(){inp.focus();},80);}}
-        close();
-      } else if(code==='TST-LIGHT'){
-        localStorage.setItem('tst-theme','light');
-        location.reload();
-      } else {
-        hint.textContent='调试代码无效，请重试';hint.style.color='#dc2626';
-      }
+      if(!code){hint.textContent='请输入调试代码';hint.style.color='#dc2626';return;}
+      fetch('https://theslowtidefk.pages.dev/api/debug/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})})
+      .then(r=>r.json())
+      .then(d=>{
+        if(!d||!d.ok){hint.textContent='调试代码无效，请重试';hint.style.color='#dc2626';return;}
+        const feat=d.feature;
+        if(feat==='glass'){
+          const mask=document.getElementById('gbConfirmMask');
+          if(mask){mask.classList.remove('hidden');const inp=document.getElementById('gbConfirmInput');if(inp){inp.value='';inp.style.borderColor='';setTimeout(function(){inp.focus();},80);}}
+          close();
+        } else if(feat==='light'){
+          localStorage.setItem('tst-theme','light');location.reload();
+        } else if(feat==='desktop'){
+          localStorage.setItem('tst_force_mode','desktop');
+          if(location.pathname.indexOf('mobile.html')>-1){location.href='index.html?m=0';}
+          else{location.reload();}
+        } else if(feat==='mobile'){
+          localStorage.setItem('tst_force_mode','mobile');
+          location.href='mobile.html';
+        } else if(feat==='perf'){
+          close();showInfo('性能面板',perfData());
+        } else if(feat==='dev'){
+          close();showInfo('开发者信息',devData());
+        } else if(feat==='reset'){
+          localStorage.removeItem('tst_force_mode');close();location.reload();
+        }
+      })
+      .catch(()=>{hint.textContent='验证服务暂时不可用，请稍后重试';hint.style.color='#dc2626';});
     }
     ok.addEventListener('click',submit);
     cancel.addEventListener('click',close);
@@ -2258,6 +2304,15 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     dbBind();
     setTimeout(function(){const i=document.getElementById('debugInput');if(i)i.focus();},50);
   });
+})();
+
+// ===== 调试信息弹窗关闭 =====
+(function(){
+  const im=document.getElementById('infoMask');
+  if(!im)return;
+  const c=document.getElementById('infoClose');
+  if(c)c.onclick=function(){im.classList.add('hidden');};
+  im.addEventListener('click',function(e){if(e.target===im)im.classList.add('hidden');});
 })();
 
 // ===== 卡片拖动（双模式：网格排序 / 自由摆放；全站小卡片通用：公告/动态/赛事回放/赞助/便捷工具，含触屏丝滑 + q弹音效）=====
@@ -4966,6 +5021,13 @@ function _q5(){
 <input type="password" id="debugInput" placeholder="输入调试代码" autocomplete="off">
 <div class="db-btns"><button id="debugOk">确定</button><button id="debugCancel">取消</button></div>
 <div id="debugHint">输入调试代码可激活对应功能</div>
+</div>
+</div>
+
+<div class="tst-debug-mask hidden" id="infoMask">
+<div class="tst-debug-box" style="width:340px;">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><b id="infoTitle">信息</b><span id="infoClose" style="cursor:pointer;opacity:.6;">✕</span></div>
+<div id="infoBody" style="font-size:13px;line-height:1.9;color:var(--text);word-break:break-all;"></div>
 </div>
 </div>
 

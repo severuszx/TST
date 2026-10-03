@@ -272,6 +272,7 @@ main::-webkit-scrollbar{display:none;}
     <div class="foot">
       <p>The Slow Tide · 潮汐之上，皆是归途</p>
       <p style="margin-top:5px;">网站源码已开源 · <a href="https://github.com/severuszx/TST" target="_blank" rel="noopener">GitHub</a></p>
+      <p id="mDebug" style="margin-top:12px;font-size:11px;opacity:.55;cursor:pointer;color:var(--txt2);">调试</p>
     </div>
   </section>
 </main>
@@ -288,6 +289,19 @@ main::-webkit-scrollbar{display:none;}
 </div>
 <div class="toast" id="toast"></div>
 
+<script>
+// 强制桌面/移动 逻辑
+(function(){
+  try{
+    var force=localStorage.getItem('tst_force_mode');
+    if(force==='desktop'){ location.replace('index.html?m=0'); return; }
+    if(/[?&]m=0/.test(location.search)) return;
+    var ua=navigator.userAgent;
+    var isMob=/Android|iPhone|iPad|iPod|Mobile/i.test(ua)||(navigator.maxTouchPoints>1&&window.innerWidth<1024);
+    if(!isMob&&!force){ location.replace('index.html?m=0'); return; }
+  }catch(e){}
+})();
+</script>
 <script>
 (function(){
   var $=function(s){return document.querySelector(s);};
@@ -523,6 +537,34 @@ main::-webkit-scrollbar{display:none;}
     }
     requestAnimationFrame(draw);
   })();
+
+  // ===== 调试入口（后端验证）=====
+  var DEBUG_API='https://theslowtidefk.pages.dev/api/debug/verify';
+  var mDbg=document.getElementById('mDebug');
+  if(mDbg){
+    mDbg.addEventListener('click',function(){
+      dialog('<h3>调试控制台</h3><p>输入有效的调试代码可激活对应功能。</p><input type="password" id="mDebugInput" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--card-brd);background:rgba(255,255,255,.08);color:var(--txt);font-size:15px;margin-bottom:12px;outline:none;text-align:center;" placeholder="输入调试代码"><button class="btn" id="mDebugOk">确定</button><button class="btn ghost" id="mDebugCancel" style="margin-top:8px;">取消</button>');
+      document.getElementById('mDebugCancel').addEventListener('click',closeDialog);
+      document.getElementById('mDebugOk').addEventListener('click',function(){
+        var code=(document.getElementById('mDebugInput').value||'').trim().toUpperCase();
+        if(!code)return;
+        fetch(DEBUG_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})})
+          .then(function(r){return r.json();})
+          .then(function(d){
+            if(!d||!d.ok){ toast('调试代码无效'); return; }
+            var f=d.feature;
+            if(f==='desktop'){ localStorage.setItem('tst_force_mode','desktop'); location.href='index.html?m=0'; }
+            else if(f==='mobile'){ localStorage.setItem('tst_force_mode','mobile'); toast('已锁定移动模式'); closeDialog(); }
+            else if(f==='reset'){ localStorage.removeItem('tst_force_mode'); location.reload(); }
+            else if(f==='glass'){ localStorage.removeItem('tst_force_mode'); location.href='index.html?m=0'; }
+            else if(f==='light'){ localStorage.setItem('tst-theme','light'); location.href='index.html?m=0'; }
+            else if(f==='perf'){ closeDialog(); toast('CPU '+(navigator.hardwareConcurrency||'?')+' 核 · 内存 '+(navigator.deviceMemory||'?')+'GB'); }
+            else if(f==='dev'){ closeDialog(); toast('UA: '+navigator.userAgent.slice(0,70)); }
+          })
+          .catch(function(){ toast('验证服务暂时不可用'); });
+      });
+    });
+  }
 
   // ===== 初始化 =====
   renderTeam();
