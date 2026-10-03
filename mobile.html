@@ -207,8 +207,8 @@ main::-webkit-scrollbar{display:none;}
     <div class="m-card">
       <div class="m-title"><span class="ico">◈</span>服务器状态</div>
       <div class="srv-grid">
-        <div class="srv-cell"><div class="k">运行状态</div><div class="v" id="srvState">检测中</div></div>
-        <div class="srv-cell"><div class="k">在线时间</div><div class="v" id="srvUp">--:--:--</div></div>
+        <div class="srv-cell"><div class="k">状态</div><div class="v" id="srvState">检测中</div></div>
+        <div class="srv-cell"><div class="k">运行时间</div><div class="v" id="srvUp">--:--:--</div></div>
         <div class="srv-cell"><div class="k">北京时间</div><div class="v" id="bjTime">--:--:--</div></div>
         <div class="srv-cell"><div class="k">服务器版本</div><div class="v" id="srvVer">--</div></div>
       </div>
@@ -223,6 +223,9 @@ main::-webkit-scrollbar{display:none;}
       <div class="quick" data-go="sponsor"><div class="qi">💳</div><div class="qn">赞助支持</div><div class="qd">支持我们</div></div>
       <div class="quick" data-go="team"><div class="qi">👥</div><div class="qn">管理团队</div><div class="qd">运营组</div></div>
     </div>
+
+    <div class="m-title" style="padding:4px 4px 10px;"><span class="ico">🌊</span>最新动态</div>
+    <div id="feedList"></div>
   </section>
 
   <!-- 投票 -->
@@ -237,12 +240,12 @@ main::-webkit-scrollbar{display:none;}
   <section class="page" id="page-fb">
     <div class="m-card">
       <div class="m-title"><span class="ico">📮</span>意见反馈</div>
-      <p class="m-sub">遇到 Bug 或有建议？前往反馈站提交，我们会认真查看每一条。</p>
+      <p class="m-sub">遇到 Bug 或有建议？直接去反馈站提交。</p>
       <button class="btn" id="fbGo">打开反馈站</button>
     </div>
     <div class="m-card">
       <div class="m-title"><span class="ico">📋</span>反馈说明</div>
-      <p class="m-sub" style="line-height:1.8;">反馈提交后可在反馈站「我的」中查看处理状态。<br>反馈编号格式：TST-XXXXXX。</p>
+      <p class="m-sub" style="line-height:1.8;">提交后可在反馈站「我的」里看处理状态。<br>反馈编号格式：TST-XXXXXX。</p>
     </div>
   </section>
 
@@ -270,7 +273,7 @@ main::-webkit-scrollbar{display:none;}
     </div>
 
     <div class="foot">
-      <p>The Slow Tide · 潮汐之上，皆是归途</p>
+      <p>© 2026 The Slow Tide</p>
       <p style="margin-top:5px;">网站源码已开源 · <a href="https://github.com/severuszx/TST" target="_blank" rel="noopener">GitHub</a></p>
       <p id="mDebug" style="margin-top:12px;font-size:11px;opacity:.55;cursor:pointer;color:var(--txt2);">调试</p>
     </div>
@@ -378,11 +381,12 @@ main::-webkit-scrollbar{display:none;}
       dataCache=d;
       renderBanners(d.announcements||[]);
       renderServer(d);
+      renderFeeds(d.feeds||[]);
     }).catch(function(){ toast('数据加载失败，请检查网络'); });
   }
   function renderBanners(list){
     var track=$('#bannerTrack'),dots=$('#bannerDots');
-    if(!list.length){ track.innerHTML='<div class="banner-item"><div class="b-title">欢迎来到 The Slow Tide</div><div class="b-content">潮汐之上，皆是归途。</div></div>'; return; }
+    if(!list.length){ track.innerHTML='<div class="banner-item"><div class="b-title">The Slow Tide</div><div class="b-content">服务器运行中。</div></div>'; return; }
     var h='';
     list.slice(0,6).forEach(function(a){
       h+='<div class="banner-item"><div class="b-date">'+a.date+'</div><div class="b-title">'+esc(a.title)+'</div><div class="b-content">'+esc((a.content||'').slice(0,120))+'</div></div>';
@@ -404,14 +408,25 @@ main::-webkit-scrollbar{display:none;}
     var st=sv.status||'online';
     var srv=$('#mSrv'),txt=$('#mSrvTxt'),stEl=$('#srvState'),upEl=$('#srvUp'),verEl=$('#srvVer');
     srv.className='m-srv'+(st==='online'?' on':' off');
-    txt.textContent=st==='online'?'服务器在线':'服务器已关闭';
-    stEl.textContent=st==='online'?'在线':'已关闭';
+    txt.textContent=st==='online'?'服务器运行中':'服务器已关闭';
+    stEl.textContent=st==='online'?'运行中':'已关闭';
     stEl.className='v'+(st==='online'?' ok':' off');
     var up=sv.uptime;
     if(up!==undefined&&up!==null){ upEl.textContent=fmtUp(up); }
     else { upEl.textContent='--:--:--'; }
     var ver=sv.version;
     if(ver){ verEl.textContent=ver; }
+  }
+  function renderFeeds(list){
+    var box=$('#feedList');
+    if(!box)return;
+    if(!list||!list.length){ box.innerHTML='<p class="empty-hint">暂无动态</p>'; return; }
+    var h='';
+    list.slice(0,5).forEach(function(f){
+      var c=(f.content||'').slice(0,80);
+      h+='<div class="m-card" style="margin-bottom:10px;padding:13px 15px;"><div class="b-date">'+(f.date||'')+'</div><div class="b-title" style="font-size:14px;">'+esc(f.title||'')+'</div>'+(c?'<div class="b-content">'+esc(c)+'</div>':'')+'</div>';
+    });
+    box.innerHTML=h;
   }
   function fmtUp(sec){
     sec=Math.max(0,Math.floor(Number(sec)||0));
