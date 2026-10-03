@@ -6216,13 +6216,19 @@ window.TST_HUNDRED = {
     const box=document.getElementById('voteBody');
     if(!box) return;
     box.innerHTML='<p class="empty-hint">加载中…</p>';
-    try{
-      const res=await fetch(VOTE_API+'/state?topic='+VOTE_TOPIC+'&dev='+encodeURIComponent(devId()));
-      const d=await res.json();
-      if(!d||d.error){ box.innerHTML='<p class="empty-hint">投票暂未开放</p>'; return; }
-      cur=d;
-      if(d.voted) renderResult(d); else renderForm(d);
-    }catch(e){ box.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; }
+    for(let attempt=0;attempt<3;attempt++){
+      try{
+        const res=await fetch(VOTE_API+'/state?topic='+VOTE_TOPIC+'&dev='+encodeURIComponent(devId()));
+        const d=await res.json();
+        if(!d||d.error){ box.innerHTML='<p class="empty-hint">投票暂未开放</p>'; return; }
+        cur=d;
+        if(d.voted) renderResult(d); else renderForm(d);
+        return;
+      }catch(e){
+        if(attempt<2){ await new Promise(r=>setTimeout(r,700*(attempt+1))); }
+        else{ box.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; }
+      }
+    }
   }
   function renderForm(d){
     const h=['<h3 style="margin:0 0 6px;color:var(--text);">'+esc(d.title)+'</h3>',
