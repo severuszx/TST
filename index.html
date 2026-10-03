@@ -6216,7 +6216,7 @@ window.TST_HUNDRED = {
     const box=document.getElementById('voteBody');
     if(!box) return;
     box.innerHTML='<p class="empty-hint">加载中…</p>';
-    for(let attempt=0;attempt<3;attempt++){
+    for(let attempt=0;attempt<5;attempt++){
       try{
         const res=await fetch(VOTE_API+'/state?topic='+VOTE_TOPIC+'&dev='+encodeURIComponent(devId()));
         const d=await res.json();
@@ -6225,7 +6225,7 @@ window.TST_HUNDRED = {
         if(d.voted) renderResult(d); else renderForm(d);
         return;
       }catch(e){
-        if(attempt<2){ await new Promise(r=>setTimeout(r,1600*(attempt+1))); }
+        if(attempt<4){ await new Promise(r=>setTimeout(r,1800*(attempt+1))); }
         else{ box.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; }
       }
     }
@@ -6280,8 +6280,10 @@ window.TST_HUNDRED = {
     const nb=e.target.closest('[data-nav="vote"]');
     if(nb){ setTimeout(loadVote,60); }
   });
-  if(location.hash==='#vote'){ setTimeout(loadVote,2500); }
-  setTimeout(loadVote,2500); // 预加载：等冷启动结束再拉取，切到投票页时直接显示
+  if(location.hash==='#vote'){ setTimeout(loadVote,3000); }
+  // 预热：页面加载即发一次请求，让 CF Functions 冷启动提前完成
+  fetch(VOTE_API+'/state?topic='+VOTE_TOPIC+'&dev='+encodeURIComponent(devId())).catch(()=>{});
+  setTimeout(loadVote,3000); // 正式预加载：预热后命中已热实例
 
   // 主题切换
   const tabsBox=document.getElementById('voteTabs');

@@ -107,6 +107,15 @@ main::-webkit-scrollbar{display:none;}
 .m-sub{font-size:12px;color:var(--txt2);margin-bottom:12px;}
 /* ===== 公告轮播 ===== */
 .banner-wrap{position:relative;border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
+/* ===== 图片轮播（与 PC 官网同款） ===== */
+.hero-slider-wrap{margin-bottom:14px;border-radius:var(--radius);overflow:hidden;position:relative;}
+.hero-slider{display:flex;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.hero-slider::-webkit-scrollbar{display:none;}
+.slide-item{flex:0 0 100%;}
+.slide-item img{width:100%;height:150px;object-fit:cover;display:block;}
+.slide-dots{display:flex;gap:6px;justify-content:center;padding:8px 0 2px;}
+.slide-dots i{width:6px;height:6px;border-radius:99px;background:rgba(125,211,252,.4);transition:all .3s;}
+.slide-dots i.on{width:14px;background:var(--accent);}
 .banner-track{display:flex;transition:transform .45s cubic-bezier(.22,1,.36,1);}
 .banner-item{
   min-width:100%;padding:18px 16px;border-radius:var(--radius);
@@ -239,12 +248,20 @@ main::-webkit-scrollbar{display:none;}
 <main id="main">
   <!-- 首页 -->
   <section class="page active" id="page-home">
+    <div class="hero-slider-wrap">
+      <div class="hero-slider" id="heroSlider">
+        <div class="slide-item"><img src="ad1.jpg" alt="轮播图1" loading="lazy"></div>
+        <div class="slide-item"><img src="ad2.jpg" alt="轮播图2" loading="lazy"></div>
+        <div class="slide-item"><img src="ad3.jpg" alt="轮播图3" loading="lazy"></div>
+      </div>
+      <div class="slide-dots" id="slideDots"></div>
+    </div>
     <div class="banner-wrap">
       <div class="banner-track" id="bannerTrack"></div>
       <div class="banner-dots" id="bannerDots"></div>
     </div>
 
-    <div class="m-card">
+    <div class="m-card drag-card" id="cardSrv">
       <div class="m-title"><span class="ico">◈</span>服务器状态</div>
       <div class="srv-grid">
         <div class="srv-cell"><div class="k">状态</div><div class="v" id="srvState">检测中</div></div>
@@ -254,8 +271,8 @@ main::-webkit-scrollbar{display:none;}
       </div>
     </div>
 
-    <div class="m-title" style="padding:2px 4px 10px;"><span class="ico">◇</span>快捷入口</div>
-    <div class="grid3">
+    <div class="m-title drag-card" id="cardQuickTitle" style="padding:2px 4px 10px;"><span class="ico">◇</span>快捷入口</div>
+    <div class="grid3 drag-card" id="cardQuick">
       <div class="quick" data-go="activity"><div class="qi">◈</div><div class="qn">活动抽奖</div><div class="qd">双庆狂欢</div></div>
       <div class="quick" data-go="tool"><div class="qi">▦</div><div class="qn">便捷工具</div><div class="qd">工具库</div></div>
       <div class="quick" data-go="notice"><div class="qi">▤</div><div class="qn">全部公告</div><div class="qd">历史公告</div></div>
@@ -264,8 +281,8 @@ main::-webkit-scrollbar{display:none;}
       <div class="quick" data-go="team"><div class="qi">◍</div><div class="qn">管理团队</div><div class="qd">运营组</div></div>
     </div>
 
-    <div class="m-title" style="padding:4px 4px 10px;"><span class="ico">≋</span>最新动态</div>
-    <div id="feedList"></div>
+    <div class="m-title drag-card" id="cardFeedTitle" style="padding:4px 4px 10px;"><span class="ico">≋</span>最新动态</div>
+    <div id="feedList" class="drag-card" style="min-height:60px;"></div>
   </section>
 
   <!-- 投票 -->
@@ -542,7 +559,7 @@ main::-webkit-scrollbar{display:none;}
       })
       .catch(function(){
         attempt++;
-        if(attempt<3){ setTimeout(go,1600*attempt); }
+        if(attempt<5){ setTimeout(go,1800*attempt); }
         else{ box.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; }
       });
     }
@@ -706,17 +723,120 @@ main::-webkit-scrollbar{display:none;}
     });
   }
 
+  // ===== 图片轮播（与 PC 官网同款） =====
+  (function(){
+    var hs=document.getElementById('heroSlider');
+    if(!hs) return;
+    var slides=Array.from(hs.querySelectorAll('.slide-item'));
+    var dots=$('#slideDots');
+    var cur=0,timer=null;
+    slides.forEach(function(_,i){ var d=document.createElement('i'); if(i===0)d.className='on'; dots.appendChild(d); });
+    var dotsAll=Array.from(dots.querySelectorAll('i'));
+    function go(i){
+      cur=(i+slides.length)%slides.length;
+      hs.scrollTo({left:hs.clientWidth*cur,behavior:'smooth'});
+      dotsAll.forEach(function(x,k){x.classList.toggle('on',k===cur);});
+    }
+    function auto(){ go(cur+1); }
+    function start(){ clearInterval(timer); timer=setInterval(auto,4500); }
+    hs.addEventListener('touchstart',function(){clearInterval(timer);},{passive:true});
+    hs.addEventListener('touchend',function(){start();},{passive:true});
+    start();
+  })();
+
+  // ===== 玻璃主题：卡片长按自由拖动排序（触摸 + 鼠标） =====
+  (function(){
+    var dh=document.documentElement;
+    var dragEl=null,longTimer=null,sx=0,sy=0,on=false,cards=[];
+    function isGlass(){ return dh.getAttribute('data-theme')==='glass'; }
+    function getCards(){ return Array.from(document.querySelectorAll('#page-home .drag-card')); }
+    function onDown(e){
+      if(!isGlass()) return;
+      var t=e.target.closest?e.target.closest('.drag-card'):null;
+      if(!t) return;
+      if(e.target.closest('button,input,a,.quick')) return;
+      sx=(e.touches?e.touches[0].clientX:e.clientX);
+      sy=(e.touches?e.touches[0].clientY:e.clientY);
+      clearTimeout(longTimer);
+      longTimer=setTimeout(function(){
+        on=true; dragEl=t;
+        dragEl.style.transition='none';
+        dragEl.style.zIndex=999;
+        dragEl.style.position='relative';
+        dragEl.style.boxShadow='0 18px 40px rgba(0,0,0,.18)';
+        cards=getCards();
+      },420);
+    }
+    function onMove(e){
+      if(!on||!dragEl) return;
+      var cx=(e.touches?e.touches[0].clientX:e.clientX);
+      var cy=(e.touches?e.touches[0].clientY:e.clientY);
+      dragEl.style.transform='translate('+(cx-sx)+'px,'+(cy-sy)+'px) scale(1.02)';
+      var rect=dragEl.getBoundingClientRect();
+      var cy2=rect.top+rect.height/2;
+      for(var i=0;i<cards.length;i++){
+        var s=cards[i];
+        if(s===dragEl) continue;
+        var r=s.getBoundingClientRect();
+        if(cy2>r.top&&cy2<r.bottom){
+          if(cy2<r.top+r.height/2){ if(r.top>rect.top) s.parentNode.insertBefore(dragEl,s); }
+          else { if(r.bottom<rect.bottom) s.parentNode.insertBefore(s,dragEl); }
+          cards=getCards();
+          break;
+        }
+      }
+      if(e.cancelable) e.preventDefault();
+    }
+    function onUp(){
+      clearTimeout(longTimer);
+      if(on&&dragEl){
+        dragEl.style.transition='transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s';
+        dragEl.style.transform='';
+        dragEl.style.boxShadow='';
+        dragEl.style.zIndex='';
+        dragEl.style.position='';
+        setTimeout(function(){ dragEl.style.transition=''; },300);
+        saveOrder();
+      }
+      on=false; dragEl=null;
+    }
+    function saveOrder(){
+      try{
+        var ids=Array.from(document.querySelectorAll('#page-home .drag-card')).map(function(c){return c.id||'';}).filter(Boolean);
+        localStorage.setItem('tst_mobile_card_order',JSON.stringify(ids));
+      }catch(e){}
+    }
+    dh.addEventListener('touchstart',onDown,{passive:false});
+    dh.addEventListener('touchmove',onMove,{passive:false});
+    dh.addEventListener('touchend',onUp,{passive:true});
+    dh.addEventListener('mousedown',onDown);
+    dh.addEventListener('mousemove',onMove);
+    dh.addEventListener('mouseup',onUp);
+    try{
+      var saved=JSON.parse(localStorage.getItem('tst_mobile_card_order')||'[]');
+      if(saved.length){
+        var wrap=document.getElementById('page-home');
+        saved.forEach(function(id){
+          var c=document.getElementById(id);
+          if(c) wrap.appendChild(c);
+        });
+      }
+    }catch(e){}
+  })();
+
   // ===== 初始化 =====
   renderTeam();
   loadData();
-  setTimeout(loadVote,2500); // 预加载：等冷启动结束
+  // 预热：页面加载即发一次请求，让 CF Functions 冷启动提前完成
+  fetch(VOTE_API+'/state?topic='+voteTopic+'&dev='+encodeURIComponent(devId())).catch(function(){});
+  setTimeout(loadVote,3000); // 正式预加载：预热后命中已热实例
   if(location.hash==='#vote'){
     tabs.forEach(function(x){x.classList.remove('active');});
     var vt=document.querySelector('.m-tab[data-tab="vote"]');
     vt.classList.add('active');
     document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
     $('#page-vote').classList.add('active');
-    setTimeout(loadVote,2500);
+    setTimeout(loadVote,3000);
   }
 })();
 </script>
