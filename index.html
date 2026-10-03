@@ -6268,6 +6268,7 @@ window.TST_HUNDRED = {
     if(nb){ setTimeout(loadVote,60); }
   });
   if(location.hash==='#vote'){ setTimeout(loadVote,120); }
+  setTimeout(loadVote,600); // 预加载：进入页面即拉取，切到投票页时直接显示
 
   // ===== 管理员：投票管理（反馈站后端校验）=====
   async function voteAdmin(action,payload){
