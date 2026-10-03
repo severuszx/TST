@@ -6225,7 +6225,7 @@ window.TST_HUNDRED = {
         if(d.voted) renderResult(d); else renderForm(d);
         return;
       }catch(e){
-        if(attempt<2){ await new Promise(r=>setTimeout(r,700*(attempt+1))); }
+        if(attempt<2){ await new Promise(r=>setTimeout(r,1600*(attempt+1))); }
         else{ box.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; }
       }
     }
@@ -6280,8 +6280,8 @@ window.TST_HUNDRED = {
     const nb=e.target.closest('[data-nav="vote"]');
     if(nb){ setTimeout(loadVote,60); }
   });
-  if(location.hash==='#vote'){ setTimeout(loadVote,120); }
-  setTimeout(loadVote,600); // 预加载：进入页面即拉取，切到投票页时直接显示
+  if(location.hash==='#vote'){ setTimeout(loadVote,2500); }
+  setTimeout(loadVote,2500); // 预加载：等冷启动结束再拉取，切到投票页时直接显示
 
   // 主题切换
   const tabsBox=document.getElementById('voteTabs');

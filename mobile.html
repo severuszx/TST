@@ -542,7 +542,7 @@ main::-webkit-scrollbar{display:none;}
       })
       .catch(function(){
         attempt++;
-        if(attempt<3){ setTimeout(go,700*attempt); }
+        if(attempt<3){ setTimeout(go,1600*attempt); }
         else{ box.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; }
       });
     }
@@ -709,14 +709,14 @@ main::-webkit-scrollbar{display:none;}
   // ===== 初始化 =====
   renderTeam();
   loadData();
-  loadVote();
+  setTimeout(loadVote,2500); // 预加载：等冷启动结束
   if(location.hash==='#vote'){
     tabs.forEach(function(x){x.classList.remove('active');});
     var vt=document.querySelector('.m-tab[data-tab="vote"]');
     vt.classList.add('active');
     document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
     $('#page-vote').classList.add('active');
-    loadVote();
+    setTimeout(loadVote,2500);
   }
 })();
 </script>
