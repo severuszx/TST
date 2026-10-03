@@ -1386,10 +1386,45 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 .mm-btn:hover{background:rgba(14,116,144,.6);color:#e0f2fe;box-shadow:0 0 20px rgba(56,189,248,.4);}
 @keyframes mmFadeUp{0%{opacity:0;transform:translateY(26px);filter:blur(6px)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
 @keyframes mmZoom{0%{opacity:0;transform:scale(.72);filter:blur(10px)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
+/* ===== 玩家投票 ===== */
+.vote-hint{font-size:13px;color:var(--text-secondary);margin:0 0 16px;}
+.vote-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
+.vote-opt{display:flex;align-items:center;gap:11px;padding:14px 16px;border:1px solid var(--border);border-radius:14px;cursor:pointer;background:var(--card);transition:border-color .2s,background .2s,transform .2s;font-size:14px;}
+.vote-opt:hover{border-color:var(--accent);transform:translateX(3px);}
+.vote-opt input{accent-color:var(--accent);}
+.vote-opt.sel{border-color:var(--accent);background:var(--accent-soft);}
+.vote-result{display:flex;flex-direction:column;gap:14px;}
+.vote-row{font-size:13px;}
+.vote-row-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;color:var(--text);}
+.vote-row-head em{font-style:normal;font-size:11px;color:var(--accent);opacity:.85;}
+.vote-bar{height:12px;border-radius:7px;background:var(--hover);overflow:hidden;}
+.vote-bar i{display:block;height:100%;border-radius:7px;background:linear-gradient(90deg,#38bdf8,#818cf8);width:0;transition:width .9s cubic-bezier(.22,1,.36,1);}
+html[data-theme="glass"] .vote-opt{background:rgba(255,255,255,.6);border-color:rgba(255,255,255,.7);backdrop-filter:saturate(180%);}
+html[data-theme="glass"] .vote-bar{background:rgba(255,255,255,.4);}
+html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#818cf8,#38bdf8);background-size:200% 100%;animation:gbTitleFlow 3s linear infinite;}
+.vote-admin-item{border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;}
+.vote-admin-item h4{margin:0 0 4px;font-size:14px;color:var(--text);}
+.vote-admin-item .vai-meta{font-size:12px;color:var(--text-secondary);margin-bottom:8px;}
+.vote-admin-item .vai-ops{display:flex;gap:8px;flex-wrap:wrap;}
+.vote-admin-item .vai-ops button{padding:5px 12px;border:1px solid var(--border);border-radius:999px;background:var(--card);color:var(--text);font-size:12px;cursor:pointer;}
+.vote-admin-item .vai-ops button:hover{border-color:var(--accent);color:var(--accent);}
 </style>
 <meta name="color-scheme" content="light">
 </head>
 <body>
+<script>
+// 手机/平板自动进入移动端专属 UI（?m=0 可跳过）
+(function(){
+  try{
+    if(/[?&]m=0/.test(location.search)) return;
+    var ua=navigator.userAgent;
+    var isMob=/Android|iPhone|iPad|iPod|Mobile/i.test(ua)||(navigator.maxTouchPoints>1&&window.innerWidth<1024);
+    if(isMob&&location.pathname.indexOf('mobile.html')<0){
+      location.replace('mobile.html'+(location.search||''));
+    }
+  }catch(e){}
+})();
+</script>
 <header class="site-header">
 <div class="container header-inner">
 <div class="logo" id="brandLogo"><img src="logo.jpg" alt="The Slow Tide" class="logo-img"> The Slow Tide</div>
@@ -1398,6 +1433,7 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 <button class="nav-link" data-nav="notice">公告</button>
 <button class="nav-link" data-nav="feed">动态</button>
 <button class="nav-link" data-nav="activity">活动</button>
+<button class="nav-link" data-nav="vote">投票</button>
 <a class="nav-link" href="tool.html">便捷工具</a>
 <button class="nav-link" data-nav="rule">玩家公约</button>
 <div class="nav-more" id="navMore">
@@ -1662,6 +1698,16 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 </div>
 </section>
 
+<!-- 投票 -->
+<section id="vote" class="page">
+<div class="container">
+<div class="section-title">玩家投票</div>
+<div class="card" id="voteCard">
+  <div id="voteBody"><p class="empty-hint">加载中…</p></div>
+</div>
+</div>
+</section>
+
 <!-- 赛事 -->
 <section id="event" class="page">
 <div class="container">
@@ -1798,6 +1844,7 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 <button class="admin-tab" data-tab="replay">赛事管理</button>
 <button class="admin-tab" data-tab="image">图片管理</button>
 <button class="admin-tab" data-tab="server">服务器设置</button>
+<button class="admin-tab" data-tab="vote">投票管理</button>
 </div>
 <div class="admin-pane active" id="paneNotice">
 <div class="card">
@@ -1874,6 +1921,18 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 <div class="hint" style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">关闭后，玩家端状态条将显示"服务器已关闭"并停止运行计时。</div>
 <button class="btn btn-primary" id="serverStatusSaveBtn">保存</button>
 </div>
+</div>
+
+<div class="admin-pane" id="paneVote">
+<div class="card">
+<div class="form-row"><label>投票标题</label><input type="text" id="voteTitle" placeholder="投票问题"></div>
+<div class="form-row"><label>选项（每行一个）</label><textarea id="voteOptions" placeholder="选项一&#10;选项二&#10;选项三" style="min-height:90px;"></textarea></div>
+<div class="form-row"><button class="btn btn-primary" id="voteSaveBtn">保存投票</button>
+<button class="btn" id="voteClearBtn">清空票数</button>
+<button class="btn" id="voteToggleBtn">启/停用</button></div>
+<div class="hint" style="font-size:12px;color:var(--text-secondary);margin-top:6px;">保存会覆盖当前投票的题目与选项（不影响已有票数）；清空票数用于重新计票。修改选项后建议清空旧票。</div>
+</div>
+<div id="voteAdminList" style="margin-top:14px;"></div>
 </div>
 </div>
 </div>
@@ -2605,7 +2664,7 @@ const pages=document.querySelectorAll('.page');
 function switchPage(pid){
   document.body.classList.remove('drag-lock');
   const _nm=document.getElementById('navMore');if(_nm)_nm.classList.remove('open');
-  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
+  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
   document.title=TITLES[pid]||'The Slow Tide 官网';
   pages.forEach(p=>p.classList.remove('active'));
   navBtns.forEach(b=>b.classList.toggle('active',b.dataset.nav===pid));
@@ -6069,6 +6128,208 @@ window.TST_HUNDRED = {
   }
 };
 
+})();
+</script>
+<script>
+// ============================================================
+// 玩家投票（数据在反馈站 D1：一个设备一次，投完可见占比）
+// ============================================================
+(function(){
+  const VOTE_API='https://theslowtidefk.pages.dev/api/vote';
+  const VOTE_TOPIC='default';
+  function devId(){
+    let d=localStorage.getItem('tst_vote_devid');
+    if(!d){ d='dv-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10); localStorage.setItem('tst_vote_devid',d); }
+    return d;
+  }
+  let cur=null;
+  async function loadVote(){
+    const box=document.getElementById('voteBody');
+    if(!box) return;
+    box.innerHTML='<p class="empty-hint">加载中…</p>';
+    try{
+      const res=await fetch(VOTE_API+'/state?topic='+VOTE_TOPIC,{headers:{'X-Device-Id':devId()}});
+      const d=await res.json();
+      if(!d||d.error){ box.innerHTML='<p class="empty-hint">投票暂未开放</p>'; return; }
+      cur=d;
+      if(d.voted) renderResult(d); else renderForm(d);
+    }catch(e){ box.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; }
+  }
+  function renderForm(d){
+    const h=['<h3 style="margin:0 0 6px;color:var(--text);">'+esc(d.title)+'</h3>',
+      '<p class="vote-hint">选择一个选项提交，每台设备限投一次，投完即可查看结果</p>',
+      '<div class="vote-opts" id="voteOpts">'];
+    d.options.forEach(o=>{ h.push('<label class="vote-opt"><input type="radio" name="voteOpt" value="'+o.id+'"><span>'+esc(o.label)+'</span></label>'); });
+    h.push('</div>','<button class="btn btn-primary" id="voteSubmitBtn">提交投票</button>','<div id="voteMsg" style="font-size:13px;margin-top:10px;color:var(--text-secondary);"></div>');
+    box.innerHTML=h.join('');
+    box.querySelectorAll('.vote-opt').forEach(el=>{
+      el.querySelector('input').addEventListener('change',()=>{
+        box.querySelectorAll('.vote-opt').forEach(x=>x.classList.remove('sel'));
+        el.classList.add('sel');
+      });
+    });
+    document.getElementById('voteSubmitBtn').onclick=submitVote;
+  }
+  async function submitVote(){
+    const sel=document.querySelector('input[name="voteOpt"]:checked');
+    const msg=document.getElementById('voteMsg');
+    if(!sel){ msg.textContent='请先选择一个选项'; return; }
+    const btn=document.getElementById('voteSubmitBtn');
+    btn.disabled=true; btn.textContent='提交中…';
+    try{
+      const res=await fetch(VOTE_API+'/submit',{method:'POST',headers:{'Content-Type':'application/json','X-Device-Id':devId()},body:JSON.stringify({topic:VOTE_TOPIC,option:Number(sel.value)})});
+      const d=await res.json();
+      if(d.error==='already_voted'){ msg.textContent='你已投过票'; loadVote(); return; }
+      if(!d.ok){ msg.textContent=d.error||'提交失败'; btn.disabled=false; btn.textContent='提交投票'; return; }
+      cur={voted:true,myOption:d.myOption,title:cur?cur.title:'',voteResult:d};
+      renderResult(cur);
+    }catch(e){ msg.textContent='提交失败，请重试'; btn.disabled=false; btn.textContent='提交投票'; }
+  }
+  function renderResult(d){
+    const vr=d.voteResult||{};
+    const rows=vr.result||[];
+    const h=['<h3 style="margin:0 0 6px;color:var(--text);">'+esc(d.title)+'</h3>',
+      '<p class="vote-hint">已投出 · 共 '+vr.total+' 票</p>','<div class="vote-result">'];
+    rows.forEach((r,i)=>{
+      const mine=(d.myOption===i)?'<em>你的选择</em>':'';
+      h.push('<div class="vote-row"><div class="vote-row-head"><span>'+esc(r.label)+' '+mine+'</span><span>'+r.count+' 票 · '+r.pct+'%</span></div><div class="vote-bar"><i data-w="'+r.pct+'"></i></div></div>');
+    });
+    h.push('</div>');
+    box.innerHTML=h.join('');
+    requestAnimationFrame(()=>{
+      box.querySelectorAll('.vote-bar i').forEach(b=>{ b.style.width=b.getAttribute('data-w')+'%'; });
+    });
+  }
+  // 切换到投票页时加载
+  document.addEventListener('click',function(e){
+    const nb=e.target.closest('[data-nav="vote"]');
+    if(nb){ setTimeout(loadVote,60); }
+  });
+  if(location.hash==='#vote'){ setTimeout(loadVote,120); }
+
+  // ===== 管理员：投票管理（反馈站后端校验）=====
+  async function voteAdmin(action,payload){
+    const res=await fetch(VOTE_API+'/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({p_password:'',p_action:action},payload||{}))});
+    const d=await res.json();
+    return d;
+  }
+  async function promptPwd(){
+    const p=prompt('请输入反馈站管理员口令（用于投票管理操作）');
+    return p||'';
+  }
+  async function refreshVoteAdmin(){
+    const box=document.getElementById('voteAdminList');
+    if(!box) return;
+    const pwd=promptPwd();
+    if(!pwd) return;
+    const d=await voteAdmin('list',{p_password:pwd});
+    if(d==='wrong_password'||(d&&d.error)){ showToast('口令错误或操作失败'); return; }
+    if(!Array.isArray(d)){ showToast('加载失败'); return; }
+    window.__votePwd=pwd;
+    const h=['<div class="card"><div class="form-row"><label>当前投票列表</label></div>'];
+    if(!d.length) h.push('<p class="empty-hint">暂无投票</p>');
+    d.forEach(t=>{
+      h.push('<div class="vote-admin-item"><h4>'+esc(t.title)+'</h4><div class="vai-meta">'+(t.active?'启用中':'已停用')+' · '+t.votes+' 票 · 选项：'+t.options.map(o=>o.label).join(' / ')+'</div><div class="vai-ops">');
+      h.push('<button data-va="load" data-id="'+t.id+'">载入编辑</button>');
+      h.push('<button data-va="toggle" data-id="'+t.id+'">'+(t.active?'停用':'启用')+'</button>');
+      h.push('<button data-va="clear" data-id="'+t.id+'">清空票数</button>');
+      h.push('<button data-va="del" data-id="'+t.id+'">删除</button>');
+      h.push('</div></div>');
+    });
+    h.push('</div>');
+    box.innerHTML=h.join('');
+    box.querySelectorAll('[data-va]').forEach(b=>{
+      b.onclick=async()=>{
+        const id=b.getAttribute('data-id');
+        const act=b.getAttribute('data-va');
+        const pwd=window.__votePwd||'';
+        if(act==='load'){
+          document.getElementById('voteTitle').value=t0(id).title;
+          document.getElementById('voteOptions').value=t0(id).options.map(o=>o.label).join('\n');
+          window.__voteEditId=id;
+          showToast('已载入编辑，可修改后保存');
+          return;
+        }
+        if(act==='toggle'){ await voteAdmin('toggle_active',{p_password:pwd,id:id}); showToast('已切换'); refreshVoteAdmin(); return; }
+        if(act==='clear'){ await voteAdmin('clear_records',{p_password:pwd,id:id}); showToast('已清空票数'); refreshVoteAdmin(); return; }
+        if(act==='del'){ if(!confirm('确认删除该投票及其全部记录？'))return; await voteAdmin('delete_topic',{p_password:pwd,id:id}); showToast('已删除'); refreshVoteAdmin(); }
+      };
+    });
+  }
+  // 缓存题目数据供载入编辑
+  let __voteCache=[];
+  function t0(id){ return __voteCache.find(t=>t.id===id)||{title:'',options:[]}; }
+  // 保存投票
+  document.addEventListener('click',function(e){
+    if(e.target.id==='voteSaveBtn'){
+      (async()=>{
+        const pwd=promptPwd(); if(!pwd)return;
+        const title=document.getElementById('voteTitle').value.trim();
+        const opts=document.getElementById('voteOptions').value.split('\n').map(s=>s.trim()).filter(Boolean).map(label=>({label}));
+        if(!title||!opts.length){ showToast('标题和选项不能为空'); return; }
+        const d=await voteAdmin('save',{p_password:pwd,id:window.__voteEditId||'default',title,options:opts});
+        if(d&&d.ok){ showToast('已保存'); window.__voteEditId=null; } else showToast('保存失败：口令错误？');
+      })();
+    }
+    if(e.target.id==='voteClearBtn'){
+      (async()=>{
+        const pwd=promptPwd(); if(!pwd)return;
+        const d=await voteAdmin('clear_records',{p_password:pwd,id:window.__voteEditId||'default'});
+        if(d&&d.ok) showToast('已清空票数'); else showToast('操作失败');
+      })();
+    }
+    if(e.target.id==='voteToggleBtn'){
+      (async()=>{
+        const pwd=promptPwd(); if(!pwd)return;
+        const d=await voteAdmin('toggle_active',{p_password:pwd,id:window.__voteEditId||'default'});
+        if(d&&d.ok) showToast('已切换启停'); else showToast('操作失败');
+      })();
+    }
+  });
+  // 管理列表加载（进入投票管理 tab 时）
+  document.addEventListener('click',function(e){
+    const tab=e.target.closest('.admin-tab[data-tab="vote"]');
+    if(tab){ setTimeout(async()=>{
+      const pwd=promptPwd(); if(!pwd)return;
+      const d=await voteAdmin('list',{p_password:pwd});
+      if(Array.isArray(d)){ __voteCache=d; window.__votePwd=pwd; renderVoteAdminList(d); }
+      else showToast('口令错误');
+    },60); }
+  });
+  function renderVoteAdminList(d){
+    const box=document.getElementById('voteAdminList');
+    if(!box) return;
+    const h=['<div class="card"><div class="form-row"><label>当前投票列表</label></div>'];
+    if(!d.length) h.push('<p class="empty-hint">暂无投票</p>');
+    d.forEach(t=>{
+      h.push('<div class="vote-admin-item"><h4>'+esc(t.title)+'</h4><div class="vai-meta">'+(t.active?'启用中':'已停用')+' · '+t.votes+' 票 · 选项：'+t.options.map(o=>o.label).join(' / ')+'</div><div class="vai-ops">');
+      h.push('<button data-va="load" data-id="'+t.id+'">载入编辑</button>');
+      h.push('<button data-va="toggle" data-id="'+t.id+'">'+(t.active?'停用':'启用')+'</button>');
+      h.push('<button data-va="clear" data-id="'+t.id+'">清空票数</button>');
+      h.push('<button data-va="del" data-id="'+t.id+'">删除</button>');
+      h.push('</div></div>');
+    });
+    h.push('</div>');
+    box.innerHTML=h.join('');
+    box.querySelectorAll('[data-va]').forEach(b=>{
+      b.onclick=async()=>{
+        const id=b.getAttribute('data-id');
+        const act=b.getAttribute('data-va');
+        const pwd=window.__votePwd||'';
+        if(act==='load'){
+          const t=d.find(x=>x.id===id)||{title:'',options:[]};
+          document.getElementById('voteTitle').value=t.title;
+          document.getElementById('voteOptions').value=(t.options||[]).map(o=>o.label).join('\n');
+          window.__voteEditId=id;
+          showToast('已载入编辑，可修改后保存');
+          return;
+        }
+        if(act==='toggle'){ await voteAdmin('toggle_active',{p_password:pwd,id:id}); showToast('已切换'); refreshVoteAdmin(); return; }
+        if(act==='clear'){ await voteAdmin('clear_records',{p_password:pwd,id:id}); showToast('已清空票数'); refreshVoteAdmin(); return; }
+        if(act==='del'){ if(!confirm('确认删除该投票及其全部记录？'))return; await voteAdmin('delete_topic',{p_password:pwd,id:id}); showToast('已删除'); refreshVoteAdmin(); }
+      };
+    });
+  }
 })();
 </script>
 

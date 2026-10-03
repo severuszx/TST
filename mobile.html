@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>The Slow Tide</title>
+<meta name="theme-color" content="#06121f">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg1:#040d18;--bg2:#0a2236;--bg3:#0d3b52;
+  --card:rgba(255,255,255,.055);--card-brd:rgba(125,211,252,.22);
+  --txt:#e8f4ff;--txt2:#9fc3dd;--accent:#38bdf8;--accent2:#818cf8;
+  --danger:#f87171;--ok:#34d399;
+  --radius:18px;
+  --sat:env(safe-area-inset-top,0);--sab:env(safe-area-inset-bottom,0);
+}
+html,body{height:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;
+  background:linear-gradient(160deg,var(--bg1) 0%,var(--bg2) 55%,var(--bg3) 100%) fixed;
+  color:var(--txt);overflow:hidden;touch-action:manipulation;
+  -webkit-user-select:none;user-select:none;
+}
+/* ===== 潮汐动效背景 ===== */
+#waves{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.5;}
+.light-orb{position:fixed;border-radius:50%;filter:blur(60px);opacity:.28;z-index:0;pointer-events:none;animation:orbDrift 16s ease-in-out infinite;}
+.light-orb.o1{width:340px;height:340px;background:#0ea5e9;top:-80px;right:-60px;}
+.light-orb.o2{width:300px;height:300px;background:#6366f1;bottom:-90px;left:-70px;animation-delay:-8s;}
+@keyframes orbDrift{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-40px,30px) scale(1.12);}}
+/* ===== 顶部 ===== */
+.m-top{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  padding:calc(var(--sat) + 10px) 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(180deg,rgba(4,13,24,.85),transparent);
+}
+.m-logo{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+.m-logo img{width:30px;height:30px;border-radius:9px;object-fit:cover;box-shadow:0 0 16px rgba(56,189,248,.45);}
+.m-logo span{font-size:17px;font-weight:800;letter-spacing:.5px;background:linear-gradient(90deg,#7dd3fc,#a5b4fc);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.m-srv{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt2);background:var(--card);border:1px solid var(--card-brd);border-radius:999px;padding:5px 11px;backdrop-filter:blur(10px);}
+.m-srv .dot{width:7px;height:7px;border-radius:50%;background:var(--txt2);}
+.m-srv.on .dot{background:var(--ok);box-shadow:0 0 8px var(--ok);animation:pulse 2s infinite;}
+.m-srv.off .dot{background:var(--danger);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+/* ===== 主区域 ===== */
+main{
+  position:fixed;top:0;left:0;right:0;bottom:0;z-index:10;
+  padding:calc(var(--sat) + 62px) 14px calc(var(--sab) + 72px);
+  overflow-y:auto;overscroll-behavior:none;
+  scrollbar-width:none;
+}
+main::-webkit-scrollbar{display:none;}
+.page{display:none;animation:fadeUp .35s ease both;}
+.page.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+/* ===== 卡片 ===== */
+.m-card{
+  background:var(--card);border:1px solid var(--card-brd);border-radius:var(--radius);
+  padding:16px;margin-bottom:14px;backdrop-filter:blur(14px);
+  box-shadow:0 8px 30px rgba(2,10,20,.35);
+  position:relative;overflow:hidden;
+}
+.m-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(125,211,252,.5),transparent);
+}
+.m-title{font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.m-title .ico{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:linear-gradient(135deg,rgba(56,189,248,.25),rgba(129,140,248,.25));}
+.m-sub{font-size:12px;color:var(--txt2);margin-bottom:12px;}
+/* ===== 公告轮播 ===== */
+.banner-wrap{position:relative;border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
+.banner-track{display:flex;transition:transform .45s cubic-bezier(.22,1,.36,1);}
+.banner-item{
+  min-width:100%;padding:18px 16px;border-radius:var(--radius);
+  background:linear-gradient(135deg,rgba(14,116,144,.55),rgba(30,64,175,.45));
+  border:1px solid var(--card-brd);position:relative;overflow:hidden;
+}
+.banner-item .b-date{font-size:11px;color:rgba(165,210,235,.85);margin-bottom:6px;}
+.banner-item .b-title{font-size:15px;font-weight:700;margin-bottom:6px;}
+.banner-item .b-content{font-size:12.5px;line-height:1.65;color:rgba(215,235,250,.9);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.banner-dots{display:flex;gap:5px;justify-content:center;padding:9px 0 2px;}
+.banner-dots i{width:6px;height:6px;border-radius:99px;background:rgba(125,211,252,.35);transition:all .3s;}
+.banner-dots i.on{width:16px;background:var(--accent);}
+/* ===== 服务器卡 ===== */
+.srv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.srv-cell{background:rgba(255,255,255,.04);border:1px solid var(--card-brd);border-radius:14px;padding:12px;}
+.srv-cell .k{font-size:11px;color:var(--txt2);margin-bottom:5px;}
+.srv-cell .v{font-size:16px;font-weight:700;}
+.srv-cell .v.ok{color:var(--ok);}
+.srv-cell .v.off{color:var(--danger);}
+/* ===== 快捷入口 ===== */
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.quick{
+  background:var(--card);border:1px solid var(--card-brd);border-radius:16px;
+  padding:14px 8px;text-align:center;cursor:pointer;
+  transition:transform .15s,background .2s;backdrop-filter:blur(10px);
+}
+.quick:active{transform:scale(.94);}
+.quick .qi{font-size:22px;margin-bottom:6px;}
+.quick .qn{font-size:12px;color:var(--txt);}
+.quick .qd{font-size:10px;color:var(--txt2);margin-top:2px;}
+/* ===== 投票 ===== */
+.vote-hint{font-size:12px;color:var(--txt2);margin:0 0 14px;}
+.vote-opts{display:flex;flex-direction:column;gap:9px;margin-bottom:16px;}
+.vote-opt{
+  display:flex;align-items:center;gap:10px;padding:13px 14px;
+  background:rgba(255,255,255,.045);border:1px solid var(--card-brd);border-radius:14px;
+  font-size:14px;cursor:pointer;transition:border-color .2s,background .2s;
+}
+.vote-opt.sel{border-color:var(--accent);background:rgba(56,189,248,.12);}
+.vote-opt .vc{width:18px;height:18px;border-radius:50%;border:2px solid rgba(125,211,252,.5);display:flex;align-items:center;justify-content:center;flex:none;}
+.vote-opt.sel .vc{border-color:var(--accent);}
+.vote-opt.sel .vc::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--accent);}
+.vote-result{display:flex;flex-direction:column;gap:13px;}
+.vote-row .head{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;color:var(--txt);}
+.vote-row .head em{font-style:normal;font-size:10.5px;color:var(--accent);}
+.vote-bar{height:11px;border-radius:7px;background:rgba(255,255,255,.08);overflow:hidden;}
+.vote-bar i{display:block;height:100%;width:0;border-radius:7px;background:linear-gradient(90deg,#38bdf8,#818cf8);transition:width .8s cubic-bezier(.22,1,.36,1);}
+/* ===== 按钮 ===== */
+.btn{
+  display:block;width:100%;padding:13px;border:none;border-radius:14px;
+  font-size:15px;font-weight:700;cursor:pointer;text-align:center;
+  background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;
+  box-shadow:0 6px 22px rgba(14,165,233,.35);transition:transform .15s,opacity .2s;
+}
+.btn:active{transform:scale(.97);}
+.btn:disabled{opacity:.5;}
+.btn.ghost{background:rgba(255,255,255,.07);color:var(--txt);box-shadow:none;border:1px solid var(--card-brd);}
+/* ===== 更多列表 ===== */
+.mlist{display:flex;flex-direction:column;gap:10px;}
+.mitem{
+  display:flex;align-items:center;gap:12px;padding:14px;
+  background:var(--card);border:1px solid var(--card-brd);border-radius:16px;
+  cursor:pointer;transition:transform .15s;
+}
+.mitem:active{transform:scale(.97);}
+.mitem .mi{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(129,140,248,.22));}
+.mitem .mt{flex:1;}
+.mitem .mt b{display:block;font-size:14px;font-weight:600;}
+.mitem .mt span{display:block;font-size:11px;color:var(--txt2);margin-top:2px;}
+.mitem .ar{color:rgba(125,211,252,.5);font-size:15px;}
+/* ===== 团队折叠 ===== */
+.team-box{display:none;flex-direction:column;gap:9px;margin-top:12px;}
+.team-box.open{display:flex;}
+.tmember{display:flex;align-items:center;gap:10px;padding:9px 10px;background:rgba(255,255,255,.04);border:1px solid var(--card-brd);border-radius:12px;}
+.tmember img{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(125,211,252,.4);}
+.tmember .tt b{display:block;font-size:13px;font-weight:600;}
+.tmember .tt span{display:block;font-size:10.5px;color:var(--txt2);}
+/* ===== 页脚 ===== */
+.foot{margin-top:18px;padding:14px 0 8px;text-align:center;font-size:11px;color:rgba(159,195,221,.6);}
+.foot a{color:rgba(125,211,252,.8);text-decoration:none;}
+/* ===== 底部导航 ===== */
+.m-tabbar{
+  position:fixed;left:12px;right:12px;bottom:calc(var(--sab) + 10px);z-index:60;
+  display:flex;background:rgba(8,25,42,.85);border:1px solid var(--card-brd);border-radius:22px;
+  backdrop-filter:blur(20px);box-shadow:0 10px 34px rgba(2,10,20,.5);padding:6px;
+}
+.m-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 6px;
+  border:none;background:transparent;color:var(--txt2);font-size:10px;cursor:pointer;
+  border-radius:16px;transition:all .2s;position:relative;
+}
+.m-tab .ti{font-size:19px;line-height:1;transition:transform .2s;}
+.m-tab.active{color:var(--accent);background:rgba(56,189,248,.1);}
+.m-tab.active .ti{transform:translateY(-1px) scale(1.12);}
+.m-tab.active::after{content:'';position:absolute;top:2px;width:16px;height:3px;border-radius:99px;background:var(--accent);}
+/* ===== 弹窗 ===== */
+.mask{position:fixed;inset:0;background:rgba(2,8,16,.6);z-index:80;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);}
+.mask.open{display:flex;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.dialog{width:100%;max-width:340px;background:linear-gradient(160deg,#0b2236,#0e3a52);border:1px solid var(--card-brd);border-radius:22px;padding:22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5);animation:popIn .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{opacity:0;transform:scale(.8) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.dialog h3{font-size:17px;margin-bottom:8px;}
+.dialog p{font-size:13px;color:var(--txt2);line-height:1.7;margin-bottom:16px;}
+.dialog .btn{margin-top:4px;}
+.dialog .btn + .btn{margin-top:8px;}
+.empty-hint{font-size:13px;color:var(--txt2);text-align:center;padding:26px 0;}
+.toast{
+  position:fixed;left:50%;bottom:calc(var(--sab) + 96px);transform:translateX(-50%);
+  background:rgba(8,25,42,.92);border:1px solid var(--card-brd);color:var(--txt);
+  font-size:13px;padding:10px 18px;border-radius:999px;z-index:99;
+  opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;max-width:82vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+</style>
+</head>
+<body>
+<div class="light-orb o1"></div>
+<div class="light-orb o2"></div>
+<canvas id="waves"></canvas>
+
+<header class="m-top">
+  <div class="m-logo" id="mLogo"><img src="logo.jpg" alt="The Slow Tide" onerror="this.style.display='none'"><span>The Slow Tide</span></div>
+  <div class="m-srv" id="mSrv"><span class="dot"></span><span id="mSrvTxt">连接中…</span></div>
+</header>
+
+<main id="main">
+  <!-- 首页 -->
+  <section class="page active" id="page-home">
+    <div class="banner-wrap">
+      <div class="banner-track" id="bannerTrack"></div>
+      <div class="banner-dots" id="bannerDots"></div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title"><span class="ico">◈</span>服务器状态</div>
+      <div class="srv-grid">
+        <div class="srv-cell"><div class="k">运行状态</div><div class="v" id="srvState">检测中</div></div>
+        <div class="srv-cell"><div class="k">在线时间</div><div class="v" id="srvUp">--:--:--</div></div>
+        <div class="srv-cell"><div class="k">北京时间</div><div class="v" id="bjTime">--:--:--</div></div>
+        <div class="srv-cell"><div class="k">服务器版本</div><div class="v" id="srvVer">--</div></div>
+      </div>
+    </div>
+
+    <div class="m-title" style="padding:2px 4px 10px;"><span class="ico">⚡</span>快捷入口</div>
+    <div class="grid3">
+      <div class="quick" data-go="activity"><div class="qi">🎁</div><div class="qn">活动抽奖</div><div class="qd">双庆狂欢</div></div>
+      <div class="quick" data-go="tool"><div class="qi">🧰</div><div class="qn">便捷工具</div><div class="qd">工具库</div></div>
+      <div class="quick" data-go="notice"><div class="qi">📢</div><div class="qn">全部公告</div><div class="qd">历史公告</div></div>
+      <div class="quick" data-go="rule"><div class="qi">📜</div><div class="qn">玩家公约</div><div class="qd">守则</div></div>
+      <div class="quick" data-go="sponsor"><div class="qi">💳</div><div class="qn">赞助支持</div><div class="qd">支持我们</div></div>
+      <div class="quick" data-go="team"><div class="qi">👥</div><div class="qn">管理团队</div><div class="qd">运营组</div></div>
+    </div>
+  </section>
+
+  <!-- 投票 -->
+  <section class="page" id="page-vote">
+    <div class="m-card">
+      <div class="m-title"><span class="ico">📊</span>玩家投票</div>
+      <div id="voteBody"><p class="empty-hint">加载中…</p></div>
+    </div>
+  </section>
+
+  <!-- 反馈 -->
+  <section class="page" id="page-fb">
+    <div class="m-card">
+      <div class="m-title"><span class="ico">📮</span>意见反馈</div>
+      <p class="m-sub">遇到 Bug 或有建议？前往反馈站提交，我们会认真查看每一条。</p>
+      <button class="btn" id="fbGo">打开反馈站</button>
+    </div>
+    <div class="m-card">
+      <div class="m-title"><span class="ico">📋</span>反馈说明</div>
+      <p class="m-sub" style="line-height:1.8;">反馈提交后可在反馈站「我的」中查看处理状态。<br>反馈编号格式：TST-XXXXXX。</p>
+    </div>
+  </section>
+
+  <!-- 更多 -->
+  <section class="page" id="page-more">
+    <div class="mlist">
+      <div class="mitem" data-go="notice"><div class="mi">📢</div><div class="mt"><b>服务器公告</b><span>官方动态与重要通知</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="feed"><div class="mi">🌊</div><div class="mt"><b>社区动态</b><span>玩家与服务器日常</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="event"><div class="mi">🏁</div><div class="mt"><b>赛事活动</b><span>官方赛事与回放</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="activity"><div class="mi">🎁</div><div class="mt"><b>活动抽奖</b><span>国庆 × 开服100天双庆</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="rule"><div class="mi">📜</div><div class="mt"><b>玩家公约</b><span>服务器守则</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="sponsor"><div class="mi">💳</div><div class="mt"><b>服务器赞助</b><span>支持我们走得更远</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="team"><div class="mi">👥</div><div class="mt"><b>管理团队</b><span>运营组与荣誉成员</span></div><span class="ar">›</span></div>
+    </div>
+
+    <div class="m-card" style="margin-top:14px;">
+      <div class="m-title" style="cursor:pointer;" id="teamHead"><span class="ico">👥</span>管理团队<span style="margin-left:auto;font-size:12px;color:var(--txt2);" id="teamArrow">展开 ▾</span></div>
+      <div class="team-box" id="teamBox"></div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title"><span class="ico">🔒</span>管理员</div>
+      <p class="m-sub">官网数据管理入口</p>
+      <button class="btn ghost" id="adminGo">进入管理员登录</button>
+    </div>
+
+    <div class="foot">
+      <p>The Slow Tide · 潮汐之上，皆是归途</p>
+      <p style="margin-top:5px;">网站源码已开源 · <a href="https://github.com/severuszx/TST" target="_blank" rel="noopener">GitHub</a></p>
+    </div>
+  </section>
+</main>
+
+<nav class="m-tabbar">
+  <button class="m-tab active" data-tab="home"><span class="ti">🌊</span>首页</button>
+  <button class="m-tab" data-tab="vote"><span class="ti">📊</span>投票</button>
+  <button class="m-tab" data-tab="fb"><span class="ti">📮</span>反馈</button>
+  <button class="m-tab" data-tab="more"><span class="ti">☰</span>更多</button>
+</nav>
+
+<div class="mask" id="mask">
+  <div class="dialog" id="dialogBox"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s);};
+  var VOTE_API='https://theslowtidefk.pages.dev/api/vote';
+  var DATA_API='https://tst-server-site.pages.dev/api/data';
+
+  // ===== Toast =====
+  var toastTimer=null;
+  function toast(msg){
+    var t=$('#toast');t.textContent=msg;t.classList.add('show');
+    clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show');},2000);
+  }
+  // ===== Dialog =====
+  function dialog(html){
+    $('#dialogBox').innerHTML=html;$('#mask').classList.add('open');
+  }
+  function closeDialog(){$('#mask').classList.remove('open');}
+  $('#mask').addEventListener('click',function(e){if(e.target===this)closeDialog();});
+
+  // ===== Tab 切换 =====
+  var tabs=document.querySelectorAll('.m-tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      var id='page-'+t.getAttribute('data-tab');
+      document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+      $('#'+id).classList.add('active');
+      $('#main').scrollTop=0;
+      if(id==='page-vote')loadVote();
+      if(id==='page-home')loadData();
+    });
+  });
+
+  // ===== Logo 连点 5 次 → 隐藏页 =====
+  var logoClicks=0,logoTimer=null;
+  $('#mLogo').addEventListener('click',function(){
+    logoClicks++;
+    clearTimeout(logoTimer);
+    logoTimer=setTimeout(function(){logoClicks=0;},800);
+    if(logoClicks>=5){
+      logoClicks=0;
+      location.href='index.html?m=0#knock';
+    }
+  });
+
+  // ===== 快捷入口 =====
+  function goDesktop(hash){
+    location.href='index.html?m=0#'+hash;
+  }
+  document.querySelectorAll('[data-go]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var g=el.getAttribute('data-go');
+      if(g==='tool'){ location.href='index.html?m=0'; setTimeout(function(){location.href='tool.html';},60); return; }
+      if(g==='team'){ document.getElementById('page-more').scrollIntoView({behavior:'smooth'}); document.getElementById('teamHead').click(); return; }
+      goDesktop(g);
+    });
+  });
+  $('#fbGo').addEventListener('click',function(){ location.href='https://theslowtidefk.pages.dev/'; });
+  $('#adminGo').addEventListener('click',function(){ location.href='index.html?m=0#admin'; });
+
+  // ===== 北京时间 =====
+  setInterval(function(){
+    var d=new Date();
+    var p=function(n){return (n<10?'0':'')+n;};
+    var s=p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+    var el=$('#bjTime'); if(el)el.textContent=s;
+  },1000);
+
+  // ===== 数据加载（公告轮播 + 服务器状态）=====
+  var dataCache=null,bannerIdx=0,bannerTimer=null;
+  function loadData(){
+    fetch(DATA_API,{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      dataCache=d;
+      renderBanners(d.announcements||[]);
+      renderServer(d);
+    }).catch(function(){ toast('数据加载失败，请检查网络'); });
+  }
+  function renderBanners(list){
+    var track=$('#bannerTrack'),dots=$('#bannerDots');
+    if(!list.length){ track.innerHTML='<div class="banner-item"><div class="b-title">欢迎来到 The Slow Tide</div><div class="b-content">潮汐之上，皆是归途。</div></div>'; return; }
+    var h='';
+    list.slice(0,6).forEach(function(a){
+      h+='<div class="banner-item"><div class="b-date">'+a.date+'</div><div class="b-title">'+esc(a.title)+'</div><div class="b-content">'+esc((a.content||'').slice(0,120))+'</div></div>';
+    });
+    track.innerHTML=h;
+    var dh='';
+    list.slice(0,6).forEach(function(_,i){ dh+='<i class="'+(i===0?'on':'')+'"></i>'; });
+    dots.innerHTML=dh;
+    var n=list.slice(0,6).length;
+    clearInterval(bannerTimer);
+    bannerTimer=setInterval(function(){
+      bannerIdx=(bannerIdx+1)%n;
+      track.style.transform='translateX(-'+(bannerIdx*100)+'%)';
+      dots.querySelectorAll('i').forEach(function(x,i){x.classList.toggle('on',i===bannerIdx);});
+    },5000);
+  }
+  function renderServer(d){
+    var sv=d.server||{};
+    var st=sv.status||'online';
+    var srv=$('#mSrv'),txt=$('#mSrvTxt'),stEl=$('#srvState'),upEl=$('#srvUp'),verEl=$('#srvVer');
+    srv.className='m-srv'+(st==='online'?' on':' off');
+    txt.textContent=st==='online'?'服务器在线':'服务器已关闭';
+    stEl.textContent=st==='online'?'在线':'已关闭';
+    stEl.className='v'+(st==='online'?' ok':' off');
+    var up=sv.uptime;
+    if(up!==undefined&&up!==null){ upEl.textContent=fmtUp(up); }
+    else { upEl.textContent='--:--:--'; }
+    var ver=sv.version;
+    if(ver){ verEl.textContent=ver; }
+  }
+  function fmtUp(sec){
+    sec=Math.max(0,Math.floor(Number(sec)||0));
+    var d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60),s=sec%60;
+    var p=function(n){return (n<10?'0':'')+n;};
+    return d>0?d+'天 '+p(h)+':'+p(m)+':'+p(s):p(h)+':'+p(m)+':'+p(s);
+  }
+  function esc(s){
+    return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ===== 投票 =====
+  var voteTopic='default',voteDevId=null;
+  function devId(){
+    if(voteDevId)return voteDevId;
+    var d=localStorage.getItem('tst_vote_devid');
+    if(!d){ d='dv-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10); localStorage.setItem('tst_vote_devid',d); }
+    voteDevId=d;return d;
+  }
+  function loadVote(){
+    var box=$('#voteBody');
+    box.innerHTML='<p class="empty-hint">加载中…</p>';
+    fetch(VOTE_API+'/state?topic='+voteTopic,{headers:{'X-Device-Id':devId()}})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||d.error){ box.innerHTML='<p class="empty-hint">投票暂未开放</p>'; return; }
+        if(d.voted)renderVoteResult(d);else renderVoteForm(d);
+      })
+      .catch(function(){ box.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; });
+  }
+  function renderVoteForm(d){
+    var box=$('#voteBody');
+    var h='<p class="vote-hint">'+esc(d.title)+'</p><div class="vote-opts">';
+    d.options.forEach(function(o){
+      h+='<div class="vote-opt" data-id="'+o.id+'"><span class="vc"></span><span>'+esc(o.label)+'</span></div>';
+    });
+    h+='</div><button class="btn" id="voteSubmit">提交投票</button><p class="vote-hint" style="margin-top:10px;text-align:center;">每台设备限投一次 · 投完即可查看结果</p>';
+    box.innerHTML=h;
+    box.querySelectorAll('.vote-opt').forEach(function(el){
+      el.addEventListener('click',function(){
+        box.querySelectorAll('.vote-opt').forEach(function(x){x.classList.remove('sel');});
+        el.classList.add('sel');
+      });
+    });
+    $('#voteSubmit').addEventListener('click',function(){
+      var sel=box.querySelector('.vote-opt.sel');
+      if(!sel){ toast('请先选择一个选项'); return; }
+      var btn=this;btn.disabled=true;btn.textContent='提交中…';
+      fetch(VOTE_API+'/submit',{method:'POST',headers:{'Content-Type':'application/json','X-Device-Id':devId()},body:JSON.stringify({topic:voteTopic,option:Number(sel.getAttribute('data-id'))})})
+        .then(function(r){return r.json();})
+        .then(function(res){
+          if(res.error==='already_voted'){ toast('你已投过票'); loadVote(); return; }
+          if(!res.ok){ toast(res.error||'提交失败'); btn.disabled=false;btn.textContent='提交投票'; return; }
+          renderVoteResult({voted:true,myOption:res.myOption,title:d.title,voteResult:res});
+        })
+        .catch(function(){ toast('提交失败，请重试'); btn.disabled=false;btn.textContent='提交投票'; });
+    });
+  }
+  function renderVoteResult(d){
+    var box=$('#voteBody');
+    var vr=d.voteResult||{};
+    var h='<p class="vote-hint">'+esc(d.title)+'</p><p class="vote-hint">已投出 · 共 '+vr.total+' 票</p><div class="vote-result">';
+    (vr.result||[]).forEach(function(r,i){
+      var mine=(d.myOption===i)?'<em> · 你的选择</em>':'';
+      h+='<div class="vote-row"><div class="head"><span>'+esc(r.label)+mine+'</span><span>'+r.count+' 票 · '+r.pct+'%</span></div><div class="vote-bar"><i data-w="'+r.pct+'"></i></div></div>';
+    });
+    h+='</div>';
+    box.innerHTML=h;
+    setTimeout(function(){
+      box.querySelectorAll('.vote-bar i').forEach(function(b){ b.style.width=b.getAttribute('data-w')+'%'; });
+    },80);
+  }
+
+  // ===== 管理团队 =====
+  var team=[
+    {n:'执又之贤',r:'服主',i:'https://aka.doubaocdn.com/s/UABlJYXIsk'},
+    {n:'轩哥',r:'管理',i:'https://aka.doubaocdn.com/s/1ylJ7wV4P4'},
+    {n:'奇迹与你',r:'管理',i:'https://aka.doubaocdn.com/s/VYzjV9saFb'},
+    {n:'子博',r:'管理',i:'https://aka.doubaocdn.com/s/hmznziWG1y'},
+    {n:'董伟晨晨',r:'管理',i:'https://aka.doubaocdn.com/s/fIM7hynJsS'},
+    {n:'牢大',r:'管理',i:'https://aka.doubaocdn.com/s/6tnUhV5bJF'},
+    {n:'周封国',r:'管理',i:'https://aka.doubaocdn.com/s/wcDniRNl6C'},
+    {n:'心就像你一样温柔',r:'管理',i:'https://aka.doubaocdn.com/s/fzoajsKe5q'},
+    {n:'是星哦',r:'管理',i:''},
+    {n:'Z次了',r:'荣誉成员 · 已退管理',i:''}
+  ];
+  function renderTeam(){
+    var box=$('#teamBox');
+    var h='';
+    team.forEach(function(m){
+      h+='<div class="tmember"><img src="'+(m.i||'')+'" alt="" onerror="this.style.opacity=0"><div class="tt"><b>'+m.n+'</b><span>'+m.r+'</span></div></div>';
+    });
+    box.innerHTML=h;
+  }
+  var teamOpen=false;
+  $('#teamHead').addEventListener('click',function(){
+    teamOpen=!teamOpen;
+    $('#teamBox').classList.toggle('open',teamOpen);
+    $('#teamArrow').textContent=teamOpen?'收起 ▴':'展开 ▾';
+  });
+
+  // ===== 背景波浪 Canvas =====
+  var cv=$('#waves'),ctx=cv.getContext('2d');
+  function size(){cv.width=innerWidth;cv.height=innerHeight;}
+  size();addEventListener('resize',size);
+  var t=0;
+  (function draw(){
+    t+=0.008;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    for(var L=0;L<3;L++){
+      ctx.beginPath();
+      var baseY=cv.height*(0.28+L*0.22),amp=14+L*8,baseA=0.45-L*0.1;
+      ctx.moveTo(0,cv.height);
+      for(var x=0;x<=cv.width;x+=4){
+        var y=baseY+Math.sin(x*0.012+(t*(0.8+L*0.25))+L*2)*amp+Math.sin(x*0.005-t*0.4+L)*amp*0.5;
+        ctx.lineTo(x,y);
+      }
+      ctx.lineTo(cv.width,cv.height);ctx.closePath();
+      var g=ctx.createLinearGradient(0,baseY-amp,0,cv.height);
+      g.addColorStop(0,'rgba(14,116,144,'+baseA+')');
+      g.addColorStop(1,'rgba(6,30,52,'+(baseA*0.6)+')');
+      ctx.fillStyle=g;ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  })();
+
+  // ===== 初始化 =====
+  renderTeam();
+  loadData();
+  loadVote();
+  if(location.hash==='#vote'){
+    tabs.forEach(function(x){x.classList.remove('active');});
+    var vt=document.querySelector('.m-tab[data-tab="vote"]');
+    vt.classList.add('active');
+    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+    $('#page-vote').classList.add('active');
+    loadVote();
+  }
+})();
+</script>
+</body>
+</html>
