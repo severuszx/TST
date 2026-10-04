@@ -940,6 +940,43 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <h3>T显编译器</h3>
 <p>生成 Minecraft JSON 文本，支持文本 / 选择器 / 记分板 / 翻译键元素。</p>
 </div>
+<div class="tool-card" onclick="openJson()">
+<h3>JSON 工具</h3>
+<p>格式化 · 压缩 · 转义 · 反转义，快速处理 JSON 文本。</p>
+</div>
+</div>
+</div>
+
+<!-- JSON 工具 -->
+<div id="jsonPage" class="compiler-wrap">
+<button class="btn back-btn" onclick="backToList()">← 返回工具列表</button>
+<div class="section-title">JSON 工具</div>
+<div class="compiler-grid">
+<div class="card">
+<h3>输入</h3>
+<div class="form-row">
+<label>JSON 文本</label>
+<textarea id="jsonIn" style="min-height:180px;" placeholder="粘贴 JSON 文本"></textarea>
+</div>
+<div class="btn-row">
+<button class="btn btn-primary" onclick="jTool(1)">格式化</button>
+<button class="btn" onclick="jTool(2)">压缩</button>
+<button class="btn" onclick="jTool(3)">转义</button>
+<button class="btn" onclick="jTool(4)">反转义</button>
+</div>
+</div>
+<div class="card">
+<h3>输出</h3>
+<div class="form-row">
+<label>结果</label>
+<textarea id="jsonOut" style="min-height:180px;" placeholder="结果将显示在这里"></textarea>
+</div>
+<div class="btn-row">
+<button class="btn btn-primary" onclick="copyJson()">复制结果</button>
+<button class="btn" onclick="document.getElementById('jsonIn').value='';document.getElementById('jsonOut').value='';">清空</button>
+</div>
+<div class="hint" id="jsonHint">格式化：美化排版；压缩：去除空白；转义/反转义：处理引号与换行。</div>
+</div>
 </div>
 </div>
 
@@ -1040,7 +1077,37 @@ $('#compilerPage').classList.add('show');
 }
 function backToList(){
 $('#compilerPage').classList.remove('show');
+$('#jsonPage').classList.remove('show');
 $('#toolList').style.display='block';
+}
+
+function openJson(){
+$('#toolList').style.display='none';
+$('#jsonPage').classList.add('show');
+}
+function jTool(mode){
+const txt=$('#jsonIn').value;
+const out=$('#jsonOut');
+try{
+  if(mode===1)out.value=JSON.stringify(JSON.parse(txt),null,2);
+  else if(mode===2)out.value=JSON.stringify(JSON.parse(txt));
+  else if(mode===3)out.value=txt.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n');
+  else out.value=txt.replace(/\\\\/g,'\\').replace(/\\"/g,'"').replace(/\\n/g,'\n');
+  $('#jsonHint').textContent='处理成功';
+}catch(e){
+  out.value='';
+  $('#jsonHint').textContent='无效 JSON：'+e.message;
+}
+}
+function copyJson(){
+const o=$('#jsonOut');
+if(o&&o.value){copyText(o.value);showToast('已复制');}
+}
+function copyText(t){
+const ta=document.createElement('textarea');
+ta.value=t;document.body.appendChild(ta);ta.select();
+try{document.execCommand('copy');}catch(e){}
+document.body.removeChild(ta);
 }
 
 function setVersion(btn){

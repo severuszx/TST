@@ -15,7 +15,7 @@
   --txt:#1f2937;--txt2:#5b6675;--accent:#52525b;--accent2:#6b7280;
   --cell:rgba(15,23,42,.035);--accent-soft:rgba(82,82,91,.1);
   --danger:#dc2626;--ok:#059669;
-  --radius:14px;
+  --radius:10px;
   --sat:env(safe-area-inset-top,0);--sab:env(safe-area-inset-bottom,0);
 }
 html[data-theme="dark"]{
@@ -47,8 +47,6 @@ html[data-theme="glass"] body{
 @keyframes gbFlow{0%{background-position:0% 0%;}50%{background-position:100% 100%;}100%{background-position:0% 0%;}}
 html[data-theme="glass"] .m-card{
   background:var(--card);
-  backdrop-filter:blur(24px) saturate(1.5);
-  -webkit-backdrop-filter:blur(24px) saturate(1.5);
   border:1px solid var(--card-brd);
   box-shadow:var(--shadow);
 }
@@ -80,7 +78,7 @@ html[data-theme="glass"] .m-top{background:rgba(255,255,255,.3);border-bottom:1p
 .m-logo{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
 .m-logo img{width:30px;height:30px;border-radius:9px;object-fit:cover;box-shadow:0 1px 4px rgba(15,23,42,.15);}
 .m-logo span{font-size:17px;font-weight:800;letter-spacing:.5px;color:var(--txt);}
-.m-srv{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt2);background:var(--card);border:1px solid var(--card-brd);border-radius:999px;padding:5px 11px;backdrop-filter:blur(10px);}
+.m-srv{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt2);background:var(--card);border:1px solid var(--card-brd);border-radius:999px;padding:5px 11px;}
 .m-srv .dot{width:7px;height:7px;border-radius:50%;background:var(--txt2);}
 .m-srv.on .dot{background:var(--ok);box-shadow:0 0 8px var(--ok);animation:pulse 2s infinite;}
 .m-srv.off .dot{background:var(--danger);}
@@ -174,10 +172,9 @@ main::-webkit-scrollbar{display:none;}
 .vote-bar i{display:block;height:100%;width:0;border-radius:7px;background:linear-gradient(90deg,#38bdf8,#818cf8);transition:width .8s cubic-bezier(.22,1,.36,1);}
 /* ===== 按钮 ===== */
 .btn{
-  display:block;width:100%;padding:13px;border:none;border-radius:14px;
-  font-size:15px;font-weight:700;cursor:pointer;text-align:center;
-  background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;
-  box-shadow:0 6px 22px rgba(14,165,233,.35);transition:transform .15s,opacity .2s;
+  display:block;width:100%;padding:13px;border:none;border-radius:8px;
+  font-size:15px;font-weight:600;cursor:pointer;text-align:center;
+  background:var(--accent);color:#fff;
 }
 .btn:active{transform:scale(.97);}
 .btn:disabled{opacity:.5;}
@@ -186,8 +183,8 @@ main::-webkit-scrollbar{display:none;}
 .mlist{display:flex;flex-direction:column;gap:10px;}
 .mitem{
   display:flex;align-items:center;gap:12px;padding:14px;
-  background:var(--card);border:1px solid var(--card-brd);border-radius:16px;
-  cursor:pointer;transition:transform .15s;
+  background:var(--card);border:1px solid var(--card-brd);border-radius:10px;
+  cursor:pointer;
 }
 .mitem:active{transform:scale(.97);}
 .mitem .mi{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--accent-soft);}
@@ -208,13 +205,13 @@ main::-webkit-scrollbar{display:none;}
 /* ===== 底部导航 ===== */
 .m-tabbar{
   position:fixed;left:12px;right:12px;bottom:calc(var(--sab) + 10px);z-index:60;
-  display:flex;background:rgba(8,25,42,.85);border:1px solid var(--card-brd);border-radius:22px;
-  backdrop-filter:blur(20px);box-shadow:0 10px 34px rgba(2,10,20,.5);padding:6px;
+  display:flex;background:var(--card);border:1px solid var(--card-brd);border-radius:12px;
+  box-shadow:var(--shadow);padding:6px;
 }
 .m-tab{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 6px;
   border:none;background:transparent;color:var(--txt2);font-size:10px;cursor:pointer;
-  border-radius:16px;transition:all .2s;position:relative;
+  border-radius:8px;position:relative;
 }
 .m-tab .ti{font-size:19px;line-height:1;transition:transform .2s;}
 .m-tab.active{color:var(--accent);background:var(--accent-soft);}
@@ -222,7 +219,7 @@ main::-webkit-scrollbar{display:none;}
 .m-tab.active::after{content:'';position:absolute;top:2px;width:16px;height:3px;border-radius:99px;background:var(--accent);}
 /* ===== 移动版工具 ===== */
 .tool-grid-m{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.tool-card-m{background:var(--cell);border:1px solid var(--card-brd);border-radius:16px;padding:16px 12px;text-align:center;cursor:pointer;transition:transform .15s;}
+.tool-card-m{background:var(--cell);border:1px solid var(--card-brd);border-radius:10px;padding:16px 12px;text-align:center;cursor:pointer;}
 .tool-card-m:active{transform:scale(.94);}
 .tool-card-m .tc-i{font-size:24px;margin-bottom:8px;}
 .tool-card-m .tc-n{font-size:14px;font-weight:700;}
@@ -441,6 +438,20 @@ main::-webkit-scrollbar{display:none;}
   </section>
 
   <!-- 更多 -->
+  <section class="page" id="page-knock">
+    <div class="m-card" style="margin-top:6px;">
+      <div class="m-title"><span class="ico">≋</span>潮汐沉寂，叩门以待</div>
+      <p class="m-sub">输入密钥，验证你与潮渊的约定。</p>
+      <div class="form-row" style="margin-bottom:12px;">
+        <input type="password" id="mK9" placeholder="输入密钥" style="width:100%;padding:10px 12px;border:1px solid var(--card-brd);border-radius:8px;background:var(--bg3);color:var(--txt);font-size:15px;outline:none;">
+      </div>
+      <button class="btn" id="mQ3" style="width:100%;padding:12px;border-radius:8px;background:var(--accent);color:#fff;border:none;font-size:15px;cursor:pointer;">叩门</button>
+      <div id="mM9" style="margin-top:12px;font-size:13px;color:var(--txt2);min-height:18px;"></div>
+      <div id="mG9" style="margin-top:12px;font-size:15px;color:var(--ok);font-weight:600;display:none;"></div>
+      <p class="m-sub" style="margin-top:12px;font-size:12px;">每台设备每天可尝试 3 次密钥。</p>
+    </div>
+  </section>
+
   <section class="page" id="page-more">
     <div class="mlist">
       <div class="mitem" data-go="notice"><div class="mi">▤</div><div class="mt"><b>服务器公告</b><span>官方动态与重要通知</span></div><span class="ar">›</span></div>
@@ -576,7 +587,7 @@ main::-webkit-scrollbar{display:none;}
     logoTimer=setTimeout(function(){logoClicks=0;},800);
     if(logoClicks>=5){
       logoClicks=0;
-      location.href='index.html?m=0#knock';
+      showTab('knock');
     }
   });
 
@@ -1158,6 +1169,43 @@ main::-webkit-scrollbar{display:none;}
     var adm=$q('#mpAdminBtn');
     if(adm)adm.onclick=function(){location.href='index.html?m=0#admin';};
   };
+})();
+</script>
+<script>
+// ===== 手机版叩门（隐藏页彩蛋，连点 logo 5 次进入） =====
+(function(){
+  function $q(s){return document.querySelector(s);}
+  function mDevId(){
+    var d=null;try{d=localStorage.getItem('tst_dev_id');}catch(e){}
+    if(!d){d='DEV-'+Math.random().toString(36).slice(2,8).toUpperCase();try{localStorage.setItem('tst_dev_id',d);}catch(e){}}
+    return d;
+  }
+  function mKnock(){
+    var inp=$q('#mK9'),msg=$q('#mM9'),gift=$q('#mG9');
+    var key=(inp?inp.value:'').trim();
+    if(!key){ if(msg){msg.textContent='请输入密钥';msg.style.color='var(--danger)';} return; }
+    if(msg){ msg.textContent='潮汐正在翻涌...'; msg.style.color='var(--txt2)'; }
+    fetch('/api/secret',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key,device:mDevId()})})
+      .then(function(r){return r.json();})
+      .then(function(res){
+        if(!msg)return;
+        if(res&&res.ok){
+          msg.textContent='';
+          if(gift){ gift.style.display='block'; gift.textContent='潮渊已开。你的兑换码：'+res.code; }
+        } else if(res&&res.error==='no_chances'){
+          msg.textContent='今日叩门次数已尽，潮汐之门暂时关闭，明日再来。'; msg.style.color='var(--danger)';
+        } else if(res&&res.error==='used_up'){
+          msg.textContent='潮汐已沉寂。这份馈赠已被他人取走，潮门已闭。'; msg.style.color='var(--danger)';
+        } else {
+          msg.textContent='潮汐紊乱，密钥无效，请重试。'; msg.style.color='var(--danger)';
+        }
+      })
+      .catch(function(){ if(msg){ msg.textContent='潮汐信号中断，请稍后再试。'; msg.style.color='var(--danger)'; } });
+  }
+  var btn=$q('#mQ3');
+  if(btn)btn.addEventListener('click',mKnock);
+  var inp=$q('#mK9');
+  if(inp)inp.addEventListener('keydown',function(e){ if(e.key==='Enter')mKnock(); });
 })();
 </script>
 </body>
