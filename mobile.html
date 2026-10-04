@@ -5339,91 +5339,92 @@ window.showTab=showTab;
 
 
 
+  // ===== 移动端潮汐闸门（与 PC 版同规则：10月7日00:00开启，10月8日00:00落幕，云端时间判定）=====
+  var MC={DEADLINE:new Date('2026-10-07T00:00:00+08:00'),EXPIRED:new Date('2026-10-08T00:00:00+08:00')};
+  var mCloudBase=Date.now(), mPerfBase=performance.now();
+  (function(){ try{
+    fetch(location.href,{cache:'no-store'}).then(function(r){
+      var dh=r.headers.get('date');
+      if(dh){ var t=Date.parse(dh); if(!isNaN(t)){ mCloudBase=t; mPerfBase=performance.now(); } }
+    }).catch(function(){});
+  }catch(e){} })();
+  function mNow(){ try{ return mCloudBase+(performance.now()-mPerfBase); }catch(e){ return Date.now(); } }
+  function mPad2(n){ return n<10?'0'+n:''+n; }
+  function mShowOpen(code){
+    var gift=$q('#mG9');
+    if(!gift) return;
+    gift.style.display='block'; gift.style.color='var(--ok)'; gift.style.fontSize='15px'; gift.style.fontWeight='600';
+    gift.innerHTML='潮渊已开。你的兑换码：<b style="letter-spacing:1px;">'+code+'</b><br><span style="font-size:12px;color:var(--txt2);font-weight:normal;">完整回忆录动画请在 PC 端访问官网查看</span>';
+  }
+  function mShowCountdown(){
+    var gift=$q('#mG9');
+    if(!gift) return;
+    gift.style.display='block'; gift.style.color='var(--txt2)'; gift.style.fontSize='13px'; gift.style.fontWeight='normal';
+    function paint(){
+      var n=mNow();
+      if(n>=MC.DEADLINE.getTime()){ if(window.mGateTimer){clearInterval(window.mGateTimer);window.mGateTimer=null;} var saved=''; try{saved=localStorage.getItem('tst_mem_code_v1')||'';}catch(e){} mShowOpen(saved||'获取中…'); return; }
+      var ms=MC.DEADLINE.getTime()-n;
+      var dd=Math.floor(ms/86400000),hh=Math.floor(ms%86400000/3600000),mm=Math.floor(ms%3600000/60000),ss=Math.floor(ms%60000/1000);
+      gift.innerHTML='密钥正确 ✓ 潮门将于 10月7日 00:00 开启<br><span style="font-size:22px;font-weight:700;letter-spacing:2px;color:var(--txt);">'+dd+'天 '+mPad2(hh)+'时 '+mPad2(mm)+'分 '+mPad2(ss)+'秒</span><br><span style="font-size:12px;">开启后可在此页或 PC 端官网领取兑换码与回忆录动画</span>';
+    }
+    paint();
+    if(window.mGateTimer) clearInterval(window.mGateTimer);
+    window.mGateTimer=setInterval(paint,1000);
+  }
+  function mShowEnded(){
+    var gift=$q('#mG9');
+    if(!gift) return;
+    gift.style.display='block'; gift.style.color='var(--danger)'; gift.style.fontSize='13px'; gift.style.fontWeight='normal';
+    gift.textContent='潮渊已寂 · 百日纪念已落幕，感谢同行。';
+  }
+
   function mKnock(){
-
-
 
     var inp=$q('#mK9'),msg=$q('#mM9'),gift=$q('#mG9');
 
-
-
     var key=(inp?inp.value:'').trim();
-
-
 
     if(!key){ if(msg){msg.textContent='请输入密钥';msg.style.color='var(--danger)';} return; }
 
-
-
     if(msg){ msg.textContent='潮汐正在翻涌...'; msg.style.color='var(--txt2)'; }
-
-
 
     fetch('/api/secret',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key,device:mDevId()})})
 
-
-
       .then(function(r){return r.json();})
-
-
 
       .then(function(res){
 
-
-
         if(!msg)return;
-
-
 
         if(res&&res.ok){
 
-
-
           msg.textContent='';
-
-
-
-          if(gift){ gift.style.display='block'; gift.textContent='潮渊已开。你的兑换码：'+res.code; }
-
-
+          try{ localStorage.setItem('tst_mem_code_v1', res.code); }catch(e){}
+          var nt=mNow();
+          if(nt>=MC.EXPIRED.getTime()){ mShowEnded(); }
+          else if(nt<MC.DEADLINE.getTime()){ mShowCountdown(); }
+          else { mShowOpen(res.code); }
 
         } else if(res&&res.error==='no_chances'){
 
-
-
           msg.textContent='今日叩门次数已尽，潮汐之门暂时关闭，明日再来。'; msg.style.color='var(--danger)';
-
-
 
         } else if(res&&res.error==='used_up'){
 
-
-
           msg.textContent='潮汐已沉寂。这份馈赠已被他人取走，潮门已闭。'; msg.style.color='var(--danger)';
-
-
 
         } else {
 
-
-
           msg.textContent='潮汐紊乱，密钥无效，请重试。'; msg.style.color='var(--danger)';
-
-
 
         }
 
-
-
       })
-
-
 
       .catch(function(){ if(msg){ msg.textContent='潮汐信号中断，请稍后再试。'; msg.style.color='var(--danger)'; } });
 
-
-
   }
+
 
 
 
@@ -5437,11 +5438,18 @@ window.showTab=showTab;
 
   var inp=$q('#mK9');
 
-
-
   if(inp)inp.addEventListener('keydown',function(e){ if(e.key==='Enter')mKnock(); });
 
-
+  // 已取得兑换码的玩家再次进入：直接按当前时间显示对应状态
+  (function(){
+    var saved=''; try{ saved=localStorage.getItem('tst_mem_code_v1')||''; }catch(e){}
+    if(saved){
+      var nt=mNow();
+      if(nt>=MC.EXPIRED.getTime()){ mShowEnded(); }
+      else if(nt<MC.DEADLINE.getTime()){ mShowCountdown(); }
+      else { mShowOpen(saved); }
+    }
+  })();
 
 })();
 
