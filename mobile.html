@@ -1073,6 +1073,8 @@ main::-webkit-scrollbar{display:none;}
     setTimeout(loadVote,3000);
   }
 })();
+  // 暴露给子页面 IIFE 的全局（移动端独立栏目页使用）
+  window.esc=esc;window.cloudNow=cloudNow;window.devId=devId;
 </script>
 <script>
 // ===== 移动版便捷工具（T显编译器 + JSON 工具）=====
@@ -1422,6 +1424,14 @@ refs:[
 ],
 closing:'本条约目前仍在持续修订中，暂不作为最终正式版本执行，后续将根据实际情况进一步完善。如有建议，欢迎通过主城官网反馈站反馈。'
 };
+  var M_DATA_API='https://tst-server-site.pages.dev/api/data';
+  var _mdata=null;
+  function mLoad(cb){
+    if(_mdata){ if(cb)cb(); return; }
+    fetch(M_DATA_API,{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      _mdata=d; if(cb)cb();
+    }).catch(function(){ if(cb)cb(); });
+  }
   var mLotTimer=null, mLotBtnEl=null;
   var LOTTERY_START=new Date('2026-10-01T00:30:00+08:00');
   var LOTTERY_END=new Date('2026-10-08T23:59:59+08:00');
@@ -1431,36 +1441,44 @@ closing:'本条约目前仍在持续修订中，暂不作为最终正式版本�
   }
   function renderMNotices(){
     var box=document.getElementById('mNoticeList'); if(!box)return;
-    var list=(window.dataCache&&dataCache.announcements||[]).filter(function(a){return !String(a.title||'').startsWith('hist:');});
-    box.innerHTML=list.map(function(a){
-      var ctn=String(a.content||'');
-      return '<div class="m-list-card"><div class="m-lc-date">'+esc(a.date||'')+'</div><div class="m-lc-title">'+esc(a.title)+'</div><div class="m-lc-content">'+linkify(ctn)+'</div></div>';
-    }).join('')||'<p class="empty-hint">暂无公告</p>';
+    mLoad(function(){
+      var list=(_mdata&&_mdata.announcements||[]).filter(function(a){return !String(a.title||'').startsWith('hist:');});
+      box.innerHTML=list.map(function(a){
+        var ctn=String(a.content||'');
+        return '<div class="m-list-card"><div class="m-lc-date">'+esc(a.date||'')+'</div><div class="m-lc-title">'+esc(a.title)+'</div><div class="m-lc-content">'+linkify(ctn)+'</div></div>';
+      }).join('')||'<p class="empty-hint">暂无公告</p>';
+    });
   }
   function renderMFeeds(){
     var box=document.getElementById('mFeedList'); if(!box)return;
-    var list=(window.dataCache&&dataCache.feeds)||[];
-    box.innerHTML=list.map(function(f){
-      var img=f.image?'<img class="m-lc-img" src="'+esc(f.image)+'" alt="">':'';
-      return '<div class="m-list-card"><div class="m-lc-title">'+esc(f.title)+'</div><div class="m-lc-date">'+esc(f.date||'')+'</div><div class="m-lc-content">'+linkify(f.content)+'</div>'+img+'</div>';
-    }).join('')||'<p class="empty-hint">暂无动态</p>';
+    mLoad(function(){
+      var list=(_mdata&&_mdata.feeds)||[];
+      box.innerHTML=list.map(function(f){
+        var img=f.image?'<img class="m-lc-img" src="'+esc(f.image)+'" alt="">':'';
+        return '<div class="m-list-card"><div class="m-lc-title">'+esc(f.title)+'</div><div class="m-lc-date">'+esc(f.date||'')+'</div><div class="m-lc-content">'+linkify(f.content)+'</div>'+img+'</div>';
+      }).join('')||'<p class="empty-hint">暂无动态</p>';
+    });
   }
   function renderMReplays(){
     var box=document.getElementById('mEventList'); if(!box)return;
-    var list=(window.dataCache&&dataCache.replays)||[];
-    box.innerHTML=list.map(function(r){
-      var vid=/\\.(mp4|webm|ogg|mov)(\?|$)/i.test(String(r.url||''))
-        ? '<video controls preload="metadata" style="width:100%;border-radius:8px;background:#000;margin-top:8px;"><source src="'+esc(r.url)+'"></video>'
-        : '<a class="m-lc-link" href="'+esc(r.url)+'" target="_blank" rel="noopener">前往平台观看 ›</a>';
-      return '<div class="m-list-card"><div class="m-lc-title">'+esc(r.title)+'</div><div class="m-lc-date">'+esc(r.date||'')+'</div>'+vid+'</div>';
-    }).join('')||'<p class="empty-hint">暂无赛事回放</p>';
+    mLoad(function(){
+      var list=(_mdata&&_mdata.replays)||[];
+      box.innerHTML=list.map(function(r){
+        var vid=/\\.(mp4|webm|ogg|mov)(\?|$)/i.test(String(r.url||''))
+          ? '<video controls preload="metadata" style="width:100%;border-radius:8px;background:#000;margin-top:8px;"><source src="'+esc(r.url)+'"></video>'
+          : '<a class="m-lc-link" href="'+esc(r.url)+'" target="_blank" rel="noopener">前往平台观看 ›</a>';
+        return '<div class="m-list-card"><div class="m-lc-title">'+esc(r.title)+'</div><div class="m-lc-date">'+esc(r.date||'')+'</div>'+vid+'</div>';
+      }).join('')||'<p class="empty-hint">暂无赛事回放</p>';
+    });
   }
   function renderMSponsors(){
     var box=document.getElementById('mSponsorList'); if(!box)return;
-    var list=(window.dataCache&&dataCache.sponsors)||[];
-    box.innerHTML=list.length
-      ? '<div class="m-card"><table class="m-sponsor"><tr><th>名次</th><th>玩家</th><th>金额</th></tr>'+list.map(function(s,i){return '<tr><td>'+(i+1)+'</td><td>'+esc(s.name)+'</td><td>'+esc(s.amount)+'</td></tr>';}).join('')+'</table></div>'
-      : '<p class="empty-hint">暂无赞助记录</p>';
+    mLoad(function(){
+      var list=(_mdata&&_mdata.sponsors)||[];
+      box.innerHTML=list.length
+        ? '<div class="m-card"><table class="m-sponsor"><tr><th>名次</th><th>玩家</th><th>金额</th></tr>'+list.map(function(s,i){return '<tr><td>'+(i+1)+'</td><td>'+esc(s.name)+'</td><td>'+esc(s.amount)+'</td></tr>';}).join('')+'</table></div>'
+        : '<p class="empty-hint">暂无赞助记录</p>';
+    });
   }
   function renderMRule(){
     var box=document.getElementById('mRuleList'); if(!box)return;
