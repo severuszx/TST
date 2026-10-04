@@ -74,7 +74,7 @@ html[data-theme="glass"]{
 
   --radius:22px;
 
-  --shadow:0 20px 50px rgba(70,90,160,.16);
+  --shadow:0 4px 14px rgba(15,23,42,.07);
 
 }
 
@@ -158,7 +158,7 @@ html[data-theme="glass"] .m-top{background:rgba(255,255,255,.3);border-bottom:1p
 
 .m-logo span{font-size:17px;font-weight:800;letter-spacing:.5px;color:var(--txt);}
 
-.m-srv{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt2);background:var(--card);border:1px solid var(--card-brd);border-radius:999px;padding:5px 11px;}
+.m-srv{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt2);background:var(--card);border:1px solid var(--card-brd);border-radius:6px;padding:5px 11px;}
 
 .m-srv .dot{width:7px;height:7px;border-radius:50%;background:var(--txt2);}
 
@@ -214,7 +214,6 @@ main::-webkit-scrollbar{display:none;}
 
 .m-title{font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
 
-.m-title .ico{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--accent-soft);}
 
 .m-sub{font-size:12px;color:var(--txt2);margin-bottom:12px;}
 
@@ -406,15 +405,36 @@ main::-webkit-scrollbar{display:none;}
 
 .foot a{color:var(--accent);text-decoration:none;}
 
+
+/* ===== 手机管理员页 ===== */
+.m-input{width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--card-brd);background:var(--card);color:var(--txt);font-size:15px;outline:none;box-sizing:border-box;margin-top:8px;}
+.m-area{width:100%;min-height:90px;padding:11px 12px;border-radius:8px;border:1px solid var(--card-brd);background:var(--card);color:var(--txt);font-size:15px;outline:none;box-sizing:border-box;margin-top:8px;resize:vertical;font-family:inherit;}
+.m-adm-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px;}
+.m-adm-tab{padding:7px 13px;border:1px solid var(--card-brd);border-radius:6px;background:var(--card);color:var(--txt2);font-size:13px;cursor:pointer;}
+.m-adm-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
+.m-adm-pane{display:none;}
+.m-adm-pane.active{display:block;}
+.m-adm-item{background:var(--card);border:1px solid var(--card-brd);border-radius:10px;padding:12px;margin-bottom:10px;box-shadow:var(--shadow);}
+.m-adm-item .at{font-size:14px;font-weight:700;}
+.m-adm-item .am{font-size:12px;color:var(--txt2);margin-top:3px;word-break:break-all;}
+.m-adm-item .ac{font-size:13px;color:var(--txt2);margin-top:4px;line-height:1.6;word-break:break-all;}
+.m-adm-item .aops{display:flex;gap:8px;margin-top:8px;}
+.m-adm-item .aops button{flex:1;padding:8px 0;border-radius:6px;border:1px solid var(--card-brd);background:var(--card);color:var(--txt);font-size:13px;cursor:pointer;}
+.m-adm-item .aops .del{color:var(--danger);border-color:var(--danger);}
+.m-adm-item .aops .pub{color:var(--ok);border-color:var(--ok);}
+.m-adm-item img{max-width:100%;border-radius:6px;margin-top:6px;}
+.m-adm-row{display:flex;align-items:center;gap:8px;font-size:14px;margin-top:8px;color:var(--txt);}
+.m-adm-row .m-input{margin-top:0;flex:1;}
+
 /* ===== 底部导航 ===== */
 
 .m-tabbar{
 
-  position:fixed;left:12px;right:12px;bottom:calc(var(--sab) + 10px);z-index:60;
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
 
-  display:flex;background:var(--card);border:1px solid var(--card-brd);border-radius:12px;
+  display:flex;background:var(--card);border-top:1px solid var(--card-brd);
 
-  box-shadow:var(--shadow);padding:6px;
+  padding:4px 0 calc(var(--sab) + 4px);box-shadow:none;
 
 }
 
@@ -422,7 +442,7 @@ main::-webkit-scrollbar{display:none;}
 
   flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 6px;
 
-  border:none;background:transparent;color:var(--txt2);font-size:10px;cursor:pointer;
+  border:none;background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;
 
   border-radius:8px;position:relative;
 
@@ -646,7 +666,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card drag-card" id="cardSrv">
 
-      <div class="m-title"><span class="ico">◈</span>服务器状态</div>
+      <div class="m-title">服务器状态</div>
 
       <div class="srv-grid">
 
@@ -664,7 +684,7 @@ main::-webkit-scrollbar{display:none;}
 
 
 
-    <div class="m-title drag-card" id="cardQuickTitle" style="padding:2px 4px 10px;"><span class="ico">◇</span>快捷入口</div>
+    <div class="m-title drag-card" id="cardQuickTitle" style="padding:2px 4px 10px;">快捷入口</div>
 
     <div class="grid3 drag-card" id="cardQuick">
 
@@ -684,7 +704,7 @@ main::-webkit-scrollbar{display:none;}
 
 
 
-    <div class="m-title drag-card" id="cardFeedTitle" style="padding:4px 4px 10px;"><span class="ico">≋</span>最新动态</div>
+    <div class="m-title drag-card" id="cardFeedTitle" style="padding:4px 4px 10px;">最新动态</div>
 
     <div id="feedList" class="drag-card" style="min-height:60px;"></div>
 
@@ -698,7 +718,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card">
 
-      <div class="m-title"><span class="ico">▥</span>玩家投票</div>
+      <div class="m-title">玩家投票</div>
 
       <div class="vote-tabs" id="voteTabs">
 
@@ -722,7 +742,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card">
 
-      <div class="m-title"><span class="ico">✉</span>意见反馈</div>
+      <div class="m-title">意见反馈</div>
 
       <p class="m-sub">遇到 Bug 或有建议？直接去反馈站提交。</p>
 
@@ -732,7 +752,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card">
 
-      <div class="m-title"><span class="ico">▦</span>反馈说明</div>
+      <div class="m-title">反馈说明</div>
 
       <p class="m-sub" style="line-height:1.8;">提交后可在反馈站「我的」里看处理状态。<br>反馈编号格式：TST-XXXXXX。</p>
 
@@ -748,7 +768,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card">
 
-      <div class="m-title"><span class="ico">▦</span>便捷工具</div>
+      <div class="m-title">便捷工具</div>
 
       <p class="m-sub">选择要使用的工具</p>
 
@@ -766,7 +786,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card mtool-panel" id="mtool-tcomp" style="display:none;">
 
-      <div class="m-title"><span class="ico">▦</span>T显编译器<span style="margin-left:auto;font-size:12px;color:var(--txt2);cursor:pointer;" data-close-tool>收起</span></div>
+      <div class="m-title">T显编译器<span style="margin-left:auto;font-size:12px;color:var(--txt2);cursor:pointer;" data-close-tool>收起</span></div>
 
       <label>目标版本</label>
 
@@ -826,7 +846,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card mtool-panel" id="mtool-jfmt" style="display:none;">
 
-      <div class="m-title"><span class="ico">{"}</span>JSON 工具<span style="margin-left:auto;font-size:12px;color:var(--txt2);cursor:pointer;" data-close-tool>收起</span></div>
+      <div class="m-title">JSON 工具<span style="margin-left:auto;font-size:12px;color:var(--txt2);cursor:pointer;" data-close-tool>收起</span></div>
 
       <label>输入 JSON</label>
 
@@ -866,7 +886,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card">
 
-      <div class="m-title"><span class="ico">◈</span>个人中心</div>
+      <div class="m-title">个人中心</div>
 
       <div class="profile-row"><span class="pk">设备标识</span><span class="pv" id="mpDevice">--</span></div>
 
@@ -880,7 +900,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card">
 
-      <div class="m-title"><span class="ico">◇</span>外观</div>
+      <div class="m-title">外观</div>
 
       <div class="profile-row"><span class="pk">深色模式</span><span class="m-switch" id="mpDarkSwitch"></span></div>
 
@@ -892,7 +912,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card">
 
-      <div class="m-title"><span class="ico">⌘</span>调试台</div>
+      <div class="m-title">调试台</div>
 
       <p class="m-sub">输入调试码激活对应功能</p>
 
@@ -912,7 +932,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card">
 
-      <div class="m-title"><span class="ico">✉</span>更多</div>
+      <div class="m-title">更多</div>
 
       <button class="btn ghost" id="mpFbBtn" style="margin-top:10px;">打开反馈站</button>
 
@@ -924,13 +944,161 @@ main::-webkit-scrollbar{display:none;}
 
 
 
+
+  <!-- 管理员 -->
+  <section class="page" id="page-admin">
+
+    <div class="m-sub-head" onclick="showTab('profile')"><span class="m-back">‹</span>管理员</div>
+
+    <div id="mAdminLoginBox">
+      <div class="m-card" style="margin-top:6px;">
+        <div class="m-title">管理员登录</div>
+        <p class="m-sub">管理官网数据与投票、反馈</p>
+        <input type="password" id="mAdminPwd" class="m-input" placeholder="管理员密码" autocomplete="off">
+        <button class="btn" id="mAdminLoginBtn" style="margin-top:10px;">登录</button>
+        <div id="mAdminLoginMsg" style="margin-top:8px;font-size:12px;color:var(--txt2);min-height:16px;"></div>
+      </div>
+    </div>
+
+    <div id="mAdminPanel" style="display:none;">
+
+      <div class="m-adm-tabs" id="mAdmTabs">
+        <button class="m-adm-tab active" data-t="notice">公告</button>
+        <button class="m-adm-tab" data-t="history">历史</button>
+        <button class="m-adm-tab" data-t="feed">动态</button>
+        <button class="m-adm-tab" data-t="sponsor">赞助</button>
+        <button class="m-adm-tab" data-t="replay">赛事</button>
+        <button class="m-adm-tab" data-t="image">图片</button>
+        <button class="m-adm-tab" data-t="server">服务器</button>
+        <button class="m-adm-tab" data-t="vote">投票</button>
+        <button class="m-adm-tab" data-t="feedback">反馈</button>
+      </div>
+
+      <div class="m-adm-pane active" id="mPaneNotice">
+        <div class="m-card">
+          <div class="m-title">新增公告</div>
+          <input type="text" id="maAnTitle" class="m-input" placeholder="标题">
+          <input type="text" id="maAnDate" class="m-input" placeholder="日期（如 2026-10-01，留空自动今天）">
+          <textarea id="maAnContent" class="m-area" placeholder="公告内容"></textarea>
+          <button class="btn" id="maAnSave">发布</button>
+          <button class="btn ghost" id="maAnCancel" style="display:none;">取消编辑</button>
+        </div>
+        <div id="maAnList"></div>
+      </div>
+
+      <div class="m-adm-pane" id="mPaneHistory">
+        <div class="m-card">
+          <div class="m-title">新增历史</div>
+          <input type="text" id="maHyTitle" class="m-input" placeholder="标题">
+          <input type="text" id="maHyDate" class="m-input" placeholder="日期（留空自动今天）">
+          <textarea id="maHyContent" class="m-area" placeholder="内容"></textarea>
+          <button class="btn" id="maHySave">发布</button>
+          <button class="btn ghost" id="maHyCancel" style="display:none;">取消编辑</button>
+        </div>
+        <div id="maHyList"></div>
+      </div>
+
+      <div class="m-adm-pane" id="mPaneFeed">
+        <div class="m-card">
+          <div class="m-title">新增动态</div>
+          <input type="text" id="maFdTitle" class="m-input" placeholder="标题">
+          <input type="text" id="maFdImg" class="m-input" placeholder="配图引用（img:xxx 或直链，可空）">
+          <input type="text" id="maFdDate" class="m-input" placeholder="日期（留空自动今天）">
+          <textarea id="maFdContent" class="m-area" placeholder="内容"></textarea>
+          <div class="m-adm-row"><label><input type="checkbox" id="maFdPin"> 置顶</label></div>
+          <button class="btn" id="maFdSave">发布</button>
+          <button class="btn ghost" id="maFdCancel" style="display:none;">取消编辑</button>
+        </div>
+        <div id="maFdList"></div>
+      </div>
+
+      <div class="m-adm-pane" id="mPaneSponsor">
+        <div class="m-card">
+          <div class="m-title">新增赞助</div>
+          <input type="text" id="maSpName" class="m-input" placeholder="名称">
+          <input type="text" id="maSpAmount" class="m-input" placeholder="金额（如 6.50）">
+          <button class="btn" id="maSpSave">添加</button>
+          <button class="btn ghost" id="maSpCancel" style="display:none;">取消编辑</button>
+        </div>
+        <div id="maSpList"></div>
+      </div>
+
+      <div class="m-adm-pane" id="mPaneReplay">
+        <div class="m-card">
+          <div class="m-title">新增赛事</div>
+          <input type="text" id="maRpTitle" class="m-input" placeholder="标题">
+          <input type="text" id="maRpUrl" class="m-input" placeholder="链接（mp4 直链或 B 站等平台链接）">
+          <input type="text" id="maRpDate" class="m-input" placeholder="日期（留空自动今天）">
+          <button class="btn" id="maRpSave">发布</button>
+          <button class="btn ghost" id="maRpCancel" style="display:none;">取消编辑</button>
+        </div>
+        <div id="maRpList"></div>
+      </div>
+
+      <div class="m-adm-pane" id="mPaneImage">
+        <div class="m-card">
+          <div class="m-title">上传图片</div>
+          <input type="file" id="maImFile" accept="image/*" class="m-input" style="padding:8px;">
+          <input type="text" id="maImName" class="m-input" placeholder="图片名称（可选）">
+          <button class="btn" id="maImUpload">上传（≤1.5MB）</button>
+          <p class="m-sub" style="margin-top:6px;">上传后点「复制引用」得到 img:xxx，可粘贴到动态配图字段</p>
+        </div>
+        <div id="maImList"></div>
+      </div>
+
+      <div class="m-adm-pane" id="mPaneServer">
+        <div class="m-card">
+          <div class="m-title">服务器设置</div>
+          <div class="m-adm-row"><label>运行状态</label>
+            <select id="maSrvStatus" class="m-input">
+              <option value="online">运行中</option>
+              <option value="offline">已关闭</option>
+            </select>
+          </div>
+          <button class="btn" id="maSrvSave">保存</button>
+        </div>
+      </div>
+
+      <div class="m-adm-pane" id="mPaneVote">
+        <div class="m-card">
+          <div class="m-title">投票管理</div>
+          <input type="text" id="maVtTitle" class="m-input" placeholder="投票标题">
+          <textarea id="maVtOptions" class="m-area" placeholder="选项，每行一个"></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="btn" id="maVtSave" style="flex:1;">保存</button>
+            <button class="btn ghost" id="maVtClear" style="flex:1;">清空票数</button>
+            <button class="btn ghost" id="maVtToggle" style="flex:1;">启/停</button>
+          </div>
+          <p class="m-sub" style="margin-top:6px;">保存覆盖当前投票题目与选项（保留票数）；改选项后建议清空旧票</p>
+        </div>
+        <div id="maVtList"></div>
+      </div>
+
+      <div class="m-adm-pane" id="mPaneFeedback">
+        <div class="m-card">
+          <div class="m-title">反馈管理</div>
+          <div class="m-adm-row"><label>筛选</label>
+            <select id="maFbFilter" class="m-input">
+              <option value="all">全部</option>
+              <option value="pending">待处理</option>
+              <option value="done">已处理</option>
+            </select>
+          </div>
+        </div>
+        <div id="maFbList"></div>
+      </div>
+
+    </div>
+
+  </section>
+
   <!-- 更多 -->
 
   <section class="page" id="page-knock">
 
     <div class="m-card" style="margin-top:6px;">
 
-      <div class="m-title"><span class="ico">≋</span>潮汐沉寂，叩门以待</div>
+      <div class="m-title">潮汐沉寂，叩门以待</div>
 
       <p class="m-sub">输入密钥，验证你与潮渊的约定。</p>
 
@@ -1054,7 +1222,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card" style="margin-top:14px;">
 
-      <div class="m-title" style="cursor:pointer;" id="teamHead"><span class="ico">◍</span>管理团队<span style="margin-left:auto;font-size:12px;color:var(--txt2);" id="teamArrow">展开 ▾</span></div>
+      <div class="m-title" style="cursor:pointer;" id="teamHead">管理团队<span style="margin-left:auto;font-size:12px;color:var(--txt2);" id="teamArrow">展开 ▾</span></div>
 
       <div class="team-box" id="teamBox"></div>
 
@@ -1064,7 +1232,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card">
 
-      <div class="m-title"><span class="ico">◇</span>设置</div>
+      <div class="m-title">设置</div>
 
       <p class="m-sub">界面外观</p>
 
@@ -1076,7 +1244,7 @@ main::-webkit-scrollbar{display:none;}
 
     <div class="m-card">
 
-      <div class="m-title"><span class="ico">◇</span>管理员</div>
+      <div class="m-title">管理员</div>
 
       <p class="m-sub">官网数据管理入口</p>
 
@@ -1103,15 +1271,15 @@ main::-webkit-scrollbar{display:none;}
 
 <nav class="m-tabbar">
 
-  <button class="m-tab active" data-tab="home"><span class="ti">≋</span>首页</button>
+  <button class="m-tab active" data-tab="home">首页</button>
 
-  <button class="m-tab" data-tab="vote"><span class="ti">▥</span>投票</button>
+  <button class="m-tab" data-tab="vote">投票</button>
 
-  <button class="m-tab" data-tab="tool"><span class="ti">▦</span>工具</button>
+  <button class="m-tab" data-tab="tool">工具</button>
 
-  <button class="m-tab" data-tab="fb"><span class="ti">✉</span>反馈</button>
+  <button class="m-tab" data-tab="fb">反馈</button>
 
-  <button class="m-tab" data-tab="more"><span class="ti">≡</span>更多</button>
+  <button class="m-tab" data-tab="more">更多</button>
 
 </nav>
 
@@ -2473,7 +2641,7 @@ window.showTab=showTab;
 
     var adm=$q('#mpAdminBtn');
 
-    if(adm)adm.onclick=function(){location.href='index.html?m=0#admin';};
+    if(adm)adm.onclick=function(){if(window.showTab)showTab('admin');else location.href='index.html?m=0#admin';};
 
   };
 
@@ -3052,10 +3220,12 @@ closing:'本条约目前仍在持续修订中，暂不作为最终正式版本�
 
           btn.textContent='今日已抽';
 
-        } else if(data&&data.error==='already_drawn'&&data.prize){
-
-          res.innerHTML='<div class="ml-prize">今日已抽过</div><div class="ml-code">'+esc(data.prize)+(data.code?' 兑换码：'+esc(data.code):'')+'</div>';
-
+        } else if(data&&data.error==='already_drawn'){
+          if(data.prize){
+            res.innerHTML='<div class="ml-prize">今日已抽过</div><div class="ml-code">'+esc(data.prize)+(data.code?' 兑换码：'+esc(data.code):'')+'</div>';
+          } else {
+            res.innerHTML='<p class="ml-hint">今日已抽过，请明天再来</p>';
+          }
           btn.textContent='今日已抽';
 
         } else if(data&&data.sold_out){
@@ -3094,6 +3264,432 @@ closing:'本条约目前仍在持续修订中，暂不作为最终正式版本�
 
 </script>
 
+<script>
+// ===== 手机管理员页（独立移动端管理员面板）=====
+(function(){
+var q=function(s){return document.querySelector(s);};
+var qa=function(s){return Array.prototype.slice.call(document.querySelectorAll(s));};
+var esc=window.esc||function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');};
+var AURL='https://tst-server-site.pages.dev/api/admin';
+var DURL='https://tst-server-site.pages.dev/api/data';
+var FURL='https://theslowtidefk.pages.dev';
+var token=sessionStorage.getItem('tst_admin_token')||'';
+var fkPw=sessionStorage.getItem('tstfb-admin-pwd')||'';
+var mData={announcements:[],feeds:[],sponsors:[],replays:[],images:[],serverStatus:'online'};
+var editingId=null, editingKind=null;
+var loginBox=q('#mAdminLoginBox'), panel=q('#mAdminPanel');
+if(!loginBox||!panel)return;
+
+function toast(m){
+  var d=document.createElement('div');
+  d.className='m-toast';
+  d.textContent=m;
+  document.body.appendChild(d);
+  setTimeout(function(){d.remove();},2200);
+}
+function resImg(src){
+  if(typeof src==='string'&&src.indexOf('img:')===0){
+    var id=src.slice(4);
+    for(var i=0;i<mData.images.length;i++){ if(mData.images[i].id===id) return mData.images[i].data; }
+    return '';
+  }
+  return src;
+}
+function fmt(d){
+  if(!d)return '';
+  var s=String(d).trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
+  var n=new Date(d);
+  if(!isNaN(n.getTime())){
+    var p=function(x){return x<10?'0'+x:''+x;};
+    return n.getFullYear()+'-'+p(n.getMonth()+1)+'-'+p(n.getDate());
+  }
+  return s;
+}
+function today(){ var n=new Date(); var p=function(x){return x<10?'0'+x:''+x;}; return n.getFullYear()+'-'+p(n.getMonth()+1)+'-'+p(n.getDate()); }
+
+// ===== 登录 =====
+function doLogin(){
+  var pwdIn=q('#mAdminPwd'), msg=q('#mAdminLoginMsg');
+  if(!pwdIn.value){ msg.textContent='请输入密码'; return; }
+  fetch(AURL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password:pwdIn.value})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d&&d.ok){
+        token=d.token; sessionStorage.setItem('tst_admin_token',token);
+        fkPw=pwdIn.value; sessionStorage.setItem('tstfb-admin-pwd',fkPw);
+        loginBox.style.display='none'; panel.style.display='block';
+        msg.textContent='';
+        mLoadData();
+      } else { msg.textContent=(d&&(d.error||d.msg))||'登录失败'; }
+    })
+    .catch(function(){ msg.textContent='网络错误，请稍后重试'; });
+}
+q('#mAdminLoginBtn').onclick=doLogin;
+q('#mAdminPwd').addEventListener('keydown',function(e){ if(e.key==='Enter'){doLogin();} });
+
+// ===== 数据服务 API =====
+function mApi(action,data){
+  return fetch(AURL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:action,data:data||{}})})
+    .then(function(r){return r.json();})
+    .then(function(d){ if(d&&!d.ok){ toast((d.error||d.msg||'操作失败')+''); return null; } return d; })
+    .catch(function(){ toast('网络错误'); return null; });
+}
+function mLoadData(){
+  fetch(DURL,{cache:'no-store'}).then(function(r){return r.json();})
+    .then(function(d){
+      if(d&&d.ok){ mData.announcements=d.announcements||[]; mData.feeds=d.feeds||[]; mData.sponsors=d.sponsors||[]; mData.replays=d.replays||[]; mData.images=d.images||[]; mData.serverStatus=d.serverStatus||'online'; }
+      mRenderAll();
+    })
+    .catch(function(){ toast('数据加载失败，请重试'); });
+}
+
+// ===== tabs =====
+var tabsEl=q('#mAdmTabs');
+if(tabsEl)tabsEl.addEventListener('click',function(e){
+  var t=e.target.closest('.m-adm-tab'); if(!t)return;
+  var k=t.getAttribute('data-t');
+  qa('.m-adm-tab').forEach(function(x){x.classList.remove('active');});
+  qa('.m-adm-pane').forEach(function(x){x.classList.remove('active');});
+  t.classList.add('active');
+  q('#mPane'+k.charAt(0).toUpperCase()+k.slice(1)).classList.add('active');
+  if(k==='server'){ q('#maSrvStatus').value=mData.serverStatus||'online'; }
+  if(k==='vote'){ mLoadVote(); }
+  if(k==='feedback'){ mLoadFeedback(); }
+});
+
+// ===== 通用条目渲染 =====
+function admItem(it,label,extra){
+  var h='<div class="m-adm-item"><div class="at">'+esc(label)+'</div><div class="am">'+esc(it.date||'')+(extra&&extra.meta?' · '+esc(extra.meta):'')+'</div>';
+  if(extra&&extra.img){ var u=resImg(extra.img); if(u)h+='<img src="'+esc(u)+'" alt="">'; }
+  if(it.content)h+='<div class="ac">'+esc(String(it.content).slice(0,180))+'</div>';
+  h+='<div class="aops"><button data-edit="'+esc(it.id)+'">编辑</button><button class="del" data-del="'+esc(it.id)+'">删除</button></div></div>';
+  return h;
+}
+function setEditing(kind,id){
+  editingKind=kind; editingId=id;
+}
+
+// ===== 公告 =====
+function noticeItems(){ return (mData.announcements||[]).filter(function(a){return String(a.title||'').indexOf('hist:')!==0;}); }
+function histItems(){ return (mData.announcements||[]).filter(function(a){return String(a.title||'').indexOf('hist:')===0;}); }
+function mRenderNotice(){
+  var list=q('#maAnList'); if(!list)return;
+  list.innerHTML=noticeItems().map(function(a){return admItem(a, String(a.title||'').replace(/^hist:/,''), {});}).join('')||'<p class="m-sub">暂无公告</p>';
+}
+function mRenderHist(){
+  var list=q('#maHyList'); if(!list)return;
+  list.innerHTML=histItems().map(function(a){return admItem(a, String(a.title||'').replace(/^hist:/,''), {});}).join('')||'<p class="m-sub">暂无历史记录</p>';
+}
+function mSaveAnnouncement(isHist){
+  var title=q(isHist?'#maHyTitle':'#maAnTitle').value.trim();
+  var content=q(isHist?'#maHyContent':'#maAnContent').value.trim();
+  var date=q(isHist?'#maHyDate':'#maAnDate').value.trim()||today();
+  if(!title||!content){ toast('请填写标题与内容'); return; }
+  var full=isHist && title.indexOf('hist:')!==0 ? 'hist:'+title : title;
+  var d=editingKind===('ann'+(isHist?'hist':'')) ? mApi('updateAnnouncement',{title:full,content:content,date:date},{id:editingId}) : mApi('addAnnouncement',{title:full,content:content,date:date});
+  d.then(function(res){
+    if(res&&res.ok){ toast('已保存'); mData.announcements=res.announcements||mData.announcements; mRenderNotice(); mRenderHist(); q(isHist?'#maHyTitle':'#maAnTitle').value=''; q(isHist?'#maHyContent':'#maAnContent').value=''; q(isHist?'#maHyDate':'#maAnDate').value=''; q(isHist?'#maHyCancel':'#maAnCancel').style.display='none'; editingKind=null; editingId=null; }
+  });
+}
+if(q('#maAnSave'))q('#maAnSave').onclick=function(){mSaveAnnouncement(false);};
+if(q('#maHySave'))q('#maHySave').onclick=function(){mSaveAnnouncement(true);};
+
+// ===== 动态 =====
+function mRenderFeed(){
+  var list=q('#maFdList'); if(!list)return;
+  list.innerHTML=(mData.feeds||[]).map(function(f){return admItem(f, String(f.title||''), {meta:(f.pinned?'置顶':''), img:f.image});}).join('')||'<p class="m-sub">暂无动态</p>';
+}
+function mSaveFeed(){
+  var title=q('#maFdTitle').value.trim();
+  var content=q('#maFdContent').value.trim();
+  var img=q('#maFdImg').value.trim();
+  var date=q('#maFdDate').value.trim()||today();
+  var pin=q('#maFdPin').checked;
+  if(!title){ toast('请填写标题'); return; }
+  var d=editingKind==='feed' ? mApi('updateFeed',{title:title,content:content,image:img||undefined,pinned:pin,date:date},{id:editingId}) : mApi('addFeed',{title:title,content:content,image:img||undefined,pinned:pin,date:date});
+  d.then(function(res){ if(res&&res.ok){ toast('已保存'); mData.feeds=res.feeds||mData.feeds; mRenderFeed(); q('#maFdTitle').value=''; q('#maFdContent').value=''; q('#maFdImg').value=''; q('#maFdDate').value=''; q('#maFdPin').checked=false; q('#maFdCancel').style.display='none'; editingKind=null; editingId=null; } });
+}
+if(q('#maFdSave'))q('#maFdSave').onclick=mSaveFeed;
+
+// ===== 赞助 =====
+function mRenderSponsor(){
+  var list=q('#maSpList'); if(!list)return;
+  list.innerHTML=(mData.sponsors||[]).map(function(s){return admItem(s, String(s.name||''), {meta:'赞助 '+String(s.amount||'')});}).join('')||'<p class="m-sub">暂无赞助记录</p>';
+}
+function mSaveSponsor(){
+  var name=q('#maSpName').value.trim();
+  var amount=q('#maSpAmount').value.trim();
+  if(!name||!amount){ toast('请填写名称与金额'); return; }
+  var d=editingKind==='sponsor' ? mApi('updateSponsor',{name:name,amount:amount},{id:editingId}) : mApi('addSponsor',{name:name,amount:amount});
+  d.then(function(res){ if(res&&res.ok){ toast('已保存'); mData.sponsors=res.sponsors||mData.sponsors; mRenderSponsor(); q('#maSpName').value=''; q('#maSpAmount').value=''; q('#maSpCancel').style.display='none'; editingKind=null; editingId=null; } });
+}
+if(q('#maSpSave'))q('#maSpSave').onclick=mSaveSponsor;
+
+// ===== 赛事 =====
+function mRenderReplay(){
+  var list=q('#maRpList'); if(!list)return;
+  list.innerHTML=(mData.replays||[]).map(function(r){return admItem(r, String(r.title||''), {meta:r.url?('链接'):''});}).join('')||'<p class="m-sub">暂无赛事</p>';
+}
+function mSaveReplay(){
+  var title=q('#maRpTitle').value.trim();
+  var url=q('#maRpUrl').value.trim();
+  var date=q('#maRpDate').value.trim()||today();
+  if(!title){ toast('请填写标题'); return; }
+  var d=editingKind==='replay' ? mApi('updateReplay',{title:title,url:url||undefined,date:date},{id:editingId}) : mApi('addReplay',{title:title,url:url||undefined,date:date});
+  d.then(function(res){ if(res&&res.ok){ toast('已保存'); mData.replays=res.replays||mData.replays; mRenderReplay(); q('#maRpTitle').value=''; q('#maRpUrl').value=''; q('#maRpDate').value=''; q('#maRpCancel').style.display='none'; editingKind=null; editingId=null; } });
+}
+if(q('#maRpSave'))q('#maRpSave').onclick=mSaveReplay;
+
+// ===== 图片 =====
+function mRenderImage(){
+  var list=q('#maImList'); if(!list)return;
+  list.innerHTML=(mData.images||[]).map(function(im){
+    return '<div class="m-adm-item"><img src="'+esc(im.data)+'" alt=""><div class="am">'+esc(im.name||im.id||'')+'</div><div class="aops"><button data-copy="'+esc(im.id)+'">复制引用</button><button class="del" data-delimg="'+esc(im.id)+'">删除</button></div></div>';
+  }).join('')||'<p class="m-sub">暂无图片</p>';
+}
+if(q('#maImUpload'))q('#maImUpload').onclick=function(){
+  var f=q('#maImFile').files[0];
+  if(!f){ toast('请选择图片'); return; }
+  if(f.size>1.5*1024*1024){ toast('图片超过 1.5MB'); return; }
+  var rd=new FileReader();
+  rd.onload=function(){
+    mApi('uploadImage',{name:q('#maImName').value.trim()||'',data:rd.result}).then(function(res){
+      if(res&&res.ok){ toast('已上传'); mData.images=res.images||mData.images; mRenderImage(); q('#maImFile').value=''; q('#maImName').value=''; }
+    });
+  };
+  rd.readAsDataURL(f);
+};
+
+// ===== 服务器 =====
+if(q('#maSrvSave'))q('#maSrvSave').onclick=function(){
+  var status=q('#maSrvStatus').value;
+  mApi('updateServer',{status:status}).then(function(res){
+    if(res&&res.ok){ toast('已保存'); mData.serverStatus=status; }
+  });
+};
+
+// ===== 投票（反馈站）=====
+var voteListCache=[];
+function mLoadVote(){
+  if(!fkPw){ toast('缺少口令'); return; }
+  fetch(FURL+'/api/vote/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({p_password:fkPw,p_action:'list'})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(Array.isArray(d)){ voteListCache=d; mRenderVote(); }
+      else if(d&&d.error){ toast('口令错误或服务异常'); }
+    })
+    .catch(function(){ toast('投票服务不可用'); });
+}
+function mRenderVote(){
+  var list=q('#maVtList'); if(!list)return;
+  list.innerHTML=voteListCache.map(function(v){
+    var n=(v.options||[]).map(function(o){return o.label;}).join('、');
+    return '<div class="m-adm-item"><div class="at">'+esc(v.title||'')+(v.active?'':'（已停用）')+'</div><div class="am">票数 '+esc(v.votes||0)+'</div><div class="ac">'+esc(n)+'</div><div class="aops"><button data-vote="toggle" data-id="'+esc(v.id)+'">启/停</button><button data-vote="clear" data-id="'+esc(v.id)+'">清票</button><button class="del" data-vote="del" data-id="'+esc(v.id)+'">删除</button></div></div>';
+  }).join('')||'<p class="m-sub">暂无投票</p>';
+}
+function mSaveVote(){
+  if(!fkPw){ toast('缺少口令'); return; }
+  var title=q('#maVtTitle').value.trim();
+  var opts=q('#maVtOptions').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+  if(!title||!opts.length){ toast('请填写标题与选项'); return; }
+  var optsObj=opts.map(function(o,i){return {id:i,label:o};});
+  fetch(FURL+'/api/vote/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({p_password:fkPw,p_action:'save',id:'default',title:title,options:optsObj})})
+    .then(function(r){return r.json();})
+    .then(function(d){ if(d&&d.ok){ toast('已保存'); q('#maVtTitle').value=''; q('#maVtOptions').value=''; mLoadVote(); } else { toast('保存失败'); } })
+    .catch(function(){ toast('网络错误'); });
+}
+function mVoteOp(act,id){
+  if(!fkPw){ toast('缺少口令'); return; }
+  if(act==='del'&&!confirm('确定删除该投票及其全部记录？'))return;
+  fetch(FURL+'/api/vote/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({p_password:fkPw,p_action:act,id:id})})
+    .then(function(r){return r.json();})
+    .then(function(d){ if(d&&d.ok){ toast('已操作'); mLoadVote(); } else { toast('操作失败'); } })
+    .catch(function(){ toast('网络错误'); });
+}
+if(q('#maVtSave'))q('#maVtSave').onclick=mSaveVote;
+if(q('#maVtClear'))q('#maVtClear').onclick=function(){ mVoteOp('clear_records','default'); };
+if(q('#maVtToggle'))q('#maVtToggle').onclick=function(){ mVoteOp('toggle_active','default'); };
+if(q('#maVtList'))q('#maVtList').addEventListener('click',function(e){
+  var b=e.target.closest('[data-vote]'); if(!b)return;
+  mVoteOp(b.getAttribute('data-vote'), b.getAttribute('data-id'));
+});
+
+// ===== 反馈（反馈站）=====
+var fbAll=[];
+function mLoadFeedback(){
+  if(!fkPw){ toast('缺少口令'); return; }
+  fetch(FURL+'/api/rest/v1/Feedback?admin=1&pw='+encodeURIComponent(fkPw)+'&select=*&order=created_at.desc&limit=200',{cache:'no-store'})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(Array.isArray(d)){ fbAll=d; mRenderFeedback(); }
+      else { toast('反馈加载失败'); }
+    })
+    .catch(function(){ toast('反馈服务不可用'); });
+}
+function fbPublicOf(o){ return !(o.is_public===false||o.is_public==='false'||o.is_public===0||o.is_public==='0'); }
+function mRenderFeedback(){
+  var list=q('#maFbList'); if(!list)return;
+  var flt=q('#maFbFilter').value;
+  var arr=fbAll.filter(function(f){
+    if(flt==='pending'&&f.status!=='pending')return false;
+    if(flt==='done'&&f.status!=='done')return false;
+    return true;
+  });
+  list.innerHTML=arr.map(function(f){
+    var pub=fbPublicOf(f)?'公开':'私密';
+    var st={pending:'待处理',doing:'处理中',done:'已处理'}[f.status]||f.status;
+    var h='<div class="m-adm-item"><div class="at">'+esc(f.no||'')+' <span style="font-size:12px;color:var(--txt2);">'+esc(st)+' · '+esc(pub)+'</span></div>';
+    h+='<div class="am">'+esc(f.gameId||'')+' · '+esc(fmt(f.created_at||''))+'</div>';
+    if(f.description)h+='<div class="ac">'+esc(String(f.description).slice(0,160))+'</div>';
+    if(f.reply)h+='<div class="ac">回复：'+esc(String(f.reply).slice(0,120))+'</div>';
+    h+='<div class="aops">';
+    h+='<button data-fb="status" data-id="'+esc(f.id)+'" data-v="'+(f.status==='done'?'pending':'done')+'">'+(f.status==='done'?'改待处理':'标记已处理')+'</button>';
+    h+='<button data-fb="pub" data-id="'+esc(f.id)+'">'+(pub==='公开'?'设为私密':'设为公开')+'</button>';
+    h+='<button class="del" data-fb="del" data-id="'+esc(f.id)+'">删除</button>';
+    h+='</div></div>';
+    return h;
+  }).join('')||'<p class="m-sub">暂无反馈</p>';
+}
+function mFbOp(act,id,v){
+  if(!fkPw){ toast('缺少口令'); return; }
+  var body={p_password:fkPw,p_action:'update',p_id:id};
+  if(act==='status'){ body.p_status=v; }
+  if(act==='pub'){ var cur=fbAll.filter(function(f){return f.id===id;})[0]; body.p_is_public=fbPublicOf(cur)?0:1; }
+  if(act==='del'){ if(!confirm('确定删除这条反馈？删除后不可恢复。'))return; body={p_password:fkPw,p_action:'delete',p_id:id}; }
+  fetch(FURL+'/api/rest/v1/rpc/admin_action',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+    .then(function(r){return r.json();})
+    .then(function(d){ if(d==='ok'){ toast('已操作'); mLoadFeedback(); } else { toast('操作失败'); } })
+    .catch(function(){ toast('网络错误'); });
+}
+if(q('#maFbList'))q('#maFbList').addEventListener('click',function(e){
+  var b=e.target.closest('[data-fb]'); if(!b)return;
+  mFbOp(b.getAttribute('data-fb'), b.getAttribute('data-id'), b.getAttribute('data-v'));
+});
+if(q('#maFbFilter'))q('#maFbFilter').addEventListener('change',mRenderFeedback);
+
+// ===== 列表操作（编辑/删除/复制）=====
+function bindListOps(){
+  var rootEl=panel;
+  if(!rootEl)return;
+  rootEl.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    if(b.getAttribute('data-del')){
+      var id=b.getAttribute('data-del');
+      var kind=editingKind;
+      var section=b.closest('.m-adm-pane');
+      var action=null;
+      if(section===q('#mPaneNotice'))action='deleteAnnouncement';
+      else if(section===q('#mPaneHistory'))action='deleteAnnouncement';
+      else if(section===q('#mPaneFeed'))action='deleteFeed';
+      else if(section===q('#mPaneSponsor'))action='deleteSponsor';
+      else if(section===q('#mPaneReplay'))action='deleteReplay';
+      if(!action){ return; }
+      if(!confirm('确定删除这条记录吗？'))return;
+      mApi(action,{id:id}).then(function(res){
+        if(res&&res.ok){
+          toast('已删除');
+          mData.announcements=res.announcements||mData.announcements;
+          mData.feeds=res.feeds||mData.feeds;
+          mData.sponsors=res.sponsors||mData.sponsors;
+          mData.replays=res.replays||mData.replays;
+          mRenderNotice(); mRenderHist(); mRenderFeed(); mRenderSponsor(); mRenderReplay();
+        }
+      });
+      return;
+    }
+    if(b.getAttribute('data-delimg')){
+      var id2=b.getAttribute('data-delimg');
+      if(!confirm('确定删除这张图片吗？'))return;
+      mApi('deleteImage',{id:id2}).then(function(res){
+        if(res&&res.ok){ toast('已删除'); mData.images=res.images||mData.images; mRenderImage(); }
+      });
+      return;
+    }
+    if(b.getAttribute('data-copy')){
+      var id3=b.getAttribute('data-copy');
+      var txt='img:'+id3;
+      try{
+        var ta=document.createElement('textarea');
+        ta.value=txt; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); ta.remove();
+        toast('已复制 img:'+id3);
+      }catch(err){ toast('复制失败：'+txt); }
+      return;
+    }
+    if(b.getAttribute('data-edit')){
+      var id4=b.getAttribute('data-edit');
+      var sec=b.closest('.m-adm-pane');
+      if(sec===q('#mPaneNotice')){
+        var a=noticeItems().filter(function(x){return x.id===id4;})[0];
+        if(!a)return;
+        editingKind='ann'; editingId=id4;
+        q('#maAnTitle').value=String(a.title||'').replace(/^hist:/,'');
+        q('#maAnDate').value=a.date||'';
+        q('#maAnContent').value=a.content||'';
+        q('#maAnSave').textContent='保存修改';
+        q('#maAnCancel').style.display='block';
+        q('#maAnCancel').onclick=function(){ editingKind=null; editingId=null; q('#maAnTitle').value=''; q('#maAnDate').value=''; q('#maAnContent').value=''; q('#maAnSave').textContent='发布'; q('#maAnCancel').style.display='none'; };
+      }
+      if(sec===q('#mPaneHistory')){
+        var h=histItems().filter(function(x){return x.id===id4;})[0];
+        if(!h)return;
+        editingKind='annhist'; editingId=id4;
+        q('#maHyTitle').value=String(h.title||'').replace(/^hist:/,'');
+        q('#maHyDate').value=h.date||'';
+        q('#maHyContent').value=h.content||'';
+        q('#maHySave').textContent='保存修改';
+        q('#maHyCancel').style.display='block';
+        q('#maHyCancel').onclick=function(){ editingKind=null; editingId=null; q('#maHyTitle').value=''; q('#maHyDate').value=''; q('#maHyContent').value=''; q('#maHySave').textContent='发布'; q('#maHyCancel').style.display='none'; };
+      }
+      if(sec===q('#mPaneFeed')){
+        var f=(mData.feeds||[]).filter(function(x){return x.id===id4;})[0];
+        if(!f)return;
+        editingKind='feed'; editingId=id4;
+        q('#maFdTitle').value=f.title||'';
+        q('#maFdImg').value=f.image||'';
+        q('#maFdDate').value=f.date||'';
+        q('#maFdContent').value=f.content||'';
+        q('#maFdPin').checked=!!f.pinned;
+        q('#maFdSave').textContent='保存修改';
+        q('#maFdCancel').style.display='block';
+        q('#maFdCancel').onclick=function(){ editingKind=null; editingId=null; q('#maFdTitle').value=''; q('#maFdImg').value=''; q('#maFdDate').value=''; q('#maFdContent').value=''; q('#maFdPin').checked=false; q('#maFdSave').textContent='发布'; q('#maFdCancel').style.display='none'; };
+      }
+      if(sec===q('#mPaneSponsor')){
+        var s=(mData.sponsors||[]).filter(function(x){return x.id===id4;})[0];
+        if(!s)return;
+        editingKind='sponsor'; editingId=id4;
+        q('#maSpName').value=s.name||'';
+        q('#maSpAmount').value=s.amount||'';
+        q('#maSpSave').textContent='保存修改';
+        q('#maSpCancel').style.display='block';
+        q('#maSpCancel').onclick=function(){ editingKind=null; editingId=null; q('#maSpName').value=''; q('#maSpAmount').value=''; q('#maSpSave').textContent='添加'; q('#maSpCancel').style.display='none'; };
+      }
+      if(sec===q('#mPaneReplay')){
+        var r=(mData.replays||[]).filter(function(x){return x.id===id4;})[0];
+        if(!r)return;
+        editingKind='replay'; editingId=id4;
+        q('#maRpTitle').value=r.title||'';
+        q('#maRpUrl').value=r.url||'';
+        q('#maRpDate').value=r.date||'';
+        q('#maRpSave').textContent='保存修改';
+        q('#maRpCancel').style.display='block';
+        q('#maRpCancel').onclick=function(){ editingKind=null; editingId=null; q('#maRpTitle').value=''; q('#maRpUrl').value=''; q('#maRpDate').value=''; q('#maRpSave').textContent='发布'; q('#maRpCancel').style.display='none'; };
+      }
+    }
+  });
+}
+bindListOps();
+
+// 已登录则直接展开
+if(token){
+  loginBox.style.display='none';
+  panel.style.display='block';
+  mLoadData();
+}
+})();
+
+</script>
 </body>
 
 </html>
