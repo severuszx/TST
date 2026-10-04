@@ -370,65 +370,6 @@ main::-webkit-scrollbar{display:none;}
     </div>
   </section>
 
-  <!-- 便捷工具（移动版独立页） -->
-  <section class="page" id="page-tool">
-    <div class="m-card">
-      <div class="m-title"><span class="ico">▦</span>便捷工具</div>
-      <p class="m-sub">选择要使用的工具</p>
-      <div class="tool-grid-m">
-        <div class="tool-card-m" data-mtool="tcomp"><div class="tc-i">▦</div><div class="tc-n">T显编译器</div><div class="tc-d">生成 Minecraft JSON 文本</div></div>
-        <div class="tool-card-m" data-mtool="jfmt"><div class="tc-i">{} </div><div class="tc-n">JSON 工具</div><div class="tc-d">格式化 · 压缩 · 校验</div></div>
-      </div>
-    </div>
-
-    <div class="m-card mtool-panel" id="mtool-tcomp" style="display:none;">
-      <div class="m-title"><span class="ico">▦</span>T显编译器<span style="margin-left:auto;font-size:12px;color:var(--txt2);cursor:pointer;" data-close-tool>收起</span></div>
-      <label>目标版本</label>
-      <div class="style-row">
-        <button class="style-btn on" data-mver="java">Java 版</button>
-        <button class="style-btn" data-mver="netease">网易版</button>
-      </div>
-      <label>元素类型</label>
-      <select id="mElemType">
-        <option value="text">文本</option>
-        <option value="selector">选择器</option>
-        <option value="score">记分板</option>
-        <option value="translate">翻译键</option>
-      </select>
-      <label id="mElemLabel">文本内容</label>
-      <input type="text" id="mElemInput" placeholder="输入内容">
-      <label>颜色</label>
-      <div class="color-row" id="mColorRow"></div>
-      <label>样式</label>
-      <div class="style-row2">
-        <label><input type="checkbox" id="mBold">粗体</label>
-        <label><input type="checkbox" id="mItalic">斜体</label>
-        <label><input type="checkbox" id="mUnder">下划线</label>
-        <label><input type="checkbox" id="mStrike">删除线</label>
-      </div>
-      <button class="btn" id="mGenJson" style="margin-top:14px;">生成 JSON</button>
-      <div class="output-m" id="mJsonOut">点击生成后，JSON 显示在这里</div>
-      <button class="btn ghost" id="mCopyJson" style="margin-top:10px;">复制 JSON</button>
-    </div>
-
-    <div class="m-card mtool-panel" id="mtool-jfmt" style="display:none;">
-      <div class="m-title"><span class="ico">{"}</span>JSON 工具<span style="margin-left:auto;font-size:12px;color:var(--txt2);cursor:pointer;" data-close-tool>收起</span></div>
-      <label>输入 JSON</label>
-      <textarea id="mJsonIn" placeholder='{"key":"value"}'></textarea>
-      <div style="display:flex;gap:8px;margin-top:12px;">
-        <button class="btn" id="mJsonFmt" style="flex:1;">格式化</button>
-        <button class="btn ghost" id="mJsonMin" style="flex:1;">压缩</button>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="btn ghost" id="mJsonEsc" style="flex:1;">转义</button>
-        <button class="btn ghost" id="mJsonUnesc" style="flex:1;">反转义</button>
-      </div>
-      <label style="margin-top:14px;">输出</label>
-      <textarea id="mJsonOutTxt" placeholder="结果输出到这里" readonly></textarea>
-      <button class="btn ghost" id="mCopyJson2" style="margin-top:10px;">复制结果</button>
-    </div>
-  </section>
-
   <!-- 个人中心（移动版独立页） -->
   <section class="page" id="page-profile">
     <div class="m-card">
@@ -553,7 +494,6 @@ main::-webkit-scrollbar{display:none;}
 <nav class="m-tabbar">
   <button class="m-tab active" data-tab="home"><span class="ti">≋</span>首页</button>
   <button class="m-tab" data-tab="vote"><span class="ti">▥</span>投票</button>
-  <button class="m-tab" data-tab="tool"><span class="ti">▦</span>工具</button>
   <button class="m-tab" data-tab="fb"><span class="ti">✉</span>反馈</button>
   <button class="m-tab" data-tab="more"><span class="ti">≡</span>更多</button>
 </nav>
