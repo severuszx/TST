@@ -2147,9 +2147,6 @@ main::-webkit-scrollbar{display:none;}
 
 })();
 
-  // 暴露给子页面 IIFE 的全局（移动端独立栏目页使用）
-
-  window.esc=esc;window.cloudNow=cloudNow;window.devId=devId;
 
 </script>
 
@@ -2849,6 +2846,17 @@ closing:'本条约目前仍在持续修订中，暂不作为最终正式版本�
 
 };
 
+  function esc(s){
+    return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function cloudNow(){
+    return Date.now();
+  }
+  function devId(){
+    var d=null;try{d=localStorage.getItem('tst_vote_devid');}catch(e){}
+    if(!d){ d='dv-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10); try{localStorage.setItem('tst_vote_devid',d);}catch(e){} }
+    return d;
+  }
   var M_DATA_API='https://tst-server-site.pages.dev/api/data';
 
   var _mdata=null;
