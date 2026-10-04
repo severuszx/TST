@@ -6221,6 +6221,16 @@ window.TST_HUNDRED = {
   }
 };
 
+
+window.CONFIG=CONFIG;window.LK=LK;window.STORE=STORE;
+window.triesLeft=triesLeft;window.lockTries=lockTries;window.paintLimitUI=paintLimitUI;
+window.readTries=readTries;window.writeTries=writeTries;window.todayStr=todayStr;
+window.serverToday=serverToday;window.floorTries=floorTries;window.hasPassed=hasPassed;
+window.cooldownUntil=cooldownUntil;window.isLocked=isLocked;window.unlockTries=unlockTries;
+window.lockRemainMs=lockRemainMs;window.markPassed=markPassed;
+window.paintTriesNote=paintTriesNote;window.paintLockBox=paintLockBox;
+window.todayKey=todayKey;window.lsGet=lsGet;window.lsSet=lsSet;window.lsDel=lsDel;
+window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
 })();
 </script>
 <script>
@@ -6386,7 +6396,8 @@ window.TST_HUNDRED = {
         if(!title||!opts.length){ showToast('标题和选项不能为空'); return; }
         const d=await voteAdmin('save',{p_password:pwd,id:window.__voteEditId||'default',title,options:opts});
         if(d&&d.ok){ showToast('已保存'); window.__voteEditId=null; } else showToast('保存失败：口令错误？');
-      })();
+      
+})();
     }
     if(e.target.id==='voteClearBtn'){
       (async()=>{
