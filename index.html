@@ -17,8 +17,27 @@
 <script>
 const serverStart=new Date('2026-06-30T00:00:00');
 const offsetMs=120*1000; // 服务器启动时间校准偏移：serverStart 比实际开服晚 2 分钟，此处补回（单位毫秒）
+// ===== 云端时间校准 =====
+// 以同源请求响应的 Date 头为云端基准，用 performance.now()（单调时钟）计算流逝，
+// 玩家修改本地系统时间不影响任何时间显示与倒计时。
+var cloudBaseMs=Date.now(), perfBase=performance.now();
+function cloudNow(){
+  try{ return cloudBaseMs + (performance.now()-perfBase); }
+  catch(e){ return Date.now(); }
+}
+(function(){
+  try{
+    fetch(location.href,{cache:'no-store'}).then(function(r){
+      var dh=r.headers.get('date');
+      if(dh){
+        var t=Date.parse(dh);
+        if(!isNaN(t)){ cloudBaseMs=t; perfBase=performance.now(); }
+      }
+    }).catch(function(){});
+  }catch(e){}
+})();
 function updateTime(){
-  const now=new Date();
+  const now=new Date(cloudNow());
   const hh=String(now.getHours()).padStart(2,'0');
   const mm=String(now.getMinutes()).padStart(2,'0');
   const ss=String(now.getSeconds()).padStart(2,'0');
@@ -4492,7 +4511,7 @@ function startLotteryCountdown(){
   var el=document.getElementById('lotteryCountdown');
   if(!el) return;
   function tick(){
-    var diff=LOTTERY_START.getTime()-new Date().getTime();
+    var diff=LOTTERY_START.getTime()-cloudNow();
     if(diff<=0){
       el.textContent='活动已开放，快来参与！';
       el.classList.add('open');
@@ -4510,7 +4529,7 @@ function startLotteryCountdown(){
 }
 function checkLotteryState(){
   var btn=document.getElementById('lotteryBtn');
-  var now=new Date();
+  var now=new Date(cloudNow());
   if(now<LOTTERY_START){
     if(btn){ btn.disabled=true; btn.textContent='未开放'; }
     startLotteryCountdown();
@@ -4529,7 +4548,7 @@ function checkLotteryState(){
   window._lotteryEndTimer=setInterval(function(){
     var el=document.getElementById('lotteryCountdown');
     if(!el) return;
-    var d=LOTTERY_END.getTime()-new Date().getTime();
+    var d=LOTTERY_END.getTime()-cloudNow();
     if(d<=0){ clearInterval(window._lotteryEndTimer); el.textContent='活动已结束'; return; }
     var dd=Math.floor(d/86400000), hh=Math.floor(d%86400000/3600000), mm=Math.floor(d%3600000/60000), ss=Math.floor(d%60000/1000);
     el.textContent='距结束 '+('0'+dd).slice(-2)+'天 '+('0'+hh).slice(-2)+':'+('0'+mm).slice(-2)+':'+('0'+ss).slice(-2);
@@ -6231,6 +6250,7 @@ window.TST_HUNDRED = {
     }
   }
   function renderForm(d){
+    const box=document.getElementById('voteBody');
     const h=['<h3 style="margin:0 0 6px;color:var(--text);">'+esc(d.title)+'</h3>',
       '<p class="vote-hint">选择一个选项提交，每台设备限投一次，投完即可查看结果</p>',
       '<div class="vote-opts" id="voteOpts">'];
@@ -6261,6 +6281,7 @@ window.TST_HUNDRED = {
     }catch(e){ msg.textContent='提交失败，请重试'; btn.disabled=false; btn.textContent='提交投票'; }
   }
   function renderResult(d){
+    const box=document.getElementById('voteBody');
     const vr=d.voteResult||{};
     const rows=vr.result||[];
     const h=['<h3 style="margin:0 0 6px;color:var(--text);">'+esc(d.title)+'</h3>',

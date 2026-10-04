@@ -70,8 +70,10 @@ html[data-theme="glass"] .light-orb{display:block;opacity:.14;}
   position:fixed;top:0;left:0;right:0;z-index:50;
   padding:calc(var(--sat) + 10px) 16px 10px;
   display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(180deg,var(--card),transparent);
+  background:var(--card);
+  border-bottom:1px solid var(--card-brd);
 }
+html[data-theme="glass"] .m-top{background:rgba(255,255,255,.3);border-bottom:1px solid rgba(255,255,255,.4);}
 .m-logo{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
 .m-logo img{width:30px;height:30px;border-radius:9px;object-fit:cover;box-shadow:0 1px 4px rgba(15,23,42,.15);}
 .m-logo span{font-size:17px;font-weight:800;letter-spacing:.5px;color:var(--txt);}
@@ -100,7 +102,7 @@ main::-webkit-scrollbar{display:none;}
 }
 .m-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(125,211,252,.5),transparent);
+  background:transparent;
 }
 .m-title{font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
 .m-title .ico{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:linear-gradient(135deg,rgba(56,189,248,.25),rgba(129,140,248,.25));}
@@ -256,7 +258,7 @@ main::-webkit-scrollbar{display:none;}
       </div>
       <div class="slide-dots" id="slideDots"></div>
     </div>
-    <div class="banner-wrap">
+    <div class="banner-wrap" style="display:none;">
       <div class="banner-track" id="bannerTrack"></div>
       <div class="banner-dots" id="bannerDots"></div>
     </div>
@@ -386,6 +388,21 @@ main::-webkit-scrollbar{display:none;}
   var $=function(s){return document.querySelector(s);};
   var VOTE_API='https://theslowtidefk.pages.dev/api/vote';
   var DATA_API='https://tst-server-site.pages.dev/api/data';
+  // ===== 云端时间校准 =====
+  // 以同源响应 Date 头为云端基准 + performance.now() 单调流逝，玩家改本地系统时间不影响时间显示与倒计时
+  var cloudBaseMs=Date.now(), perfBase=performance.now();
+  function cloudNow(){
+    try{ return cloudBaseMs+(performance.now()-perfBase); }
+    catch(e){ return Date.now(); }
+  }
+  (function(){
+    try{
+      fetch(location.href,{cache:'no-store'}).then(function(r){
+        var dh=r.headers.get('date');
+        if(dh){ var t=Date.parse(dh); if(!isNaN(t)){ cloudBaseMs=t; perfBase=performance.now(); } }
+      }).catch(function(){});
+    }catch(e){}
+  })();
   // ===== Toast =====
   var toastTimer=null;
   function toast(msg){
@@ -444,13 +461,13 @@ main::-webkit-scrollbar{display:none;}
   // ===== 北京时间 + 运行时间 =====
   var srvStartT=null;
   setInterval(function(){
-    var d=new Date();
+    var d=new Date(cloudNow());
     var p=function(n){return (n<10?'0':'')+n;};
     var s=p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
     var el=$('#bjTime'); if(el)el.textContent=s;
     var upEl2=$('#srvUp');
     if(upEl2){
-      if(srvStartT){ var diff=Math.floor((Date.now()-srvStartT)/1000); upEl2.textContent=fmtUp(diff); }
+      if(srvStartT){ var diff=Math.floor((cloudNow()-srvStartT)/1000); upEl2.textContent=fmtUp(diff); }
       else { upEl2.textContent='已关闭'; }
     }
   },1000);
@@ -498,7 +515,7 @@ main::-webkit-scrollbar{display:none;}
       if(sv.start){ var t0=new Date(sv.start).getTime(); if(isNaN(t0)){ t0=Number(sv.start)*1000; } if(!isNaN(t0)&&t0>0){ startT=t0; } }
       if(!startT){ startT=new Date('2026-06-30T00:00:00').getTime()+120000; }
       srvStartT=startT;
-      var diff=Math.floor((Date.now()-srvStartT)/1000);
+      var diff=Math.floor((cloudNow()-srvStartT)/1000);
       if(upEl){ upEl.textContent=fmtUp(diff); }
     }
     var ver=sv.version;
