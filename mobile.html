@@ -1733,6 +1733,12 @@ main::-webkit-scrollbar{display:none;}
 
     var attempt=0;
 
+    function failUI(){
+      box.innerHTML='<p class="empty-hint">加载失败，请检查网络后点下方重试</p><button class="btn ghost" style="margin-top:12px;" id="voteRetry">重新加载</button>';
+      var rb=$('#voteRetry');
+      if(rb)rb.addEventListener('click',function(){ loadVote(); });
+    }
+
     function go(){
 
       fetch(VOTE_API+'/state?topic='+voteTopic+'&dev='+encodeURIComponent(devId()))
@@ -1751,9 +1757,9 @@ main::-webkit-scrollbar{display:none;}
 
         attempt++;
 
-        if(attempt<5){ setTimeout(go,1800*attempt); }
+        if(attempt<3){ setTimeout(go,800); }
 
-        else{ box.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; }
+        else{ failUI(); }
 
       });
 
