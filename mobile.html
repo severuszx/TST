@@ -220,6 +220,40 @@ main::-webkit-scrollbar{display:none;}
 .m-tab.active{color:var(--accent);background:var(--accent-soft);}
 .m-tab.active .ti{transform:translateY(-1px) scale(1.12);}
 .m-tab.active::after{content:'';position:absolute;top:2px;width:16px;height:3px;border-radius:99px;background:var(--accent);}
+/* ===== 移动版工具 ===== */
+.tool-grid-m{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tool-card-m{background:var(--cell);border:1px solid var(--card-brd);border-radius:16px;padding:16px 12px;text-align:center;cursor:pointer;transition:transform .15s;}
+.tool-card-m:active{transform:scale(.94);}
+.tool-card-m .tc-i{font-size:24px;margin-bottom:8px;}
+.tool-card-m .tc-n{font-size:14px;font-weight:700;}
+.tool-card-m .tc-d{font-size:11px;color:var(--txt2);margin-top:4px;line-height:1.5;}
+.mtool-panel{margin-top:14px;}
+.mtool-panel label{display:block;font-size:12px;color:var(--txt2);margin:12px 0 6px;}
+.mtool-panel select,.mtool-panel input[type=text]{
+  width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--card-brd);
+  background:var(--card);color:var(--txt);font-size:14px;outline:none;
+}
+.mtool-panel textarea{width:100%;min-height:120px;padding:11px 12px;border-radius:12px;border:1px solid var(--card-brd);background:var(--card);color:var(--txt);font-size:13px;font-family:ui-monospace,Consolas,monospace;outline:none;resize:vertical;box-sizing:border-box;}
+.style-row{display:flex;gap:8px;}
+.style-btn{flex:1;padding:9px 0;border-radius:12px;border:1px solid var(--card-brd);background:var(--card);color:var(--txt2);font-size:13px;cursor:pointer;}
+.style-btn.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+.color-row{display:flex;flex-wrap:wrap;gap:8px;}
+.color-chip{width:30px;height:30px;border-radius:50%;border:2px solid var(--card-brd);cursor:pointer;position:relative;}
+.color-chip.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft);}
+.style-row2{display:flex;gap:12px;font-size:13px;color:var(--txt);}
+.style-row2 label{display:flex;align-items:center;gap:5px;margin:0;}
+.style-row2 input{accent-color:var(--accent);}
+.output-m{margin-top:12px;padding:12px;border-radius:12px;background:var(--cell);border:1px solid var(--card-brd);font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.7;word-break:break-all;color:var(--txt);min-height:40px;}
+.output-m.err{color:var(--danger);}
+/* ===== 移动版个人中心 ===== */
+.profile-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--card-brd);font-size:13.5px;}
+.profile-row:last-child{border-bottom:none;}
+.profile-row .pk{color:var(--txt2);}
+.profile-row .pv{color:var(--txt);max-width:60%;text-align:right;word-break:break-all;}
+.m-switch{position:relative;width:44px;height:26px;border-radius:99px;background:var(--card-brd);cursor:pointer;transition:background .25s;flex:none;}
+.m-switch.on{background:var(--ok);}
+.m-switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .25s;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+.m-switch.on::after{left:21px;}
 /* ===== 弹窗 ===== */
 .mask{position:fixed;inset:0;background:rgba(2,8,16,.6);z-index:80;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);}
 .mask.open{display:flex;animation:fadeIn .2s ease;}
@@ -315,6 +349,97 @@ main::-webkit-scrollbar{display:none;}
     </div>
   </section>
 
+  <!-- 便捷工具（移动版独立页） -->
+  <section class="page" id="page-tool">
+    <div class="m-card">
+      <div class="m-title"><span class="ico">▦</span>便捷工具</div>
+      <p class="m-sub">选择要使用的工具</p>
+      <div class="tool-grid-m">
+        <div class="tool-card-m" data-mtool="tcomp"><div class="tc-i">▦</div><div class="tc-n">T显编译器</div><div class="tc-d">生成 Minecraft JSON 文本</div></div>
+        <div class="tool-card-m" data-mtool="jfmt"><div class="tc-i">{} </div><div class="tc-n">JSON 工具</div><div class="tc-d">格式化 · 压缩 · 校验</div></div>
+      </div>
+    </div>
+
+    <div class="m-card mtool-panel" id="mtool-tcomp" style="display:none;">
+      <div class="m-title"><span class="ico">▦</span>T显编译器<span style="margin-left:auto;font-size:12px;color:var(--txt2);cursor:pointer;" data-close-tool>收起</span></div>
+      <label>目标版本</label>
+      <div class="style-row">
+        <button class="style-btn on" data-mver="java">Java 版</button>
+        <button class="style-btn" data-mver="netease">网易版</button>
+      </div>
+      <label>元素类型</label>
+      <select id="mElemType">
+        <option value="text">文本</option>
+        <option value="selector">选择器</option>
+        <option value="score">记分板</option>
+        <option value="translate">翻译键</option>
+      </select>
+      <label id="mElemLabel">文本内容</label>
+      <input type="text" id="mElemInput" placeholder="输入内容">
+      <label>颜色</label>
+      <div class="color-row" id="mColorRow"></div>
+      <label>样式</label>
+      <div class="style-row2">
+        <label><input type="checkbox" id="mBold">粗体</label>
+        <label><input type="checkbox" id="mItalic">斜体</label>
+        <label><input type="checkbox" id="mUnder">下划线</label>
+        <label><input type="checkbox" id="mStrike">删除线</label>
+      </div>
+      <button class="btn" id="mGenJson" style="margin-top:14px;">生成 JSON</button>
+      <div class="output-m" id="mJsonOut">点击生成后，JSON 显示在这里</div>
+      <button class="btn ghost" id="mCopyJson" style="margin-top:10px;">复制 JSON</button>
+    </div>
+
+    <div class="m-card mtool-panel" id="mtool-jfmt" style="display:none;">
+      <div class="m-title"><span class="ico">{"}</span>JSON 工具<span style="margin-left:auto;font-size:12px;color:var(--txt2);cursor:pointer;" data-close-tool>收起</span></div>
+      <label>输入 JSON</label>
+      <textarea id="mJsonIn" placeholder='{"key":"value"}'></textarea>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn" id="mJsonFmt" style="flex:1;">格式化</button>
+        <button class="btn ghost" id="mJsonMin" style="flex:1;">压缩</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn ghost" id="mJsonEsc" style="flex:1;">转义</button>
+        <button class="btn ghost" id="mJsonUnesc" style="flex:1;">反转义</button>
+      </div>
+      <label style="margin-top:14px;">输出</label>
+      <textarea id="mJsonOutTxt" placeholder="结果输出到这里" readonly></textarea>
+      <button class="btn ghost" id="mCopyJson2" style="margin-top:10px;">复制结果</button>
+    </div>
+  </section>
+
+  <!-- 个人中心（移动版独立页） -->
+  <section class="page" id="page-profile">
+    <div class="m-card">
+      <div class="m-title"><span class="ico">◈</span>个人中心</div>
+      <div class="profile-row"><span class="pk">设备标识</span><span class="pv" id="mpDevice">--</span></div>
+      <div class="profile-row"><span class="pk">设备类型</span><span class="pv" id="mpDeviceType">--</span></div>
+      <div class="profile-row"><span class="pk">浏览器</span><span class="pv" id="mpUA">--</span></div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title"><span class="ico">◇</span>外观</div>
+      <div class="profile-row"><span class="pk">深色模式</span><span class="m-switch" id="mpDarkSwitch"></span></div>
+      <p class="m-sub" style="margin-top:8px;">液态玻璃主题需在调试台输入调试码开启</p>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title"><span class="ico">⌘</span>调试台</div>
+      <p class="m-sub">输入调试码激活对应功能</p>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <input type="text" id="mpDebugInput" placeholder="输入调试码" style="flex:1;padding:10px 12px;border-radius:12px;border:1px solid var(--card-brd);background:var(--card);color:var(--txt);font-size:14px;outline:none;">
+        <button class="btn" id="mpDebugBtn">执行</button>
+      </div>
+      <div id="mpDebugMsg" style="margin-top:8px;font-size:12px;color:var(--txt2);min-height:16px;"></div>
+    </div>
+
+    <div class="m-card">
+      <div class="m-title"><span class="ico">✉</span>更多</div>
+      <button class="btn ghost" id="mpFbBtn" style="margin-top:10px;">打开反馈站</button>
+      <button class="btn ghost" id="mpAdminBtn" style="margin-top:10px;">管理员登录</button>
+    </div>
+  </section>
+
   <!-- 更多 -->
   <section class="page" id="page-more">
     <div class="mlist">
@@ -325,6 +450,7 @@ main::-webkit-scrollbar{display:none;}
       <div class="mitem" data-go="rule"><div class="mi">≡</div><div class="mt"><b>玩家公约</b><span>服务器守则</span></div><span class="ar">›</span></div>
       <div class="mitem" data-go="sponsor"><div class="mi">◉</div><div class="mt"><b>服务器赞助</b><span>支持我们走得更远</span></div><span class="ar">›</span></div>
       <div class="mitem" data-go="team"><div class="mi">◍</div><div class="mt"><b>管理团队</b><span>运营组与荣誉成员</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="profile"><div class="mi">◈</div><div class="mt"><b>个人中心</b><span>设备信息 · 主题 · 调试</span></div><span class="ar">›</span></div>
     </div>
 
     <div class="m-card" style="margin-top:14px;">
@@ -355,6 +481,7 @@ main::-webkit-scrollbar{display:none;}
 <nav class="m-tabbar">
   <button class="m-tab active" data-tab="home"><span class="ti">≋</span>首页</button>
   <button class="m-tab" data-tab="vote"><span class="ti">▥</span>投票</button>
+  <button class="m-tab" data-tab="tool"><span class="ti">▦</span>工具</button>
   <button class="m-tab" data-tab="fb"><span class="ti">✉</span>反馈</button>
   <button class="m-tab" data-tab="more"><span class="ti">≡</span>更多</button>
 </nav>
@@ -423,17 +550,22 @@ main::-webkit-scrollbar{display:none;}
 
   // ===== Tab 切换 =====
   var tabs=document.querySelectorAll('.m-tab');
+  function showTab(name){
+    tabs.forEach(function(x){x.classList.remove('active');});
+    var tb=document.querySelector('.m-tab[data-tab="'+name+'"]');
+    if(tb)tb.classList.add('active');
+    var id='page-'+name;
+    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+    var pg=document.getElementById(id);
+    if(pg)pg.classList.add('active');
+    $('#main').scrollTop=0;
+    if(id==='page-vote')loadVote();
+    if(id==='page-home')loadData();
+    if(id==='page-tool')initMTool();
+    if(id==='page-profile')initMProfile();
+  }
   tabs.forEach(function(t){
-    t.addEventListener('click',function(){
-      tabs.forEach(function(x){x.classList.remove('active');});
-      t.classList.add('active');
-      var id='page-'+t.getAttribute('data-tab');
-      document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-      $('#'+id).classList.add('active');
-      $('#main').scrollTop=0;
-      if(id==='page-vote')loadVote();
-      if(id==='page-home')loadData();
-    });
+    t.addEventListener('click',function(){ showTab(t.getAttribute('data-tab')); });
   });
 
   // ===== Logo 连点 5 次 → 隐藏页 =====
@@ -455,7 +587,8 @@ main::-webkit-scrollbar{display:none;}
   document.querySelectorAll('[data-go]').forEach(function(el){
     el.addEventListener('click',function(){
       var g=el.getAttribute('data-go');
-      if(g==='tool'){ location.href='index.html?m=0'; setTimeout(function(){location.href='tool.html';},60); return; }
+      if(g==='tool'){ showTab('tool'); return; }
+      if(g==='profile'){ showTab('profile'); return; }
       if(g==='team'){ document.getElementById('page-more').scrollIntoView({behavior:'smooth'}); document.getElementById('teamHead').click(); return; }
       goDesktop(g);
     });
@@ -860,6 +993,171 @@ main::-webkit-scrollbar{display:none;}
     $('#page-vote').classList.add('active');
     setTimeout(loadVote,3000);
   }
+})();
+</script>
+<script>
+// ===== 移动版便捷工具（T显编译器 + JSON 工具）=====
+(function(){
+  function $q(s){return document.querySelector(s);}
+  var mVer='java',mColor='white';
+  var mSecCode={white:'f',black:'0',dark_blue:'1',dark_green:'2',dark_aqua:'3',dark_red:'4',dark_purple:'5',gold:'6',gray:'7',dark_gray:'8',blue:'9',green:'a',aqua:'b',red:'c',light_purple:'d',yellow:'e'};
+  var mColors=[['white','#ffffff'],['black','#000000'],['dark_blue','#0000aa'],['dark_green','#00aa00'],['dark_aqua','#00aaaa'],['dark_red','#aa0000'],['dark_purple','#aa00aa'],['gold','#ffaa00'],['gray','#aaaaaa'],['dark_gray','#555555'],['blue','#5555ff'],['green','#55ff55'],['aqua','#55ffff'],['red','#ff5555'],['light_purple','#ff55ff'],['yellow','#ffff55']];
+  window.initMTool=function(){
+    var row=$q('#mColorRow');
+    if(row&&!row.children.length){
+      mColors.forEach(function(c){
+        var i=document.createElement('i');
+        i.className='color-chip'+(c[0]===mColor?' on':'');
+        i.style.background=c[1];
+        i.setAttribute('data-color',c[0]);
+        i.addEventListener('click',function(){
+          document.querySelectorAll('.color-chip').forEach(function(x){x.classList.remove('on');});
+          i.classList.add('on');mColor=c[0];
+        });
+        row.appendChild(i);
+      });
+    }
+  };
+  document.querySelectorAll('[data-mver]').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('[data-mver]').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');mVer=b.getAttribute('data-mver');
+    });
+  });
+  var elemType=$q('#mElemType');
+  if(elemType){
+    elemType.addEventListener('change',function(){
+      var labels={text:'文本内容',selector:'选择器（如 @p @a）',score:'记分板目标（如 @s）',translate:'翻译键（如 key.xxx）'};
+      var l=$q('#mElemLabel');if(l)l.textContent=labels[this.value]||'内容';
+    });
+  }
+  var genBtn=$q('#mGenJson');
+  if(genBtn){
+    genBtn.addEventListener('click',function(){
+      var type=(elemType&&elemType.value)||'text';
+      var inputEl=$q('#mElemInput');
+      var input=(inputEl?inputEl.value:'').trim();
+      var out=$q('#mJsonOut');
+      if(!input){out.textContent='请先输入内容';out.classList.add('err');return;}
+      var bold=$q('#mBold').checked,italic=$q('#mItalic').checked,under=$q('#mUnder').checked,strike=$q('#mStrike').checked;
+      var el;
+      if(mVer==='java'){
+        if(type==='text')el={text:input};
+        else if(type==='selector')el={selector:input};
+        else if(type==='score')el={score:{name:input,objective:'obj'}};
+        else el={translate:input};
+        el.color=mColor;
+        if(bold)el.bold=true;if(italic)el.italic=true;if(under)el.underlined=true;if(strike)el.strikethrough=true;
+      }else{
+        var code='';
+        if(mColor!=='white')code+='§'+mSecCode[mColor];
+        if(bold)code+='§l';if(italic)code+='§o';if(under)code+='§n';if(strike)code+='§m';
+        el={text:code+input};
+      }
+      out.textContent=JSON.stringify(el);
+      out.classList.remove('err');
+    });
+  }
+  function copyM(t){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){try{toast('已复制');}catch(e){}},function(){fallbackCopy(t);});
+    }else fallbackCopy(t);
+  }
+  function fallbackCopy(t){
+    var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');try{toast('已复制');}catch(e){}}catch(e){}
+    document.body.removeChild(ta);
+  }
+  var copyBtn=$q('#mCopyJson');
+  if(copyBtn)copyBtn.addEventListener('click',function(){var t=$q('#mJsonOut').textContent;if(t&&t.indexOf('点击')===-1&&t.indexOf('请先')===-1)copyM(t);});
+  function jTool(mode){
+    var txt=($q('#mJsonIn')||{value:''}).value;
+    var out=$q('#mJsonOutTxt');
+    try{
+      if(mode===1)out.value=JSON.stringify(JSON.parse(txt),null,2);
+      else if(mode===2)out.value=JSON.stringify(JSON.parse(txt));
+      else if(mode===3)out.value=txt.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n');
+      else out.value=txt.replace(/\\\\/g,'\\').replace(/\\"/g,'"').replace(/\\n/g,'\n');
+    }catch(e){out.value='无效 JSON：'+e.message;}
+  }
+  var f1=$q('#mJsonFmt'),f2=$q('#mJsonMin'),f3=$q('#mJsonEsc'),f4=$q('#mJsonUnesc');
+  if(f1)f1.addEventListener('click',function(){jTool(1);});
+  if(f2)f2.addEventListener('click',function(){jTool(2);});
+  if(f3)f3.addEventListener('click',function(){jTool(3);});
+  if(f4)f4.addEventListener('click',function(){jTool(4);});
+  var c2=$q('#mCopyJson2');
+  if(c2)c2.addEventListener('click',function(){var o=$q('#mJsonOutTxt');if(o&&o.value)copyM(o.value);});
+  document.querySelectorAll('[data-close-tool]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var p=$q('#mtool-tcomp'),p2=$q('#mtool-jfmt');
+      if(p)p.style.display='none';if(p2)p2.style.display='none';
+    });
+  });
+  document.querySelectorAll('[data-mtool]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var t=el.getAttribute('data-mtool');
+      var p=$q('#mtool-tcomp'),p2=$q('#mtool-jfmt');
+      if(p)p.style.display=(t==='tcomp'?'block':'none');
+      if(p2)p2.style.display=(t==='jfmt'?'block':'none');
+      if(t==='tcomp')window.initMTool();
+    });
+  });
+})();
+</script>
+<script>
+// ===== 移动版个人中心 =====
+(function(){
+  function $q(s){return document.querySelector(s);}
+  window.initMProfile=function(){
+    var did=null;try{did=localStorage.getItem('tst_dev_id');}catch(e){}
+    if(!did){did='DEV-'+Math.random().toString(36).slice(2,8).toUpperCase();try{localStorage.setItem('tst_dev_id',did);}catch(e){}}
+    var d=$q('#mpDevice');if(d)d.textContent=did;
+    var dt=$q('#mpDeviceType');if(dt)dt.textContent=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)?'移动设备':'平板/桌面';
+    var ua=$q('#mpUA');if(ua)ua.textContent=navigator.userAgent.slice(0,64);
+    var sw=$q('#mpDarkSwitch');
+    var cur=document.documentElement.getAttribute('data-theme');
+    if(sw){
+      sw.classList.toggle('on',cur==='dark');
+      sw.onclick=function(){
+        var dark=document.documentElement.getAttribute('data-theme')!=='dark';
+        document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+        sw.classList.toggle('on',dark);
+        try{localStorage.setItem('tst-theme',dark?'dark':'light');}catch(e){}
+      };
+    }
+    var dbg=$q('#mpDebugBtn');
+    if(dbg){
+      dbg.onclick=function(){
+        var code=($q('#mpDebugInput')||{value:''}).value.trim();
+        var msg=$q('#mpDebugMsg');
+        if(!code){msg.textContent='请输入调试码';return;}
+        var up=code.toUpperCase();
+        if(up==='GLASS'){document.documentElement.setAttribute('data-theme','glass');msg.textContent='已激活液态玻璃主题（本次有效）';return;}
+        if(up==='LIGHT'||up==='DARK'){document.documentElement.setAttribute('data-theme',up==='LIGHT'?'light':'dark');try{localStorage.setItem('tst-theme',up==='LIGHT'?'light':'dark');}catch(e){}msg.textContent='已切换主题';return;}
+        msg.textContent='验证中…';
+        fetch('https://theslowtidefk.pages.dev/api/debug/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:up})})
+          .then(function(r){return r.json();})
+          .then(function(d){
+            if(!d||!d.ok){msg.textContent='调试码无效，请重试';return;}
+            var feat=d.feature;
+            if(feat==='glass'){document.documentElement.setAttribute('data-theme','glass');msg.textContent='已激活液态玻璃主题（本次有效）';}
+            else if(feat==='light'){document.documentElement.setAttribute('data-theme','light');try{localStorage.setItem('tst-theme','light');}catch(e){}msg.textContent='已切换浅色';}
+            else if(feat==='dark'){document.documentElement.setAttribute('data-theme','dark');try{localStorage.setItem('tst-theme','dark');}catch(e){}msg.textContent='已切换深色';}
+            else if(feat==='desktop'){try{localStorage.setItem('tst_force_mode','desktop');}catch(e){}location.href='index.html?m=0';}
+            else if(feat==='mobile'){try{localStorage.setItem('tst_force_mode','mobile');}catch(e){}location.reload();}
+            else if(feat==='perf'){msg.textContent='性能面板（移动端暂未集成，请用 PC 查看）';}
+            else if(feat==='dev'){msg.textContent='UA:'+navigator.userAgent.slice(0,80);}
+            else if(feat==='reset'){try{localStorage.removeItem('tst_force_mode');}catch(e){}location.reload();}
+            else{msg.textContent='功能已执行';}
+          })
+          .catch(function(){msg.textContent='验证服务不可用，请稍后再试';});
+      };
+    }
+    var fb=$q('#mpFbBtn');
+    if(fb)fb.onclick=function(){location.href='https://theslowtidefk.pages.dev/';};
+    var adm=$q('#mpAdminBtn');
+    if(adm)adm.onclick=function(){location.href='index.html?m=0#admin';};
+  };
 })();
 </script>
 </body>
