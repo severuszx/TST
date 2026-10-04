@@ -69,7 +69,9 @@ function setThemeColor(mode){
 }
 try{
   var mode=localStorage.getItem('tst-theme');
-  if(mode!=='glass' && mode!=='dark' && mode!=='light'){ mode='light'; }
+  if(/[?&]glass/.test(location.search)){ mode='glass'; }
+  else if(mode!=='dark'){ mode='light'; }
+  if(mode!=='dark' && mode!=='light'){ mode='light'; }
 }catch(e){ var mode='light'; }
 document.documentElement.setAttribute('data-theme',mode);
 setThemeColor(mode);

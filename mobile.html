@@ -362,11 +362,13 @@ main::-webkit-scrollbar{display:none;}
 <div class="toast" id="toast"></div>
 
 <script>
-// 主题应用（与主站共用 tst-theme）
+// 主题应用（与主站共用 tst-theme；液态玻璃默认不自动启用，仅 URL ?glass 或调试码激活）
 (function(){
   try{
+    if(/[?&]glass/.test(location.search)){ document.documentElement.setAttribute('data-theme','glass'); return; }
     var mode=localStorage.getItem('tst-theme');
-    if(mode==='light'||mode==='glass'){ document.documentElement.setAttribute('data-theme',mode); }
+    if(mode==='dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+    else { document.documentElement.setAttribute('data-theme','light'); }
   }catch(e){}
 })();
 </script>
