@@ -4739,13 +4739,14 @@ function _q3(){
   var gift=document.getElementById('g9');
   var key=(inp?inp.value:'').trim();
   if(!key){ if(msg){msg.textContent='请输入密钥';msg.className='sp-msg err';} return; }
-  // 前端每日 3 次限制（后端同样限制）
-  if(_knockLeft()<=0){
+  // 前端每日 3 次限制（后端同样限制；统一用密钥尝试计数，避免两套计数器显示矛盾）
+  if(triesLeft()<=0){
+    lockTries();
+    paintLimitUI();
     if(msg){ msg.textContent='今日叩门次数已尽，潮汐之门暂时关闭，明日再来。'; msg.className='sp-msg err'; }
     return;
   }
   if(msg){ msg.textContent='潮汐正在翻涌...'; msg.className='sp-msg'; }
-  _knockUse();
   fetch('/api/secret',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key,device:(typeof getDeviceId==='function'?getDeviceId():'')})})
     .then(function(r){return r.json();})
     .then(function(res){
@@ -4755,6 +4756,8 @@ function _q3(){
         _q6(res.code);
         return;
       } else if(res && res.error==='no_chances'){
+        lockTries();
+        paintLimitUI();
         if(msg){ msg.textContent='今日叩门次数已尽，潮汐之门暂时关闭，明日再来。'; msg.className='sp-msg err'; }
       } else if(res && res.error==='used_up'){
         if(msg){ msg.textContent='潮汐已沉寂。这份馈赠已被他人取走，潮门已闭。'; msg.className='sp-msg err'; }
