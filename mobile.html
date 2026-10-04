@@ -1371,8 +1371,9 @@ main::-webkit-scrollbar{display:none;}
 
 
         <div class="m-card drag-card" id="cardCfg">
-      <div class="m-title">配置要求</div>
-      <p style="font-size:12px;color:var(--txt2);margin:0 0 10px;">本服含模组与光影资源，建议参考以下配置。</p>
+      <div class="m-title" id="cfgTitle" style="cursor:pointer;">配置要求 <span style="font-size:11px;color:var(--txt2);font-weight:400;">（最低 / 推荐 · 仅供参考）</span></div>
+      <div id="cfgBody" style="display:none;">
+      <p style="font-size:12px;color:var(--txt2);margin:0 0 10px;">本服含模组与光影资源，以下配置仅供参考。</p>
       <div style="font-size:12px;line-height:1.7;">
         <div style="font-weight:600;">移动端 · 手机/平板</div>
         <div style="color:var(--txt2);">最低：麒麟985 / 苹果A14 / 骁龙855 / 天玑1000L 及以上</div>
@@ -1384,6 +1385,8 @@ main::-webkit-scrollbar{display:none;}
         <div style="color:var(--txt2);font-size:11px;margin-top:2px;">最低可正常进服游玩；推荐可长时间稳定高帧率，特效与区块渲染更完整</div>
       </div>
     </div>
+
+
 
 <div class="m-title drag-card" id="cardQuickTitle" style="padding:2px 4px 10px;">快捷入口</div>
 
@@ -1885,7 +1888,7 @@ main::-webkit-scrollbar{display:none;}
 
 
 
-      <button class="btn ghost" id="mpAdminBtn" style="margin-top:10px;">管理员登录</button>
+      <p id="mpAdminBtn" style="margin-top:10px;font-size:12px;color:var(--txt2);opacity:.55;cursor:pointer;text-align:center;">管理员入口</p>
 
 
 
@@ -5295,6 +5298,10 @@ window.showTab=showTab;
 
 
     if(fb)fb.onclick=function(){location.href='https://theslowtidefk.pages.dev/';};
+
+  var cT=document.getElementById('cfgTitle'),cB=document.getElementById('cfgBody');
+  if(cT&&cB){ cT.addEventListener('click',function(){ cB.style.display=(cB.style.display==='none')?'block':'none'; }); }
+
 
 
 
