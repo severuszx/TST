@@ -269,6 +269,30 @@ main::-webkit-scrollbar{display:none;}
   opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;max-width:82vw;text-align:center;
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+/* ===== 移动端独立栏目 ===== */
+.m-sub-head{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:16px;font-weight:700;color:var(--txt);}
+.m-back{border:none;background:var(--cell);color:var(--txt);width:32px;height:32px;border-radius:8px;font-size:16px;cursor:pointer;flex:none;}
+.m-list{display:flex;flex-direction:column;gap:12px;}
+.m-list-card{background:var(--card);border:1px solid var(--card-brd);border-radius:10px;padding:14px;box-shadow:var(--shadow);}
+.m-lc-date{font-size:12px;color:var(--txt2);margin-bottom:6px;}
+.m-lc-title{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px;}
+.m-lc-content{font-size:13px;color:var(--txt2);line-height:1.6;word-break:break-all;}
+.m-lc-img{width:100%;border-radius:8px;margin-top:8px;display:block;}
+.m-lc-link{display:block;margin-top:8px;color:var(--accent);font-size:13px;text-decoration:none;}
+.m-sponsor{width:100%;border-collapse:collapse;font-size:13px;}
+.m-sponsor th,.m-sponsor td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--card-brd);}
+.m-sponsor th{color:var(--txt2);font-weight:600;}
+.m-rule-title{font-size:18px;font-weight:800;text-align:center;color:var(--txt);margin-bottom:4px;}
+.m-rule-sub{font-size:13px;text-align:center;color:var(--txt2);margin-bottom:12px;}
+.m-rule-sec{margin-top:14px;}
+.m-rule-head{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px;padding-left:8px;border-left:3px solid var(--accent);}
+.m-rule-p{font-size:13px;color:var(--txt2);line-height:1.7;margin:0 0 8px;}
+.m-cd{font-size:24px;font-weight:800;text-align:center;color:var(--accent);margin:10px 0 14px;letter-spacing:1px;}
+.ml-prize{font-size:17px;font-weight:800;text-align:center;color:var(--accent);padding:12px 0 4px;}
+.ml-code{font-size:15px;font-weight:700;text-align:center;color:var(--txt);padding:6px 0 4px;word-break:break-all;}
+.ml-hint{font-size:12px;text-align:center;color:var(--txt2);padding-top:6px;}
+.ml-err{font-size:13px;text-align:center;color:var(--danger);padding:10px 0;}
 </style>
 </head>
 <body>
@@ -452,6 +476,43 @@ main::-webkit-scrollbar{display:none;}
     </div>
   </section>
 
+
+  <section class="page" id="page-notice">
+    <div class="m-sub-head"><button class="m-back" onclick="showTab('more')">‹</button><span>服务器公告</span></div>
+    <div id="mNoticeList" class="m-list"></div>
+  </section>
+
+  <section class="page" id="page-feed">
+    <div class="m-sub-head"><button class="m-back" onclick="showTab('more')">‹</button><span>社区动态</span></div>
+    <div id="mFeedList" class="m-list"></div>
+  </section>
+
+  <section class="page" id="page-event">
+    <div class="m-sub-head"><button class="m-back" onclick="showTab('more')">‹</button><span>赛事活动</span></div>
+    <div id="mEventList" class="m-list"></div>
+  </section>
+
+  <section class="page" id="page-activity">
+    <div class="m-sub-head"><button class="m-back" onclick="showTab('more')">‹</button><span>活动抽奖</span></div>
+    <div class="m-card">
+      <div class="m-title">国庆盛典 × 开服100天</div>
+      <p class="m-sub">双庆抽奖 · 每台设备每天限抽一次，兑换码先到先得<br>活动时间：10月1日 00:30 至 10月8日 23:59</p>
+      <div class="m-cd" id="mLotCd">--:--:--</div>
+      <button class="btn" id="mLotBtn">开启潮汐之门</button>
+      <div id="mLotResult"></div>
+    </div>
+  </section>
+
+  <section class="page" id="page-rule">
+    <div class="m-sub-head"><button class="m-back" onclick="showTab('more')">‹</button><span>玩家公约</span></div>
+    <div class="m-card" id="mRuleList"></div>
+  </section>
+
+  <section class="page" id="page-sponsor">
+    <div class="m-sub-head"><button class="m-back" onclick="showTab('more')">‹</button><span>服务器赞助</span></div>
+    <div id="mSponsorList"></div>
+  </section>
+
   <section class="page" id="page-more">
     <div class="mlist">
       <div class="mitem" data-go="notice"><div class="mi">▤</div><div class="mt"><b>服务器公告</b><span>官方动态与重要通知</span></div><span class="ar">›</span></div>
@@ -574,6 +635,12 @@ main::-webkit-scrollbar{display:none;}
     if(id==='page-home')loadData();
     if(id==='page-tool')initMTool();
     if(id==='page-profile')initMProfile();
+    if(id==='page-notice')renderMNotices();
+    if(id==='page-feed')renderMFeeds();
+    if(id==='page-event')renderMReplays();
+    if(id==='page-sponsor')renderMSponsors();
+    if(id==='page-rule')renderMRule();
+    if(id==='page-activity')renderMLottery();
   }
   tabs.forEach(function(t){
     t.addEventListener('click',function(){ showTab(t.getAttribute('data-tab')); });
@@ -601,6 +668,7 @@ main::-webkit-scrollbar{display:none;}
       if(g==='tool'){ showTab('tool'); return; }
       if(g==='profile'){ showTab('profile'); return; }
       if(g==='team'){ document.getElementById('page-more').scrollIntoView({behavior:'smooth'}); document.getElementById('teamHead').click(); return; }
+      if(g==='notice'||g==='feed'||g==='event'||g==='activity'||g==='rule'||g==='sponsor'){ showTab(g); return; }
       goDesktop(g);
     });
   });
@@ -1206,6 +1274,254 @@ main::-webkit-scrollbar{display:none;}
   if(btn)btn.addEventListener('click',mKnock);
   var inp=$q('#mK9');
   if(inp)inp.addEventListener('keydown',function(e){ if(e.key==='Enter')mKnock(); });
+})();
+</script>
+<script>
+// ===== 移动端独立栏目：数据渲染 + 活动抽奖 =====
+(function(){
+  var RULES={
+treatyTitle:'The Slow Tide 服务器总条约',
+subTitle:'网易基岩 TST 山头',
+intro:[
+'本条约适用于 The Slow Tide 服务器全体玩家，统一规范服务器内行为准则、经济秩序、建筑保护、PVP机制、设备使用及违规处罚等全部游玩相关事宜。',
+'本条约所有条款具备通用性、约束性与权威性。不接受“不知情”“规则未阅读”“卡规则漏洞”等任何免责理由。无论玩家资历、服务器贡献高低，管理员均有权对违规行为采取警告、权限限制、限时封禁、永久封禁等处置。',
+'针对本条约未明文列举，但确实扰乱服务器秩序、破坏公共环境、侵害他人权益的行为，管理组有权根据行为造成的实际影响，做出合理、公正的判定与处罚。',
+'全体玩家在服务器内及关联社群的一切行为，必须严格遵守《中华人民共和国法律法规》。严禁以任何形式诋毁、攻击、抹黑、诽谤服务器、管理团队及其他玩家；严禁使用任何技术手段干扰、破坏服务器正常运行。',
+'本条约将根据服务器运营状态动态优化更新。重大规则变更将提前发布官方公告告知全体玩家。凡进入本服务器游玩、参与社群交流，即视为已阅读、理解并自愿同意本条约全部内容；若不认可本规则，请勿进入服务器及相关社群。'
+],
+toc:[
+['sec1','基础行为规范'],['sec2','聊天与社交规范'],['sec3','建筑与领地保护'],['sec4','资源采集与环境维护'],['sec5','经济与交易规则'],['sec6','PVP与战斗行为'],['sec7','红石与生电设备规范'],['sec8','生物与村民管理'],['sec9','玩家权益与反馈渠道'],['sec10','违规处理与处罚制度'],['sec11','服务器管理组职责'],['sec12','活动与赛事规则'],['sec13','数据与存档管理'],['sec14','规则更新与解释权']
+],
+sections:[
+{id:'sec1',title:'1. 基础行为规范',paras:[
+'服务器管理组不受理玩家之间普通拆家、偷家、毁基地等私人纠纷，外挂破坏、恶性BUG滥用等违规行为除外。',
+'服务器日志与安全插件，仅用于防御外挂作弊、防护公共设施与玩家领地安全。',
+'严禁一切危害服务器安全、运行稳定、公共利益的行为，违者从重处罚。',
+'全面禁止任何形式的外挂、作弊程序、辅助工具。',
+'全体玩家需文明游玩、友善交流，遵守基础礼仪规范。',
+'严禁传播涉黄、涉黑、涉暴、低俗恶俗等不良信息。',
+'禁止在公共区域跑跳搭。',
+'服务器官方语言为简体中文，全员交流统一使用汉语。',
+'禁止建造含低俗暗示、违规隐喻、不良导向的建筑。',
+'禁止利用游戏BUG、机制漏洞实施破坏、牟利、扰民等恶性行为。',
+'禁止一切违背双方意愿的强制PVP行为。',
+'所有游戏行为、社交行为必须符合国家法律法规，违法违规行为一律从重处罚。',
+'所有生电、红石设备必须配备独立开关，做到人走机停，杜绝长期空转占用服务器资源。',
+'新建交通设施（冰道、铁路、通道等）不得干扰、占用、破坏已有公共交通线路。',
+'服务器内全面禁止赌博行为，一经发现立刻责令拆除并永久封禁。',
+'玩家产生纠纷、矛盾争议时，禁止情绪化闹事，需冷静沟通或联系管理依规解决。'
+]},
+{id:'sec2',title:'2. 聊天与社交规范',paras:[
+'服务器及社群官方交流语言为中文（简体、繁体通用）。',
+'禁止刻意断章取义、过度解读、歪曲他人发言、故意误导他人。',
+'禁止散布谣言、宗教传教、引流广告、无关推广信息。',
+'严禁发布、传播涉黄、涉暴、涉政、违法违规内容，一经发现永久封禁。',
+'禁止私自向服务器、社群内添加各类机器人、自动脚本、推送程序。'
+]},
+{id:'sec3',title:'3. 建筑与领地保护',paras:[
+'服务器默认无全域建筑保护，未圈地区域建筑损毁风险由玩家自行承担。',
+'玩家可使用圈地系统保护私人建筑，领地范围内禁止一切未经允许的破坏、改动、占用行为，违规可联系管理或通过举报箱申诉。',
+'未进行圈地的建筑、设施、临时建筑，不受服务器保护，除外挂、BUG恶意破坏外，损毁后果由建造者自行承担。',
+'未经领地主许可，禁止在他人领地内建造、改造地形、放置设施、改动结构。',
+'禁止破坏、损毁、改动服务器公共建筑，包含主城、公共传送点、出生点、末地出生点等公共设施。',
+'领地所有者连续30天未登录服务器，该领地自动回收，归属权回归服务器。',
+'领地内非领地成员造成的一切破坏、违规、纠纷问题，由当事人自行承担全部责任。'
+]},
+{id:'sec4',title:'4. 资源采集与环境维护',paras:[
+'禁止在非领地范围内大规模破坏地形，包括掏空山体、大面积填水、大范围铲平地貌等。',
+'禁止在出生点、公共区域进行大规模挖掘、爆破、地形改造。',
+'倡导合理、节制利用资源，避免过度采集造成资源浪费与枯竭。',
+'废弃矿洞、闲置建筑、残留工程设施，建议自行填埋、清理规整。',
+'禁止利用漏洞、机制刷取货币、物资、资源，违者严肃处罚。'
+]},
+{id:'sec5',title:'5. 经济与交易规则',paras:[
+'禁止恶意囤货、控价、哄抬物价、扰乱服务器市场经济秩序，违者从重处理。',
+'严禁利用漏洞刷取金币、物品、资源，一经查实直接封号处理。',
+'系统商店仅作为物资兜底补充渠道，不作为主要获取途径。',
+'玩家私下交易价格由双方自主协商，管理组不介入正常定价，仅干预恶意控价、欺诈行为。',
+'全面禁止现实货币交易（RMB交易），包括物品买卖、金币变现、代练交易等，一经发现永久封禁。',
+'服务器管理组有权不定期调整系统商店物价，玩家如有异议可以通过官网反馈站反馈。'
+]},
+{id:'sec6',title:'6. PVP与战斗行为',paras:[
+'所有非双方自愿的强制PVP、偷袭、追杀行为一律禁止，违者封号处理。',
+'禁止在主城、出生点等公共安全区域主动发起PVP战斗。',
+'官方活动、赛事期间的PVP规则，以当期活动公告为准。'
+]},
+{id:'sec7',title:'7. 红石与生电设备规范',paras:[
+'服务器开放红石、生电玩法，但所有设备必须控制在合理负载范围内，不得影响服务器运行。',
+'禁止建造高频红石、大面积卡顿装置、占服设备。',
+'长期运行、高负载、大型生电设备，建造前需要提前向管理组报备备案。',
+'废弃、闲置红石设备需要及时拆除，避免占用区块资源。',
+'全部红石、生电设备必须设置可控开关，严格执行人走机停规则。',
+'禁止搭建多核堆叠、多层叠加的超规格生电机器。',
+'服务器自带高频限制机制，高频类红石设备无法正常运行，请勿违规搭建。'
+]},
+{id:'sec8',title:'8. 生物与村民管理',paras:[
+'禁止恶意屠村、批量击杀无辜生物、浪费生物资源。',
+'村民交易、繁殖机制可以在合规范围内合理使用。',
+'禁止在公共区域建造大型刷怪塔、大规模村民繁殖机，特殊需求需要提前报备管理。',
+'禁止利用生物寻路机制、聚集机制恶意造成服务器卡顿。',
+'合理、节制使用各类生物机制，杜绝滥用、恶意堆载。',
+'服务器开启区块清理机制，禁止大批量、密集饲养生物，防止卡顿、吞档。'
+]},
+{id:'sec9',title:'9. 玩家权益与反馈渠道',paras:[
+'玩家对管理处罚、判定结果存在异议，可凭有效证据通过官网反馈站提交申诉。',
+'玩家合理建议、优化提案可以通过主城官网反馈站提交，管理组承诺三个工作日内回复处理。',
+'管理组不会无故干涉、限制玩家正常、合规的游戏发展与玩法。',
+'全体玩家享有平等游玩权益，不受管理员或其他玩家的针对、歧视、无端干预。',
+'玩家可以在不违反条约的前提下，自由选择玩法、建设方向与社交方式。',
+'玩家有权知晓自身账号处罚的全部依据、违规事由。',
+'管理组严格保护玩家隐私，绝不公开玩家IP、联系方式等私人信息。',
+'玩家游戏数据仅用于服务器正常运营，绝不向第三方泄露、转交。',
+'违规调查阶段，管理组可依规查阅对应游戏日志与数据，严禁滥用权限。',
+'管理组对所有玩家一视同仁，不存在特殊权限、亲友优待。',
+'管理组内部矛盾、争议判定，由全体管理员共同裁定，保证公开公正。',
+'玩家发现管理员存在违规操作、滥用权限行为，可向其他管理成员举报。',
+'玩家领地范围内的建筑、物品、设施受官方保护，其他人禁止擅自破坏、盗取、改动。',
+'因服务器故障、存档异常造成的数据损失，管理组会尽力修复，但不保证百分百完全恢复。'
+]},
+{id:'sec10',title:'10. 违规处理与处罚制度',paras:[
+'轻微违规：口头警告、书面提醒、临时限制部分权限。',
+'中度违规：清空违规资产、限时封禁账号。',
+'严重违规：永久封禁账号。',
+'作弊、漏洞刷物、恶意破坏等恶性行为，直接处罚、不给予提前警告。',
+'全部处罚记录统一存档，作为后续判定参考依据。'
+]},
+{id:'sec11',title:'11. 服务器管理组职责',paras:[
+'负责规则执行、服务器维护、活动策划、玩家纠纷调解、秩序维护。',
+'秉持公正、公开、透明原则处理全部服务器相关事务。',
+'不参与玩家正常经济竞争，不干预合规玩法与正常游戏发展。',
+'主动接受全体玩家监督，积极回应合理质疑与建议。'
+]},
+{id:'sec12',title:'12. 活动与赛事规则',paras:[
+'各类官方活动、赛事优先遵循当期专属活动规则。',
+'活动内违规玩家直接取消参赛资格与奖励资格，情节严重追加常规处罚。',
+'活动奖励、规则、流程以官方公告为准。',
+'全部活动最终解释权归服务器管理组所有。'
+]},
+{id:'sec13',title:'13. 数据与存档管理',paras:[
+'服务器会定期自动备份存档，但无法保证单个建筑、单件物品精准复原。',
+'因不可抗力、网络故障、设备问题造成的数据丢失，管理组不承担赔偿责任。',
+'服务器大版本更新前会发布公告，最大限度保留原有存档内容。',
+'玩家金币、物品、权限、成就等个人数据，以服务器后台记录作为唯一有效依据。'
+]},
+{id:'sec14',title:'14. 规则更新与解释权',paras:[
+'本条约会跟随服务器发展持续优化、补充、修改。',
+'规则重大修订、增减条款，会提前发布公告通知全体玩家。',
+'小规模文字微调、细节优化，可直接更新不另行通知。',
+'本服务器全部条约的最终解释权归 The Slow Tide 管理组所有。'
+]}
+],
+makeNote:'条约制定说明',
+makers:'参与制定玩家：执又之贤、极岚 及 The Slow Tide 服务器全体参与研讨玩家',
+refNote:'参考来源说明：',
+refs:[
+'1. 参考国内多社区Minecraft服务器成熟管理框架与运营经验；',
+'2. 参考公开服务器规约、玩家手册等公开资料，并结合本服实际情况优化改写；',
+'3. 感谢所有公开参考资料及参与规则完善的玩家与创作者。'
+],
+closing:'本条约目前仍在持续修订中，暂不作为最终正式版本执行，后续将根据实际情况进一步完善。如有建议，欢迎通过主城官网反馈站反馈。'
+};
+  var mLotTimer=null, mLotBtnEl=null;
+  var LOTTERY_START=new Date('2026-10-01T00:30:00+08:00');
+  var LOTTERY_END=new Date('2026-10-08T23:59:59+08:00');
+
+  function linkify(t){
+    return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">$1</a>');
+  }
+  function renderMNotices(){
+    var box=document.getElementById('mNoticeList'); if(!box)return;
+    var list=(window.dataCache&&dataCache.announcements||[]).filter(function(a){return !String(a.title||'').startsWith('hist:');});
+    box.innerHTML=list.map(function(a){
+      var ctn=String(a.content||'');
+      return '<div class="m-list-card"><div class="m-lc-date">'+esc(a.date||'')+'</div><div class="m-lc-title">'+esc(a.title)+'</div><div class="m-lc-content">'+linkify(ctn)+'</div></div>';
+    }).join('')||'<p class="empty-hint">暂无公告</p>';
+  }
+  function renderMFeeds(){
+    var box=document.getElementById('mFeedList'); if(!box)return;
+    var list=(window.dataCache&&dataCache.feeds)||[];
+    box.innerHTML=list.map(function(f){
+      var img=f.image?'<img class="m-lc-img" src="'+esc(f.image)+'" alt="">':'';
+      return '<div class="m-list-card"><div class="m-lc-title">'+esc(f.title)+'</div><div class="m-lc-date">'+esc(f.date||'')+'</div><div class="m-lc-content">'+linkify(f.content)+'</div>'+img+'</div>';
+    }).join('')||'<p class="empty-hint">暂无动态</p>';
+  }
+  function renderMReplays(){
+    var box=document.getElementById('mEventList'); if(!box)return;
+    var list=(window.dataCache&&dataCache.replays)||[];
+    box.innerHTML=list.map(function(r){
+      var vid=/\\.(mp4|webm|ogg|mov)(\?|$)/i.test(String(r.url||''))
+        ? '<video controls preload="metadata" style="width:100%;border-radius:8px;background:#000;margin-top:8px;"><source src="'+esc(r.url)+'"></video>'
+        : '<a class="m-lc-link" href="'+esc(r.url)+'" target="_blank" rel="noopener">前往平台观看 ›</a>';
+      return '<div class="m-list-card"><div class="m-lc-title">'+esc(r.title)+'</div><div class="m-lc-date">'+esc(r.date||'')+'</div>'+vid+'</div>';
+    }).join('')||'<p class="empty-hint">暂无赛事回放</p>';
+  }
+  function renderMSponsors(){
+    var box=document.getElementById('mSponsorList'); if(!box)return;
+    var list=(window.dataCache&&dataCache.sponsors)||[];
+    box.innerHTML=list.length
+      ? '<div class="m-card"><table class="m-sponsor"><tr><th>名次</th><th>玩家</th><th>金额</th></tr>'+list.map(function(s,i){return '<tr><td>'+(i+1)+'</td><td>'+esc(s.name)+'</td><td>'+esc(s.amount)+'</td></tr>';}).join('')+'</table></div>'
+      : '<p class="empty-hint">暂无赞助记录</p>';
+  }
+  function renderMRule(){
+    var box=document.getElementById('mRuleList'); if(!box)return;
+    var h='<div class="m-rule-title">'+esc(RULES.treatyTitle)+'</div><div class="m-rule-sub">'+esc(RULES.subTitle)+'</div>';
+    (RULES.intro||[]).forEach(function(p){ h+='<p class="m-rule-p">'+esc(p)+'</p>'; });
+    (RULES.sections||[]).forEach(function(s){
+      h+='<div class="m-rule-sec"><div class="m-rule-head">'+esc(s.title)+'</div>'+((s.paras||[]).map(function(pp){return '<p class="m-rule-p">'+esc(pp)+'</p>';}).join(''))+'</div>';
+    });
+    box.innerHTML=h;
+  }
+
+  function fmtCD(ms){
+    if(ms<=0)return '00:00:00';
+    var d=Math.floor(ms/86400000),h=Math.floor(ms%86400000/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000);
+    var pad=function(n){return n<10?'0'+n:''+n;};
+    return (d>0?(d+'天 '):'')+pad(h)+':'+pad(m)+':'+pad(s);
+  }
+  function renderMLottery(){
+    var cd=document.getElementById('mLotCd'), btn=document.getElementById('mLotBtn'), res=document.getElementById('mLotResult');
+    if(!cd||!btn)return;
+    mLotBtnEl=btn;
+    if(!btn._b){ btn._b=true; btn.addEventListener('click',mDoLottery); }
+    function tick(){
+      var now=cloudNow();
+      if(now<LOTTERY_START.getTime()){ cd.textContent='距开放 '+fmtCD(LOTTERY_START.getTime()-now); btn.disabled=true; btn.textContent='未开放'; }
+      else if(now>LOTTERY_END.getTime()){ cd.textContent='活动已结束'; btn.disabled=true; btn.textContent='已结束'; }
+      else { cd.textContent='距结束 '+fmtCD(LOTTERY_END.getTime()-now); btn.disabled=false; btn.textContent='开启潮汐之门'; }
+    }
+    tick();
+    clearInterval(mLotTimer); mLotTimer=setInterval(tick,1000);
+  }
+  function mDoLottery(){
+    var btn=mLotBtnEl||document.getElementById('mLotBtn'), res=document.getElementById('mLotResult');
+    if(!btn||btn.disabled)return;
+    btn.disabled=true; btn.textContent='潮汐翻涌中…';
+    res.innerHTML='<p class="ml-hint">正在抽取…</p>';
+    fetch('/api/lottery/draw',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({p_device:devId()})})
+      .then(function(r){return r.json();})
+      .then(function(data){
+        if(data&&data.ok){
+          res.innerHTML='<div class="ml-prize">获得：'+esc(data.prize||'未知奖品')+'</div><div class="ml-code">兑换码：'+esc(data.code||'')+'</div><p class="ml-hint">兑换码仅可使用一次，请及时领取</p>';
+          btn.textContent='今日已抽';
+        } else if(data&&data.error==='already_drawn'&&data.prize){
+          res.innerHTML='<div class="ml-prize">今日已抽过</div><div class="ml-code">'+esc(data.prize)+(data.code?' 兑换码：'+esc(data.code):'')+'</div>';
+          btn.textContent='今日已抽';
+        } else if(data&&data.sold_out){
+          res.innerHTML='<p class="ml-err">全部兑换码已抽完，感谢参与</p>';
+          btn.textContent='已抽完'; btn.disabled=true;
+        } else if(data&&data.error==='not_open'){
+          res.innerHTML='<p class="ml-err">活动尚未开放</p>';
+          btn.disabled=false; btn.textContent='开启潮汐之门';
+        } else {
+          res.innerHTML='<p class="ml-err">抽奖失败：'+esc((data&&data.error)||'未知错误')+'</p>';
+          btn.disabled=false; btn.textContent='开启潮汐之门';
+        }
+      })
+      .catch(function(){ res.innerHTML='<p class="ml-err">网络异常，请稍后重试</p>'; btn.disabled=false; btn.textContent='开启潮汐之门'; });
+  }
+  window.renderMNotices=renderMNotices;window.renderMFeeds=renderMFeeds;
+  window.renderMReplays=renderMReplays;window.renderMSponsors=renderMSponsors;
+  window.renderMRule=renderMRule;window.renderMLottery=renderMLottery;
 })();
 </script>
 </body>
