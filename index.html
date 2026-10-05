@@ -4736,87 +4736,149 @@ function openBench3D(){
   try{ const ext=gl.getExtension('WEBGL_debug_renderer_info');
     if(ext)gpuName=String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||'未知'); }catch(e){}
   if(gpuEl)gpuEl.textContent=gpuName;
-  // ---- 金属着色器（环境 + 漫反射 + 高光 + 菲涅尔科技边缘光）----
-  const vsrc='attribute vec3 aPos;attribute vec3 aNor;uniform mat4 uM,uVP;uniform vec3 uCam;varying vec3 vN;varying vec3 vP;varying vec3 vV;void main(){vN=mat3(uM)*aNor;vec4 wp=uM*vec4(aPos,1.0);vP=wp.xyz;vV=uCam-wp.xyz;gl_Position=uVP*wp;}';
-  const fsrc='precision mediump float;uniform vec3 uL;uniform vec3 uL2;uniform vec3 uTint;varying vec3 vN;varying vec3 vP;varying vec3 vV;void main(){vec3 n=normalize(vN);vec3 l=normalize(uL);vec3 l2=normalize(uL2);vec3 v=normalize(vV);float d=max(dot(n,l),0.0);float d2=max(dot(n,l2),0.0)*0.55;float s=pow(max(dot(reflect(-l,n),v),0.0),40.0);float fr=pow(1.0-max(dot(n,v),0.0),2.8);vec3 base=uTint;vec3 col=base*(0.10+0.62*d+0.30*d2)+vec3(1.0,0.98,0.92)*s*0.85+vec3(0.16,0.42,0.9)*fr*1.35;gl_FragColor=vec4(col,1.0);}';
-  // ---- 发光粒子着色器（additive）----
-  const pvs='attribute vec3 aPos;attribute vec3 aCol;attribute float aSize;uniform mat4 uVP;varying vec3 vC;void main(){vC=aCol;gl_Position=uVP*vec4(aPos,1.0);gl_PointSize=aSize;}';
-  const pfs='precision mediump float;varying vec3 vC;void main(){vec2 q=gl_PointCoord-0.5;float a=1.0-smoothstep(0.02,0.5,length(q)*2.0);gl_FragColor=vec4(vC,a);}';
-  // ---- 纯色线段着色器（网格地板）----
-  const lvs='attribute vec3 aPos;attribute vec3 aCol;uniform mat4 uVP;varying vec3 vC;void main(){vC=aCol;gl_Position=uVP*vec4(aPos,1.0);}';
-  const lfs='precision mediump float;varying vec3 vC;void main(){gl_FragColor=vec4(vC,1.0);}';
+  // ---- 模型着色器（环境 + 漫反射 + 高光 + 边缘光）----
+  const vsrc='attribute vec3 aPos;attribute vec3 aNor;attribute vec3 aCol;uniform mat4 uM,uVP;uniform vec3 uCam;varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vN=mat3(uM)*aNor;vC=aCol;vec4 wp=uM*vec4(aPos,1.0);vP=wp.xyz;vV=uCam-wp.xyz;gl_Position=uVP*wp;}';
+  const fsrc='precision mediump float;uniform vec3 uL;varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vec3 n=normalize(vN);vec3 l=normalize(uL);vec3 v=normalize(vV);float d=max(dot(n,l),0.0);float s=pow(max(dot(reflect(-l,n),v),0.0),22.0);float fr=pow(1.0-max(dot(n,v),0.0),2.0)*0.28;vec3 col=vC*(0.16+0.78*d)+vec3(1.0,0.95,0.9)*s*0.7+vec3(0.5,0.7,1.0)*fr;gl_FragColor=vec4(col,1.0);}';
   function mkShader(t,sr){const sh=gl.createShader(t);gl.shaderSource(sh,sr);gl.compileShader(sh);return sh;}
   function mkProg(vs,fs){const pr=gl.createProgram();gl.attachShader(pr,mkShader(gl.VERTEX_SHADER,vs));gl.attachShader(pr,mkShader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);return pr;}
-  const meshP=mkProg(vsrc,fsrc),partP=mkProg(pvs,pfs),lineP=mkProg(lvs,lfs);
+  const meshP=mkProg(vsrc,fsrc);
   gl.useProgram(meshP);
   const uM=gl.getUniformLocation(meshP,'uM'),uVP=gl.getUniformLocation(meshP,'uVP'),
-        uL=gl.getUniformLocation(meshP,'uL'),uL2=gl.getUniformLocation(meshP,'uL2'),
-        uCam=gl.getUniformLocation(meshP,'uCam'),uTint=gl.getUniformLocation(meshP,'uTint');
-  const pVP=gl.getUniformLocation(partP,'uVP'),pPosL=gl.getAttribLocation(partP,'aPos'),
-        pColL=gl.getAttribLocation(partP,'aCol'),pSzL=gl.getAttribLocation(partP,'aSize');
-  const lVP=gl.getUniformLocation(lineP,'uVP'),lPosL=gl.getAttribLocation(lineP,'aPos'),lColL=gl.getAttribLocation(lineP,'aCol');
-  // ---- 几何生成 ----
-  function buildSphere(seg){
-    const lon=seg,lat=seg>>1;const pos=[],nor=[],idx=[];
-    for(let j=0;j<=lat;j++){const phi=Math.PI*(0.5-j/lat);
-      for(let i=0;i<=lon;i++){const th=2*Math.PI*i/lon;
-        const x=Math.cos(phi)*Math.cos(th),y=Math.sin(phi),z=Math.cos(phi)*Math.sin(th);
-        pos.push(x,y,z);nor.push(x,y,z);}}
+        uL=gl.getUniformLocation(meshP,'uL'),uCam=gl.getUniformLocation(meshP,'uCam');
+  const loc=gl.getAttribLocation(meshP,'aPos'),locN=gl.getAttribLocation(meshP,'aNor'),locC=gl.getAttribLocation(meshP,'aCol');
+  // ---- 高精度「毒蘑菇」程序化模型 ----
+  // 菌盖：高细分半球 + 波状伞缘（红色渐变 + 白斑）
+  function buildCap(lon,lat){
+    const pos=[],nor=[],col=[],idx=[];
+    for(let j=0;j<=lat;j++){
+      const v=j/lat;
+      const phi=Math.PI*0.5*v;
+      const edge=Math.pow(v,0.75);
+      for(let i=0;i<=lon;i++){
+        const u=i/lon;
+        const th=2*Math.PI*u;
+        // 伞缘波状卷曲
+        const wave=0.10*Math.sin(th*6.0)*edge*edge;
+        const r=2.0*(1.0-v*0.42)+wave;
+        const y=2.0*Math.sin(phi)-0.15*v*Math.cos(th*4.0)*edge;
+        const x=Math.cos(th)*r;
+        const z=Math.sin(th)*r;
+        // 法线：朝上外
+        let nx=x,ny=1.6-(v*1.8),nz=z;
+        const nl=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;nx/=nl;ny/=nl;nz/=nl;
+        pos.push(x,y,z);nor.push(nx,ny,nz);
+        // 颜色：顶面红，底部淡
+        const rr=0.80-0.12*v;
+        const gg=0.10+0.16*v;
+        const bb=0.12+0.2*v;
+        // 白斑（伪随机散布）
+        let cr=rr,cg=gg,cb=bb;
+        const spot=Math.sin(i*23.0+j*17.0)*43758.5453-Math.floor(Math.sin(i*23.0+j*17.0)*43758.5453);
+        if(spot<0.085&&v>0.2&&v<0.88){cr=0.94;cg=0.93;cb=0.88;}
+        col.push(cr,cg,cb);
+      }
+    }
     for(let j=0;j<lat;j++)for(let i=0;i<lon;i++){
       const a=j*(lon+1)+i,b=a+1,c=(j+1)*(lon+1)+i,d=c+1;
-      idx.push(a,b,c,b,d,c);}
-    return {pos:new Float32Array(pos),nor:new Float32Array(nor),idx:new Uint16Array(idx),tri:lat*lon*2};
+      idx.push(a,b,c,b,d,c);
+    }
+    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint32Array(idx)};
   }
-  function buildTorus(maj,tube,segT,segR){
-    const pos=[],nor=[],idx=[];
-    for(let j=0;j<=segR;j++){const vr=j/segR*2*Math.PI;
-      for(let i=0;i<=segT;i++){const hu=i/segT*2*Math.PI;
-        const cx=Math.cos(hu),sx=Math.sin(hu),cv=Math.cos(vr),sv=Math.sin(vr);
-        const x=(maj+tube*cv)*cx,y=tube*sv,z=(maj+tube*cv)*sx;
-        pos.push(x,y,z);nor.push(cv*cx,sv,cv*sx);}}
+  // 菌柄：弯曲柱体（奶油色 + 环纹）
+  function buildStem(segT,segR){
+    const pos=[],nor=[],col=[],idx=[];
+    for(let j=0;j<=segR;j++){
+      const v=j/segR;
+      const y=-2.6+v*2.6;
+      const rr=0.55*(1.0-v*0.62);
+      const bend=0.32*Math.sin(v*Math.PI);
+      const ox=Math.sin(v*5.0)*0.05;
+      for(let i=0;i<=segT;i++){
+        const th=2*Math.PI*i/segT;
+        const x=(rr+ox)*Math.cos(th)+bend;
+        const z=(rr+ox)*Math.sin(th);
+        pos.push(x,y,z);
+        const nx=Math.cos(th),ny=0.0,nz=Math.sin(th);
+        nor.push(nx,ny,nz);
+        const ring=0.10+0.06*Math.sin(v*22.0);
+        col.push(0.86-ring*0.3,0.82-ring*0.3,0.72-ring*0.25);
+      }
+    }
     for(let j=0;j<segR;j++)for(let i=0;i<segT;i++){
       const a=j*(segT+1)+i,b=a+1,c=(j+1)*(segT+1)+i,d=c+1;
-      idx.push(a,b,c,b,d,c);}
-    return {pos:new Float32Array(pos),nor:new Float32Array(nor),idx:new Uint16Array(idx),tri:segT*segR*2};
+      idx.push(a,b,c,b,d,c);
+    }
+    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint32Array(idx)};
   }
-  const sA=buildSphere(224),sB=buildSphere(160),sC=buildSphere(112),ring=buildTorus(2.7,0.38,160,56);
+  // 菌褶（菌盖底部放射扇形，米白）
+  function buildGills(lon){
+    const pos=[],nor=[],col=[],idx=[];
+    for(let i=0;i<=lon;i++){
+      const th=2*Math.PI*i/lon;
+      const r0=0.28,r1=1.55;
+      pos.push(Math.cos(th)*r0,-0.02,Math.sin(th)*r0);
+      pos.push(Math.cos(th)*r1,-0.05,Math.sin(th)*r1);
+      nor.push(0,1,0,0,1,0);
+      col.push(0.92,0.88,0.80, 0.92,0.88,0.80);
+    }
+    for(let i=0;i<lon;i++){
+      const a=i*2,b=i*2+1,c=(i+1)*2,d=(i+1)*2+1;
+      idx.push(a,c,d,c,b,d);
+    }
+    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint32Array(idx)};
+  }
+  // 白斑球（菌盖上凸起斑点）
+  function buildSpots(n){
+    const pos=[],nor=[],col=[],idx=[];
+    const seg=16;
+    for(let k=0;k<n;k++){
+      const v=0.22+0.60*Math.random();
+      const u=Math.random();
+      const th=2*Math.PI*u;
+      const baseY=1.35+Math.sin(v*Math.PI*0.5)*1.15;
+      const rr=0.20*(0.6+0.5*Math.random());
+      const cx=Math.cos(th)*1.35*(1-v*0.5),cz=Math.sin(th)*1.35*(1-v*0.5);
+      const base=pos.length/3;
+      for(let j=0;j<=seg;j++){
+        const phi=Math.PI*(j/seg);
+        for(let i=0;i<=seg;i++){
+          const ph=2*Math.PI*i/seg;
+          const x=Math.sin(phi)*Math.cos(ph)*rr+cx;
+          const y=Math.cos(phi)*rr*0.8+baseY;
+          const z=Math.sin(phi)*Math.sin(ph)*rr+cz;
+          pos.push(x,y,z);
+          const nx=Math.sin(phi)*Math.cos(ph),ny=Math.cos(phi)*0.8,nz=Math.sin(phi)*Math.sin(ph);
+          nor.push(nx,ny,nz);
+          col.push(0.97,0.96,0.90);
+        }
+      }
+      for(let j=0;j<seg;j++)for(let i=0;i<seg;i++){
+        const a=base+j*(seg+1)+i,b=a+1,c=base+(j+1)*(seg+1)+i,d=c+1;
+        idx.push(a,b,c,b,d,c);
+      }
+    }
+    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint32Array(idx)};
+  }
+  const cap=buildCap(320,160),stem=buildStem(160,64),gills=buildGills(288),spots=buildSpots(30);
+  // 合并为一个网格
+  function merge(parts){
+    let pn=0,cn=0;
+    parts.forEach(function(o){pn+=o.pos.length/3;cn+=o.idx.length;});
+    const pos=new Float32Array(pn*3),nor=new Float32Array(pn*3),col=new Float32Array(pn*3),idx=new Uint32Array(cn);
+    let po=0,io=0;
+    parts.forEach(function(o){
+      pos.set(o.pos,po*3);nor.set(o.nor,po*3);col.set(o.col,po*3);
+      for(let i=0;i<o.idx.length;i++)idx[io+i]=o.idx[i]+po;
+      po+=o.pos.length/3;io+=o.idx.length;
+    });
+    return {pos:pos,nor:nor,col:col,idx:idx,tri:idx.length/3,verts:pn};
+  }
+  const model=merge([cap,stem,gills,spots]);
   function mkBuf(d){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,d,gl.STATIC_DRAW);return b;}
   function mkIdx(d){const b=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,b);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,d,gl.STATIC_DRAW);return b;}
-  const bufs=[sA,sB,sC,ring].map(function(o){
-    return {pos:mkBuf(o.pos),nor:mkBuf(o.nor),idx:mkIdx(o.idx),n:o.idx.length,tri:o.tri};
-  });
-  const loc=gl.getAttribLocation(meshP,'aPos'),locN=gl.getAttribLocation(meshP,'aNor');
-  function setMesh(b){gl.bindBuffer(gl.ARRAY_BUFFER,b.pos);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
-    gl.bindBuffer(gl.ARRAY_BUFFER,b.nor);gl.enableVertexAttribArray(locN);gl.vertexAttribPointer(locN,3,gl.FLOAT,false,0,0);}
-  // ---- 科技网格地板（GL_LINES）----
-  const GR=40,GST=2;const gPos=[],gCol=[];
-  for(let i=-GR;i<=GR;i+=GST){
-    gPos.push(-GR,0,i, GR,0,i);gCol.push(.13,.16,.28, .13,.16,.28);
-    gPos.push(i,0,-GR, i,0,GR);gCol.push(.13,.16,.28, .13,.16,.28);
-  }
-  const grid={pos:mkBuf(new Float32Array(gPos)),col:mkBuf(new Float32Array(gCol)),n:gPos.length/3};
-  // ---- 流光粒子（轨道光带 3200 + 背景星尘 900）----
-  const PN=3200,pPos=new Float32Array(PN*3),pCol=new Float32Array(PN*3),pSize=new Float32Array(PN);
-  const PH=new Float32Array(PN),PR=new Float32Array(PN),PT=new Float32Array(PN);
-  const C1=[0.20,0.55,1.0],C2=[0.55,0.35,1.0],C3=[0.15,0.95,1.0];
-  for(let i=0;i<PN;i++){
-    PH[i]=Math.random()*6.283;PR[i]=0.9+Math.random()*3.4;PT[i]=Math.random()*6.283;
-    pSize[i]=4+Math.random()*10;
-    const t=Math.random();let c;
-    if(t<0.5)c=C1;else if(t<0.8)c=C2;else c=C3;
-    pCol[i*3]=c[0];pCol[i*3+1]=c[1];pCol[i*3+2]=c[2];
-  }
-  const pB=gl.createBuffer(),pColB=gl.createBuffer(),pSzB=gl.createBuffer();
-  const DN=900,dPos=new Float32Array(DN*3),dCol=new Float32Array(DN*3),dSz=new Float32Array(DN),dP=new Float32Array(DN);
-  for(let i=0;i<DN;i++){
-    const r=5+Math.random()*22,th=Math.random()*6.283,ph=Math.acos(Math.random()*2-1);
-    dPos[i*3]=r*Math.sin(ph)*Math.cos(th);dPos[i*3+1]=r*Math.cos(ph)*0.75;dPos[i*3+2]=r*Math.sin(ph)*Math.sin(th);
-    const b=0.3+Math.random()*0.7;dCol[i*3]=b*0.6;dCol[i*3+1]=b*0.7;dCol[i*3+2]=b;
-    dSz[i]=1+Math.random()*2.6;dP[i]=Math.random()*6.283;
-  }
-  const dB=gl.createBuffer(),dColB=gl.createBuffer(),dSzB=gl.createBuffer();
+  const mBuf={pos:mkBuf(model.pos),nor:mkBuf(model.nor),col:mkBuf(model.col),idx:mkIdx(model.idx),n:model.idx.length};
   // ---- 相机/投影 ----
-  const fov=50*Math.PI/180,zn=0.1,zf=120;
+  const fov=46*Math.PI/180,zn=0.1,zf=80;
   const proj=new Float32Array(16);proj[0]=1/(Math.tan(fov/2));proj[5]=1/Math.tan(fov/2);proj[10]=(zf+zn)/(zn-zf);proj[11]=-1;proj[14]=2*zf*zn/(zn-zf);
   const m4=function(){const m=new Float32Array(16);m[0]=m[5]=m[10]=m[15]=1;return m;};
   function mul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++){o[c*4+r]=a[r]*b[c*4]+a[4+r]*b[c*4+1]+a[8+r]*b[c*4+2]+a[12+r]*b[c*4+3];}return o;}
@@ -4830,90 +4892,40 @@ function openBench3D(){
     return m;}
   function resize(){const dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(canvas.clientWidth*dpr);canvas.height=Math.round(canvas.clientHeight*dpr);gl.viewport(0,0,canvas.width,canvas.height);}
   resize();
+  gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);
+  const extIdx=gl.getExtension('OES_element_index_uint');
+  if(!extIdx){ note.textContent='当前浏览器不支持 32 位索引，无法运行测试'; if(fill)fill.style.width='100%'; return; }
   let running=true,raf=0,last=performance.now(),frames=0,acc=0,phase='warm',phaseT=0,avgFps=0;
   function tick(now){
     if(!running)return;
     const dt=Math.min((now-last)/1000,0.1);last=now;
     phaseT+=dt;frames++;acc+=dt;
     const t=now/1000;
-    gl.disable(gl.DEPTH_TEST);
-    gl.clearColor(0.006,0.009,0.022,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-    // 相机：平滑环绕 + 轻微推近 + 呼吸
-    const ang=t*0.14;
-    const rad=Math.max(6.0,7.6-t*0.10);
-    const eye=[Math.cos(ang)*rad,1.6+Math.sin(t*0.24)*0.5,Math.sin(ang)*rad];
-    const vp=mul(proj,lookAt(eye,[0,0.35,0]));
-    // 动态双光源（主光绕行 + 冷光固定）
-    const lx=Math.cos(t*0.45)*4,ly=2.6+Math.sin(t*0.7)*1.2,lz=Math.sin(t*0.45)*4;
-    // ---- 背景星尘（additive 闪烁）----
-    gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);
-    gl.useProgram(partP);
-    gl.uniformMatrix4fv(pVP,false,vp);
-    for(let i=0;i<DN;i++){
-      const fl=0.4+0.6*(0.5+0.5*Math.sin(t*1.7+dP[i]*6.283));
-      dCol[i*3]=0.5*fl;dCol[i*3+1]=0.6*fl;dCol[i*3+2]=0.85*fl;
-    }
-    gl.bindBuffer(gl.ARRAY_BUFFER,dB);gl.bufferData(gl.ARRAY_BUFFER,dPos,gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(pPosL);gl.vertexAttribPointer(pPosL,3,gl.FLOAT,false,0,0);
-    gl.bindBuffer(gl.ARRAY_BUFFER,dColB);gl.bufferData(gl.ARRAY_BUFFER,dCol,gl.DYNAMIC_DRAW);
-    gl.enableVertexAttribArray(pColL);gl.vertexAttribPointer(pColL,3,gl.FLOAT,false,0,0);
-    gl.bindBuffer(gl.ARRAY_BUFFER,dSzB);gl.bufferData(gl.ARRAY_BUFFER,dSz,gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(pSzL);gl.vertexAttribPointer(pSzL,1,gl.FLOAT,false,0,0);
-    gl.drawArrays(gl.POINTS,0,DN);
-    // ---- 流光轨道粒子（螺旋光带）----
-    for(let i=0;i<PN;i++){
-      const ph=PH[i],r0=PR[i];
-      const th=PT[i]+t*(0.5/(0.6+r0*0.5));
-      const r=r0+0.30*Math.sin(t*0.85+ph*7.3);
-      const y=0.30*Math.sin(t*1.1+ph*9.0)*(1.7-r0*0.30)+0.10*Math.sin(t*2.4+ph*4.3);
-      pPos[i*3]=Math.cos(th)*r;
-      pPos[i*3+1]=y;
-      pPos[i*3+2]=Math.sin(th)*r;
-      const pu=0.65+0.35*Math.sin(t*2.1+ph*5.5);
-      pSize[i]=(4+10*(1-r0/4.6))*pu;
-    }
-    gl.bindBuffer(gl.ARRAY_BUFFER,pB);gl.bufferData(gl.ARRAY_BUFFER,pPos,gl.DYNAMIC_DRAW);
-    gl.enableVertexAttribArray(pPosL);gl.vertexAttribPointer(pPosL,3,gl.FLOAT,false,0,0);
-    gl.bindBuffer(gl.ARRAY_BUFFER,pColB);gl.bufferData(gl.ARRAY_BUFFER,pCol,gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(pColL);gl.vertexAttribPointer(pColL,3,gl.FLOAT,false,0,0);
-    gl.bindBuffer(gl.ARRAY_BUFFER,pSzB);gl.bufferData(gl.ARRAY_BUFFER,pSize,gl.DYNAMIC_DRAW);
-    gl.enableVertexAttribArray(pSzL);gl.vertexAttribPointer(pSzL,1,gl.FLOAT,false,0,0);
-    gl.drawArrays(gl.POINTS,0,PN);
-    // ---- 网格地板（GL_LINES，轻微呼吸）----
-    gl.disable(gl.BLEND);
-    gl.useProgram(lineP);
-    gl.uniformMatrix4fv(lVP,false,vp);
-    gl.bindBuffer(gl.ARRAY_BUFFER,grid.pos);gl.enableVertexAttribArray(lPosL);gl.vertexAttribPointer(lPosL,3,gl.FLOAT,false,0,0);
-    gl.bindBuffer(gl.ARRAY_BUFFER,grid.col);gl.enableVertexAttribArray(lColL);gl.vertexAttribPointer(lColL,3,gl.FLOAT,false,0,0);
-    gl.drawArrays(gl.LINES,0,grid.n);
-    // ---- 金属测试体（深度 + 双光源 + 菲涅尔）----
-    gl.enable(gl.DEPTH_TEST);
+    gl.clearColor(0.012,0.018,0.03,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+    // 相机：缓慢环绕 + 轻微浮动
+    const ang=t*0.16;
+    const eye=[Math.cos(ang)*5.1,1.35+Math.sin(t*0.25)*0.28,Math.sin(ang)*5.1];
+    const vp=mul(proj,lookAt(eye,[0,0.1,0]));
     gl.useProgram(meshP);
     gl.uniformMatrix4fv(uVP,false,vp);
-    gl.uniform3fv(uL,[lx,ly,lz]);
-    gl.uniform3fv(uL2,[-0.4,0.8,-0.6]);
+    gl.uniform3fv(uL,[-0.5,1.0,-0.3]);
     gl.uniform3fv(uCam,eye);
-    const meshes=[
-      [sA,bufs[0],1.05,0,0.5,[0.20,0.34,0.62]],
-      [sB,bufs[1],0.62,2.3,-0.8,[0.20,0.42,0.58]],
-      [sC,bufs[2],0.42,-2.1,0.7,[0.34,0.24,0.60]],
-      [ring,bufs[3],1.0,0,0.0,[0.50,0.36,0.16]]
-    ];
-    meshes.forEach(function(mo){
-      const b=mo[1],r=mo[2],orb=mo[3],sp=mo[4],tint=mo[5];
-      const mx=m4();const c=Math.cos(t*sp),sn=Math.sin(t*sp);
-      mx[0]=c*r;mx[2]=sn*r;mx[8]=-sn*r;mx[10]=c*r;
-      mx[12]=Math.sin(t*0.3+orb)*2.4;mx[13]=0.05;mx[14]=Math.cos(t*0.3+orb)*2.4;
-      gl.uniformMatrix4fv(uM,false,mx);
-      gl.uniform3fv(uTint,tint);
-      setMesh(b);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,b.idx);gl.drawElements(gl.TRIANGLES,b.n,gl.UNSIGNED_SHORT,0);
-    });
+    // 模型矩阵：自转 + 微浮动
+    const mx=m4();
+    const c=Math.cos(t*0.28),sn=Math.sin(t*0.28);
+    mx[0]=c;mx[2]=sn;mx[8]=-sn;mx[10]=c;
+    mx[13]=Math.sin(t*0.22)*0.12;
+    gl.uniformMatrix4fv(uM,false,mx);
+    gl.bindBuffer(gl.ARRAY_BUFFER,mBuf.pos);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,mBuf.nor);gl.enableVertexAttribArray(locN);gl.vertexAttribPointer(locN,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,mBuf.col);gl.enableVertexAttribArray(locC);gl.vertexAttribPointer(locC,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,mBuf.idx);
+    gl.drawElements(gl.TRIANGLES,mBuf.n,gl.UNSIGNED_INT,0);
     // ---- HUD ----
     const curFps=1/Math.max(dt,1e-4);
     if(fpsEl)fpsEl.textContent=String(Math.round(curFps));
     if(msEl)msEl.textContent=(dt*1000).toFixed(1)+' ms';
-    const triTotal=sA.tri+sB.tri+sC.tri+ring.tri;
-    if(stEl)stEl.textContent=triTotal.toLocaleString()+' 三角形 · '+(PN+DN)+' 粒子 · 金属/菲涅尔光照';
+    if(stEl)stEl.textContent=model.tri.toLocaleString()+' 三角形 · '+model.verts.toLocaleString()+' 顶点 · 高细分曲面';
     if(phase==='warm'){
       if(phaseT>=2){phase='run';phaseT=0;frames=0;acc=0;}
       if(note)note.textContent='预热中（2 秒）· 不计入成绩';
