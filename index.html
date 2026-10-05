@@ -4834,10 +4834,16 @@ function openBench3D(){
     const m=m4();m[0]=r[0];m[1]=u[0];m[2]=-f[0];m[4]=r[1];m[5]=u[1];m[6]=-f[1];m[8]=r[2];m[9]=u[2];m[10]=-f[2];
     m[12]=-(r[0]*eye[0]+r[1]*eye[1]+r[2]*eye[2]);m[13]=-(u[0]*eye[0]+u[1]*eye[1]+u[2]*eye[2]);m[14]=f[0]*eye[0]+f[1]*eye[1]+f[2]*eye[2];
     return m;}
+  // 固定基础渲染分辨率（不依赖 DOM 布局，弹窗打开瞬间也能正确设置）
+  const baseW=1280,baseH=720;
   function applyRes(mult){
-    const w=canvas.clientWidth,h=canvas.clientHeight;
-    canvas.width=Math.round(w*mult);canvas.height=Math.round(h*mult);
-    gl.viewport(0,0,canvas.width,canvas.height);}
+    canvas.width=Math.round(baseW*mult);canvas.height=Math.round(baseH*mult);
+    gl.viewport(0,0,canvas.width,canvas.height);
+    let tt=core.tri;
+    for(let i=0;i<16;i++)tt+=orbA[i].tri;
+    for(let i=0;i<8;i++)tt+=orbB[i].tri;
+    for(let i=0;i<6;i++)tt+=rings[i].tri;
+    if(stEl)stEl.textContent=tt.toLocaleString()+' 三角 · 8 光源 · '+canvas.width+'×'+canvas.height;}
   applyRes(1);
   gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);
   let running=true,raf=0,last=performance.now();
@@ -4914,7 +4920,7 @@ function openBench3D(){
     const curFps=1/Math.max(dt,1e-4);
     if(fpsEl)fpsEl.textContent=String(Math.round(curFps));
     if(msEl)msEl.textContent=(dt*1000).toFixed(1)+' ms';
-    if(stEl)stEl.textContent=triTotal.toLocaleString()+' 三角 · 8 光源 · '+step[0]+'x 超采样';
+    if(stEl)stEl.textContent=triTotal.toLocaleString()+' 三角 · 8 光源 · '+canvas.width+'×'+canvas.height+' · '+step[0]+'x';
     if(stepDone||allDone)return;
     stepT+=dt;stepFrames++;stepAcc+=dt;
     if(fill)fill.style.width=(Math.min(stepT/step[1],1)*100).toFixed(0)+'%';
