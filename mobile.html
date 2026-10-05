@@ -6407,7 +6407,9 @@ closing:'本条约目前仍在持续修订中，暂不作为最终正式版本�
 
 
 
-      else { cd.textContent='距结束 '+fmtCD(LOTTERY_END.getTime()-now); btn.disabled=false; btn.textContent='开启潮汐之门'; }
+      else { if(window.__lotState==='empty'){ cd.textContent='奖池已空'; btn.disabled=true; btn.textContent='已抽完'; }
+          else if(window.__lotState==='drawn'){ cd.textContent='今日已抽'; btn.disabled=true; btn.textContent='今日已抽'; }
+          else { cd.textContent='距结束 '+fmtCD(LOTTERY_END.getTime()-now); btn.disabled=false; btn.textContent='开启潮汐之门'; } }
 
 
 
@@ -6424,8 +6426,8 @@ closing:'本条约目前仍在持续修订中，暂不作为最终正式版本�
 
     fetch('/api/lottery/state?device='+encodeURIComponent(devId()),{cache:'no-store'}).then(function(r){return r.json();}).then(function(st){
       if(!st) return;
-      if(st.drawn){ cd.textContent='今日已抽'; btn.disabled=true; btn.textContent='今日已抽'; return; }
-      if(st.remaining<=0){ cd.textContent='奖池已空'; btn.disabled=true; btn.textContent='已抽完'; }
+      window.__lotState = st.drawn ? 'drawn' : (st.remaining<=0 ? 'empty' : null);
+      tick();
     }).catch(function(){});
 
 
