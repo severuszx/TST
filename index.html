@@ -4624,9 +4624,9 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
       if(!code){hint.textContent='请输入调试代码';hint.style.color='#dc2626';return;}
 
-      fetch('https://theslowtidefk.pages.dev/api/debug/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})})
+      const vf=function(u){return fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})}).then(function(r){return r.json();});};
 
-      .then(r=>r.json())
+      vf('https://theslowtide.pages.dev/api/debug/verify').then(function(d){if(d&&d.ok){return d;}return vf('https://theslowtidefk.pages.dev/api/debug/verify');})
 
       .then(d=>{
 
