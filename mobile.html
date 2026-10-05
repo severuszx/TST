@@ -62,7 +62,7 @@
 
 
 
-  --danger:#dc2626;--ok:#059669;
+  --danger:#dc2626;--ok:#059669;--shadow:0 4px 14px rgba(15,23,42,.07);
 
 
 
@@ -106,7 +106,7 @@ html[data-theme="dark"]{
 
 
 
-  --danger:#f87171;--ok:#34d399;
+  --danger:#f87171;--ok:#34d399;--shadow:0 4px 14px rgba(0,0,0,.4);
 
 
 
@@ -142,7 +142,7 @@ html[data-theme="glass"]{
 
 
 
-  --danger:#dc2626;--ok:#059669;
+  --danger:#dc2626;--ok:#059669;--shadow:0 4px 14px rgba(15,23,42,.07);
 
 
 
@@ -394,11 +394,11 @@ main::-webkit-scrollbar{display:none;}
 
 
 
-  padding:16px;margin-bottom:14px;backdrop-filter:blur(14px);
+  padding:16px;margin-bottom:14px;
 
 
 
-  box-shadow:0 8px 30px rgba(2,10,20,.35);
+  box-shadow:var(--shadow);
 
 
 
@@ -572,15 +572,11 @@ main::-webkit-scrollbar{display:none;}
 
 
 
-  background:var(--card);border:1px solid var(--card-brd);border-radius:16px;
+  background:var(--card);border:1px solid var(--card-brd);border-radius:10px;
 
+  padding:13px 8px;text-align:center;cursor:pointer;
 
-
-  padding:14px 8px;text-align:center;cursor:pointer;
-
-
-
-  transition:transform .15s,background .2s;backdrop-filter:blur(10px);
+  transition:transform .15s,background .2s;box-shadow:var(--shadow);
 
 
 
@@ -592,7 +588,7 @@ main::-webkit-scrollbar{display:none;}
 
 
 
-.quick .qi{font-size:22px;margin-bottom:6px;}
+.quick .qi{font-size:19px;margin-bottom:6px;color:var(--accent);}
 
 
 
@@ -692,13 +688,9 @@ main::-webkit-scrollbar{display:none;}
 
 
 
-  display:block;width:100%;padding:13px;border:none;border-radius:8px;
+  display:block;width:100%;padding:11px 14px;border:none;border-radius:6px;
 
-
-
-  font-size:15px;font-weight:600;cursor:pointer;text-align:center;
-
-
+  font-size:14px;font-weight:600;cursor:pointer;text-align:center;
 
   background:var(--accent);color:#fff;
 
@@ -716,7 +708,7 @@ main::-webkit-scrollbar{display:none;}
 
 
 
-.btn.ghost{background:rgba(255,255,255,.07);color:var(--txt);box-shadow:none;border:1px solid var(--card-brd);}
+.btn.ghost{background:var(--card);color:var(--txt);box-shadow:none;border:1px solid var(--card-brd);}
 
 
 
@@ -752,7 +744,7 @@ main::-webkit-scrollbar{display:none;}
 
 
 
-.mitem .mi{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--accent-soft);}
+.mitem .mi{width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--accent);}
 
 
 
@@ -1413,6 +1405,10 @@ main::-webkit-scrollbar{display:none;}
 
 
       <div class="quick" data-go="sponsor"><div class="qi">◉</div><div class="qn">赞助支持</div><div class="qd">支持我们</div></div>
+
+
+
+      <div class="quick" data-go="more"><div class="qi">☰</div><div class="qn">更多</div><div class="qd">全部栏目</div></div>
 
 
 
@@ -2424,7 +2420,7 @@ main::-webkit-scrollbar{display:none;}
 
 
 
-      <div class="mitem" data-go="event"><div class="mi">🏁</div><div class="mt"><b>赛事活动</b><span>官方赛事与回放</span></div><span class="ar">›</span></div>
+      <div class="mitem" data-go="event"><div class="mi">赛</div><div class="mt"><b>赛事活动</b><span>官方赛事与回放</span></div><span class="ar">›</span></div>
 
 
 
@@ -6291,15 +6287,9 @@ closing:'本条约目前仍在持续修订中，暂不作为最终正式版本�
 
 
 
-      box.innerHTML=list.length
-
-
-
-        ? '<div class="m-card"><table class="m-sponsor"><tr><th>名次</th><th>玩家</th><th>金额</th></tr>'+list.map(function(s,i){return '<tr><td>'+(i+1)+'</td><td>'+esc(s.name)+'</td><td>'+esc(s.amount)+'</td></tr>';}).join('')+'</table></div>'
-
-
-
-        : '<p class="empty-hint">暂无赞助记录</p>';
+      box.innerHTML='<div class="m-card" style="text-align:center;"><div class="m-title" style="justify-content:center;">赞助收款二维码</div><img src="wechat-qrcode.jpg" alt="赞助收款码" style="max-width:180px;width:100%;border-radius:8px;display:block;margin:10px auto 0;"></div>'+(list.length
+        ? '<div class="m-card"><div class="m-title">赞助排行榜</div><table class="m-sponsor"><tr><th>名次</th><th>玩家</th><th>金额</th></tr>'+list.map(function(s2,i){return '<tr><td>'+(i+1)+'</td><td>'+esc(s2.name)+'</td><td>'+esc(s2.amount)+'</td></tr>';}).join('')+'</table></div>'
+        : '<p class="empty-hint">暂无赞助记录</p>');
 
 
 
@@ -6693,9 +6683,9 @@ q('#mAdminPwd').addEventListener('keydown',function(e){ if(e.key==='Enter'){doLo
 
 // ===== 数据服务 API =====
 
-function mApi(action,data){
+function mApi(action,data,extra){
 
-  return fetch(AURL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:action,data:data||{}})})
+  return fetch(AURL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(Object.assign({action:action,data:data||{}},extra||{}))})
 
     .then(function(r){return r.json();})
 
