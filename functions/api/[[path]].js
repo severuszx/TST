@@ -10,6 +10,8 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const DATA_ORIGIN = 'https://tst-server-site.pages.dev';
 // 管理员口令：注意此文件在公开仓库，密码会随源码可见；后续需改为环境变量+数据库侧改密
 let ADMIN_PWD = null; // 管理员口令：仅由 onRequest 从环境变量 ADMIN_PWD 注入（仓库不含口令）
+// ===== 调试台验证（同源；前端优先调用，兜底反馈站）=====
+const DEBUG_CODES = { 'TST-G4N7QX': 'bench3d', K3M9X7: 'glass', X2W5V8: 'light', Q8N4R2: 'desktop', M7Z1P6: 'mobile', H6D3B9: 'perf', F5J8C4: 'dev', R2T7W1: 'reset' };
 
 // ===== 国庆&开服100天双庆抽奖（时区：北京时间 UTC+8）=====
 const L_START = new Date('2026-10-01T00:00:00+08:00');  // 2026-10-01 00:00 正式开放
@@ -105,6 +107,15 @@ export async function onRequest(context) {
 
   if (request.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders(request) });
+  }
+  // ===== 调试台验证（同源，减少对反馈站域名的依赖）=====
+  if (path === '/api/debug/verify' && request.method === 'POST') {
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { bd = {}; }
+    const code = String(bd.code || '').trim().toUpperCase();
+    const feat = DEBUG_CODES[code];
+    if (feat) return json({ ok: true, feature: feat }, 200, request);
+    return json({ ok: false, error: 'bad_code' }, 200, request);
   }
 
   // ===== 抽奖状态查询（含开放状态/剩余码数/今日已抽）=====
