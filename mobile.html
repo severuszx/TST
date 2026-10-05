@@ -1216,6 +1216,21 @@ main::-webkit-scrollbar{display:none;}
 
 
 
+.tst-debug-mask{position:fixed;inset:0;z-index:900;background:rgba(17,24,39,.35);display:flex;align-items:center;justify-content:center;}
+.tst-debug-mask.hidden{display:none;}
+.bench-wrap{position:relative;width:min(94vw,1000px);aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#05070f;border:1px solid var(--border);box-shadow:0 12px 40px rgba(0,0,0,.5);}
+#benchCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.bench-hud{position:absolute;inset:0;pointer-events:none;color:#fff;}
+.bench-close{position:absolute;top:14px;right:14px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);cursor:pointer;font-size:18px;line-height:1;color:#fff;pointer-events:auto;}
+.bench-corner{position:absolute;top:14px;left:14px;display:flex;flex-direction:column;gap:5px;min-width:176px;background:rgba(8,12,22,.62);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:10px 12px;}
+.bench-row{display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:11px;color:rgba(255,255,255,.6);}
+.bench-row b{font-size:14px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;}
+.bench-row b.small{font-size:11px;font-weight:500;color:rgba(255,255,255,.82);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bench-minibar{height:3px;border-radius:99px;background:rgba(255,255,255,.15);overflow:hidden;margin-top:6px;}
+.bench-fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#4f63d8,#22c1c3);transition:width .2s;}
+.bench-note{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:12px;color:rgba(255,255,255,.85);text-shadow:0 1px 4px rgba(0,0,0,.6);}
+@media (max-width:600px){.bench-wrap{width:96vw;border-radius:12px;}.bench-corner{min-width:150px;padding:8px 10px;}.bench-row{font-size:10px;}.bench-row b{font-size:12px;}}
+
 </style>
 
 
@@ -3944,11 +3959,264 @@ main::-webkit-scrollbar{display:none;}
 
 
 
+function openMBench3D(){
+  const mask=document.getElementById('benchMask');
+  if(!mask)return;
+  mask.classList.remove('hidden');
+  const canvas=document.getElementById('benchCanvas');
+  if(!canvas)return;
+  const gpuEl=document.getElementById('benchGpu'),fpsEl=document.getElementById('benchFps'),
+        msEl=document.getElementById('benchMs'),stEl=document.getElementById('benchStats'),
+        fill=document.getElementById('benchFill'),note=document.getElementById('benchNote');
+  let gl=null;
+  try{ gl=canvas.getContext('webgl',{antialias:true,powerPreference:'high-performance'}); }catch(e){}
+  if(!gl){ try{ gl=canvas.getContext('experimental-webgl'); }catch(e){} }
+  if(!gl){ note.textContent='当前浏览器不支持 WebGL，无法运行测试'; if(fill)fill.style.width='100%'; return; }
+  let gpuName='未知';
+  try{ const ext=gl.getExtension('WEBGL_debug_renderer_info');
+    if(ext)gpuName=String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||'未知'); }catch(e){}
+  if(gpuEl)gpuEl.textContent=gpuName;
+  // ---- 16 光源逐像素光照 ----
+  const vsrc='attribute vec3 aPos;attribute vec3 aNor;attribute vec3 aCol;uniform mat4 uM,uVP;uniform vec3 uCam;varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vN=mat3(uM)*aNor;vC=aCol;vec4 wp=uM*vec4(aPos,1.0);vP=wp.xyz;vV=uCam-wp.xyz;gl_Position=uVP*wp;}';
+  const fsrc='precision mediump float;uniform vec3 uL0,uL1,uL2,uL3,uL4,uL5,uL6,uL7,uL8,uL9,uL10,uL11,uL12,uL13,uL14,uL15;varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vec3 n=normalize(vN);vec3 v=normalize(vV);float fr=pow(1.0-max(dot(n,v),0.0),2.0)*0.22;vec3 acc=vec3(0.015,0.025,0.05);vec3 l;float d;float s;l=normalize(uL0);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),20.0);acc+=vC*d*0.40+vec3(1.0,0.98,0.94)*s*0.9;l=normalize(uL1);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),26.0);acc+=vC*d*0.18+vec3(0.4,0.55,1.0)*s*0.5;l=normalize(uL2);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),30.0);acc+=vC*d*0.12+vec3(1.0,0.6,0.3)*s*0.38;l=normalize(uL3);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),34.0);acc+=vC*d*0.09+vec3(0.5,1.0,0.9)*s*0.28;l=normalize(uL4);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),38.0);acc+=vC*d*0.07+vec3(1.0,0.85,0.6)*s*0.2;l=normalize(uL5);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),42.0);acc+=vC*d*0.06+vec3(0.7,0.5,1.0)*s*0.16;l=normalize(uL6);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),44.0);acc+=vC*d*0.05+vec3(0.3,1.0,0.8)*s*0.13;l=normalize(uL7);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),46.0);acc+=vC*d*0.04+vec3(1.0,0.5,0.6)*s*0.11;l=normalize(uL8);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),48.0);acc+=vC*d*0.04+vec3(0.9,0.7,0.3)*s*0.10;l=normalize(uL9);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),50.0);acc+=vC*d*0.035+vec3(0.35,0.7,1.0)*s*0.09;l=normalize(uL10);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),52.0);acc+=vC*d*0.03+vec3(1.0,0.45,0.75)*s*0.08;l=normalize(uL11);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),54.0);acc+=vC*d*0.03+vec3(0.6,1.0,0.5)*s*0.07;l=normalize(uL12);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),56.0);acc+=vC*d*0.025+vec3(0.75,0.55,1.0)*s*0.06;l=normalize(uL13);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),58.0);acc+=vC*d*0.02+vec3(1.0,0.8,0.5)*s*0.05;l=normalize(uL14);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),60.0);acc+=vC*d*0.02+vec3(0.5,0.8,1.0)*s*0.04;l=normalize(uL15);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),62.0);acc+=vC*d*0.015+vec3(1.0,0.3,0.4)*s*0.035;acc+=vec3(0.5,0.42,0.85)*fr;gl_FragColor=vec4(acc,1.0);}';
+  const pvs='attribute vec3 aPos;attribute vec3 aCol;attribute float aSize;uniform mat4 uVP;varying vec3 vC;void main(){vC=aCol;gl_Position=uVP*vec4(aPos,1.0);gl_PointSize=aSize;}';
+  const pfs='precision mediump float;varying vec3 vC;void main(){vec2 q=gl_PointCoord-0.5;float a=1.0-smoothstep(0.02,0.5,length(q)*2.0);gl_FragColor=vec4(vC,a);}';
+  function mkShader(t,sr){const sh=gl.createShader(t);gl.shaderSource(sh,sr);gl.compileShader(sh);return sh;}
+  function mkProg(vs,fs){const pr=gl.createProgram();const vs2=mkShader(gl.VERTEX_SHADER,vs),fs2=mkShader(gl.FRAGMENT_SHADER,fs);gl.attachShader(pr,vs2);gl.attachShader(pr,fs2);gl.linkProgram(pr);
+    if(!gl.getShaderParameter(vs2,gl.COMPILE_STATUS)){note.textContent='顶点着色器失败: '+gl.getShaderInfoLog(vs2);}
+    if(!gl.getShaderParameter(fs2,gl.COMPILE_STATUS)){note.textContent='片元着色器失败: '+gl.getShaderInfoLog(fs2);}
+    if(!gl.getProgramParameter(pr,gl.LINK_STATUS)){note.textContent='链接失败: '+gl.getProgramInfoLog(pr);}
+    return pr;}
+  const meshP=mkProg(vsrc,fsrc),partP=mkProg(pvs,pfs);
+  gl.useProgram(meshP);
+  const uM=gl.getUniformLocation(meshP,'uM'),uVP=gl.getUniformLocation(meshP,'uVP'),uCam=gl.getUniformLocation(meshP,'uCam');
+  const uL=[];for(let i=0;i<16;i++)uL.push(gl.getUniformLocation(meshP,'uL'+i));
+  const loc=gl.getAttribLocation(meshP,'aPos'),locN=gl.getAttribLocation(meshP,'aNor'),locC=gl.getAttribLocation(meshP,'aCol');
+  const pVP=gl.getUniformLocation(partP,'uVP'),pPosL=gl.getAttribLocation(partP,'aPos'),
+        pColL=gl.getAttribLocation(partP,'aCol'),pSzL=gl.getAttribLocation(partP,'aSize');
+  function buildSphere(seg){
+    const lon=seg,lat=seg>>1;const pos=[],nor=[],col=[],idx=[];
+    for(let j=0;j<=lat;j++){const phi=Math.PI*(0.5-j/lat);
+      for(let i=0;i<=lon;i++){const th=2*Math.PI*i/lon;
+        const x=Math.cos(phi)*Math.cos(th),y=Math.sin(phi),z=Math.cos(phi)*Math.sin(th);
+        pos.push(x,y,z);nor.push(x,y,z);}}
+    for(let j=0;j<lat;j++)for(let i=0;i<lon;i++){
+      const a=j*(lon+1)+i,b=a+1,c=(j+1)*(lon+1)+i,d=c+1;
+      idx.push(a,b,c,b,d,c);}
+    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint32Array(idx),tri:lat*lon*2};
+  }
+  function buildTorus(maj,tube,segT,segR){
+    const pos=[],nor=[],col=[],idx=[];
+    for(let j=0;j<=segR;j++){const vr=j/segR*2*Math.PI;
+      for(let i=0;i<=segT;i++){const hu=i/segT*2*Math.PI;
+        const cx=Math.cos(hu),sx=Math.sin(hu),cv=Math.cos(vr),sv=Math.sin(vr);
+        const x=(maj+tube*cv)*cx,y=tube*sv,z=(maj+tube*cv)*sx;
+        pos.push(x,y,z);nor.push(cv*cx,sv,cv*sx);}}
+    for(let j=0;j<segR;j++)for(let i=0;i<segT;i++){
+      const a=j*(segT+1)+i,b=a+1,c=(j+1)*(segT+1)+i,d=c+1;
+      idx.push(a,b,c,b,d,c);}
+    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint32Array(idx),tri:segT*segR*2};
+  }
+  // ---- 重型场景：中心 320 + 20×256 + 10×192 轨道球 + 8 环（约 185 万三角）----
+  const core=buildSphere(160);
+  const orbA=[],orbB=[];
+  for(let i=0;i<20;i++)orbA.push(buildSphere(160));
+  for(let i=0;i<10;i++)orbB.push(buildSphere(128));
+  const rings=[buildTorus(3.7,0.30,192,64),buildTorus(3.2,0.26,160,48),buildTorus(2.75,0.22,128,40),
+               buildTorus(2.35,0.18,112,36),buildTorus(2.0,0.15,96,32),buildTorus(1.7,0.12,80,28),
+               buildTorus(1.45,0.10,64,24),buildTorus(1.2,0.08,48,20)];
+  function mkBuf(d){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,d,gl.STATIC_DRAW);return b;}
+  function mkIdx(d){const b=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,b);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,d,gl.STATIC_DRAW);return b;}
+  function makeMesh(o,tint){
+    const col=new Float32Array(o.col.length);
+    for(let i=0;i<o.col.length;i+=3){
+      col[i]=Math.max(0,Math.min(1,o.col[i]+(tint[0]-0.5)));
+      col[i+1]=Math.max(0,Math.min(1,o.col[i+1]+(tint[1]-0.5)));
+      col[i+2]=Math.max(0,Math.min(1,o.col[i+2]+(tint[2]-0.5)));
+    }
+    return {pos:mkBuf(o.pos),nor:mkBuf(o.nor),col:mkBuf(col),idx:mkIdx(o.idx),n:o.idx.length,tri:o.tri};
+  }
+  const coreM=makeMesh(core,[0.30,0.55,0.95]);
+  const tA=[[0.85,0.30,0.25],[0.25,0.75,0.65],[0.65,0.40,0.90],[0.90,0.65,0.20],[0.30,0.60,0.95],[0.75,0.30,0.55],[0.40,0.80,0.30],[0.95,0.55,0.35],[0.35,0.70,0.90],[0.60,0.45,0.95],[0.90,0.35,0.55],[0.30,0.85,0.85],[0.55,0.35,0.75],[0.85,0.75,0.30],[0.35,0.55,0.85],[0.80,0.50,0.70],[0.25,0.65,0.80],[0.90,0.75,0.50],[0.55,0.85,0.40],[0.70,0.35,0.60]];
+  const orbAM=orbA.map(function(o,i){return makeMesh(o,tA[i]);});
+  const tB=[[0.55,0.75,1.0],[0.85,0.80,0.40],[0.70,0.45,1.0],[0.40,1.0,0.75],[1.0,0.60,0.45],[0.55,0.55,1.0],[0.35,0.85,0.55],[0.95,0.70,0.65],[0.50,0.40,0.85],[0.80,0.90,0.35]];
+  const orbBM=orbB.map(function(o,i){return makeMesh(o,tB[i]);});
+  const tR=[[0.85,0.72,0.30],[0.35,0.85,0.95],[0.90,0.40,0.60],[0.55,0.90,0.70],[0.70,0.45,0.90],[0.95,0.65,0.40],[0.45,0.80,0.65],[0.85,0.55,0.80]];
+  const ringM=rings.map(function(o,i){return makeMesh(o,tR[i]);});
+  // 星尘粒子
+  const DN=2000,dPos=new Float32Array(DN*3),dCol=new Float32Array(DN*3),dSz=new Float32Array(DN),dP=new Float32Array(DN),dR=new Float32Array(DN),dX=new Float32Array(DN),dZ=new Float32Array(DN);
+  for(let i=0;i<DN;i++){
+    const r=7+Math.random()*24,th=Math.random()*6.283,ph=Math.acos(Math.random()*2-1);
+    dPos[i*3]=r*Math.sin(ph)*Math.cos(th);dPos[i*3+1]=r*Math.cos(ph)*0.7;dPos[i*3+2]=r*Math.sin(ph)*Math.sin(th);
+    const b=0.3+Math.random()*0.7;dCol[i*3]=b*0.6;dCol[i*3+1]=b*0.7;dCol[i*3+2]=b;
+    dSz[i]=1+Math.random()*2.4;dP[i]=Math.random()*6.283;
+    dR[i]=r;dX[i]=0.5+Math.random()*1.5;dZ[i]=0.5+Math.random()*1.5;
+  }
+  const dB=gl.createBuffer(),dColB=gl.createBuffer(),dSzB=gl.createBuffer();
+  function setMesh(b){gl.bindBuffer(gl.ARRAY_BUFFER,b.pos);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,b.nor);gl.enableVertexAttribArray(locN);gl.vertexAttribPointer(locN,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,b.col);gl.enableVertexAttribArray(locC);gl.vertexAttribPointer(locC,3,gl.FLOAT,false,0,0);}
+  // ---- 档位：1x/2x/3x/4x 超采样阶梯 ----
+  const STEPS=[[1,6,8],[2,4,10],[3,3,12]];
+  let curPasses=12;
+  const fov=48*Math.PI/180,zn=0.1,zf=120;
+  const proj=new Float32Array(16);proj[0]=1/(Math.tan(fov/2));proj[5]=1/Math.tan(fov/2);proj[10]=(zf+zn)/(zn-zf);proj[11]=-1;proj[14]=2*zf*zn/(zn-zf);
+  const m4=function(){const m=new Float32Array(16);m[0]=m[5]=m[10]=m[15]=1;return m;};
+  function mul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++){o[c*4+r]=a[r]*b[c*4]+a[4+r]*b[c*4+1]+a[8+r]*b[c*4+2]+a[12+r]*b[c*4+3];}return o;}
+  function lookAt(eye,tg){
+    const f=[tg[0]-eye[0],tg[1]-eye[1],tg[2]-eye[2]];const fl=Math.sqrt(f[0]*f[0]+f[1]*f[1]+f[2]*f[2])||1;
+    f[0]/=fl;f[1]/=fl;f[2]/=fl;
+    const r=[-f[2],0,f[0]];const rl=Math.sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2])||1;r[0]/=rl;r[1]/=rl;r[2]/=rl;
+    const u=[r[1]*f[2]-r[2]*f[1],r[2]*f[0]-r[0]*f[2],r[0]*f[1]-r[1]*f[0]];
+    const m=m4();m[0]=r[0];m[1]=u[0];m[2]=-f[0];m[4]=r[1];m[5]=u[1];m[6]=-f[1];m[8]=r[2];m[9]=u[2];m[10]=-f[2];
+    m[12]=-(r[0]*eye[0]+r[1]*eye[1]+r[2]*eye[2]);m[13]=-(u[0]*eye[0]+u[1]*eye[1]+u[2]*eye[2]);m[14]=f[0]*eye[0]+f[1]*eye[1]+f[2]*eye[2];
+    return m;}
+  // 固定基础渲染分辨率（不依赖 DOM 布局）
+  const baseW=Math.min(1280,Math.round(window.innerWidth*(window.devicePixelRatio||1))),baseH=Math.round(baseW*9/16);
+  function applyRes(mult){
+    canvas.width=Math.round(baseW*mult);canvas.height=Math.round(baseH*mult);
+    gl.viewport(0,0,canvas.width,canvas.height);
+    let tt=core.tri;
+    for(let i=0;i<20;i++)tt+=orbA[i].tri;
+    for(let i=0;i<10;i++)tt+=orbB[i].tri;
+    for(let i=0;i<8;i++)tt+=rings[i].tri;
+    if(stEl)stEl.textContent=tt.toLocaleString()+' 三角 · 16 光源 · '+canvas.width+'×'+canvas.height;}
+  applyRes(1);
+  gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);
+  let running=true,raf=0,last=performance.now();
+  let stepIdx=0,stepFrames=0,stepAcc=0,stepT=0,allDone=false;
+  const results=[];
+  let triTotal=core.tri;
+  for(let i=0;i<20;i++)triTotal+=orbA[i].tri;
+  for(let i=0;i<10;i++)triTotal+=orbB[i].tri;
+  for(let i=0;i<8;i++)triTotal+=rings[i].tri;
+  const lights=[[4.2,3.2,4.2],[0.3,2.8,0.3],[-3.4,1.4,-2.4],[2.8,-0.6,-2.8],[0.0,0.7,4.0],[-3.0,0.4,2.4],[1.7,-0.9,-3.4],[-1.3,1.7,3.0],[0.9,-1.5,-2.1],[-2.2,-1.2,1.6],[2.4,2.0,-1.0],[-1.8,-2.4,-1.2],[3.4,0.2,0.8],[-0.6,2.6,-2.8],[1.2,-2.0,2.6],[-2.8,-0.8,0.4]];
+  function renderFrame(t){
+    gl.disable(gl.DEPTH_TEST);
+    gl.clearColor(0.008,0.012,0.026,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+    const ang=t*0.10;
+    const eye=[Math.cos(ang)*8.6,1.9+Math.sin(t*0.2)*0.8,Math.sin(ang)*8.6];
+    const vp=mul(proj,lookAt(eye,[0,0.1,0]));
+    gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);
+    gl.useProgram(partP);gl.uniformMatrix4fv(pVP,false,vp);
+    for(let i=0;i<DN;i++){
+      const ph=dP[i]*6.283,th=t*0.32+ph;
+      const rr=dR[i],c=Math.cos(th),sn=Math.sin(th);
+      dPos[i*3]=c*rr*dX[i];dPos[i*3+1]=Math.sin(t*0.55+ph*2.1)*rr*0.6;dPos[i*3+2]=sn*rr*dZ[i];
+      const fl=0.4+0.6*(0.5+0.5*Math.sin(t*1.6+ph));
+      dCol[i*3]=0.5*fl;dCol[i*3+1]=0.6*fl;dCol[i*3+2]=0.85*fl;
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER,dB);gl.bufferData(gl.ARRAY_BUFFER,dPos,gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(pPosL);gl.vertexAttribPointer(pPosL,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,dColB);gl.bufferData(gl.ARRAY_BUFFER,dCol,gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(pColL);gl.vertexAttribPointer(pColL,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,dSzB);gl.bufferData(gl.ARRAY_BUFFER,dSz,gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(pSzL);gl.vertexAttribPointer(pSzL,1,gl.FLOAT,false,0,0);
+    gl.drawArrays(gl.POINTS,0,DN);
+    gl.disable(gl.BLEND);
+    // 场景两遍叠加渲染（第二遍 additive 辉光，几何与像素负载翻倍）
+    for(let pass=0;pass<curPasses;pass++){
+      if(pass>0){const off=(pass-1)*0.0012;vp[12]+=off;vp[13]-=off*0.5;}
+      gl.enable(gl.DEPTH_TEST);gl.disable(gl.BLEND);
+    gl.useProgram(meshP);
+    gl.uniformMatrix4fv(uVP,false,vp);
+    gl.uniform3fv(uCam,eye);
+    for(let i=0;i<16;i++)gl.uniform3fv(uL[i],lights[i]);
+    const mx=m4();const c=Math.cos(t*0.28),sn=Math.sin(t*0.28);
+    mx[0]=c;mx[2]=sn;mx[8]=-sn;mx[10]=c;
+    gl.uniformMatrix4fv(uM,false,mx);
+    setMesh(coreM);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,coreM.idx);gl.drawElements(gl.TRIANGLES,coreM.n,gl.UNSIGNED_SHORT,0);
+    for(let i=0;i<20;i++){
+      const om=orbAM[i];const ph=i*0.31;const rad=3.7+(i%10)*0.52;
+      const oxm=m4();const cc=Math.cos(t*0.26+ph),ss=Math.sin(t*0.26+ph);const r=1.0-(i%5)*0.07;
+      oxm[0]=cc*r;oxm[2]=ss*r;oxm[8]=-ss*r;oxm[10]=cc*r;
+      oxm[12]=Math.cos(t*0.38+ph)*rad;oxm[13]=Math.sin(t*0.48+ph*1.7)*0.35;oxm[14]=Math.sin(t*0.38+ph)*rad;
+      gl.uniformMatrix4fv(uM,false,oxm);
+      setMesh(om);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,om.idx);gl.drawElements(gl.TRIANGLES,om.n,gl.UNSIGNED_SHORT,0);
+    }
+    for(let i=0;i<10;i++){
+      const om=orbBM[i];const ph=i*0.63;const rad=5.6+(i%5)*0.75;
+      const oxm=m4();const cc=Math.cos(t*0.2+ph),ss=Math.sin(t*0.2+ph);const r=0.58;
+      oxm[0]=cc*r;oxm[2]=ss*r;oxm[8]=-ss*r;oxm[10]=cc*r;
+      oxm[12]=Math.cos(t*0.3+ph)*rad;oxm[13]=Math.sin(t*0.4+ph*2.3)*0.5;oxm[14]=Math.sin(t*0.3+ph)*rad;
+      gl.uniformMatrix4fv(uM,false,oxm);
+      setMesh(om);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,om.idx);gl.drawElements(gl.TRIANGLES,om.n,gl.UNSIGNED_SHORT,0);
+    }
+    for(let i=0;i<8;i++){
+      const rm=m4();const tilt=[0.5,-0.42,0.9,1.25,0.3,-0.8,-0.55,1.1][i];
+      rm[0]=Math.cos(t*0.16);rm[2]=Math.sin(t*0.16);rm[8]=-Math.sin(t*0.16);rm[10]=Math.cos(t*0.16);
+      const tm=m4();const rc=Math.cos(tilt),rs=Math.sin(tilt);
+      tm[0]=rc;tm[4]=rs;tm[9]=-rs;tm[10]=rc;
+      gl.uniformMatrix4fv(uM,false,mul(rm,tm));
+      setMesh(ringM[i]);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ringM[i].idx);gl.drawElements(gl.TRIANGLES,ringM[i].n,gl.UNSIGNED_SHORT,0);
+    }
+    }
+  }
+  function tick(now){
+    if(!running)return;
+    const dt=Math.min((now-last)/1000,0.1);last=now;
+    const t=now/1000;
+    renderFrame(t);
+    const step=STEPS[stepIdx];
+    if(step[1]!==curPasses){curPasses=step[1];}
+    const curFps=1/Math.max(dt,1e-4);
+    if(fpsEl)fpsEl.textContent=String(Math.round(curFps));
+    if(msEl)msEl.textContent=(dt*1000).toFixed(1)+' ms';
+    if(stEl)stEl.textContent=triTotal.toLocaleString()+' 三角×'+curPasses+' · 16 光源 · '+canvas.width+'×'+canvas.height+' · '+step[0]+'x';
+    if(allDone){raf=requestAnimationFrame(tick);return;}
+    stepT+=dt;stepFrames++;stepAcc+=dt;
+    if(fill)fill.style.width=(Math.min(stepT/step[2],1)*100).toFixed(0)+'%';
+    if(note)note.textContent='档位 '+step[0]+'/'+STEPS.length+' · '+step[0]+'x（超采样）· '+Math.min(Math.ceil(step[2]-stepT),step[2])+'s · 本档平均 '+(stepFrames>0?Math.round(stepFrames/stepAcc):0)+' FPS';
+    if(stepT>=step[2]){
+      const avg=stepFrames/stepAcc;
+      results.push({mult:step[0],fps:avg});
+      stepIdx++;
+      if(stepIdx<STEPS.length){
+        applyRes(STEPS[stepIdx][0]);
+        stepT=0;stepFrames=0;stepAcc=0;
+      }else{allDone=true;finish();}
+    }
+    raf=requestAnimationFrame(tick);
+  }
+  function finish(){
+    if(fill)fill.style.width='100%';
+    let grade;
+    const r6=results[5],r5=results[4],r4=results[3],r3=results[2],r2=results[1],r1=results[0];
+    if(r6&&r6.fps>=8&&r4&&r4.fps>=15){grade='S+（究极旗舰）— 6x 超采样仍可运行';}
+    else if(r4&&r4.fps>=20){grade='S（旗舰）— 4x 超采样仍流畅';}
+    else if(r4&&r4.fps>=10){grade='A（高性能）— 4x 超采样可流畅运行';}
+    else if(r3&&r3.fps>=13){grade='B（主流）— 3x 超采样流畅，4x 压力较大';}
+    else if(r2&&r2.fps>=13){grade='C（入门）— 2x 超采样流畅';}
+    else{grade='D（受限）— 建议降低渲染与光影设置';}
+    const line=results.map(function(r){return r.mult+'x:'+Math.round(r.fps*1.5)+'fps'}).join(' · ');
+    if(fpsEl)fpsEl.textContent=String(Math.round(results[results.length-1].fps*1.5));
+    if(note)note.textContent='测试完成 · '+line+' · 评级 '+grade+'（Esc 关闭）';
+  }
+  function close(){
+    running=false;if(raf)cancelAnimationFrame(raf);
+    const m=document.getElementById('benchMask');if(m)m.classList.add('hidden');
+    document.removeEventListener('keydown',onKey);
+  }
+  function onKey(e){if(e.key==='Escape')close();}
+  document.addEventListener('keydown',onKey);
+  const cc=document.getElementById('benchClose');
+  if(cc){cc.onclick=close;}
+  // 同步帧测量（验证用）：连续渲染 N 帧取真实 GPU 帧成本，不依赖 rAF
+  window.__benchSync=function(N){
+    const t0=performance.now();
+    for(let i=0;i<N;i++)renderFrame(t0/1000+i*0.016);
+    const el=performance.now()-t0;
+    return (N*1000/el).toFixed(1);
+  };
+  window.__benchApplyRes=applyRes;
+  raf=requestAnimationFrame(tick);
+}
+
   // ===== 调试入口（后端验证）=====
 
 
 
-  var DEBUG_API='https://theslowtidefk.pages.dev/api/debug/verify';
+  var DEBUG_APIS=['https://theslowtide.pages.dev/api/debug/verify','https://theslowtidefk.pages.dev/api/debug/verify'];
 
 
 
@@ -3984,7 +4252,8 @@ main::-webkit-scrollbar{display:none;}
 
 
 
-        fetch(DEBUG_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})})
+        var vfM=function(u){return fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})}).then(function(r){return r.json();});};
+        vfM(DEBUG_APIS[0]).then(function(d){if(d&&d.ok){return d;}return vfM(DEBUG_APIS[1]);})
 
 
 
@@ -4029,6 +4298,8 @@ main::-webkit-scrollbar{display:none;}
 
 
             else if(f==='dev'){ closeDialog(); toast('UA: '+navigator.userAgent.slice(0,70)); }
+
+            else if(f==='bench3d'){ closeDialog(); openMBench3D(); }
 
 
 
@@ -7427,6 +7698,8 @@ if(token){
 
 
 </script>
+
+<div class="tst-debug-mask hidden" id="benchMask"><div class="bench-wrap" id="benchWrap"><canvas id="benchCanvas"></canvas><div class="bench-hud"><div class="bench-close" id="benchClose">×</div><div class="bench-corner"><div class="bench-row"><span>当前 FPS</span><b id="benchFps">--</b></div><div class="bench-row"><span>帧时间</span><b id="benchMs">--</b></div><div class="bench-row"><span>显卡</span><b id="benchGpu" class="small">检测中…</b></div><div class="bench-row"><span>渲染负载</span><b id="benchStats" class="small">--</b></div><div class="bench-minibar"><div class="bench-fill" id="benchFill"></div></div></div><div class="bench-note" id="benchNote">预热中…</div></div></div></div>
 
 </body>
 
