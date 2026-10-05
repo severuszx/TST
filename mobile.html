@@ -4003,7 +4003,7 @@ function openMBench3D(){
     for(let j=0;j<lat;j++)for(let i=0;i<lon;i++){
       const a=j*(lon+1)+i,b=a+1,c=(j+1)*(lon+1)+i,d=c+1;
       idx.push(a,b,c,b,d,c);}
-    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint32Array(idx),tri:lat*lon*2};
+    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint16Array(idx),tri:lat*lon*2};
   }
   function buildTorus(maj,tube,segT,segR){
     const pos=[],nor=[],col=[],idx=[];
@@ -4015,7 +4015,7 @@ function openMBench3D(){
     for(let j=0;j<segR;j++)for(let i=0;i<segT;i++){
       const a=j*(segT+1)+i,b=a+1,c=(j+1)*(segT+1)+i,d=c+1;
       idx.push(a,b,c,b,d,c);}
-    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint32Array(idx),tri:segT*segR*2};
+    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint16Array(idx),tri:segT*segR*2};
   }
   // ---- 重型场景：中心 320 + 20×256 + 10×192 轨道球 + 8 环（约 185 万三角）----
   const core=buildSphere(160);
