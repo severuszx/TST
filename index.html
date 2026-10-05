@@ -4733,8 +4733,6 @@ function openBench3D(){
   try{ gl=canvas.getContext('webgl',{antialias:true,powerPreference:'high-performance'}); }catch(e){}
   if(!gl){ try{ gl=canvas.getContext('experimental-webgl'); }catch(e){} }
   if(!gl){ note.textContent='当前浏览器不支持 WebGL，无法运行测试'; if(fill)fill.style.width='100%'; return; }
-  const extIdx=gl.getExtension('OES_element_index_uint');
-  if(!extIdx){ note.textContent='当前浏览器不支持 32 位索引，无法运行测试'; if(fill)fill.style.width='100%'; return; }
   let gpuName='未知';
   try{ const ext=gl.getExtension('WEBGL_debug_renderer_info');
     if(ext)gpuName=String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||'未知'); }catch(e){}
@@ -4820,7 +4818,8 @@ function openBench3D(){
     gl.bindBuffer(gl.ARRAY_BUFFER,b.nor);gl.enableVertexAttribArray(locN);gl.vertexAttribPointer(locN,3,gl.FLOAT,false,0,0);
     gl.bindBuffer(gl.ARRAY_BUFFER,b.col);gl.enableVertexAttribArray(locC);gl.vertexAttribPointer(locC,3,gl.FLOAT,false,0,0);}
   // ---- 档位：1x/2x/3x/4x 超采样阶梯 ----
-  const STEPS=[[1,15],[2,20],[3,25],[4,30],[5,30],[6,30]];
+  const STEPS=[[1,12,8],[2,12,8],[3,9,9],[4,6,10],[5,4,10],[6,3,10]];
+  let curPasses=12;
   const fov=48*Math.PI/180,zn=0.1,zf=120;
   const proj=new Float32Array(16);proj[0]=1/(Math.tan(fov/2));proj[5]=1/Math.tan(fov/2);proj[10]=(zf+zn)/(zn-zf);proj[11]=-1;proj[14]=2*zf*zn/(zn-zf);
   const m4=function(){const m=new Float32Array(16);m[0]=m[5]=m[10]=m[15]=1;return m;};
@@ -4877,7 +4876,7 @@ function openBench3D(){
     gl.drawArrays(gl.POINTS,0,DN);
     gl.disable(gl.BLEND);
     // 场景两遍叠加渲染（第二遍 additive 辉光，几何与像素负载翻倍）
-    for(let pass=0;pass<6;pass++){
+    for(let pass=0;pass<curPasses;pass++){
       if(pass>0){const off=(pass-1)*0.0012;vp[12]+=off;vp[13]-=off*0.5;}
       gl.enable(gl.DEPTH_TEST);gl.disable(gl.BLEND);
     gl.useProgram(meshP);
@@ -4887,14 +4886,14 @@ function openBench3D(){
     const mx=m4();const c=Math.cos(t*0.28),sn=Math.sin(t*0.28);
     mx[0]=c;mx[2]=sn;mx[8]=-sn;mx[10]=c;
     gl.uniformMatrix4fv(uM,false,mx);
-    setMesh(coreM);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,coreM.idx);gl.drawElements(gl.TRIANGLES,coreM.n,gl.UNSIGNED_INT,0);
+    setMesh(coreM);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,coreM.idx);gl.drawElements(gl.TRIANGLES,coreM.n,gl.UNSIGNED_SHORT,0);
     for(let i=0;i<20;i++){
       const om=orbAM[i];const ph=i*0.31;const rad=3.7+(i%10)*0.52;
       const oxm=m4();const cc=Math.cos(t*0.26+ph),ss=Math.sin(t*0.26+ph);const r=1.0-(i%5)*0.07;
       oxm[0]=cc*r;oxm[2]=ss*r;oxm[8]=-ss*r;oxm[10]=cc*r;
       oxm[12]=Math.cos(t*0.38+ph)*rad;oxm[13]=Math.sin(t*0.48+ph*1.7)*0.35;oxm[14]=Math.sin(t*0.38+ph)*rad;
       gl.uniformMatrix4fv(uM,false,oxm);
-      setMesh(om);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,om.idx);gl.drawElements(gl.TRIANGLES,om.n,gl.UNSIGNED_INT,0);
+      setMesh(om);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,om.idx);gl.drawElements(gl.TRIANGLES,om.n,gl.UNSIGNED_SHORT,0);
     }
     for(let i=0;i<10;i++){
       const om=orbBM[i];const ph=i*0.63;const rad=5.6+(i%5)*0.75;
@@ -4902,7 +4901,7 @@ function openBench3D(){
       oxm[0]=cc*r;oxm[2]=ss*r;oxm[8]=-ss*r;oxm[10]=cc*r;
       oxm[12]=Math.cos(t*0.3+ph)*rad;oxm[13]=Math.sin(t*0.4+ph*2.3)*0.5;oxm[14]=Math.sin(t*0.3+ph)*rad;
       gl.uniformMatrix4fv(uM,false,oxm);
-      setMesh(om);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,om.idx);gl.drawElements(gl.TRIANGLES,om.n,gl.UNSIGNED_INT,0);
+      setMesh(om);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,om.idx);gl.drawElements(gl.TRIANGLES,om.n,gl.UNSIGNED_SHORT,0);
     }
     for(let i=0;i<8;i++){
       const rm=m4();const tilt=[0.5,-0.42,0.9,1.25,0.3,-0.8,-0.55,1.1][i];
@@ -4910,7 +4909,7 @@ function openBench3D(){
       const tm=m4();const rc=Math.cos(tilt),rs=Math.sin(tilt);
       tm[0]=rc;tm[4]=rs;tm[9]=-rs;tm[10]=rc;
       gl.uniformMatrix4fv(uM,false,mul(rm,tm));
-      setMesh(ringM[i]);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ringM[i].idx);gl.drawElements(gl.TRIANGLES,ringM[i].n,gl.UNSIGNED_INT,0);
+      setMesh(ringM[i]);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ringM[i].idx);gl.drawElements(gl.TRIANGLES,ringM[i].n,gl.UNSIGNED_SHORT,0);
     }
     }
   }
@@ -4920,15 +4919,16 @@ function openBench3D(){
     const t=now/1000;
     renderFrame(t);
     const step=STEPS[stepIdx];
+    if(step[1]!==curPasses){curPasses=step[1];}
     const curFps=1/Math.max(dt,1e-4);
     if(fpsEl)fpsEl.textContent=String(Math.round(curFps));
     if(msEl)msEl.textContent=(dt*1000).toFixed(1)+' ms';
-    if(stEl)stEl.textContent=triTotal.toLocaleString()+' 三角×6 · 16 光源 · '+canvas.width+'×'+canvas.height+' · '+step[0]+'x';
+    if(stEl)stEl.textContent=triTotal.toLocaleString()+' 三角×'+curPasses+' · 16 光源 · '+canvas.width+'×'+canvas.height+' · '+step[0]+'x';
     if(allDone){raf=requestAnimationFrame(tick);return;}
     stepT+=dt;stepFrames++;stepAcc+=dt;
-    if(fill)fill.style.width=(Math.min(stepT/step[1],1)*100).toFixed(0)+'%';
-    if(note)note.textContent='档位 '+step[0]+'/'+STEPS.length+' · '+step[0]+'x（超采样）· '+Math.min(Math.ceil(step[1]-stepT),step[1])+'s · 本档平均 '+(stepFrames>0?Math.round(stepFrames/stepAcc):0)+' FPS';
-    if(stepT>=step[1]){
+    if(fill)fill.style.width=(Math.min(stepT/step[2],1)*100).toFixed(0)+'%';
+    if(note)note.textContent='档位 '+step[0]+'/'+STEPS.length+' · '+step[0]+'x（超采样）· '+Math.min(Math.ceil(step[2]-stepT),step[2])+'s · 本档平均 '+(stepFrames>0?Math.round(stepFrames/stepAcc):0)+' FPS';
+    if(stepT>=step[2]){
       const avg=stepFrames/stepAcc;
       results.push({mult:step[0],fps:avg});
       stepIdx++;
@@ -4943,7 +4943,7 @@ function openBench3D(){
     if(fill)fill.style.width='100%';
     let grade;
     const r6=results[5],r5=results[4],r4=results[3],r3=results[2],r2=results[1],r1=results[0];
-    if(r6&&r6.fps>=8){grade='S+（究极旗舰）— 6x 超采样仍可运行';}
+    if(r6&&r6.fps>=8&&r4&&r4.fps>=15){grade='S+（究极旗舰）— 6x 超采样仍可运行';}
     else if(r4&&r4.fps>=20){grade='S（旗舰）— 4x 超采样仍流畅';}
     else if(r4&&r4.fps>=10){grade='A（高性能）— 4x 超采样可流畅运行';}
     else if(r3&&r3.fps>=13){grade='B（主流）— 3x 超采样流畅，4x 压力较大';}
