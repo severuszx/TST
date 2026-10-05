@@ -1654,48 +1654,49 @@ html[data-theme="glass"] .glass-bg-picker.hidden{display:none;}
 
 .tst-debug-mask.hidden{display:none;}
 
-.tst-debug-box{width:300px;background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:22px;}
+.tst-debug-box{width:300px;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:20px 22px;}
 
 html[data-theme="glass"] .tst-debug-box{background:rgba(255,255,255,.55);backdrop-filter:saturate(180%);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 80px rgba(70,90,160,.25),inset 0 1px 0 rgba(255,255,255,.9);}
 
-.db-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;}
+.db-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;}
 
-.db-desc{font-size:12px;line-height:1.7;color:var(--text-secondary);background:var(--hover);border:1px solid var(--border);border-radius:12px;padding:9px 12px;margin-bottom:12px;}
+.db-desc{font-size:12px;line-height:1.7;color:var(--text-secondary);margin-bottom:14px;}
 
-html[data-theme="glass"] .db-desc{background:rgba(255,255,255,.4);border-color:rgba(255,255,255,.5);}
+html[data-theme="glass"] .db-desc{color:rgba(20,30,70,.75);}
 
-#debugInput{width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--hover);font-size:14px;color:var(--text);outline:none;}
+#debugInput{width:100%;padding:10px 13px;border-radius:9px;border:1px solid var(--border);background:var(--hover);font-size:14px;color:var(--text);outline:none;}
 
 html[data-theme="glass"] #debugInput{background:rgba(255,255,255,.42);border-color:rgba(255,255,255,.6);box-shadow:0 4px 16px rgba(70,90,160,.1),inset 0 1px 0 rgba(255,255,255,.85);}
 
-.db-btns{display:flex;gap:10px;margin-top:14px;}
+.db-btns{display:flex;gap:8px;margin-top:14px;}
 
-.db-btns button{flex:1;padding:9px 0;border-radius:999px;border:1px solid var(--border);font-size:13px;cursor:pointer;background:var(--card);box-shadow:var(--shadow);color:var(--text);transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
+.db-btns button{flex:1;padding:9px 0;border-radius:9px;border:1px solid var(--border);font-size:13px;cursor:pointer;background:transparent;color:var(--text);transition:background .15s;}
 
-html[data-theme="glass"] .db-btns button{background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.3));border-color:rgba(255,255,255,.7);box-shadow:0 4px 14px rgba(70,90,160,.14),inset 0 1px 0 rgba(255,255,255,.95);}
+html[data-theme="glass"] .db-btns button{background:rgba(255,255,255,.35);border-color:rgba(255,255,255,.65);box-shadow:inset 0 1px 0 rgba(255,255,255,.8);}
 
-.db-btns button:hover{transform:scale(1.05);}
+.db-btns button:hover{background:var(--hover);}
 
-#debugOk{color:#fff!important;background:linear-gradient(180deg,#4f63d8,#3b4fd0)!important;border-color:rgba(79,99,216,.6)!important;}
+#debugOk{background:var(--text)!important;color:var(--bg)!important;border-color:transparent!important;}
+
+html[data-theme="glass"] #debugOk{background:rgba(20,35,90,.85)!important;color:#fff!important;}
 
 #debugHint{font-size:11px;color:var(--text-secondary);margin-top:10px;}
+html[data-theme="glass"] #debugHint{color:rgba(20,30,70,.65);}
 /* ===== 3D 性能渲染测试（调试台 bench3d）===== */
-.bench-wrap{position:relative;width:min(94vw,980px);aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:#05070f;border:1px solid var(--border);box-shadow:var(--shadow);}
+.bench-wrap{position:relative;width:min(94vw,1000px);aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#05070f;border:1px solid var(--border);box-shadow:var(--shadow);}
 #benchCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
-.bench-hud{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:16px 18px;pointer-events:none;color:#fff;background:linear-gradient(180deg,rgba(0,0,0,.42),transparent 26%,transparent 68%,rgba(0,0,0,.5));}
-.bench-top{display:flex;align-items:center;justify-content:space-between;pointer-events:auto;}
-.bench-title{font-size:15px;font-weight:700;letter-spacing:.4px;text-shadow:0 1px 6px rgba(0,0,0,.55);}
-.bench-close{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);cursor:pointer;font-size:18px;line-height:1;color:#fff;transition:background .15s;}
+.bench-hud{position:absolute;inset:0;pointer-events:none;color:#fff;}
+.bench-close{position:absolute;top:14px;right:14px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);cursor:pointer;font-size:18px;line-height:1;color:#fff;transition:background .15s;pointer-events:auto;}
 .bench-close:hover{background:rgba(255,255,255,.28);}
-.bench-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.bench-cell{background:rgba(10,14,24,.55);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:10px 12px;backdrop-filter:blur(6px);}
-.bench-cell span{display:block;font-size:11px;color:rgba(255,255,255,.62);margin-bottom:4px;}
-.bench-cell b{display:block;font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;}
-.bench-cell b.small{font-size:12px;font-weight:500;color:rgba(255,255,255,.78);}
-.bench-bar{height:5px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden;}
+.bench-corner{position:absolute;top:14px;left:14px;display:flex;flex-direction:column;gap:5px;min-width:176px;background:rgba(8,12,22,.62);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:10px 12px;backdrop-filter:blur(8px);}
+html[data-theme="glass"] .bench-corner{background:rgba(8,14,32,.5);}
+.bench-row{display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:11px;color:rgba(255,255,255,.6);}
+.bench-row b{font-size:14px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;}
+.bench-row b.small{font-size:11px;font-weight:500;color:rgba(255,255,255,.82);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bench-minibar{height:3px;border-radius:99px;background:rgba(255,255,255,.15);overflow:hidden;margin-top:6px;}
 .bench-fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#4f63d8,#22c1c3);transition:width .2s;}
-.bench-note{font-size:12px;color:rgba(255,255,255,.85);text-align:center;text-shadow:0 1px 4px rgba(0,0,0,.6);}
-html[data-theme="glass"] .bench-wrap{background:rgba(5,10,22,.86);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 80px rgba(70,90,160,.3);}
+.bench-note{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:12px;color:rgba(255,255,255,.85);text-shadow:0 1px 4px rgba(0,0,0,.6);}
+html[data-theme="glass"] .bench-wrap{background:rgba(5,10,22,.9);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 80px rgba(70,90,160,.3);}
 
 /* 滚动条 */
 
@@ -4732,118 +4733,94 @@ function openBench3D(){
   try{ gl=canvas.getContext('webgl',{antialias:true,powerPreference:'high-performance'}); }catch(e){}
   if(!gl){ try{ gl=canvas.getContext('experimental-webgl'); }catch(e){} }
   if(!gl){ note.textContent='当前浏览器不支持 WebGL，无法运行测试'; if(fill)fill.style.width='100%'; return; }
+  const extIdx=gl.getExtension('OES_element_index_uint');
+  if(!extIdx){ note.textContent='当前浏览器不支持 32 位索引，无法运行测试'; if(fill)fill.style.width='100%'; return; }
   let gpuName='未知';
   try{ const ext=gl.getExtension('WEBGL_debug_renderer_info');
     if(ext)gpuName=String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||'未知'); }catch(e){}
   if(gpuEl)gpuEl.textContent=gpuName;
-  // ---- 模型着色器（环境 + 漫反射 + 高光 + 边缘光）----
+  // ---- 六光源逐像素光照着色器 ----
   const vsrc='attribute vec3 aPos;attribute vec3 aNor;attribute vec3 aCol;uniform mat4 uM,uVP;uniform vec3 uCam;varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vN=mat3(uM)*aNor;vC=aCol;vec4 wp=uM*vec4(aPos,1.0);vP=wp.xyz;vV=uCam-wp.xyz;gl_Position=uVP*wp;}';
-  const fsrc='precision mediump float;uniform vec3 uL;uniform vec3 uL2;varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vec3 n=normalize(vN);vec3 l=normalize(uL);vec3 l2=normalize(uL2);vec3 v=normalize(vV);float d=max(dot(n,l),0.0);float d2=max(dot(n,l2),0.0)*0.5;float s=pow(max(dot(reflect(-l,n),v),0.0),60.0);float fr=pow(1.0-max(dot(n,v),0.0),3.0)*0.55;vec3 col=vC*(0.14+0.55*d+0.25*d2)+vec3(1.0,0.98,0.95)*s*1.0+vec3(0.35,0.55,1.0)*fr;gl_FragColor=vec4(col,1.0);}';
+  const fsrc='precision mediump float;uniform vec3 uL0,uL1,uL2,uL3,uL4,uL5;varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vec3 n=normalize(vN);vec3 v=normalize(vV);float fr=pow(1.0-max(dot(n,v),0.0),2.0)*0.18;vec3 acc=vec3(0.03,0.04,0.07);vec3 l;float d;float s;l=normalize(uL0);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),22.0);acc+=vC*d*0.62+vec3(1.0,0.98,0.94)*s*0.9;l=normalize(uL1);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),28.0);acc+=vC*d*0.26+vec3(0.4,0.55,1.0)*s*0.55;l=normalize(uL2);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),34.0);acc+=vC*d*0.15+vec3(1.0,0.6,0.3)*s*0.4;l=normalize(uL3);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),38.0);acc+=vC*d*0.10+vec3(0.5,1.0,0.9)*s*0.3;l=normalize(uL4);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),44.0);acc+=vC*d*0.08+vec3(1.0,0.85,0.6)*s*0.22;l=normalize(uL5);d=max(dot(n,l),0.0);s=pow(max(dot(reflect(-l,n),v),0.0),48.0);acc+=vC*d*0.06+vec3(0.7,0.5,1.0)*s*0.18;acc+=vec3(0.55,0.45,0.85)*fr;gl_FragColor=vec4(acc,1.0);}';
+  // ---- 星尘粒子着色器 ----
+  const pvs='attribute vec3 aPos;attribute vec3 aCol;attribute float aSize;uniform mat4 uVP;varying vec3 vC;void main(){vC=aCol;gl_Position=uVP*vec4(aPos,1.0);gl_PointSize=aSize;}';
+  const pfs='precision mediump float;varying vec3 vC;void main(){vec2 q=gl_PointCoord-0.5;float a=1.0-smoothstep(0.02,0.5,length(q)*2.0);gl_FragColor=vec4(vC,a);}';
   function mkShader(t,sr){const sh=gl.createShader(t);gl.shaderSource(sh,sr);gl.compileShader(sh);return sh;}
   function mkProg(vs,fs){const pr=gl.createProgram();gl.attachShader(pr,mkShader(gl.VERTEX_SHADER,vs));gl.attachShader(pr,mkShader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);return pr;}
-  const meshP=mkProg(vsrc,fsrc);
+  const meshP=mkProg(vsrc,fsrc),partP=mkProg(pvs,pfs);
   gl.useProgram(meshP);
   const uM=gl.getUniformLocation(meshP,'uM'),uVP=gl.getUniformLocation(meshP,'uVP'),
-        uL=gl.getUniformLocation(meshP,'uL'),uL2=gl.getUniformLocation(meshP,'uL2'),
-        uCam=gl.getUniformLocation(meshP,'uCam');
+        uCam=gl.getUniformLocation(meshP,'uCam'),
+        uL0=gl.getUniformLocation(meshP,'uL0'),uL1=gl.getUniformLocation(meshP,'uL1'),
+        uL2=gl.getUniformLocation(meshP,'uL2'),uL3=gl.getUniformLocation(meshP,'uL3'),
+        uL4=gl.getUniformLocation(meshP,'uL4'),uL5=gl.getUniformLocation(meshP,'uL5');
   const loc=gl.getAttribLocation(meshP,'aPos'),locN=gl.getAttribLocation(meshP,'aNor'),locC=gl.getAttribLocation(meshP,'aCol');
-  // ---- 高精度「水晶晶簇」模型 ----
-  // 水晶柱：八棱柱 + 收尖，细分为高渲染要求负载
-  function buildCrystal(segT,segR,rad,height,tilt,rot){
-    const pos=[],nor=[],col=[],idx=[];
-    const base=pos.length/3;
-    for(let j=0;j<=segR;j++){
-      const v=j/segR;
-      const rr=rad*(1.0-v*0.92);
-      const y=(v-0.5)*height;
-      for(let i=0;i<=segT;i++){
-        const th=2*Math.PI*i/segT;
-        const x=rr*Math.cos(th),z=rr*Math.sin(th);
-        pos.push(x,y,z);
-        const nx=Math.cos(th),nz=Math.sin(th);
-        // 晶面法线：每个面法向取该面中点方向，得到棱面感
-        nor.push(nx*1.2,0.2,nz*1.2);
-        // 颜色：紫/青渐变
-        const mixv=Math.min(1,Math.abs(th%(2*Math.PI/segT)/(2*Math.PI/segT)-0.5)*2);
-        const r=0.45+0.30*mixv, g=0.20+0.35*(1-mixv), b=0.85+0.10*mixv;
-        col.push(r,g,b);
-      }
-    }
-    for(let j=0;j<segR;j++)for(let i=0;i<segT;i++){
-      const a=j*(segT+1)+i,b=a+1,c=(j+1)*(segT+1)+i,d=c+1;
-      idx.push(a,b,c,b,d,c);
-    }
-    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint16Array(idx)};
-  }
-  // 底座：压扁高细分球（岩石灰）
-  function buildBase(seg){
+  const pVP=gl.getUniformLocation(partP,'uVP'),pPosL=gl.getAttribLocation(partP,'aPos'),
+        pColL=gl.getAttribLocation(partP,'aCol'),pSzL=gl.getAttribLocation(partP,'aSize');
+  // ---- 高细分球体 ----
+  function buildSphere(seg){
     const lon=seg,lat=seg>>1;const pos=[],nor=[],col=[],idx=[];
     for(let j=0;j<=lat;j++){const phi=Math.PI*(0.5-j/lat);
       for(let i=0;i<=lon;i++){const th=2*Math.PI*i/lon;
         const x=Math.cos(phi)*Math.cos(th),y=Math.sin(phi),z=Math.cos(phi)*Math.sin(th);
-        const rr=1.0+0.25*(Math.sin(i*3.7+j*2.3)*0.5+0.5);
-        pos.push(x*rr*1.15,y*rr*0.42,z*rr*1.15);
-        nor.push(x,y*2.4,z);
-        const g=0.30+0.14*Math.sin(i*5.1+j*1.7);
-        col.push(g*1.1,g,g*1.2);
-      }}
+        pos.push(x,y,z);nor.push(x,y,z);}}
     for(let j=0;j<lat;j++)for(let i=0;i<lon;i++){
       const a=j*(lon+1)+i,b=a+1,c=(j+1)*(lon+1)+i,d=c+1;
-      idx.push(a,b,c,b,d,c);
-    }
-    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint16Array(idx)};
+      idx.push(a,b,c,b,d,c);}
+    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint32Array(idx),tri:lat*lon*2};
   }
-  // 细光环（漂浮能量环）
-  function buildRing(maj,tube,segT,segR){
+  function buildTorus(maj,tube,segT,segR){
     const pos=[],nor=[],col=[],idx=[];
     for(let j=0;j<=segR;j++){const vr=j/segR*2*Math.PI;
       for(let i=0;i<=segT;i++){const hu=i/segT*2*Math.PI;
         const cx=Math.cos(hu),sx=Math.sin(hu),cv=Math.cos(vr),sv=Math.sin(vr);
         const x=(maj+tube*cv)*cx,y=tube*sv,z=(maj+tube*cv)*sx;
-        pos.push(x,y,z);nor.push(cv*cx,sv,cv*sx);
-        col.push(0.25,0.45,1.0);
-      }}
+        pos.push(x,y,z);nor.push(cv*cx,sv,cv*sx);}}
     for(let j=0;j<segR;j++)for(let i=0;i<segT;i++){
       const a=j*(segT+1)+i,b=a+1,c=(j+1)*(segT+1)+i,d=c+1;
-      idx.push(a,b,c,b,d,c);
-    }
-    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint16Array(idx)};
+      idx.push(a,b,c,b,d,c);}
+    return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint32Array(idx),tri:segT*segR*2};
   }
-  const base=buildBase(128);
-  const rings=[buildRing(3.1,0.055,160,16),buildRing(3.5,0.04,160,16)];
-  // 24 根水晶（随机摆放/倾斜/大小）
-  const crystals=[];
-  for(let k=0;k<24;k++){
-    const ang=Math.random()*6.283;
-    const rad=0.35+Math.random()*1.15;
-    const tilt=0.10+Math.random()*0.30;
-    const rot=Math.random()*6.283;
-    const size=0.75+Math.random()*1.7;
-    crystals.push({
-      mesh:buildCrystal(36,28,0.16*size,2.6*size,tilt,rot),
-      x:Math.cos(ang)*rad, z:Math.sin(ang)*rad, rot:Math.random()*6.283,
-      tilt:Math.PI*tilt*0.35, h:Math.random()*6.283
-    });
-  }
-  // 合并网格
-  function merge(parts){
-    let pn=0,cn=0;
-    parts.forEach(function(o){pn+=o.pos.length/3;cn+=o.idx.length;});
-    const pos=new Float32Array(pn*3),nor=new Float32Array(pn*3),col=new Float32Array(pn*3),idx=new Uint16Array(cn);
-    let po=0,io=0;
-    parts.forEach(function(o){
-      pos.set(o.pos,po*3);nor.set(o.nor,po*3);col.set(o.col,po*3);
-      for(let i=0;i<o.idx.length;i++)idx[io+i]=o.idx[i]+po;
-      po+=o.pos.length/3;io+=o.idx.length;
-    });
-    return {pos:pos,nor:nor,col:col,idx:idx,tri:idx.length/3,verts:pn};
-  }
-  const model=merge([base].concat(rings).concat(crystals.map(function(c){return c.mesh;})));
+  // ---- 大规模场景：中心 288 + 12×224 + 6×160 轨道球 + 4 环 ----
+  const core=buildSphere(288);
+  const orb12=[],orb6=[];
+  for(let i=0;i<12;i++)orb12.push(buildSphere(224));
+  for(let i=0;i<6;i++)orb6.push(buildSphere(160));
+  const rings=[buildTorus(3.2,0.28,192,64),buildTorus(2.6,0.22,160,48),buildTorus(2.0,0.16,128,40),buildTorus(1.45,0.12,96,32)];
   function mkBuf(d){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,d,gl.STATIC_DRAW);return b;}
   function mkIdx(d){const b=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,b);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,d,gl.STATIC_DRAW);return b;}
-  const mBuf={pos:mkBuf(model.pos),nor:mkBuf(model.nor),col:mkBuf(model.col),idx:mkIdx(model.idx),n:model.idx.length};
+  function makeMesh(o,tint){
+    const col=new Float32Array(o.col.length);
+    for(let i=0;i<o.col.length;i+=3){
+      col[i]=Math.max(0,Math.min(1,o.col[i]+(tint[0]-0.5)));
+      col[i+1]=Math.max(0,Math.min(1,o.col[i+1]+(tint[1]-0.5)));
+      col[i+2]=Math.max(0,Math.min(1,o.col[i+2]+(tint[2]-0.5)));
+    }
+    return {pos:mkBuf(o.pos),nor:mkBuf(o.nor),col:mkBuf(col),idx:mkIdx(o.idx),n:o.idx.length,tri:o.tri};
+  }
+  const coreM=makeMesh(core,[0.30,0.55,0.95]);
+  const t12=[[0.85,0.30,0.25],[0.25,0.75,0.65],[0.65,0.40,0.90],[0.90,0.65,0.20],[0.30,0.60,0.95],[0.75,0.30,0.55],[0.40,0.80,0.30],[0.95,0.55,0.35],[0.35,0.70,0.90],[0.60,0.45,0.95],[0.90,0.35,0.55],[0.30,0.85,0.85]];
+  const orb12M=orb12.map(function(o,i){return makeMesh(o,t12[i]);});
+  const t6=[[0.55,0.75,1.0],[0.85,0.80,0.40],[0.70,0.45,1.0],[0.40,1.0,0.75],[1.0,0.60,0.45],[0.55,0.55,1.0]];
+  const orb6M=orb6.map(function(o,i){return makeMesh(o,t6[i]);});
+  const ringM=rings.map(function(o,i){
+    const ts=[[0.85,0.72,0.30],[0.35,0.85,0.95],[0.90,0.40,0.60],[0.55,0.90,0.70]];
+    return makeMesh(o,ts[i]);
+  });
+  // 星尘
+  const DN=420,dPos=new Float32Array(DN*3),dCol=new Float32Array(DN*3),dSz=new Float32Array(DN),dP=new Float32Array(DN);
+  for(let i=0;i<DN;i++){
+    const r=7+Math.random()*20,th=Math.random()*6.283,ph=Math.acos(Math.random()*2-1);
+    dPos[i*3]=r*Math.sin(ph)*Math.cos(th);dPos[i*3+1]=r*Math.cos(ph)*0.7;dPos[i*3+2]=r*Math.sin(ph)*Math.sin(th);
+    const b=0.3+Math.random()*0.7;dCol[i*3]=b*0.6;dCol[i*3+1]=b*0.7;dCol[i*3+2]=b;
+    dSz[i]=1+Math.random()*2.4;dP[i]=Math.random()*6.283;
+  }
+  const dB=gl.createBuffer(),dColB=gl.createBuffer(),dSzB=gl.createBuffer();
+  function setMesh(b){gl.bindBuffer(gl.ARRAY_BUFFER,b.pos);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,b.nor);gl.enableVertexAttribArray(locN);gl.vertexAttribPointer(locN,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,b.col);gl.enableVertexAttribArray(locC);gl.vertexAttribPointer(locC,3,gl.FLOAT,false,0,0);}
   // ---- 相机/投影 ----
-  const fov=48*Math.PI/180,zn=0.1,zf=80;
+  const fov=48*Math.PI/180,zn=0.1,zf=120;
   const proj=new Float32Array(16);proj[0]=1/(Math.tan(fov/2));proj[5]=1/Math.tan(fov/2);proj[10]=(zf+zn)/(zn-zf);proj[11]=-1;proj[14]=2*zf*zn/(zn-zf);
   const m4=function(){const m=new Float32Array(16);m[0]=m[5]=m[10]=m[15]=1;return m;};
   function mul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++){o[c*4+r]=a[r]*b[c*4]+a[4+r]*b[c*4+1]+a[8+r]*b[c*4+2]+a[12+r]*b[c*4+3];}return o;}
@@ -4855,39 +4832,96 @@ function openBench3D(){
     const m=m4();m[0]=r[0];m[1]=u[0];m[2]=-f[0];m[4]=r[1];m[5]=u[1];m[6]=-f[1];m[8]=r[2];m[9]=u[2];m[10]=-f[2];
     m[12]=-(r[0]*eye[0]+r[1]*eye[1]+r[2]*eye[2]);m[13]=-(u[0]*eye[0]+u[1]*eye[1]+u[2]*eye[2]);m[14]=f[0]*eye[0]+f[1]*eye[1]+f[2]*eye[2];
     return m;}
-  function resize(){const dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(canvas.clientWidth*dpr);canvas.height=Math.round(canvas.clientHeight*dpr);gl.viewport(0,0,canvas.width,canvas.height);}
+  // 强制 2x 超采样高分辨率渲染（不依赖设备 DPR，压满像素填充率）
+  function resize(){const dpr=2;canvas.width=Math.round(canvas.clientWidth*dpr);canvas.height=Math.round(canvas.clientHeight*dpr);gl.viewport(0,0,canvas.width,canvas.height);}
   resize();
   gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);
   let running=true,raf=0,last=performance.now(),frames=0,acc=0,phase='warm',phaseT=0,avgFps=0;
   function tick(now){
+    try{
     if(!running)return;
     const dt=Math.min((now-last)/1000,0.1);last=now;
     phaseT+=dt;frames++;acc+=dt;
     const t=now/1000;
-    gl.clearColor(0.012,0.016,0.034,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-    // 相机：缓慢环绕
-    const ang=t*0.15;
-    const eye=[Math.cos(ang)*4.8,1.25+Math.sin(t*0.22)*0.3,Math.sin(ang)*4.8];
-    const vp=mul(proj,lookAt(eye,[0,0.4,0]));
+    gl.disable(gl.DEPTH_TEST);
+    gl.clearColor(0.008,0.012,0.026,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+    const ang=t*0.12;
+    const eye=[Math.cos(ang)*7.6,1.6+Math.sin(t*0.2)*0.7,Math.sin(ang)*7.6];
+    const vp=mul(proj,lookAt(eye,[0,0.1,0]));
+    // 星尘
+    gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);
+    gl.useProgram(partP);gl.uniformMatrix4fv(pVP,false,vp);
+    for(let i=0;i<DN;i++){
+      const fl=0.4+0.6*(0.5+0.5*Math.sin(t*1.6+dP[i]*6.283));
+      dCol[i*3]=0.5*fl;dCol[i*3+1]=0.6*fl;dCol[i*3+2]=0.85*fl;
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER,dB);gl.bufferData(gl.ARRAY_BUFFER,dPos,gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(pPosL);gl.vertexAttribPointer(pPosL,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,dColB);gl.bufferData(gl.ARRAY_BUFFER,dCol,gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(pColL);gl.vertexAttribPointer(pColL,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,dSzB);gl.bufferData(gl.ARRAY_BUFFER,dSz,gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(pSzL);gl.vertexAttribPointer(pSzL,1,gl.FLOAT,false,0,0);
+    gl.drawArrays(gl.POINTS,0,DN);
+    gl.disable(gl.BLEND);
+    // 主场景（23 个网格 + 6 光源）
+    gl.enable(gl.DEPTH_TEST);
     gl.useProgram(meshP);
     gl.uniformMatrix4fv(uVP,false,vp);
-    gl.uniform3fv(uL,[-0.45,1.0,-0.35]);
-    gl.uniform3fv(uL2,[0.5,0.2,0.6]);
     gl.uniform3fv(uCam,eye);
-    const mx=m4();
-    const c=Math.cos(t*0.25),sn=Math.sin(t*0.25);
+    gl.uniform3fv(uL0,[Math.cos(t*0.5)*4,3.0,Math.sin(t*0.5)*4]);
+    gl.uniform3fv(uL1,[-3.0,1.2,-2.0]);
+    gl.uniform3fv(uL2,[2.5,-0.5,-2.5]);
+    gl.uniform3fv(uL3,[0.0,0.6,3.5]);
+    gl.uniform3fv(uL4,[-2.5,0.3,2.0]);
+    gl.uniform3fv(uL5,[1.5,-0.8,-3.0]);
+    const mx=m4();const c=Math.cos(t*0.3),sn=Math.sin(t*0.3);
     mx[0]=c;mx[2]=sn;mx[8]=-sn;mx[10]=c;
     gl.uniformMatrix4fv(uM,false,mx);
-    gl.bindBuffer(gl.ARRAY_BUFFER,mBuf.pos);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
-    gl.bindBuffer(gl.ARRAY_BUFFER,mBuf.nor);gl.enableVertexAttribArray(locN);gl.vertexAttribPointer(locN,3,gl.FLOAT,false,0,0);
-    gl.bindBuffer(gl.ARRAY_BUFFER,mBuf.col);gl.enableVertexAttribArray(locC);gl.vertexAttribPointer(locC,3,gl.FLOAT,false,0,0);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,mBuf.idx);
-    gl.drawElements(gl.TRIANGLES,mBuf.n,gl.UNSIGNED_SHORT,0);
+    setMesh(coreM);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,coreM.idx);gl.drawElements(gl.TRIANGLES,coreM.n,gl.UNSIGNED_INT,0);
+    for(let i=0;i<12;i++){
+      const om=orb12M[i];
+      const ph=i*0.52;
+      const rad=3.2+(i%6)*0.62;
+      const oxm=m4();const cc=Math.cos(t*0.28+ph),ss=Math.sin(t*0.28+ph);
+      const r=1.0-(i%4)*0.10;
+      oxm[0]=cc*r;oxm[2]=ss*r;oxm[8]=-ss*r;oxm[10]=cc*r;
+      oxm[12]=Math.cos(t*0.4+ph)*rad;
+      oxm[13]=Math.sin(t*0.5+ph*1.7)*0.35;
+      oxm[14]=Math.sin(t*0.4+ph)*rad;
+      gl.uniformMatrix4fv(uM,false,oxm);
+      setMesh(om);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,om.idx);gl.drawElements(gl.TRIANGLES,om.n,gl.UNSIGNED_INT,0);
+    }
+    for(let i=0;i<6;i++){
+      const om=orb6M[i];
+      const ph=i*1.05;
+      const rad=5.0+(i%3)*0.9;
+      const oxm=m4();const cc=Math.cos(t*0.2+ph),ss=Math.sin(t*0.2+ph);
+      const r=0.62;
+      oxm[0]=cc*r;oxm[2]=ss*r;oxm[8]=-ss*r;oxm[10]=cc*r;
+      oxm[12]=Math.cos(t*0.32+ph)*rad;
+      oxm[13]=Math.sin(t*0.42+ph*2.3)*0.5;
+      oxm[14]=Math.sin(t*0.32+ph)*rad;
+      gl.uniformMatrix4fv(uM,false,oxm);
+      setMesh(om);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,om.idx);gl.drawElements(gl.TRIANGLES,om.n,gl.UNSIGNED_INT,0);
+    }
+    for(let i=0;i<4;i++){
+      const rm=m4();
+      const tilt=[0.5,-0.42,0.9,1.25][i];
+      rm[0]=Math.cos(t*0.18);rm[2]=Math.sin(t*0.18);rm[8]=-Math.sin(t*0.18);rm[10]=Math.cos(t*0.18);
+      const tm=m4();const rc=Math.cos(tilt),rs=Math.sin(tilt);
+      tm[0]=rc;tm[4]=rs;tm[9]=-rs;tm[10]=rc;
+      const fm=mul(rm,tm);
+      gl.uniformMatrix4fv(uM,false,fm);
+      setMesh(ringM[i]);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ringM[i].idx);gl.drawElements(gl.TRIANGLES,ringM[i].n,gl.UNSIGNED_INT,0);
+    }
     // ---- HUD ----
     const curFps=1/Math.max(dt,1e-4);
     if(fpsEl)fpsEl.textContent=String(Math.round(curFps));
     if(msEl)msEl.textContent=(dt*1000).toFixed(1)+' ms';
-    if(stEl)stEl.textContent=model.tri.toLocaleString()+' 三角形 · '+model.verts.toLocaleString()+' 顶点 · 高细分曲面';
+    let triTotal=core.tri+rings.reduce(function(a,o){return a+o.tri;},0);
+    for(let i=0;i<12;i++)triTotal+=orb12[i].tri;
+    for(let i=0;i<6;i++)triTotal+=orb6[i].tri;
+    if(stEl)stEl.textContent=triTotal.toLocaleString()+' 三角 · 6 光源 · 2x 超采样';
     if(phase==='warm'){
       if(phaseT>=2){phase='run';phaseT=0;frames=0;acc=0;}
       if(note)note.textContent='预热中（2 秒）· 不计入成绩';
@@ -4899,14 +4933,15 @@ function openBench3D(){
     }else{
       if(fill)fill.style.width='100%';
     }
+    }catch(err){if(note)note.textContent='运行错误: '+(err&&err.message?err.message:String(err));running=false;return;}
     raf=requestAnimationFrame(tick);
   }
   function finish(){
     const avg=Math.round(avgFps);
     let grade;
-    if(avg>=120)grade='性能优秀 — 可流畅运行高特效光影场景';
-    else if(avg>=60)grade='性能良好 — 常规场景稳定流畅';
-    else if(avg>=30)grade='性能中等 — 建议关闭光影、降低渲染距离';
+    if(avg>=80)grade='性能优秀 — 可流畅运行高特效光影场景';
+    else if(avg>=40)grade='性能良好 — 常规场景稳定流畅';
+    else if(avg>=20)grade='性能中等 — 建议关闭光影、降低渲染距离';
     else grade='性能偏弱 — 该设备运行官网推荐配置可能较吃力';
     if(fpsEl)fpsEl.textContent=String(avg);
     if(note)note.textContent='测试完成 · 平均 '+avg+' FPS · '+grade+'（按 Esc 或右上角 × 关闭）';
@@ -10365,17 +10400,14 @@ function _q5(){
   <div class="bench-wrap" id="benchWrap">
     <canvas id="benchCanvas"></canvas>
     <div class="bench-hud">
-      <div class="bench-top">
-        <div class="bench-title">3D 性能渲染测试</div>
-        <div class="bench-close" id="benchClose">×</div>
+      <div class="bench-close" id="benchClose">×</div>
+      <div class="bench-corner">
+        <div class="bench-row"><span>当前 FPS</span><b id="benchFps">--</b></div>
+        <div class="bench-row"><span>帧时间</span><b id="benchMs">--</b></div>
+        <div class="bench-row"><span>显卡</span><b id="benchGpu" class="small">检测中…</b></div>
+        <div class="bench-row"><span>渲染负载</span><b id="benchStats" class="small">--</b></div>
+        <div class="bench-minibar"><div class="bench-fill" id="benchFill"></div></div>
       </div>
-      <div class="bench-grid">
-        <div class="bench-cell"><span>当前 FPS</span><b id="benchFps">--</b></div>
-        <div class="bench-cell"><span>帧时间</span><b id="benchMs">--</b></div>
-        <div class="bench-cell"><span>显卡</span><b id="benchGpu">检测中…</b></div>
-        <div class="bench-cell"><span>渲染负载</span><b id="benchStats">--</b></div>
-      </div>
-      <div class="bench-bar"><div class="bench-fill" id="benchFill"></div></div>
       <div class="bench-note" id="benchNote">预热中…</div>
     </div>
   </div>
@@ -10387,13 +10419,13 @@ function _q5(){
 
 <div class="db-title">调试控制台</div>
 
-<div class="db-desc">这里是内测调试入口，输入有效的调试代码可激活对应功能。</div>
+<div class="db-desc">内测入口，输入调试代码可激活对应功能。</div>
 
 <input type="password" id="debugInput" placeholder="输入调试代码" autocomplete="off">
 
 <div class="db-btns"><button id="debugOk">确定</button><button id="debugCancel">取消</button></div>
 
-<div id="debugHint">输入调试代码可激活对应功能</div>
+<div id="debugHint">调试代码由服务器校验</div>
 
 </div>
 
