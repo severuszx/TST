@@ -190,9 +190,9 @@ export async function onRequest(context) {
     return proxyFetch(DATA_ORIGIN + '/api/admin' + url.search, request);
   }
 
-  // 服务器工具（禁用物品/任务）转发到数据服务站点
+  // 服务器工具（禁用物品/任务）转发到数据服务站点（反馈站 TSTFK 的 D1）
   if (path.startsWith('/api/tools')) {
-    return proxyFetch(DATA_ORIGIN + '/api/tools' + url.search, request);
+    return proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request);
   }
 
   // 仅代理 /api/auth/* 与 /api/rest/*（含 draw_lottery 兼容转发）
