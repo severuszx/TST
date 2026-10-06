@@ -3978,7 +3978,7 @@ function openMBench3D(){
   if(gpuEl)gpuEl.textContent=gpuName;
   // ---- 16 光源逐像素光照 ----
   const vsrc='attribute vec3 aPos;attribute vec3 aNor;attribute vec3 aCol;uniform mat4 uM,uVP;uniform vec3 uCam;varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vN=mat3(uM)*aNor;vC=aCol;vec4 wp=uM*vec4(aPos,1.0);vP=wp.xyz;vV=uCam-wp.xyz;gl_Position=uVP*wp;}';
-  const fsrc='precision mediump float;uniform vec3 uL[16];varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vec3 n=normalize(vN);vec3 v=normalize(vV);float fr=pow(1.0-max(dot(n,v),0.0),2.0)*0.22;vec3 acc=vec3(0.015,0.025,0.05);for(int i=0;i<16;i++){vec3 l=normalize(uL[i]);float d=max(dot(n,l),0.0);float s=pow(max(dot(reflect(-l,n),v),0.0),20.0+float(i)*3.0);float dd=0.40-float(i)*0.024;float ss=0.90-float(i)*0.055;acc+=vC*d*max(dd,0.015)+vec3(1.0,0.92,0.85)*s*max(ss,0.035);}acc+=vec3(0.5,0.42,0.85)*fr;gl_FragColor=vec4(acc,1.0);}';
+  const fsrc='precision mediump float;uniform vec3 uL[16];varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vec3 n=normalize(vN);vec3 v=normalize(vV);float fr=pow(1.0-max(dot(n,v),0.0),2.0)*0.22;vec3 acc=vec3(0.045,0.085,0.18)+vC*0.35;for(int i=0;i<16;i++){vec3 l=normalize(uL[i]);float d=max(dot(n,l),0.0);float s=pow(max(dot(reflect(-l,n),v),0.0),20.0+float(i)*3.0);float dd=0.40-float(i)*0.024;float ss=0.90-float(i)*0.055;acc+=vC*d*max(dd,0.015)+vec3(1.0,0.92,0.85)*s*max(ss,0.035);}acc+=vec3(0.5,0.42,0.85)*fr;gl_FragColor=vec4(acc,1.0);}';
   const pvs='attribute vec3 aPos;attribute vec3 aCol;attribute float aSize;uniform mat4 uVP;varying vec3 vC;void main(){vC=aCol;gl_Position=uVP*vec4(aPos,1.0);gl_PointSize=aSize;}';
   const pfs='precision mediump float;varying vec3 vC;void main(){vec2 q=gl_PointCoord-0.5;float a=1.0-smoothstep(0.02,0.5,length(q)*2.0);gl_FragColor=vec4(vC,a);}';
   function mkShader(t,sr){const sh=gl.createShader(t);gl.shaderSource(sh,sr);gl.compileShader(sh);return sh;}
@@ -4170,7 +4170,7 @@ function openMBench3D(){
     if(allDone){raf=requestAnimationFrame(tick);return;}
     stepT+=dt;stepFrames++;stepAcc+=dt;
     if(fill)fill.style.width=(Math.min(stepT/step[2],1)*100).toFixed(0)+'%';
-    if(note)note.textContent='档位 '+step[0]+'/'+STEPS.length+' · '+step[0]+'x（超采样）· '+Math.min(Math.ceil(step[2]-stepT),step[2])+'s · 本档平均 '+(stepFrames>0?Math.round(stepFrames/stepAcc):0)+' FPS';
+    if(stepFrames===1){try{const px=new Uint8Array(4);gl.readPixels(canvas.width>>1,canvas.height>>1,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);if(note)note.textContent='档位 '+step[0]+'/'+STEPS.length+' · 中心像素 '+px[0]+','+px[1]+','+px[2]+'（深=模型未画）';}catch(e){}}if(note&&stepFrames>1)note.textContent='档位 '+step[0]+'/'+STEPS.length+' · '+step[0]+'x（超采样）· '+Math.min(Math.ceil(step[2]-stepT),step[2])+'s · 本档平均 '+(stepFrames>0?Math.round(stepFrames/stepAcc):0)+' FPS';
     if(stepT>=step[2]){
       const avg=stepFrames/stepAcc;
       results.push({mult:step[0],fps:avg});
