@@ -4257,15 +4257,7 @@ function openMBench3D(){
 
 
         var vfM=function(u){return fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})}).then(function(r){return r.json();});};
-        vfM(DEBUG_APIS[0]).then(function(d){if(d&&d.ok){return d;}return vfM(DEBUG_APIS[1]);})
-
-
-
-          .then(function(r){return r.json();})
-
-
-
-          .then(function(d){
+        vfM(DEBUG_APIS[0]).then(function(d){if(d&&d.ok){return d;}return vfM(DEBUG_APIS[1]);}).then(function(d){
 
 
 
