@@ -3813,6 +3813,77 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 
 
+<!-- 聊天室 -->
+
+<section id="chat" class="page">
+
+<div class="container">
+
+<div class="section-title">聊天室</div>
+
+<style>
+.chat-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:15px;font-weight:600;}
+.chat-hint{font-size:12px;opacity:.65;font-weight:400;}
+.chat-scroll{height:min(52vh,460px);overflow-y:auto;border:1px solid rgba(127,127,127,.2);border-radius:10px;padding:10px 12px;background:rgba(127,127,127,.06);display:flex;flex-direction:column;gap:8px;}
+.chat-scroll::-webkit-scrollbar{width:8px;}
+.chat-scroll::-webkit-scrollbar-thumb{background:rgba(127,127,127,.35);border-radius:4px;}
+.chat-msg{display:flex;gap:8px;align-items:baseline;font-size:14px;line-height:1.5;}
+.chat-msg .c-name{font-weight:700;flex:none;color:var(--primary,#5aa8ff);}
+.chat-msg.web .c-name{color:var(--accent,#9b6cff);}
+.chat-msg .c-text{word-break:break-word;white-space:pre-wrap;}
+.chat-msg .c-time{font-size:11px;opacity:.5;margin-left:auto;flex:none;align-self:center;}
+.chat-msg.sys .c-name{opacity:.55;}
+.chat-input-row{display:flex;gap:10px;margin-top:12px;}
+.chat-input-row input{flex:1;min-width:0;}
+.chat-input-row .btn{flex:none;}
+.status-line{display:flex;align-items:center;gap:10px;font-size:14px;}
+.status-line .dot{width:10px;height:10px;border-radius:50%;background:#888;flex:none;}
+.status-line .dot.on{background:#3ddc84;box-shadow:0 0 8px rgba(61,220,132,.7);}
+.status-line .dot.off{background:#e05a5a;box-shadow:0 0 8px rgba(224,90,90,.6);}
+</style>
+
+<div class="card" style="margin-bottom:14px;">
+
+  <div class="status-line">
+
+    <span class="dot" id="chatDot"></span>
+
+    <span id="chatStatusText">状态检测中…</span>
+
+    <span style="opacity:.7;font-size:13px;" id="chatStatusMeta"></span>
+
+  </div>
+
+</div>
+
+<div class="card">
+
+  <div class="chat-head">
+
+    <span>服务器实时聊天</span>
+
+    <span class="chat-hint" id="chatHint">连接中…</span>
+
+  </div>
+
+  <div class="chat-scroll" id="chatMsgList"><p class="empty-hint">加载中…</p></div>
+
+  <div class="chat-input-row">
+
+    <input type="text" id="chatInput" placeholder="在游戏内发布消息…（进入服务器的玩家都能看到）" autocomplete="off" maxlength="200">
+
+    <button class="btn btn-primary" id="chatSendBtn">发送</button>
+
+  </div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
 <!-- 公约 -->
 
 <section id="rule" class="page">
@@ -4854,6 +4925,10 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
         } else if(feat==='bench3d'){
 
           close();openBench3D();
+
+        } else if(feat==='chat'){
+
+          close();switchPage('chat');if(window.chatInit)chatInit();
 
         } else if(feat==='reset'){
 
@@ -6001,7 +6076,7 @@ function switchPage(pid){
 
   const _nm=document.getElementById('navMore');if(_nm)_nm.classList.remove('open');
 
-  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
+  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',chat:'聊天室 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
 
   document.title=TITLES[pid]||'The Slow Tide 官网';
 
@@ -6020,6 +6095,150 @@ function switchPage(pid){
 }
 
 navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
+
+
+
+// ===== 聊天室（调试码 chat 激活，内测功能）=====
+
+var chatTimer=null, chatLastId=0, chatInited=false;
+
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function chatInit(){
+
+  if(chatInited)return;chatInited=true;
+
+  loadChatStatus();
+
+  loadChatHistory();
+
+  chatTimer=setInterval(loadChatHistory,3000);
+
+  setInterval(loadChatStatus,30000);
+
+  var hint=document.getElementById('chatHint');
+
+  if(hint)hint.textContent='已连接 · 每 3 秒同步';
+
+  var inp=document.getElementById('chatInput'),btn=document.getElementById('chatSendBtn');
+
+  var send=function(){
+
+    var v=(inp.value||'').trim();
+
+    if(!v){inp.focus();return;}
+
+    fetch('/api/chat/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:v})})
+
+    .then(function(r){return r.json();})
+
+    .then(function(d){
+
+      if(d&&d.ok){
+
+        appendChat({sender:'官网',message:v,kind:'web',ts:new Date().toISOString().slice(11,16)});
+
+        inp.value='';
+
+      } else { showToast('发送失败，请重试'); }
+
+    })
+
+    .catch(function(){showToast('发送失败，请稍后再试');});
+
+  };
+
+  if(btn)btn.onclick=send;
+
+  if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter')send();});
+
+}
+
+function appendChat(m){
+
+  var box=document.getElementById('chatMsgList');
+
+  if(!box)return;
+
+  if(box.querySelector('.empty-hint'))box.innerHTML='';
+
+  var row=document.createElement('div');
+
+  row.className='chat-msg'+(m.kind==='web'?' web':'')+(m.kind==='sys'?' sys':'');
+
+  var t=(m.ts||'').toString().slice(11,16);
+
+  row.innerHTML='<span class="c-name">'+esc(m.sender)+'</span><span class="c-text">'+esc(m.message)+'</span><span class="c-time">'+t+'</span>';
+
+  box.appendChild(row);
+
+  box.scrollTop=box.scrollHeight;
+
+}
+
+function loadChatHistory(){
+
+  var box=document.getElementById('chatMsgList');
+
+  if(!box)return;
+
+  fetch('/api/chat/history?after='+chatLastId).then(function(r){return r.json();})
+
+  .then(function(d){
+
+    if(!d||!Array.isArray(d.messages))return;
+
+    if(!d.messages.length&&!chatLastId){box.innerHTML='<p class="empty-hint">暂无聊天记录，游戏里说句话试试</p>';return;}
+
+    d.messages.forEach(function(m){
+
+      if(m.id>chatLastId){chatLastId=m.id;appendChat(m);}
+
+    });
+
+  })
+
+  .catch(function(){});
+
+}
+
+function loadChatStatus(){
+
+  var dot=document.getElementById('chatDot'),txt=document.getElementById('chatStatusText'),meta=document.getElementById('chatStatusMeta');
+
+  if(!dot)return;
+
+  fetch('/api/server-status').then(function(r){return r.json();})
+
+  .then(function(d){
+
+    if(!d)return;
+
+    if(d.status==='online'){
+
+      dot.className='dot on';
+
+      txt.textContent='服务器在线 · '+d.online+'/'+d.max+' 人';
+
+      if(meta)meta.textContent=(d.latency?'延迟 '+d.latency+'ms':'')+' · '+(d.ts||'').slice(5,16)+' 上报';
+
+    } else {
+
+      dot.className='dot off';
+
+      txt.textContent='服务器离线（机器人未上报）';
+
+      if(meta)meta.textContent='等待机器人连接…';
+
+    }
+
+  })
+
+  .catch(function(){});
+
+}
+
+
 
 
 
