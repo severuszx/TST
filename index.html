@@ -213,6 +213,13 @@ try{ var gbInit=localStorage.getItem('tst-glass-bg'); if(gbInit){document.docume
       });
     });
   }
+  function refresh(){
+    if(!isAdmin() && !tq){
+      box.innerHTML='<p class="empty-hint">'+(tmode==='items'?'输入物品名称或 ID，搜索是否被禁用':'输入关键词，查询任务详情')+'</p>';
+      return;
+    }
+    render();
+  }
   if(tabs){
     tabs.addEventListener('click',function(e){
       var b=e.target.closest('[data-tmode]'); if(!b) return;
@@ -220,12 +227,12 @@ try{ var gbInit=localStorage.getItem('tst-glass-bg'); if(gbInit){document.docume
       document.getElementById('toolsSearchInput').value='';
       Array.prototype.forEach.call(tabs.children,function(x){ x.classList.toggle('on',x===b); });
       adminTitle.textContent=tmode==='items'?'新增禁用物品':'新增任务';
-      render();
+      refresh();
     });
   }
   var sBtn=document.getElementById('toolsSearchBtn'), sInp=document.getElementById('toolsSearchInput');
-  if(sBtn) sBtn.onclick=function(){ tq=sInp.value.trim(); render(); };
-  if(sInp) sInp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ tq=sInp.value.trim(); render(); } });
+  if(sBtn) sBtn.onclick=function(){ tq=sInp.value.trim(); refresh(); };
+  if(sInp) sInp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ tq=sInp.value.trim(); refresh(); } });
   var aBtn=document.getElementById('toolsAdminBtn');
   if(aBtn) aBtn.onclick=function(){
     if(!isAdmin()){
@@ -261,7 +268,7 @@ try{ var gbInit=localStorage.getItem('tst-glass-bg'); if(gbInit){document.docume
   };
   var loBtn=document.getElementById('taLogoutBtn');
   if(loBtn) loBtn.onclick=function(){ sessionStorage.removeItem('tstToolsAdmin'); sessionStorage.removeItem('tstToolsPw'); adminBox.style.display='none'; tipTxt('已退出管理'); };
-  render();
+  refresh();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', initTools);
   else initTools();
