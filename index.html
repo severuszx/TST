@@ -156,6 +156,113 @@ try{ var gbInit=localStorage.getItem('tst-glass-bg'); if(gbInit){document.docume
 
 })();
 
+// ===== 服务器工具（禁用物品/任务查询 + 管理员管理）=====
+(function(){
+  var tmode='items', tq='';
+  var box=document.getElementById('toolsBody'), tip=document.getElementById('toolsTip');
+  var adminBox=document.getElementById('toolsAdmin'), adminTitle=document.getElementById('toolsAdminTitle');
+  var tabs=document.getElementById('toolsTabs');
+  function tipTxt(s){ if(tip){ tip.textContent=s; tip.style.display=s?'block':'none'; } }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function isAdmin(){ return sessionStorage.getItem('tstToolsAdmin')==='1'; }
+  function pw(){ return sessionStorage.getItem('tstToolsPw')||''; }
+  function api(url,opt){
+    return fetch(url,opt||{}).then(function(r){ return r.json(); }).catch(function(){ return null; });
+  }
+  function render(){
+    box.innerHTML='<p class="empty-hint">加载中…</p>';
+    var url='/api/tools/'+(tmode==='items'?'items':'tasks')+'?q='+encodeURIComponent(tq||'');
+    api(url).then(function(d){
+      if(!d || !Array.isArray(d)){ box.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; return; }
+      if(!d.length){ box.innerHTML='<p class="empty-hint">没有找到相关内容</p>'; return; }
+      var html='';
+      if(tmode==='items'){
+        d.forEach(function(it){
+          html+='<div class="tool-row" style="border-bottom:1px solid rgba(127,127,127,.18);padding:10px 2px;display:flex;align-items:center;justify-content:space-between;gap:10px;">'
+            +'<div style="flex:1;min-width:0;"><b>'+esc(it.name)+'</b>'
+            +(it.en_id?' <span style="opacity:.6;font-size:12px;font-family:monospace;">'+esc(it.en_id)+'</span>':'')
+            +(it.special&&it.special!=='全部'?' <span style="font-size:12px;opacity:.7;">特殊值 '+esc(it.special)+'</span>':'')
+            +'<span style="margin-left:8px;font-size:12px;color:#e5484d;border:1px solid rgba(229,72,77,.5);border-radius:4px;padding:1px 6px;">已禁用</span>'
+            +(it.note?'<div style="font-size:12px;opacity:.55;margin-top:3px;">'+esc(it.note)+'</div>':'')
+            +'</div>'
+            +(isAdmin()?'<button class="btn tool-del" data-id="'+it.id+'" style="flex:none;padding:4px 10px;font-size:12px;">删除</button>':'')
+            +'</div>';
+        });
+      } else {
+        d.forEach(function(t){
+          html+='<div class="tool-row" style="border-bottom:1px solid rgba(127,127,127,.18);padding:10px 2px;display:flex;align-items:center;justify-content:space-between;gap:10px;">'
+            +'<div style="flex:1;min-width:0;"><b>'+esc(t.title)+'</b>'
+            +(t.chapter?' <span style="font-size:12px;opacity:.65;">'+esc(t.chapter)+'</span>':'')
+            +(t.status?' <span style="font-size:12px;opacity:.7;color:#3b82f6;">'+esc(t.status)+'</span>':'')
+            +(t.target?'<div style="font-size:12px;opacity:.6;margin-top:3px;">'+esc(t.target)+'</div>':'')
+            +'</div>'
+            +(isAdmin()?'<button class="btn tool-del" data-id="'+t.id+'" style="flex:none;padding:4px 10px;font-size:12px;">删除</button>':'')
+            +'</div>';
+        });
+      }
+      box.innerHTML=html;
+      Array.prototype.forEach.call(box.querySelectorAll('.tool-del'),function(b){
+        b.onclick=function(){
+          var id=b.getAttribute('data-id');
+          var ep=tmode==='items'?'item_del':'task_del';
+          api('/api/tools/'+ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pw:pw(),id:id})}).then(function(d){
+            if(d && d.ok){ tipTxt('已删除'); render(); } else { tipTxt('删除失败（密码无效或已过期）'); }
+          });
+        };
+      });
+    });
+  }
+  if(tabs){
+    tabs.addEventListener('click',function(e){
+      var b=e.target.closest('[data-tmode]'); if(!b) return;
+      tmode=b.getAttribute('data-tmode'); tq='';
+      document.getElementById('toolsSearchInput').value='';
+      Array.prototype.forEach.call(tabs.children,function(x){ x.classList.toggle('on',x===b); });
+      adminTitle.textContent=tmode==='items'?'新增禁用物品':'新增任务';
+      render();
+    });
+  }
+  var sBtn=document.getElementById('toolsSearchBtn'), sInp=document.getElementById('toolsSearchInput');
+  if(sBtn) sBtn.onclick=function(){ tq=sInp.value.trim(); render(); };
+  if(sInp) sInp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ tq=sInp.value.trim(); render(); } });
+  var aBtn=document.getElementById('toolsAdminBtn');
+  if(aBtn) aBtn.onclick=function(){
+    if(!isAdmin()){
+      var p=prompt('请输入管理员密码：');
+      if(p===null) return;
+      sessionStorage.setItem('tstToolsPw',p||'');
+      sessionStorage.setItem('tstToolsAdmin',p?'1':'0');
+      if(!p){ tipTxt('未输入密码'); return; }
+    }
+    adminBox.style.display='block';
+    adminTitle.textContent=tmode==='items'?'新增禁用物品':'新增任务';
+    tipTxt('');
+  };
+  var addBtn=document.getElementById('taAddBtn');
+  if(addBtn) addBtn.onclick=function(){
+    var name=(document.getElementById('taName').value||'').trim();
+    if(!name){ tipTxt('物品名称必填'); return; }
+    api('/api/tools/item',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pw:pw(),name:name,en_id:document.getElementById('taEn').value,special:document.getElementById('taSpecial').value,note:document.getElementById('taNote').value})}).then(function(d){
+      if(d && d.ok){ tipTxt('已添加'); document.getElementById('taName').value=''; document.getElementById('taEn').value=''; document.getElementById('taSpecial').value=''; document.getElementById('taNote').value=''; render(); }
+      else if(d && d.error==='wrong_password'){ tipTxt('密码错误'); sessionStorage.removeItem('tstToolsAdmin'); adminBox.style.display='none'; }
+      else { tipTxt('添加失败'); }
+    });
+  };
+  var addTaskBtn=document.getElementById('taAddTaskBtn');
+  if(addTaskBtn) addTaskBtn.onclick=function(){
+    var title=(document.getElementById('taTitle').value||'').trim();
+    if(!title){ tipTxt('任务名称必填'); return; }
+    api('/api/tools/task',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pw:pw(),chapter:document.getElementById('taChapter').value,title:title,target:document.getElementById('taTarget').value,status:document.getElementById('taStatus').value})}).then(function(d){
+      if(d && d.ok){ tipTxt('已添加'); document.getElementById('taTitle').value=''; document.getElementById('taChapter').value=''; document.getElementById('taTarget').value=''; document.getElementById('taStatus').value=''; render(); }
+      else if(d && d.error==='wrong_password'){ tipTxt('密码错误'); sessionStorage.removeItem('tstToolsAdmin'); adminBox.style.display='none'; }
+      else { tipTxt('添加失败'); }
+    });
+  };
+  var loBtn=document.getElementById('taLogoutBtn');
+  if(loBtn) loBtn.onclick=function(){ sessionStorage.removeItem('tstToolsAdmin'); sessionStorage.removeItem('tstToolsPw'); adminBox.style.display='none'; tipTxt('已退出管理'); };
+  render();
+})();
+
 </script>
 
 <style>
@@ -2954,6 +3061,8 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <a class="nav-link" href="tool.html">便捷工具</a>
 
+<button class="nav-link" data-nav="tools">服务器工具</button>
+
 <button class="nav-link" data-nav="rule">玩家公约</button>
 
 <div class="nav-more" id="navMore">
@@ -3621,6 +3730,78 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <div id="sponsorList"></div>
 
 </div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- 服务器工具 -->
+
+<section id="tools" class="page">
+
+<div class="container">
+
+<div class="section-title">服务器工具</div>
+
+<div class="card">
+
+  <div class="vote-tabs" id="toolsTabs">
+
+    <button class="on" data-tmode="items">禁用物品</button>
+
+    <button data-tmode="tasks">任务查询</button>
+
+  </div>
+
+  <div class="search-row" style="margin-top:12px;">
+
+    <input type="text" id="toolsSearchInput" placeholder="输入名称或 ID 搜索…" autocomplete="off">
+
+    <button class="btn btn-primary" id="toolsSearchBtn">搜索</button>
+
+    <button class="btn" id="toolsAdminBtn">管理</button>
+
+  </div>
+
+  <div class="tip-message" id="toolsTip" style="display:none;"></div>
+
+  <div id="toolsBody"><p class="empty-hint">加载中…</p></div>
+
+  <div id="toolsAdmin" style="display:none;margin-top:14px;border-top:1px solid rgba(127,127,127,.25);padding-top:12px;">
+
+    <h3 id="toolsAdminTitle">新增禁用物品</h3>
+
+    <div id="toolsAdminForm" style="display:grid;gap:8px;margin-top:8px;">
+
+      <input type="text" id="taName" placeholder="物品名称（必填）" autocomplete="off">
+
+      <input type="text" id="taEn" placeholder="英文 ID（可留空）" autocomplete="off">
+
+      <input type="text" id="taSpecial" placeholder="特殊值（默认 全部）" autocomplete="off">
+
+      <input type="text" id="taNote" placeholder="说明（可留空）" autocomplete="off">
+
+      <button class="btn btn-primary" id="taAddBtn">添加物品</button>
+
+      <input type="text" id="taChapter" placeholder="任务章节（如：第一章 | 潮起）" autocomplete="off" style="margin-top:6px;">
+
+      <input type="text" id="taTitle" placeholder="任务名称（必填）" autocomplete="off">
+
+      <input type="text" id="taTarget" placeholder="任务目标描述" autocomplete="off">
+
+      <input type="text" id="taStatus" placeholder="状态（如：进行中 / 已领奖 / 未解锁）" autocomplete="off">
+
+      <button class="btn btn-primary" id="taAddTaskBtn">添加任务</button>
+
+      <button class="btn" id="taLogoutBtn" style="margin-top:4px;">退出管理</button>
+
+    </div>
+
+  </div>
 
 </div>
 
@@ -5818,7 +5999,7 @@ function switchPage(pid){
 
   const _nm=document.getElementById('navMore');if(_nm)_nm.classList.remove('open');
 
-  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
+  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
 
   document.title=TITLES[pid]||'The Slow Tide 官网';
 
