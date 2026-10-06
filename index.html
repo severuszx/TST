@@ -3834,6 +3834,8 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 .chat-msg .c-time{font-size:11px;opacity:.5;margin-left:auto;flex:none;align-self:center;}
 .chat-msg.sys .c-name{opacity:.55;}
 .chat-input-row{display:flex;gap:10px;margin-top:12px;}
+.chat-nick-row{display:flex;gap:10px;align-items:center;margin-top:10px;}
+.chat-nick-row input{flex:0 0 46%;}
 .chat-input-row input{flex:1;min-width:0;}
 .chat-input-row .btn{flex:none;}
 .status-line{display:flex;align-items:center;gap:10px;font-size:14px;}
@@ -3862,11 +3864,19 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
     <span>服务器实时聊天</span>
 
-    <span class="chat-hint" id="chatHint">连接中…</span>
+    <span style="display:flex;align-items:center;gap:10px;"><span class="chat-hint" id="chatHint">连接中…</span><button class="btn" id="chatAdminBtn" style="padding:3px 10px;font-size:12px;">管理员指令</button></span>
 
   </div>
 
   <div class="chat-scroll" id="chatMsgList"><p class="empty-hint">加载中…</p></div>
+
+  <div class="chat-nick-row">
+
+    <input type="text" id="chatNick" placeholder="你的游戏昵称（广播时显示）" autocomplete="off" maxlength="24" style="flex:0 0 46%;">
+
+    <span style="opacity:.6;font-size:12px;">昵称会显示在游戏广播里</span>
+
+  </div>
 
   <div class="chat-input-row">
 
@@ -6120,6 +6130,10 @@ function chatInit(){
 
   if(hint)hint.textContent='已连接 · 每 3 秒同步';
 
+  var nick=document.getElementById('chatNick');
+
+  if(nick){nick.value=localStorage.getItem('tst_chat_nick')||'';nick.addEventListener('change',function(){localStorage.setItem('tst_chat_nick',nick.value.trim());});}
+
   var inp=document.getElementById('chatInput'),btn=document.getElementById('chatSendBtn');
 
   var send=function(){
@@ -6128,7 +6142,9 @@ function chatInit(){
 
     if(!v){inp.focus();return;}
 
-    fetch('/api/chat/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:v})})
+    var nm=(nick?nick.value:'').trim()||'官网';
+
+    fetch('/api/chat/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:v,sender:nm})})
 
     .then(function(r){return r.json();})
 
@@ -6136,9 +6152,13 @@ function chatInit(){
 
       if(d&&d.ok){
 
-        appendChat({sender:'官网',message:v,kind:'web',ts:new Date().toISOString().slice(11,16)});
+        appendChat({sender:nm,message:v,kind:'web',ts:new Date().toISOString().slice(11,16)});
 
         inp.value='';
+
+      } else if(d&&d.error==='command_blocked'){
+
+        showToast(d.msg||'消息包含指令内容，已被拒绝发送');
 
       } else { showToast('发送失败，请重试'); }
 
@@ -6151,6 +6171,38 @@ function chatInit(){
   if(btn)btn.onclick=send;
 
   if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter')send();});
+
+  var ab=document.getElementById('chatAdminBtn');
+
+  if(ab)ab.onclick=openChatCmd;
+
+}
+
+function openChatCmd(){
+
+  var pw=prompt('管理员密码：');
+
+  if(pw===null)return;
+
+  var cmd=prompt('输入要在服务器执行的指令（不带 /）：');
+
+  if(cmd===null||!cmd.trim())return;
+
+  fetch('/api/chat/cmd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pw:pw,cmd:cmd.trim()})})
+
+  .then(function(r){return r.json();})
+
+  .then(function(d){
+
+    if(d&&d.ok){showToast('指令已下发至机器人执行');}
+
+    else if(d&&d.error==='wrong_password'){showToast('密码错误');}
+
+    else{showToast('下发失败，请重试');}
+
+  })
+
+  .catch(function(){showToast('下发失败，请稍后再试');});
 
 }
 
