@@ -11512,6 +11512,8 @@ function renderHomeCountdown(){
 
 function mountHomeUnlockButton(){
 
+  return; // 兑换码不公开于首页：查看需经隐藏页解密流程（PC 回忆录动画后）
+
   if (!isOpen()) return;                       // 硬闸：没到点/已过期不给入口
 
   var foot = document.getElementById('tstHdFoot');

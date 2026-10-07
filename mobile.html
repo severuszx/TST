@@ -5660,7 +5660,7 @@ window.showTab=showTab;
       if(n>=MC.DEADLINE.getTime()){ if(window.mGateTimer){clearInterval(window.mGateTimer);window.mGateTimer=null;} var saved=''; try{saved=localStorage.getItem('tst_mem_code_v1')||'';}catch(e){} mShowOpen(saved||'获取中…'); return; }
       var ms=MC.DEADLINE.getTime()-n;
       var dd=Math.floor(ms/86400000),hh=Math.floor(ms%86400000/3600000),mm=Math.floor(ms%3600000/60000),ss=Math.floor(ms%60000/1000);
-      gift.innerHTML='密钥正确 ✓ 潮门将于 10月7日 00:00 开启<br><span style="font-size:22px;font-weight:700;letter-spacing:2px;color:var(--txt);">'+dd+'天 '+mPad2(hh)+'时 '+mPad2(mm)+'分 '+mPad2(ss)+'秒</span><br><span style="font-size:12px;">开启后可在此页或 PC 端官网领取兑换码与回忆录动画</span>';
+      gift.innerHTML='密钥正确 ✓ 潮门将于 10月7日 00:00 开启<br><span style="font-size:22px;font-weight:700;letter-spacing:2px;color:var(--txt);">'+dd+'天 '+mPad2(hh)+'时 '+mPad2(mm)+'分 '+mPad2(ss)+'秒</span><br><span style="font-size:12px;">开启后请前往 PC 端官网查看回忆录动画并领取兑换码</span>';
     }
     paint();
     if(window.mGateTimer) clearInterval(window.mGateTimer);
