@@ -171,6 +171,9 @@ try{ var gbInit=localStorage.getItem('tst-glass-bg'); if(gbInit){document.docume
     return fetch(url,opt||{}).then(function(r){ return r.json(); }).catch(function(){ return null; });
   }
   function render(){
+    if(tmode==='eco'){ renderEcoUI(); return; }
+    var sr0=document.getElementById('toolsSearchInput');
+    if(sr0 && sr0.parentNode) sr0.parentNode.style.display='';
     box.innerHTML='<p class="empty-hint">加载中…</p>';
     var url='/api/tools/'+(tmode==='items'?'items':'tasks')+'?q='+encodeURIComponent(tq||'');
     api(url).then(function(d){
@@ -214,6 +217,9 @@ try{ var gbInit=localStorage.getItem('tst-glass-bg'); if(gbInit){document.docume
     });
   }
   function refresh(){
+    if(tmode==='eco'){ renderEcoUI(); return; }
+    var sr1=document.getElementById('toolsSearchInput');
+    if(sr1 && sr1.parentNode) sr1.parentNode.style.display='';
     if(!isAdmin() && !tq){
       box.innerHTML='<p class="empty-hint">'+(tmode==='items'?'输入物品名称或 ID，搜索是否被禁用':'输入关键词，查询任务详情')+'</p>';
       return;
@@ -226,7 +232,10 @@ try{ var gbInit=localStorage.getItem('tst-glass-bg'); if(gbInit){document.docume
       tmode=b.getAttribute('data-tmode'); tq='';
       document.getElementById('toolsSearchInput').value='';
       Array.prototype.forEach.call(tabs.children,function(x){ x.classList.toggle('on',x===b); });
-      adminTitle.textContent=tmode==='items'?'新增禁用物品':'新增任务';
+      adminTitle.textContent=tmode==='items'?'新增禁用物品':(tmode==='tasks'?'新增任务':'');
+      if(tmode==='eco'){ adminBox.style.display='none'; }
+      var srow=document.querySelector('#tools .search-row');
+      if(srow) srow.style.display=(tmode==='eco')?'none':'';
       refresh();
     });
   }
@@ -273,6 +282,694 @@ try{ var gbInit=localStorage.getItem('tst-glass-bg'); if(gbInit){document.docume
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', initTools);
   else initTools();
 })();
+
+</script>
+
+<style>
+/* ===== 经济模拟器 ===== */
+.eco-wrap{font-size:14px;line-height:1.75;color:var(--text);}
+.eco-wrap details{border:1px solid var(--border);border-radius:16px;background:var(--card);margin-bottom:18px;overflow:hidden;box-shadow:0 2px 12px rgba(15,23,42,.06);}
+.eco-wrap summary{cursor:pointer;padding:13px 18px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;gap:10px;position:relative;background:var(--card);border-bottom:1px solid var(--border);}
+.eco-wrap summary::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--accent);flex:none;}
+.eco-wrap summary::after{content:"▾";margin-left:auto;transition:transform .25s;color:var(--text-secondary);font-size:12px;}
+.eco-wrap details[open] summary::after{transform:rotate(180deg);}
+.eco-inner{padding:14px 18px 18px;}
+.eco-mod{position:relative;border:1px solid var(--border);border-radius:10px;background:var(--card);padding:18px;margin-bottom:16px;box-shadow:0 2px 10px rgba(15,23,42,.05);}
+.eco-mod h4{margin:0 0 4px;font-size:16px;color:var(--text);display:flex;align-items:center;gap:8px;font-weight:700;}
+.eco-mod h4::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--accent);flex:none;}
+.eco-sub{font-size:12.5px;color:var(--text-secondary);margin:0 0 14px;opacity:.9;}
+.eco-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px;}
+.eco-grid label{display:block;font-size:12.5px;color:var(--text-secondary);margin-bottom:5px;}
+.eco-in,.eco-sel{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:13.5px;transition:border-color .2s,background .2s;}
+.eco-in:hover,.eco-sel:hover{border-color:var(--accent);}
+.eco-in:focus,.eco-sel:focus{outline:none;border-color:var(--accent);}
+.eco-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+.eco-row .eco-sel{flex:2;min-width:200px;}
+.eco-row .eco-in{flex:1;min-width:90px;}
+.eco-btn{cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:6px;padding:8px 18px;font-size:13.5px;transition:all .2s;}
+.eco-btn:hover{background:var(--hover);}
+.eco-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;}
+.eco-btn.primary:hover{filter:brightness(1.08);background:var(--accent);}
+.eco-out{margin-top:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);padding:12px 14px;font-size:13.5px;line-height:1.75;}
+.eco-out b.big{font-size:24px;color:var(--accent);font-weight:800;}
+.eco-num{font-family:ui-monospace,Consolas,"SF Mono",monospace;}
+.eco-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;border:1px solid var(--border);}
+.eco-table th,.eco-table td{border-bottom:1px solid var(--border);padding:8px 10px;text-align:left;white-space:nowrap;}
+.eco-table th{background:var(--hover);font-weight:600;color:var(--text);}
+.eco-table tbody tr:hover{background:var(--hover);}
+.eco-table .num{text-align:right;font-family:ui-monospace,Consolas,monospace;}
+.eco-tag{display:inline-block;font-size:11px;border:1px solid var(--border);border-radius:4px;padding:1px 6px;color:var(--text-secondary);margin-left:6px;background:var(--card);}
+.eco-warn{color:#c0392b;font-size:12.5px;font-weight:600;}
+html[data-theme="dark"] .eco-warn,html[data-theme="glass"] .eco-warn{color:#ff9d9d;}
+.eco-ok{color:#2e7d32;font-size:12.5px;font-weight:600;}
+html[data-theme="dark"] .eco-ok,html[data-theme="glass"] .eco-ok{color:#93e6a0;}
+.eco-addlink{cursor:pointer;color:var(--accent);font-size:13px;font-weight:600;border:none;background:none;padding:6px 2px;text-decoration:none;transition:opacity .2s;}
+.eco-addlink:hover{opacity:.75;text-decoration:underline;}
+.eco-hint{font-size:12px;color:var(--text-secondary);opacity:.85;margin-top:10px;}
+.eco-apt{font-size:11.5px;color:var(--text-secondary);margin-left:8px;flex:none;border:1px solid var(--border);border-radius:4px;padding:1px 6px;background:var(--card);white-space:nowrap;}
+.eco-toolsbar{display:flex;justify-content:flex-end;gap:8px;margin:-6px 0 12px;}
+/* 服务器工具切换卡片 */
+#toolsTabs{display:grid;grid-template-columns:repeat(3,minmax(140px,1fr));gap:12px;margin-bottom:18px;max-width:720px;}
+#toolsTabs button{border:1px solid var(--border);background:var(--card);color:var(--text);padding:14px 16px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;text-align:left;box-shadow:0 2px 10px rgba(15,23,42,.05);transition:transform .18s,box-shadow .18s,border-color .18s,background .18s;}
+#toolsTabs button b{display:block;font-size:14.5px;}
+#toolsTabs button span{display:block;font-weight:400;font-size:12px;color:var(--text-secondary);margin-top:3px;}
+#toolsTabs button:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(15,23,42,.09);}
+#toolsTabs button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
+#toolsTabs button.on span{color:var(--text-secondary);}
+@media(max-width:640px){#toolsTabs{grid-template-columns:1fr;}}
+/* 物品联想浮层 */
+.eco-suggest{position:absolute;z-index:999;max-height:320px;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 10px 30px rgba(15,23,42,.14);font-size:13px;display:none;min-width:220px;}
+.eco-suggest .es-item{padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:12px;align-items:center;}
+.eco-suggest .es-item:hover{background:var(--hover);}
+.eco-suggest .es-item .es-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.eco-suggest .es-item .es-price{color:var(--text-secondary);font-size:12px;flex:none;}
+.eco-suggest .es-empty{padding:9px 12px;color:var(--text-secondary);}
+/* 经济模拟器：双栏排版 */
+.eco-cols{display:flex;gap:18px;align-items:flex-start;}
+.eco-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:16px;}
+@media(max-width:1100px){.eco-cols{flex-direction:column;}}
+/* 物品输入 + 下拉选择按钮 */
+.eco-inbox{display:flex;gap:6px;align-items:center;min-width:0;}
+.eco-inbox .eco-in{flex:1;min-width:0;}
+.eco-pick{flex:none;width:38px;padding:0;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text-secondary);cursor:pointer;font-size:13px;line-height:1;height:38px;box-shadow:none;}
+/* 普通模式（浅色/深色）：关闭鼠标悬停位移/缩放/过渡动效；玻璃主题保留其效果 */
+html[data-theme="light"] :hover,html[data-theme="dark"] :hover{transform:none !important;transition:none !important;}
+</style>
+
+<script>
+// ===== 经济模拟器（服务器工具·PC 端）=====
+var ECO_ITEMS=[
+{c:'特殊',n:'称号 The Slow Tide',b:200000,s:null,note:'永久限购1'},
+{c:'末地三神器',n:'末影统治者',b:192,s:96,note:'每日限购3'},
+{c:'末地三神器',n:'末影超越者',b:384,s:192,note:'每日限购3'},
+{c:'末地三神器',n:'末影指挥者',b:576,s:288,note:'每日限购3'},
+{c:'稀有战利品',n:'绿宝石',b:8,s:1.2,note:'永久限购50'},
+{c:'附魔书',n:'附魔书 冲击II',b:32,s:9.6,note:'每日限购1'},
+{c:'附魔书',n:'附魔书 引雷',b:40,s:16,note:'每日限购1'},
+{c:'附魔书',n:'附魔书 海之眷顾III',b:32,s:9.6,note:'每日限购1'},
+{c:'附魔书',n:'附魔书 冰霜行者II',b:32,s:9.6,note:'每日限购1'},
+{c:'附魔书',n:'附魔书 经验修补',b:65,s:24,note:'每日限购1'},
+{c:'附魔书',n:'附魔书 无限',b:36,s:9,note:'每日限购1'},
+{c:'附魔书',n:'附魔书 耐久III',b:36,s:11.2,note:'每日限购1'},
+{c:'附魔书',n:'附魔书 效率V',b:40,s:12.8,note:'每日限购1'},
+{c:'附魔书',n:'附魔书 锋利V',b:44,s:14.4,note:'每日限购1'},
+{c:'附魔书',n:'附魔书 保护IV',b:48,s:16,note:'每日限购1'},
+{c:'稀有战利品',n:'蜘蛛眼',b:1.6,s:0.2,note:'每日限购32'},
+{c:'稀有战利品',n:'恶魂之泪',b:9.6,s:5.6,note:'每日限购4'},
+{c:'稀有战利品',n:'海洋之心',b:22.4,s:12.8,note:'每日限购8'},
+{c:'稀有战利品',n:'凋灵骷髅模型',b:null,s:30,note:'每日限购0'},
+{c:'合成半成品&原材料',n:'海晶砂粒',b:11.2,s:0.64,note:'每日限购16'},
+{c:'合成半成品&原材料',n:'海晶碎片',b:12.8,s:0.96,note:'每日限购16'},
+{c:'合成半成品&原材料',n:'书',b:6.4,s:0.8,note:'每日限购64'},
+{c:'合成半成品&原材料',n:'纸',b:6.4,s:0.4,note:'每日限购128'},
+{c:'合成半成品&原材料',n:'铁桶',b:9.6,s:2.4,note:'每日限购16'},
+{c:'合成半成品&原材料',n:'玻璃',b:2.4,s:0.2,note:'每日限购128'},
+{c:'末地资源',n:'潜影壳',b:11.2,s:5.6,note:'每日限购8'},
+{c:'末地资源',n:'龙息',b:12.8,s:6.4,note:'每日限购4'},
+{c:'末地资源',n:'紫珀块',b:7.2,s:1.6,note:'每日限购64'},
+{c:'末地资源',n:'末影之眼',b:8,s:4,note:'每日限购12'},
+{c:'末地资源',n:'末影珍珠',b:7.2,s:1.6,note:'每日限购24'},
+{c:'下界资源',n:'远古残骸',b:22.4,s:11.2,note:'每日限购4'},
+{c:'下界资源',n:'岩浆膏',b:5.6,s:0.48,note:'每日限购16'},
+{c:'下界资源',n:'烈焰棒',b:3.2,s:0.48,note:'每日限购16'},
+{c:'下界资源',n:'下界石英',b:4,s:0.32,note:'每日限购96'},
+{c:'下界资源',n:'下界岩',b:0.8,s:0.08,note:'不限购'},
+{c:'养殖产物',n:'蜂蜜瓶',b:2.4,s:0.32,note:'每日限购48'},
+{c:'养殖产物',n:'白色羊毛',b:1.2,s:0.16,note:'每日限购128'},
+{c:'养殖产物',n:'生鸡肉',b:0.8,s:0.08,note:'每日限购128'},
+{c:'养殖产物',n:'生猪排',b:0.96,s:0.08,note:'每日限购128'},
+{c:'养殖产物',n:'生牛肉',b:0.96,s:0.08,note:'每日限购128'},
+{c:'农业种植产物',n:'小麦',b:0.64,s:0.2,note:'每周限购256'},
+{c:'农业种植产物',n:'西瓜',b:0.64,s:0.2,note:'每周限购192'},
+{c:'农业种植产物',n:'南瓜',b:0.64,s:0.2,note:'每周限购192'},
+{c:'农业种植产物',n:'甘蔗',b:0.64,s:0.2,note:'每周限购192'},
+{c:'农业种植产物',n:'甜菜根',b:0.64,s:0.2,note:'每周限购256'},
+{c:'农业种植产物',n:'胡萝卜',b:0.64,s:0.2,note:'每周限购256'},
+{c:'农业种植产物',n:'马铃薯',b:0.64,s:0.2,note:'每周限购256'},
+{c:'原木&矿物',n:'铁锭',b:3.2,s:1.2,note:'每周限购128'},
+{c:'原木&矿物',n:'黑曜石',b:12.8,s:4.8,note:'每周限购32'},
+{c:'原木&矿物',n:'钻石',b:40,s:14,note:'每周限购8'},
+{c:'原木&矿物',n:'红石粉',b:4,s:0.48,note:'每周限购64'},
+{c:'原木&矿物',n:'青金石',b:4.8,s:0.64,note:'每周限购32'},
+{c:'原木&矿物',n:'金锭',b:5.6,s:1.5,note:'每周限购64'},
+{c:'原木&矿物',n:'煤炭',b:1.2,s:0.5,note:'每周限购384'},
+{c:'原木&矿物',n:'云杉原木',b:1.2,s:0.25,note:'每周限购512'},
+{c:'原木&矿物',n:'白桦原木',b:1.2,s:0.25,note:'每周限购512'},
+{c:'原木&矿物',n:'橡木原木',b:1.2,s:0.25,note:'每周限购512'}
+];
+function ecoFmt(n){ if(n==null||isNaN(n)) return '—'; return Number(n).toLocaleString('zh-CN',{maximumFractionDigits:2}); }
+function ecoDL(){
+  var h='';
+  for(var i=0;i<ECO_ITEMS.length;i++){ h+='<option value="'+ecoEsc(ECO_ITEMS[i].n)+'">'; }
+  return h;
+}
+var ECO_USER=[];
+try{ ECO_USER=JSON.parse(localStorage.getItem('tst_eco_user')||'[]'); }catch(e){ ECO_USER=[]; }
+function ecoSaveUser(){ try{ localStorage.setItem('tst_eco_user',JSON.stringify(ECO_USER)); }catch(e){} }
+function ecoFind(nm){
+  var s=String(nm==null?'':nm).trim().toLowerCase().replace(/\s+/g,'');
+  if(!s) return null;
+  var i,it;
+  for(i=0;i<ECO_USER.length;i++){ it=ECO_USER[i]; if(String(it.n).toLowerCase().replace(/\s+/g,'')===s) return it; }
+  for(i=0;i<ECO_ITEMS.length;i++){ it=ECO_ITEMS[i]; if(String(it.n).toLowerCase().replace(/\s+/g,'')===s) return it; }
+  for(i=0;i<ECO_USER.length;i++){ it=ECO_USER[i]; if(String(it.n).toLowerCase().replace(/\s+/g,'').indexOf(s)>=0) return it; }
+  for(i=0;i<ECO_ITEMS.length;i++){ it=ECO_ITEMS[i]; if(String(it.n).toLowerCase().replace(/\s+/g,'').indexOf(s)>=0) return it; }
+  return null;
+}
+function ecoEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+/* 物品联想浮层（替代原生 datalist，避免下拉列表超出屏幕；document 委托，任何阶段可用） */
+var ecoSG=null;
+function ecoHideSG(){ if(ecoSG) ecoSG.style.display='none'; }
+function ecoShowSG(inp,full){
+  if(!ecoSG){ ecoSG=document.createElement('div'); ecoSG.className='eco-suggest'; document.body.appendChild(ecoSG); }
+  var s=String(inp.value||'').trim().toLowerCase().replace(/\s+/g,'');
+  if(!s&&!full){ ecoHideSG(); return; }
+  var list=[], i, it, nm, x;
+  function mk(it,tag){ return {n:it.n,p:(it.s!=null?'回收 '+ecoFmt(it.s):'买 '+ecoFmt(it.b)),tag:tag||it.c||''}; }
+  if(full&&!s){
+    for(i=0;i<ECO_USER.length;i++){ it=ECO_USER[i]; list.push(mk(it,'自定义')); }
+    for(i=0;i<ECO_ITEMS.length;i++){ it=ECO_ITEMS[i]; list.push(mk(it,'')); }
+  } else {
+    for(i=0;i<ECO_USER.length;i++){ it=ECO_USER[i]; nm=String(it.n).toLowerCase().replace(/\s+/g,''); if(nm===s) list.push(mk(it,'自定义')); }
+    for(i=0;i<ECO_ITEMS.length;i++){ it=ECO_ITEMS[i]; nm=String(it.n).toLowerCase().replace(/\s+/g,''); if(nm===s) list.push(mk(it,'')); }
+    if(full||!list.length){
+      for(i=0;i<ECO_USER.length;i++){ it=ECO_USER[i]; nm=String(it.n).toLowerCase().replace(/\s+/g,''); if(nm.indexOf(s)>=0) list.push(mk(it,'自定义')); }
+      for(i=0;i<ECO_ITEMS.length;i++){ it=ECO_ITEMS[i]; nm=String(it.n).toLowerCase().replace(/\s+/g,''); if(nm.indexOf(s)>=0) list.push(mk(it,'')); }
+    }
+  }
+  if(!list.length){ ecoSG.innerHTML='<div class="es-empty">无匹配物品，可自行填写单价</div>'; }
+  else{
+    var max=full?list.length:10;
+    var html='';
+    for(i=0;i<list.length&&i<max;i++){ x=list[i];
+      html+='<div class="es-item" data-v="'+ecoEsc(x.n)+'"><span class="es-name">'+ecoEsc(x.n)+(x.tag?' <span class="eco-tag">'+ecoEsc(x.tag)+'</span>':'')+'</span><span class="es-price">'+ecoEsc(x.p)+'</span></div>';
+    }
+    if(full&&list.length>max) html+='<div class="es-empty">共 '+list.length+' 项，继续输入可筛选</div>';
+    ecoSG.innerHTML=html;
+    ecoSG.onclick=function(ev){ var it2=ev.target.closest('.es-item'); if(!it2) return; inp.value=it2.getAttribute('data-v'); inp.dispatchEvent(new Event('input',{bubbles:true})); inp.focus(); ecoHideSG(); };
+  }
+  var r=inp.getBoundingClientRect();
+  ecoSG.style.display='block';
+  ecoSG.style.top=Math.round(r.bottom+window.scrollY+4)+'px';
+  ecoSG.style.left=Math.round(r.left+window.scrollX)+'px';
+  ecoSG.style.width=Math.max(r.width,240)+'px';
+}
+(function(){
+  document.addEventListener('input',function(e){
+    var t=e.target;
+    if(!t||t.tagName!=='INPUT') return;
+    var free=(t.getAttribute('data-aname')!==null)||t.id==='ecoBbuy'||t.id==='ecoBsell'||t.id==='ecoTitem'||t.id==='ecoUname';
+    if(free) ecoShowSG(t);
+  });
+  document.addEventListener('click',function(e){
+    var pk=e.target.closest?e.target.closest('.eco-pick'):null;
+    if(pk){ var pin=pk.previousElementSibling; if(pin&&pin.tagName==='INPUT'){ ecoShowSG(pin,true); return; } }
+    if(ecoSG&&ecoSG.style.display==='block'&&!(ecoSG.contains(e.target)||(e.target.getAttribute&&e.target.getAttribute('data-aname')!==null)||(e.target.classList&&e.target.classList.contains('eco-pick')))) ecoHideSG();
+  });
+})();
+
+function renderEcoUI(){
+  var box=document.getElementById('toolsBody');
+  var h='<div class="eco-wrap">';
+  h+='<datalist id="ecoDL">'+ecoDL()+'</datalist>';
+
+  /* 使用说明 */
+  h+='<details open><summary>使用说明</summary><div class="eco-inner">'
+    +'<p style="margin:0 0 6px;">这里是服务器经济系统的配套计算工具，帮你把 <b>游戏里的资源换算成金币</b>、找 <b>套利空间</b>、评估 <b>全服通胀</b>，也能当 <b>通用物价计算器</b> 用（不限于游戏）。</p>'
+    +'<ul style="margin:0 0 6px;padding-left:18px;">'
+    +'<li>物品名称<b>可以直接输入</b>，输入时会有服务器物价表联想；已收录物品会自动带入系统买价 / 回收价，也可手动改成你的成交价。</li>'
+    +'<li>物价数据取自 2026-10-10 的服务器系统商店设置（买价 / 回收价 / 限购）。</li>'
+    +'<li>“资产”按<b>回收价</b>折算；回收价显示 — 的物品不可回收（如称号收藏品），只计数量不计资产。</li>'
+    +'<li>“全服经济”用的是简化货币模型（经验估计），结果仅作参考，不代表服务器真实经济。</li>'
+    +'<li>“时间性价比”里的产出效率是经验估计值，可自行改成你的真实数据。</li>'
+    +'</ul></div></details>';
+
+  /* 重置工具栏 */
+  h+='<div class="eco-toolsbar"><button class="eco-btn" id="ecoResetU" title="只清空你在「自定义物价库」里添加的价格">重置自定义物价</button><button class="eco-btn" id="ecoResetAll" title="清空自定义物价并恢复所有输入为初始状态">全部重置</button></div>';
+
+  /* 双栏排版：左列 = 输入计算类，右列 = 数据模拟类 */
+  h+='<div class="eco-cols"><div class="eco-col">';
+
+  /* ① 资产计算器 */
+  h+='<div class="eco-mod"><h4>资产计算器</h4><p class="eco-sub">输入你的金币和物资数量，折算你的总资产（按系统商店回收价，可手改单价）。</p>'
+    +'<div class="eco-grid"><div><label>金币余额</label><input class="eco-in eco-num" id="ecoAcoin" type="number" min="0" step="any" value="0"></div></div>'
+    +'<div id="ecoArows">'+ecoARowHtml()+ecoARowHtml()+'</div>'
+    +'<button class="eco-addlink" id="ecoAadd">＋ 添加一行</button> '
+    +'<button class="eco-btn primary" id="ecoAgo">计算总资产</button>'
+    +'<div class="eco-out" id="ecoAout"></div></div>';
+
+  /* ② 套利计算器 */
+  h+='<div class="eco-mod"><h4>套利计算器</h4><p class="eco-sub">买入、卖出两个物品（或同一物品低买高卖），看单件利润、利润率与限购下的最大套利。</p>'
+    +'<div class="eco-row"><div class="eco-inbox"><input class="eco-in" id="ecoBbuy" placeholder="买入物品"><button class="eco-pick" type="button">▾</button></div><input class="eco-in eco-num" id="ecoBbuyP" type="number" min="0" step="any" placeholder="买入单价"><span class="eco-apt" id="ecoBbuyD"></span></div>'
+    +'<div class="eco-row"><div class="eco-inbox"><input class="eco-in" id="ecoBsell" placeholder="卖出物品"><button class="eco-pick" type="button">▾</button></div><input class="eco-in eco-num" id="ecoBsellP" type="number" min="0" step="any" placeholder="卖出单价"><span class="eco-apt" id="ecoBsellD"></span></div>'
+    +'<div class="eco-grid"><div><label>数量</label><input class="eco-in eco-num" id="ecoBcnt" type="number" min="0" step="any" value="1"></div></div>'
+    +'<button class="eco-btn primary" id="ecoBgo">计算套利</button>'
+    +'<div class="eco-out" id="ecoBout"></div></div>';
+
+  /* ⑤ 自定义计算器（游戏走进生活） */
+  h+='<div class="eco-mod"><h4>通用物价计算器（不限于游戏）</h4><p class="eco-sub">任意物品：填名称、数量、单价算总价；再填回收/卖出价可算利润。生活中也能用。</p>'
+    +'<div id="ecoCrows">'
+    +'<div class="eco-row"><input class="eco-in" data-fname placeholder="物品名称"><input class="eco-in eco-num" data-fqty type="number" min="0" step="any" placeholder="数量"><input class="eco-in eco-num" data-fbuy type="number" min="0" step="any" placeholder="买入单价"><input class="eco-in eco-num" data-fsell type="number" min="0" step="any" placeholder="卖出单价"></div>'
+    +'<div class="eco-row"><input class="eco-in" data-fname placeholder="物品名称"><input class="eco-in eco-num" data-fqty type="number" min="0" step="any" placeholder="数量"><input class="eco-in eco-num" data-fbuy type="number" min="0" step="any" placeholder="买入单价"><input class="eco-in eco-num" data-fsell type="number" min="0" step="any" placeholder="卖出单价"></div>'
+    +'</div>'
+    +'<button class="eco-addlink" id="ecoCadd">＋ 添加一行</button> '
+    +'<button class="eco-btn primary" id="ecoFgo">计算</button>'
+    +'<div class="eco-out" id="ecoFout"></div></div>';
+
+  /* ⑥ 攒钱计划 */
+  h+='<div class="eco-mod"><h4>攒钱计划</h4><p class="eco-sub">想买某件东西（比如 20 万金币的称号），按你每天的收入算算要攒多久。</p>'
+    +'<div class="eco-grid">'
+    +'<div><label>目标金额（金币）</label><input class="eco-in eco-num" id="ecoGgoal" type="number" min="0" step="any" placeholder="如 200000"></div>'
+    +'<div><label>已有金币</label><input class="eco-in eco-num" id="ecoGhave" type="number" min="0" step="any" value="0"></div>'
+    +'<div><label>每日收入（金币）</label><input class="eco-in eco-num" id="ecoGday" type="number" min="0" step="any" placeholder="如 3000"></div>'
+    +'</div>'
+    +'<button class="eco-btn primary" id="ecoGgo">计算攒钱时间</button>'
+    +'<div class="eco-out" id="ecoGout"></div></div>';
+
+  h+='</div><div class="eco-col">';
+
+  /* ③ 全服经济模拟 */
+  h+='<div class="eco-mod"><h4>全服经济模拟（通胀推演）</h4><p class="eco-sub">估算全服货币总量，模拟“全民刷钻石”等情景对物价的影响（简化货币模型，仅供参考）。</p>'
+    +'<div class="eco-grid">'
+    +'<div><label>当前全服货币总量（金币）</label><input class="eco-in eco-num" id="ecoCM" type="number" min="0" step="any" placeholder="如 5000000"></div>'
+    +'<div><label>当前钻石回收价（默认 14）</label><input class="eco-in eco-num" id="ecoCDia" type="number" min="0" step="any" value="14"></div>'
+    +'<div><label>参与刷钻的玩家数</label><input class="eco-in eco-num" id="ecoCP" type="number" min="0" step="any" value="10"></div>'
+    +'<div><label>人均日产钻石（个）</label><input class="eco-in eco-num" id="ecoCD" type="number" min="0" step="any" value="20"></div>'
+    +'<div><label>持续天数</label><input class="eco-in eco-num" id="ecoCT" type="number" min="0" step="any" value="7"></div>'
+    +'</div>'
+    +'<button class="eco-btn primary" id="ecoCgo">推演通胀</button>'
+    +'<div class="eco-out" id="ecoCout"></div></div>';
+
+  /* ④ 时间性价比 */
+  h+='<div class="eco-mod"><h4>时间性价比对比</h4><p class="eco-sub">每小时做什么最赚（按系统回收价折算，效率为经验估计，可改成你的真实数据）。</p>'
+    +'<div class="eco-row"><div class="eco-inbox"><input class="eco-in" id="ecoTitem" placeholder="物品名称"><button class="eco-pick" type="button">▾</button></div><input class="eco-in eco-num" id="ecoTcnt" type="number" min="0" step="any" placeholder="每小时产出数量"><button class="eco-btn" id="ecoTadd">加入对比</button></div>'
+    +'<div class="eco-out" id="ecoTout"></div></div>';
+
+  /* ⑦ 自定义物价库 */
+  h+='<div class="eco-mod"><h4>自定义物价库</h4><p class="eco-sub">把你自己的成交价 / 收购价记下来（保存在本机浏览器），之后所有计算器都会优先使用你的价格。</p>'
+    +'<div class="eco-row"><input class="eco-in" id="ecoUname" placeholder="物品名称"><input class="eco-in eco-num" id="ecoUbuy" type="number" min="0" step="any" placeholder="买价（可选）"><input class="eco-in eco-num" id="ecoUsell" type="number" min="0" step="any" placeholder="回收/卖出价"><input class="eco-in" id="ecoUnote" placeholder="备注（可选）"><button class="eco-btn" id="ecoUadd">添加</button></div>'
+    +'<div class="eco-out" id="ecoUlist"></div></div>';
+
+  /* ⑧ 单位换算 */
+  h+='<div class="eco-mod"><h4>单位换算（组 / 个）</h4><p class="eco-sub">一组 = 64 个。输入单价和数量（个或组）算总价；填预算可反算能买多少。</p>'
+    +'<div class="eco-grid">'
+    +'<div><label>物品单价（金币 / 个）</label><input class="eco-in eco-num" id="ecoUcP" type="number" min="0" step="any" placeholder="如 14"></div>'
+    +'<div><label>数量（个）</label><input class="eco-in eco-num" id="ecoUcC" type="number" min="0" step="any" value="0"></div>'
+    +'<div><label>数量（组）</label><input class="eco-in eco-num" id="ecoUcG" type="number" min="0" step="any" value="0"></div>'
+    +'<div><label>预算（金币，可选）</label><input class="eco-in eco-num" id="ecoUcB" type="number" min="0" step="any" placeholder="如 5000"></div>'
+    +'</div>'
+    +'<button class="eco-btn primary" id="ecoUcGo">换算</button>'
+    +'<div class="eco-out" id="ecoUcOut"></div></div>';
+
+  /* ⑨ 购买力对比 */
+  h+='<div class="eco-mod"><h4>购买力对比</h4><p class="eco-sub">同样一笔钱，分别能买多少件不同物品，直观看出哪边更“值”。</p>'
+    +'<div class="eco-grid">'
+    +'<div><label>预算（金币）</label><input class="eco-in eco-num" id="ecoPB" type="number" min="0" step="any" placeholder="如 10000"></div>'
+    +'<div><label>物品 A 单价</label><input class="eco-in eco-num" id="ecoPA" type="number" min="0" step="any" placeholder="如 14"></div>'
+    +'<div><label>物品 B 单价</label><input class="eco-in eco-num" id="ecoPBB" type="number" min="0" step="any" placeholder="如 40"></div>'
+    +'</div>'
+    +'<button class="eco-btn primary" id="ecoPGo">对比</button>'
+    +'<div class="eco-out" id="ecoPOut"></div></div>';
+
+  h+='</div></div>';
+
+  /* 内容面板（默认展示资产计算器） */
+  h+='<div class="eco-panel on" id="ecoPanel-asset">';
+  h+='<div class="eco-mod"><h4>资产计算器</h4><p class="eco-sub">输入你的金币和物资数量，折算你的总资产（按系统商店回收价，可手改单价）。</p>'
+    +'<div class="eco-grid"><div><label>金币余额</label><input class="eco-in eco-num" id="ecoAcoin" type="number" min="0" step="any" value="0"></div></div>'
+    +'<div id="ecoArows">'+ecoARowHtml()+ecoARowHtml()+'</div>'
+    +'<button class="eco-addlink" id="ecoAadd">＋ 添加一行</button> '
+    +'<button class="eco-btn primary" id="ecoAgo">计算总资产</button>'
+    +'<div class="eco-out" id="ecoAout"></div></div>';
+  h+='</div>';
+
+  h+='<div class="eco-panel" id="ecoPanel-arb">';
+  h+='<div class="eco-mod"><h4>套利计算器</h4><p class="eco-sub">买入、卖出两个物品（或同一物品低买高卖），看单件利润、利润率与限购下的最大套利。</p>'
+    +'<div class="eco-row"><div class="eco-inbox"><input class="eco-in" id="ecoBbuy" placeholder="买入物品"><button class="eco-pick" type="button">▾</button></div><input class="eco-in eco-num" id="ecoBbuyP" type="number" min="0" step="any" placeholder="买入单价"><span class="eco-apt" id="ecoBbuyD"></span></div>'
+    +'<div class="eco-row"><div class="eco-inbox"><input class="eco-in" id="ecoBsell" placeholder="卖出物品"><button class="eco-pick" type="button">▾</button></div><input class="eco-in eco-num" id="ecoBsellP" type="number" min="0" step="any" placeholder="卖出单价"><span class="eco-apt" id="ecoBsellD"></span></div>'
+    +'<div class="eco-grid"><div><label>数量</label><input class="eco-in eco-num" id="ecoBcnt" type="number" min="0" step="any" value="1"></div></div>'
+    +'<button class="eco-btn primary" id="ecoBgo">计算套利</button>'
+    +'<div class="eco-out" id="ecoBout"></div></div>';
+  h+='</div>';
+
+  h+='<div class="eco-panel" id="ecoPanel-life">';
+  h+='<div class="eco-mod"><h4>通用物价计算器（不限于游戏）</h4><p class="eco-sub">任意物品：填名称、数量、单价算总价；再填回收/卖出价可算利润。生活中也能用。</p>'
+    +'<div id="ecoCrows">'
+    +'<div class="eco-row"><input class="eco-in" data-fname placeholder="物品名称"><input class="eco-in eco-num" data-fqty type="number" min="0" step="any" placeholder="数量"><input class="eco-in eco-num" data-fbuy type="number" min="0" step="any" placeholder="买入单价"><input class="eco-in eco-num" data-fsell type="number" min="0" step="any" placeholder="卖出单价"></div>'
+    +'<div class="eco-row"><input class="eco-in" data-fname placeholder="物品名称"><input class="eco-in eco-num" data-fqty type="number" min="0" step="any" placeholder="数量"><input class="eco-in eco-num" data-fbuy type="number" min="0" step="any" placeholder="买入单价"><input class="eco-in eco-num" data-fsell type="number" min="0" step="any" placeholder="卖出单价"></div>'
+    +'</div>'
+    +'<button class="eco-addlink" id="ecoCadd">＋ 添加一行</button> '
+    +'<button class="eco-btn primary" id="ecoFgo">计算</button>'
+    +'<div class="eco-out" id="ecoFout"></div></div>';
+  h+='</div>';
+
+  h+='<div class="eco-panel" id="ecoPanel-save">';
+  h+='<div class="eco-mod"><h4>攒钱计划</h4><p class="eco-sub">想买某件东西（比如 20 万金币的称号），按你每天的收入算算要攒多久。</p>'
+    +'<div class="eco-grid">'
+    +'<div><label>目标金额（金币）</label><input class="eco-in eco-num" id="ecoGgoal" type="number" min="0" step="any" placeholder="如 200000"></div>'
+    +'<div><label>已有金币</label><input class="eco-in eco-num" id="ecoGhave" type="number" min="0" step="any" value="0"></div>'
+    +'<div><label>每日收入（金币）</label><input class="eco-in eco-num" id="ecoGday" type="number" min="0" step="any" placeholder="如 3000"></div>'
+    +'</div>'
+    +'<button class="eco-btn primary" id="ecoGgo">计算攒钱时间</button>'
+    +'<div class="eco-out" id="ecoGout"></div></div>';
+  h+='</div>';
+
+  h+='<div class="eco-panel" id="ecoPanel-macro">';
+  h+='<div class="eco-mod"><h4>全服经济模拟（通胀推演）</h4><p class="eco-sub">估算全服货币总量，模拟“全民刷钻石”等情景对物价的影响（简化货币模型，仅供参考）。</p>'
+    +'<div class="eco-grid">'
+    +'<div><label>当前全服货币总量（金币）</label><input class="eco-in eco-num" id="ecoCM" type="number" min="0" step="any" placeholder="如 5000000"></div>'
+    +'<div><label>当前钻石回收价（默认 14）</label><input class="eco-in eco-num" id="ecoCDia" type="number" min="0" step="any" value="14"></div>'
+    +'<div><label>参与刷钻的玩家数</label><input class="eco-in eco-num" id="ecoCP" type="number" min="0" step="any" value="10"></div>'
+    +'<div><label>人均日产钻石（个）</label><input class="eco-in eco-num" id="ecoCD" type="number" min="0" step="any" value="20"></div>'
+    +'<div><label>持续天数</label><input class="eco-in eco-num" id="ecoCT" type="number" min="0" step="any" value="7"></div>'
+    +'</div>'
+    +'<button class="eco-btn primary" id="ecoCgo">推演通胀</button>'
+    +'<div class="eco-out" id="ecoCout"></div></div>';
+  h+='</div>';
+
+  h+='<div class="eco-panel" id="ecoPanel-time">';
+  h+='<div class="eco-mod"><h4>时间性价比对比</h4><p class="eco-sub">每小时做什么最赚（按系统回收价折算，效率为经验估计，可改成你的真实数据）。</p>'
+    +'<div class="eco-row"><div class="eco-inbox"><input class="eco-in" id="ecoTitem" placeholder="物品名称"><button class="eco-pick" type="button">▾</button></div><input class="eco-in eco-num" id="ecoTcnt" type="number" min="0" step="any" placeholder="每小时产出数量"><button class="eco-btn" id="ecoTadd">加入对比</button></div>'
+    +'<div class="eco-out" id="ecoTout"></div></div>';
+  h+='</div>';
+
+  h+='<div class="eco-panel" id="ecoPanel-pricelib">';
+  h+='<div class="eco-mod"><h4>自定义物价库</h4><p class="eco-sub">把你自己的成交价 / 收购价记下来（保存在本机浏览器），之后所有计算器都会优先使用你的价格。</p>'
+    +'<div class="eco-row"><input class="eco-in" id="ecoUname" placeholder="物品名称"><input class="eco-in eco-num" id="ecoUbuy" type="number" min="0" step="any" placeholder="买价（可选）"><input class="eco-in eco-num" id="ecoUsell" type="number" min="0" step="any" placeholder="回收/卖出价"><input class="eco-in" id="ecoUnote" placeholder="备注（可选）"><button class="eco-btn" id="ecoUadd">添加</button></div>'
+    +'<div class="eco-out" id="ecoUlist"></div></div>';
+  h+='</div>';
+
+  h+='<div class="eco-panel" id="ecoPanel-unit">';
+  h+='<div class="eco-mod"><h4>单位换算（组 / 个）</h4><p class="eco-sub">一组 = 64 个。输入单价和数量（个或组）算总价；填预算可反算能买多少。</p>'
+    +'<div class="eco-grid">'
+    +'<div><label>物品单价（金币 / 个）</label><input class="eco-in eco-num" id="ecoUcP" type="number" min="0" step="any" placeholder="如 14"></div>'
+    +'<div><label>数量（个）</label><input class="eco-in eco-num" id="ecoUcC" type="number" min="0" step="any" value="0"></div>'
+    +'<div><label>数量（组）</label><input class="eco-in eco-num" id="ecoUcG" type="number" min="0" step="any" value="0"></div>'
+    +'<div><label>预算（金币，可选）</label><input class="eco-in eco-num" id="ecoUcB" type="number" min="0" step="any" placeholder="如 5000"></div>'
+    +'</div>'
+    +'<button class="eco-btn primary" id="ecoUcGo">换算</button>'
+    +'<div class="eco-out" id="ecoUcOut"></div></div>';
+  h+='</div>';
+
+  h+='<div class="eco-panel" id="ecoPanel-power">';
+  h+='<div class="eco-mod"><h4>购买力对比</h4><p class="eco-sub">同样一笔钱，分别能买多少件不同物品，直观看出哪边更“值”。</p>'
+    +'<div class="eco-grid">'
+    +'<div><label>预算（金币）</label><input class="eco-in eco-num" id="ecoPB" type="number" min="0" step="any" placeholder="如 10000"></div>'
+    +'<div><label>物品 A 单价</label><input class="eco-in eco-num" id="ecoPA" type="number" min="0" step="any" placeholder="如 14"></div>'
+    +'<div><label>物品 B 单价</label><input class="eco-in eco-num" id="ecoPBB" type="number" min="0" step="any" placeholder="如 40"></div>'
+    +'</div>'
+    +'<button class="eco-btn primary" id="ecoPGo">对比</button>'
+    +'<div class="eco-out" id="ecoPOut"></div></div>';
+  h+='</div>';
+
+  /* ⑥ 物价表参考 */
+  h+='<details><summary>物价表参考（'+ECO_ITEMS.length+' 项）</summary><div class="eco-inner">'
+    +'<input class="eco-in" id="ecoSearch" placeholder="筛选物品…" style="max-width:260px;margin-bottom:8px;">'
+    +'<table class="eco-table" id="ecoTable"><thead><tr><th>分类</th><th>物品</th><th class="num">买价</th><th class="num">回收价</th><th>限购</th></tr></thead><tbody></tbody></table>'
+    +'<p class="eco-hint">注：价格为 2026-10-10 系统商店设置；“称号 The Slow Tide”为收藏品（永久限购 1，商店不回收）。回收价显示 — 表示该物品商店不回收。</p>'
+    +'</div></details>';
+
+  h+='</div>';
+  box.innerHTML=h;
+
+  /* 物价表填充 */
+  var tb=document.getElementById('ecoTable').getElementsByTagName('tbody')[0];
+  var rowsHtml='';
+  for(var i=0;i<ECO_ITEMS.length;i++){ var it=ECO_ITEMS[i];
+    rowsHtml+='<tr data-n="'+ecoEsc(it.n).toLowerCase()+'"><td style="opacity:.65;">'+ecoEsc(it.c)+'</td><td>'+ecoEsc(it.n)+'</td><td class="num">'+ecoFmt(it.b)+'</td><td class="num">'+ecoFmt(it.s)+'</td><td>'+ecoEsc(it.note||'')+'</td></tr>';
+  }
+  tb.innerHTML=rowsHtml;
+  var ecoSearch=document.getElementById('ecoSearch');
+  if(ecoSearch) ecoSearch.addEventListener('input',function(){
+    var q=ecoSearch.value.trim().toLowerCase();
+    var rows=tb.rows;
+    for(var i=0;i<rows.length;i++){ rows[i].style.display=(!q||rows[i].getAttribute('data-n').indexOf(q)>=0)?'':'none'; }
+  });
+
+  /* ① 资产计算器 */
+  function ecoARowHtml(){
+    return '<div class="eco-row"><div class="eco-inbox"><input class="eco-in" data-aname placeholder="物品名称（可直接输入）"><button class="eco-pick" type="button">▾</button></div><input class="eco-in eco-num" data-apx type="number" min="0" step="any" placeholder="回收单价·可选"><input class="eco-in eco-num" data-acnt type="number" min="0" step="any" placeholder="数量"><span class="eco-apt" data-apt></span></div>';
+  }
+  var aRows=document.getElementById('ecoArows');
+  if(aRows) aRows.addEventListener('input',function(e){
+    var t=e.target;
+    if(t&&t.getAttribute('data-aname')===''){
+      var row=t.closest?t.closest('.eco-row'):null;
+      if(!row) return;
+      var it=ecoFind(t.value);
+      var ap=row.querySelector('[data-apt]');
+      var px=row.querySelector('[data-apx]');
+      if(ap) ap.textContent=it?('已收录 · 回收 '+ecoFmt(it.s)):'';
+      if(px&&it&&it.s!=null&&px.value==='') px.value=it.s;
+    }
+  });
+  var aAdd=document.getElementById('ecoAadd');
+  if(aAdd) aAdd.onclick=function(){
+    var d=document.createElement('div');
+    d.innerHTML=ecoARowHtml();
+    document.getElementById('ecoArows').appendChild(d);
+  };
+  var aGo=document.getElementById('ecoAgo');
+  if(aGo) aGo.onclick=function(){
+    var coin=parseFloat(document.getElementById('ecoAcoin').value)||0;
+    var rows=document.getElementById('ecoArows').querySelectorAll('.eco-row');
+    var total=coin, det='<table class="eco-table"><thead><tr><th>物品</th><th class="num">数量</th><th class="num">回收价</th><th class="num">小计</th></tr></thead><tbody>';
+    var rowsUsed=0, unRec='';
+    for(var i=0;i<rows.length;i++){
+      var nm=rows[i].querySelector('[data-aname]').value.trim();
+      var cnt=parseFloat(rows[i].querySelector('[data-acnt]').value)||0;
+      if(!nm||cnt<=0) continue;
+      var it=ecoFind(nm);
+      var pxv=rows[i].querySelector('[data-apx]').value;
+      var px=parseFloat(pxv);
+      var price=(!isNaN(px)&&px>=0)?px:((it&&it.s!=null)?it.s:null);
+      rowsUsed++;
+      var shown=ecoEsc(nm)+(it?'<span class="eco-tag">'+ecoEsc(it.c)+'</span>':'');
+      if(price==null||price===0){ unRec+='<div style="font-size:12px;opacity:.7;">'+ecoEsc(nm)+'：商店不回收 / 未收录，只计数量不计资产（可填回收单价后重算）。</div>'; continue; }
+      var sub=cnt*price; total+=sub;
+      det+='<tr><td>'+shown+'</td><td class="num">'+ecoFmt(cnt)+'</td><td class="num">'+ecoFmt(price)+'</td><td class="num">'+ecoFmt(sub)+'</td></tr>';
+    }
+    det+='<tr><td colspan="3"><b>金币余额</b></td><td class="num"><b>'+ecoFmt(coin)+'</b></td></tr></tbody></table>';
+    document.getElementById('ecoAout').innerHTML='<div>估算总资产：<b class="big eco-num">'+ecoFmt(total)+'</b> 金币</div>'
+      +(!rowsUsed?'<p class="eco-hint">还没有填写物品行。</p>':'')+det+unRec+'<p class="eco-hint">已收录物品按系统商店回收价折算（可手改单价）；未收录物品需自行填写回收单价。实际价值以交易市场为准。</p>';
+  };
+
+  /* ② 套利计算器 */
+  function syncB(){
+    var bi=ecoFind(document.getElementById('ecoBbuy').value);
+    var si=ecoFind(document.getElementById('ecoBsell').value);
+    var bd=document.getElementById('ecoBbuyD'), sd=document.getElementById('ecoBsellD');
+    var bb=document.getElementById('ecoBbuyP'), sp=document.getElementById('ecoBsellP');
+    bd.textContent=bi?('已收录 · 系统买价 '+ecoFmt(bi.b)):'';
+    sd.textContent=si?('已收录 · 系统回收价 '+ecoFmt(si.s)):'';
+    if(bi&&bi.b!=null&&!bb.value) bb.value=bi.b;
+    if(si&&si.s!=null&&!sp.value) sp.value=si.s;
+  }
+  var bBuy=document.getElementById('ecoBbuy'), bSell=document.getElementById('ecoBsell');
+  if(bBuy) bBuy.addEventListener('input',syncB);
+  if(bSell) bSell.addEventListener('input',syncB);
+  var bGo=document.getElementById('ecoBgo');
+  if(bGo) bGo.onclick=function(){
+    var buy=parseFloat(document.getElementById('ecoBbuyP').value);
+    var sell=parseFloat(document.getElementById('ecoBsellP').value);
+    var cnt=parseFloat(document.getElementById('ecoBcnt').value)||1;
+    if(isNaN(buy)||isNaN(sell)||buy<0||sell<0){ document.getElementById('ecoBout').innerHTML='<span class="eco-warn">请填写买入价和卖出价。</span>'; return; }
+    var profit=sell-buy, margin=(buy>0)?(profit/buy*100):0, total=profit*cnt;
+    var bi=ecoFind(document.getElementById('ecoBbuy').value), si=ecoFind(document.getElementById('ecoBsell').value);
+    var note='';
+    if(bi&&si&&bi.n===si.n){ var it=bi;
+      if(profit>0) note='<div class="eco-ok">⚠ 系统商店存在倒挂（回收价 '+ecoFmt(it.s)+' &gt; 买价 '+ecoFmt(it.b)+'），可直接在商店循环套利。</div>';
+      else note='<div class="eco-hint">同一物品在商店买进卖出是亏的（商店赚差价），套利主要发生在玩家市场。</div>';
+    }
+    if(bi&&bi.note&&bi.note.indexOf('限购')>=0){
+      note+='<div class="eco-hint">该物品 '+ecoEsc(bi.note)+'，满额度最大套利约 <b>'+ecoFmt(Math.max(0,profit)*((parseInt(bi.note.replace(/\D/g,'')||0,10))||0))+'</b> 金币。</div>';
+    }
+    document.getElementById('ecoBout').innerHTML='<div>单件利润：<b class="big eco-num '+(profit>=0?'eco-ok" style="color:':'')+(profit<0?'eco-warn" style="color:':'')+'\'>'+(profit>=0?'+':'')+ecoFmt(profit)+'</b> 金币　利润率：<b class="eco-num">'+(profit>=0?'+':'')+ecoFmt(margin)+'%</b></div>'
+      +'<div>共 '+ecoFmt(cnt)+' 件：总利润 <b class="eco-num">'+(profit>=0?'+':'')+ecoFmt(total)+'</b> 金币</div>'+note;
+  };
+  syncB();
+
+  /* ③ 全服经济模拟 */
+  var cGo=document.getElementById('ecoCgo');
+  if(cGo) cGo.onclick=function(){
+    var M=parseFloat(document.getElementById('ecoCM').value);
+    var dia=parseFloat(document.getElementById('ecoCDia').value)||14;
+    var P=parseFloat(document.getElementById('ecoCP').value)||0;
+    var D=parseFloat(document.getElementById('ecoCD').value)||0;
+    var T=parseFloat(document.getElementById('ecoCT').value)||0;
+    if(isNaN(M)||M<=0){ document.getElementById('ecoCout').innerHTML='<span class="eco-warn">请填写当前全服货币总量（这是推演的基准）。</span>'; return; }
+    var newGold=P*D*T*dia;
+    var infl=newGold/M*100;
+    var m2=M+newGold;
+    var newDia=dia/(1+infl/100);
+    var o='<div>新增注入金币：<b class="eco-num">'+ecoFmt(newGold)+'</b>（'+ecoFmt(P)+' 人 × 日产 '+ecoFmt(D)+' 钻 × '+ecoFmt(T)+' 天 × 回收 '+ecoFmt(dia)+'）</div>'
+      +'<div>货币总量：<b class="eco-num">'+ecoFmt(M)+'</b> → <b class="eco-num">'+ecoFmt(m2)+'</b>（+'+ecoFmt(infl)+'%）</div>'
+      +'<div>按简化货币模型，物价水平预计上涨约 <b class="eco-num">'+ecoFmt(infl)+'%</b>，钻石回收价或从 <b class="eco-num">'+ecoFmt(dia)+'</b> 跌至约 <b class="eco-num">'+ecoFmt(newDia)+'</b>。</div>'
+      +'<p class="eco-hint">模型假设：货币数量论（物价 ∝ 货币量），未计回收、限购与玩家囤积。此预测是经验估计，仅作经营参考。</p>';
+    document.getElementById('ecoCout').innerHTML=o;
+  };
+
+  /* ④ 时间性价比 */
+  var ecoTrows=[{name:'钻石',cnt:12},{name:'远古残骸',cnt:8},{name:'铁锭',cnt:40},{name:'橡木原木',cnt:256},{name:'小麦',cnt:384},{name:'生牛肉',cnt:200}];
+  function renderT(){
+    var o='<table class="eco-table"><thead><tr><th>项目</th><th class="num">每小时产出</th><th class="num">回收单价</th><th class="num">折合金币/时</th></tr></thead><tbody>';
+    var list=[];
+    for(var i=0;i<ecoTrows.length;i++){ var r=ecoTrows[i], it=ecoFind(r.name);
+      if(!it||it.s==null) continue;
+      list.push({name:it.n,cnt:r.cnt,g:r.cnt*it.s,it:it});
+    }
+    list.sort(function(a,b){ return b.g-a.g; });
+    for(var j=0;j<list.length;j++){ var x=list[j];
+      o+='<tr><td>'+ecoEsc(x.name)+'<span class="eco-tag">'+ecoEsc(x.it.c)+'</span></td><td class="num">'+ecoFmt(x.cnt)+'</td><td class="num">'+ecoFmt(x.it.s)+'</td><td class="num"><b>'+ecoFmt(x.g)+'</b></td></tr>';
+    }
+    o+='</tbody></table><p class="eco-hint">内置效率为经验估计：钻石 12/时、远古残骸 8/时、刷铁机 40 铁锭/时、伐木 256 原木/时、自动小麦田 384 小麦/时、养牛场 200 牛肉/时。加入你自己的数据做对比。</p>';
+    document.getElementById('ecoTout').innerHTML=o;
+  }
+  var tAdd=document.getElementById('ecoTadd');
+  if(tAdd) tAdd.onclick=function(){
+    var nm=document.getElementById('ecoTitem').value.trim();
+    var cnt=parseFloat(document.getElementById('ecoTcnt').value)||0;
+    if(!nm||cnt<=0) return;
+    ecoTrows.push({name:nm,cnt:cnt});
+    renderT();
+    document.getElementById('ecoTitem').value=''; document.getElementById('ecoTcnt').value='';
+  };
+  renderT();
+
+  /* ⑤ 通用计算器 */
+  function addCRow(){
+    var d=document.createElement('div');
+    d.className='eco-row';
+    d.innerHTML='<input class="eco-in" data-fname placeholder="物品名称"><input class="eco-in eco-num" data-fqty type="number" min="0" step="any" placeholder="数量"><input class="eco-in eco-num" data-fbuy type="number" min="0" step="any" placeholder="买入单价"><input class="eco-in eco-num" data-fsell type="number" min="0" step="any" placeholder="卖出单价">';
+    document.getElementById('ecoCrows').appendChild(d);
+  }
+  var cAdd=document.getElementById('ecoCadd');
+  if(cAdd) cAdd.onclick=addCRow;
+  var fGo=document.getElementById('ecoFgo');
+  if(fGo) fGo.onclick=function(){
+    var rows=document.getElementById('ecoCrows').querySelectorAll('.eco-row');
+    var det='<table class="eco-table"><thead><tr><th>物品</th><th class="num">数量</th><th class="num">买入单价</th><th class="num">卖出单价</th><th class="num">总价值</th><th class="num">利润</th></tr></thead><tbody>';
+    var total=0, profitSum=0, used=0;
+    for(var i=0;i<rows.length;i++){
+      var nm=rows[i].querySelector('[data-fname]').value.trim();
+      var qty=parseFloat(rows[i].querySelector('[data-fqty]').value)||0;
+      var buy=parseFloat(rows[i].querySelector('[data-fbuy]').value);
+      var sell=parseFloat(rows[i].querySelector('[data-fsell]').value);
+      if(!nm&&!qty&&isNaN(buy)&&isNaN(sell)) continue;
+      if(!nm){ nm='（未命名）'; }
+      if(qty<=0) continue;
+      used++;
+      var price=!isNaN(sell)?sell:(!isNaN(buy)?buy:0);
+      var val=qty*price;
+      var pf=(!isNaN(sell)&&!isNaN(buy))?(sell-buy)*qty:null;
+      total+=val; if(pf!=null) profitSum+=pf;
+      det+='<tr><td>'+ecoEsc(nm)+'</td><td class="num">'+ecoFmt(qty)+'</td><td class="num">'+ecoFmt(buy)+'</td><td class="num">'+ecoFmt(sell)+'</td><td class="num">'+ecoFmt(val)+'</td><td class="num">'+(pf==null?'—':(pf>=0?'+':'')+ecoFmt(pf))+'</td></tr>';
+    }
+    det+='</tbody></table>';
+    document.getElementById('ecoFout').innerHTML=(used?'<div>总价值：<b class="big eco-num">'+ecoFmt(total)+'</b>　利润合计：<b class="eco-num '+(profitSum>=0?'eco-ok':'eco-warn')+'">'+(profitSum>=0?'+':'')+ecoFmt(profitSum)+'</b></div>':'<p class="eco-hint">还没有填写数据。</p>')+det
+      +'<p class="eco-hint">没填卖出价时按买入单价计总价值；两者都填则额外算利润。不限物品，生活里算账也能用。</p>';
+  };
+
+  /* ⑥ 攒钱计划 */
+  var gGo=document.getElementById('ecoGgo');
+  if(gGo) gGo.onclick=function(){
+    var goal=parseFloat(document.getElementById('ecoGgoal').value);
+    var have=parseFloat(document.getElementById('ecoGhave').value)||0;
+    var day=parseFloat(document.getElementById('ecoGday').value)||0;
+    if(isNaN(goal)||goal<=0){ document.getElementById('ecoGout').innerHTML='<span class="eco-warn">请填写目标金额。</span>'; return; }
+    if(day<=0){ document.getElementById('ecoGout').innerHTML='<span class="eco-warn">请填写每日收入。</span>'; return; }
+    var need=Math.max(0,goal-have);
+    var days=Math.ceil(need/day);
+    var o='<div>还差 <b class="eco-num">'+ecoFmt(need)+'</b> 金币，按每日 <b class="eco-num">'+ecoFmt(day)+'</b> 收入，大约需要 <b class="big eco-num">'+ecoFmt(days)+'</b> 天</div>';
+    if(days>0&&days<3650) o+='<div>约 '+ecoFmt(Math.round(days/30))+' 个月 / '+ecoFmt((days/365).toFixed(1))+' 年。</div>';
+    if(need<=0) o+='<div class="eco-ok">金币已经够了，直接买！</div>';
+    o+='<p class="eco-hint">收入参考：把「时间性价比」里每小时产出 × 你的游戏时长就是日收入；也可以直接用你自己的实际日收入。</p>';
+    document.getElementById('ecoGout').innerHTML=o;
+  };
+
+  /* ⑦ 自定义物价库 */
+  function renderUList(){
+    var box=document.getElementById('ecoUlist');
+    if(!box) return;
+    if(!ECO_USER.length){ box.innerHTML='<p class="eco-hint" style="margin:0;">还没有自定义物品。添加后即可在所有计算器里使用。</p>'; return; }
+    var o='<table class="eco-table"><thead><tr><th>物品</th><th class="num">买价</th><th class="num">回收/卖出价</th><th>备注</th><th></th></tr></thead><tbody>';
+    for(var i=0;i<ECO_USER.length;i++){ var u=ECO_USER[i];
+      o+='<tr><td>'+ecoEsc(u.n)+'<span class="eco-tag">自定义</span></td><td class="num">'+ecoFmt(u.b)+'</td><td class="num">'+ecoFmt(u.s)+'</td><td>'+ecoEsc(u.note||'')+'</td><td><button class="eco-btn" data-udel="'+i+'" style="padding:3px 10px;font-size:12px;">删除</button></td></tr>';
+    }
+    o+='</tbody></table><p class="eco-hint">自定义价格保存在本机浏览器（localStorage），换设备或清缓存后会丢失。</p>';
+    box.innerHTML=o;
+    var dels=box.querySelectorAll('[data-udel]');
+    for(var j=0;j<dels.length;j++){ dels[j].onclick=function(){ ECO_USER.splice(parseInt(this.getAttribute('data-udel'),10),1); ecoSaveUser(); renderUList(); }; }
+  }
+  var uAdd=document.getElementById('ecoUadd');
+  if(uAdd) uAdd.onclick=function(){
+    var nm=document.getElementById('ecoUname').value.trim();
+    var s=parseFloat(document.getElementById('ecoUsell').value);
+    if(!nm||isNaN(s)||s<0){ document.getElementById('ecoUlist').innerHTML='<span class="eco-warn">名称和回收/卖出价必填。</span>'; return; }
+    var b=parseFloat(document.getElementById('ecoUbuy').value);
+    ECO_USER.push({n:nm,b:isNaN(b)?null:b,s:s,note:document.getElementById('ecoUnote').value.trim()||''});
+    ecoSaveUser();
+    document.getElementById('ecoUname').value=''; document.getElementById('ecoUbuy').value=''; document.getElementById('ecoUsell').value=''; document.getElementById('ecoUnote').value='';
+    renderUList();
+  };
+  renderUList();
+
+  /* 重置 */
+  var rU=document.getElementById('ecoResetU'), rA=document.getElementById('ecoResetAll');
+  if(rU) rU.onclick=function(){
+    if(ECO_USER.length&&!confirm('确定清空你的自定义物价库吗？')) return;
+    ECO_USER=[]; ecoSaveUser(); renderEcoUI();
+  };
+  if(rA) rA.onclick=function(){
+    if(!confirm('确定全部重置吗？将清空自定义物价并恢复所有输入为初始状态。')) return;
+    ECO_USER=[]; ecoSaveUser(); renderEcoUI();
+  };
+
+  /* （经济模拟器为双栏布局，无节点切换） */
+
+  /* ⑧ 单位换算 */
+  var ucGo=document.getElementById('ecoUcGo');
+  if(ucGo) ucGo.onclick=function(){
+    var p=parseFloat(document.getElementById('ecoUcP').value);
+    var c=parseFloat(document.getElementById('ecoUcC').value)||0;
+    var g=parseFloat(document.getElementById('ecoUcG').value)||0;
+    var b=document.getElementById('ecoUcB').value;
+    var o='';
+    if(!isNaN(p)&&p>=0&&(c>0||g>0)){
+      var total=p*(c+g*64);
+      var units=c+g*64;
+      o+='<p class="eco-strong">总价：<b>'+ecoFmt(total)+' 金币</b></p>'
+        +'<p class="eco-hint" style="margin-top:4px;">合计 '+units.toLocaleString('zh-CN')+' 个（约 '+ecoFmt(units/64)+' 组）；按系统回收价，卖商店可得 <b>'+ecoFmt(total*0.7)+'</b> 金币（回收折价 30%）。</p>';
+    }
+    if(!isNaN(p)&&p>0&&b!==''){
+      var bv=parseFloat(b);
+      if(!isNaN(bv)&&bv>=0){
+        var q=Math.floor(bv/p);
+        o+='<p class="eco-strong" style="margin-top:8px;">预算 '+ecoFmt(bv)+' 金币可买：<b>'+q.toLocaleString('zh-CN')+' 个</b>（约 '+ecoFmt(q/64)+' 组）</p>';
+      }
+    }
+    document.getElementById('ecoUcOut').innerHTML=o||'<span class="eco-warn">请填写物品单价，并填数量或预算。</span>';
+  };
+
+  /* ⑨ 购买力对比 */
+  var pGo=document.getElementById('ecoPGo');
+  if(pGo) pGo.onclick=function(){
+    var b=parseFloat(document.getElementById('ecoPB').value);
+    var a=parseFloat(document.getElementById('ecoPA').value);
+    var bb=parseFloat(document.getElementById('ecoPBB').value);
+    var box=document.getElementById('ecoPOut');
+    if(isNaN(b)||b<0||isNaN(a)||a<=0||isNaN(bb)||bb<=0){ box.innerHTML='<span class="eco-warn">请填写预算和 A / B 两个单价（单价需大于 0）。</span>'; return; }
+    var qa=Math.floor(b/a), qb=Math.floor(b/bb);
+    var o='<table class="eco-table"><thead><tr><th></th><th class="num">单价</th><th class="num">预算可买（个）</th><th class="num">约（组）</th></tr></thead><tbody>'
+      +'<tr><td>物品 A</td><td class="num">'+ecoFmt(a)+'</td><td class="num">'+qa.toLocaleString('zh-CN')+'</td><td class="num">'+ecoFmt(qa/64)+'</td></tr>'
+      +'<tr><td>物品 B</td><td class="num">'+ecoFmt(bb)+'</td><td class="num">'+qb.toLocaleString('zh-CN')+'</td><td class="num">'+ecoFmt(qb/64)+'</td></tr>'
+      +'</tbody></table>';
+    if(qa>qb) o+='<p class="eco-strong">同样 '+ecoFmt(b)+' 金币，买 A 比买 B 多 <b>'+(qa-qb).toLocaleString('zh-CN')+' 个</b>。</p>';
+    else if(qb>qa) o+='<p class="eco-strong">同样 '+ecoFmt(b)+' 金币，买 B 比买 A 多 <b>'+(qb-qa).toLocaleString('zh-CN')+' 个</b>。</p>';
+    else o+='<p class="eco-hint">同样 '+ecoFmt(b)+' 金币，A / B 买到的数量一样。</p>';
+    box.innerHTML=o;
+  };
+}
 
 </script>
 
@@ -3765,9 +4462,11 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
   <div class="vote-tabs" id="toolsTabs">
 
-    <button class="on" data-tmode="items">禁用物品</button>
+    <button class="on" data-tmode="items"><b>禁用物品</b><span>查物品是否被禁</span></button>
 
-    <button data-tmode="tasks">任务查询</button>
+    <button data-tmode="tasks"><b>任务查询</b><span>查任务详情</span></button>
+
+    <button data-tmode="eco"><b>经济模拟器</b><span>资产/套利/物价</span></button>
 
   </div>
 
@@ -4080,6 +4779,8 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <button class="admin-tab" data-tab="vote">投票管理</button>
 
+<button class="admin-tab" data-tab="stats">访问统计</button>
+
 </div>
 
 <div class="admin-pane active" id="paneNotice">
@@ -4255,6 +4956,52 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 </div>
 
 <div id="voteAdminList" style="margin-top:14px;"></div>
+
+</div>
+
+<div class="admin-pane" id="paneStats">
+
+<div class="card">
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+
+<div style="flex:1;min-width:110px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;" id="stTodayPv">-</div><div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">今日访问(PV)</div></div>
+
+<div style="flex:1;min-width:110px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;" id="stTodayUv">-</div><div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">今日访客(UV)</div></div>
+
+<div style="flex:1;min-width:110px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;" id="stTotalPv">-</div><div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">累计访问</div></div>
+
+<div style="flex:1;min-width:110px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;" id="stTotalUv">-</div><div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">累计访客</div></div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div style="font-weight:600;margin-bottom:10px;">近14天访问趋势</div>
+
+<div id="stTrend" style="display:flex;align-items:flex-end;gap:6px;height:130px;overflow-x:auto;"></div>
+
+</div>
+
+<div class="card">
+
+<div style="font-weight:600;margin-bottom:10px;">热门页面 Top10</div>
+
+<div id="stPages" style="font-size:13px;"></div>
+
+</div>
+
+<div class="card">
+
+<div style="font-weight:600;margin-bottom:10px;">设备占比</div>
+
+<div id="stDevices" style="font-size:13px;"></div>
+
+</div>
+
+<div class="hint" style="font-size:12px;color:var(--text-secondary);margin-top:6px;">统计自启用起记录：每次打开官网（PC/手机端）自动上报一次访问，同一设备每天最多计一次访客(UV)。</div>
 
 </div>
 
@@ -7754,6 +8501,8 @@ $('#adminLoginBtn').onclick=async()=>{
 
     sessionStorage.setItem('tst_admin_token',ADMIN_TOKEN);
 
+    sessionStorage.setItem('tst_admin_pw',pwd);
+
     showToast('登录成功');
 
     showAdminPanel();
@@ -7779,6 +8528,88 @@ function showAdminPanel(){
   $('#adminPanel').style.display='block';
 
   refreshAdminLists();
+
+  loadStats();
+
+}
+
+async function loadStats(){
+
+  const pw = sessionStorage.getItem('tst_admin_pw');
+
+  if(!pw){ return; }
+
+  const el = $('#paneStats');
+
+  try{
+
+    const r = await fetch('https://theslowtidefk.pages.dev/api/stats', { headers:{'x-admin-pw':pw} });
+
+    const d = await r.json();
+
+    if(!d.ok){ if(el) el.innerHTML='<div class="card"><div style="color:var(--text-secondary);font-size:13px;">统计加载失败：'+(d.error||'未知错误')+'</div></div>'; return; }
+
+    $('#stTodayPv').textContent = d.today_pv;
+
+    $('#stTodayUv').textContent = d.today_uv;
+
+    $('#stTotalPv').textContent = d.total_pv;
+
+    $('#stTotalUv').textContent = d.total_uv;
+
+    const tv = d.trend || [];
+
+    const max = Math.max(1, ...tv.map(x=>x.pv));
+
+    $('#stTrend').innerHTML = tv.map(x=>{
+
+      const h = Math.max(2, Math.round(x.pv/max*100));
+
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;">'
+
+        + '<div style="width:100%;background:var(--accent);opacity:.85;border-radius:4px 4px 0 0;height:'+h+'px;" title="'+x.vdate+' PV:'+x.pv+' UV:'+x.uv+'"></div>'
+
+        + '<div style="font-size:10px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">'+String(x.vdate).slice(5)+'</div>'
+
+        + '<div style="font-size:10px;color:var(--text-secondary);">'+x.pv+'</div></div>';
+
+    }).join('') || '<span style="font-size:12px;color:var(--text-secondary);">暂无数据</span>';
+
+    const pg = d.pages || [];
+
+    $('#stPages').innerHTML = pg.map((x,i)=>{
+
+      return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--border);">'
+
+        + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">'+(i+1)+'. '+esc(x.path)+'</span>'
+
+        + '<span style="color:var(--text-secondary);">'+x.n+' 次</span></div>';
+
+    }).join('') || '<span style="font-size:12px;color:var(--text-secondary);">暂无数据</span>';
+
+    const dv = d.devices || [];
+
+    const totalDev = dv.reduce((s,x)=>s+x.n,0) || 1;
+
+    $('#stDevices').innerHTML = dv.map(x=>{
+
+      const w = Math.round(x.n/totalDev*100);
+
+      return '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;">'
+
+        + '<span style="width:70px;">'+(x.t==='mobile'?'手机':'电脑')+'</span>'
+
+        + '<div style="flex:1;height:10px;background:var(--bg-secondary);border-radius:5px;overflow:hidden;"><div style="width:'+w+'%;height:100%;background:var(--accent);"></div></div>'
+
+        + '<span>'+w+'%</span></div>';
+
+    }).join('') || '<span style="font-size:12px;color:var(--text-secondary);">暂无数据</span>';
+
+  }catch(e){
+
+    if(el) el.innerHTML='<div class="card"><div style="color:var(--text-secondary);font-size:13px;">统计服务暂时不可用，请稍后重试。</div></div>';
+
+  }
 
 }
 
@@ -13741,6 +14572,30 @@ window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
   }
 
 })();
+
+</script>
+
+<script>
+
+// ===== 访问量统计上报（每次打开页面记一次 PV）=====
+
+(function(){try{
+
+  var dev=localStorage.getItem('tst_dev_id');
+
+  if(!dev){dev='d'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('tst_dev_id',dev);}
+
+  var p=(location.pathname.split('/').pop()||'/');
+
+  if(location.hash)p+=location.hash;
+
+  var payload=JSON.stringify({path:String(p).slice(0,200),ref:String(document.referrer||'').slice(0,300),device_id:dev,ua:String(navigator.userAgent||'').slice(0,300)});
+
+  if(navigator.sendBeacon){navigator.sendBeacon('https://theslowtidefk.pages.dev/api/visit',new Blob([payload],{type:'application/json'}));}
+
+  else{var x=new XMLHttpRequest();x.open('POST','https://theslowtidefk.pages.dev/api/visit',true);x.setRequestHeader('Content-Type','application/json');x.send(payload);}
+
+}catch(e){}}());
 
 </script>
 
