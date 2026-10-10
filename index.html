@@ -1559,6 +1559,13 @@ background:var(--bg);color:var(--text);font-size:14px;outline:none;font-family:i
 
 .admin-tab.active{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;}
 
+.post-intro{font-size:13px;color:var(--text-secondary);margin-bottom:12px;line-height:1.7;}
+.post-bar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.post-msg{font-size:13px;color:var(--text-secondary);margin-left:10px;}
+.post-tags{display:inline-block;font-size:12px;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:1px 8px;margin-right:6px;}
+.post-pin{display:inline-block;font-size:12px;color:#fff;background:var(--accent);border-radius:4px;padding:1px 8px;margin-right:6px;}
+.post-pcard{word-break:break-word;}
+
 .admin-pane{display:none;}
 
 .admin-pane.active{display:block;}
@@ -3765,6 +3772,8 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <button class="nav-link" data-nav="activity">活动</button>
 
+<button class="nav-link" data-nav="post">发帖</button>
+
 <button class="nav-link" data-nav="vote">投票</button>
 
 <a class="nav-link" href="tool.html">便捷工具</a>
@@ -4213,6 +4222,27 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 </section>
 
 
+
+<!-- 玩家发帖 -->
+<section id="post" class="page">
+<div class="container">
+<div class="section-title">玩家发帖</div>
+<div class="card" style="margin-bottom:14px;">
+<div class="post-intro">发帖功能内测中 · 需要卡密才能发布（卡密由管理员发放）。帖子会显示你填写的游戏昵称，支持点赞与评论。</div>
+<div class="form-row"><label>游戏昵称</label><input type="text" id="poName" maxlength="24" placeholder="你的游戏名称"></div>
+<div class="form-row"><label>内容</label><textarea id="poContent" maxlength="500" placeholder="分享你的服务器见闻、建筑、红石作品…" style="min-height:90px;"></textarea></div>
+<div class="form-row"><label>标签（可选）</label><input type="text" id="poTags" maxlength="60" placeholder="如 建筑 / 红石 / 活动"></div>
+<div class="form-row"><label>卡密</label><input type="text" id="poCard" maxlength="20" placeholder="TSTP-XXXXXXXXXX"></div>
+<div class="form-row"><button class="btn btn-primary" id="poSendBtn">发布帖子</button><span id="poMsg" class="post-msg"></span></div>
+</div>
+<div class="post-bar">
+<button class="btn" id="poSortNew">最新</button>
+<button class="btn" id="poSortHot">热门</button>
+<span id="poCount" class="post-msg"></span>
+</div>
+<div id="postList"></div>
+</div>
+</section>
 
 <!-- 活动 -->
 
@@ -4779,6 +4809,8 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <button class="admin-tab" data-tab="vote">投票管理</button>
 
+<button class="admin-tab" data-tab="post">发帖管理</button>
+
 <button class="admin-tab" data-tab="stats">访问统计</button>
 
 </div>
@@ -4956,6 +4988,22 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 </div>
 
 <div id="voteAdminList" style="margin-top:14px;"></div>
+
+</div>
+
+<div class="admin-pane" id="panePost">
+
+<div class="card">
+
+<div class="form-row"><label>生成内测卡密</label><input type="number" id="pcGenCount" value="5" min="1" max="50" style="width:80px;"><button class="btn btn-primary" id="pcGenBtn">生成</button></div>
+
+<div class="hint" style="font-size:12px;color:var(--text-secondary);margin-top:6px;">每张卡密只能发布一条帖子，发布后自动核销；重置可恢复为未使用。</div>
+
+</div>
+
+<div id="pcCardList" style="margin-top:14px;"></div>
+
+<div id="pcPostList" style="margin-top:14px;"></div>
 
 </div>
 
@@ -6845,7 +6893,7 @@ function switchPage(pid){
 
   const _nm=document.getElementById('navMore');if(_nm)_nm.classList.remove('open');
 
-  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',chat:'聊天室 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
+  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',post:'发帖 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',chat:'聊天室 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
 
   document.title=TITLES[pid]||'The Slow Tide 官网';
 
@@ -14599,7 +14647,203 @@ window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
 
 </script>
 
+<script>
+// ===== 玩家发帖（PC · 内测卡密，数据存储于反馈站 D1）=====
+(function(){
+  const POST_API='https://theslowtidefk.pages.dev/api/posts';
+  function pDev(){
+    var d=localStorage.getItem('tst_dev_id');
+    if(!d){d='d'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('tst_dev_id',d);}
+    return d;
+  }
+  function pTime(ts){
+    if(!ts) return '';
+    var d=new Date(String(ts).replace(' ','T'));
+    if(isNaN(d.getTime())) return String(ts);
+    function p(n){return n<10?'0'+n:''+n;}
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+  }
+  function pLink(t){return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">$1</a>');}
+  var poSort='new';
+  async function loadPosts(){
+    const box=document.getElementById('postList'); if(!box) return;
+    box.innerHTML='<p class="post-msg" style="padding:10px 0;">加载中…</p>';
+    try{
+      const r=await fetch(POST_API+'/list?sort='+poSort+'&dev='+encodeURIComponent(pDev()),{cache:'no-store'});
+      const d=await r.json();
+      const posts=(d&&d.posts)||[];
+      const cnt=document.getElementById('poCount'); if(cnt) cnt.textContent='共 '+posts.length+' 条帖子';
+      if(!posts.length){ box.innerHTML='<p class="post-msg" style="padding:10px 0;">还没有帖子，来发第一条吧</p>'; return; }
+      box.innerHTML=posts.map(function(p){
+        const tags=p.tags?'<span class="post-tags">'+esc(p.tags)+'</span>':'';
+        const pin=p.pinned?'<span class="post-pin">置顶</span>':'';
+        return '<div class="card post-pcard" style="margin-bottom:12px;" data-pid="'+p.id+'">'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;"><b>'+esc(p.name)+'</b><span style="font-size:12px;color:var(--text-secondary);">'+pin+pTime(p.created_at)+'</span></div>'+
+          '<div style="white-space:pre-wrap;word-break:break-word;line-height:1.7;">'+pLink(p.content)+'</div>'+
+          (tags?'<div style="margin-top:8px;">'+tags+'</div>':'')+
+          '<div style="display:flex;gap:10px;margin-top:12px;font-size:13px;">'+
+          '<button class="btn" data-act="like" '+(p.liked?'style="color:var(--accent);"':'')+'>赞 '+p.likes+'</button>'+
+          '<button class="btn" data-act="cm">评论 '+p.comments+'</button>'+
+          '</div>'+
+          '<div class="post-cm" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"></div>'+
+          '</div>';
+      }).join('');
+      box.querySelectorAll('[data-act="like"]').forEach(b=>{ b.onclick=function(){ doLike(b); }; });
+      box.querySelectorAll('[data-act="cm"]').forEach(b=>{ b.onclick=function(){ toggleCm(b); }; });
+    }catch(e){ box.innerHTML='<p class="post-msg" style="padding:10px 0;color:var(--danger);">加载失败，请稍后重试</p>'; }
+  }
+  async function doLike(btn){
+    const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
+    try{
+      const r=await fetch(POST_API+'/like',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({post_id:Number(pid),dev:pDev()})});
+      const d=await r.json();
+      if(d&&d.ok){ btn.textContent='赞 '+d.likes; btn.style.color='var(--accent)'; }
+      else if(d&&d.error==='already_liked'){ btn.style.color='var(--accent)'; showToast('你已经赞过这条帖子了'); }
+      else showToast('点赞失败');
+    }catch(e){ showToast('网络异常，请稍后再试'); }
+  }
+  async function toggleCm(btn){
+    const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
+    const box=card.querySelector('.post-cm');
+    if(box.style.display!=='none'){ box.style.display='none'; return; }
+    box.style.display='block';
+    box.innerHTML='<p class="post-msg">加载评论…</p>';
+    try{
+      const r=await fetch(POST_API+'/comments?post_id='+pid,{cache:'no-store'});
+      const d=await r.json();
+      const cs=(d&&d.comments)||[];
+      box.innerHTML=cs.map(function(c){return '<div style="margin-bottom:8px;"><b>'+esc(c.name)+'</b> <span style="font-size:12px;color:var(--text-secondary);">'+pTime(c.created_at)+'</span><div style="font-size:14px;margin-top:2px;">'+pLink(c.content)+'</div></div>';}).join('')+
+        '<div style="display:flex;gap:6px;margin-top:10px;"><input id="cmName_'+pid+'" maxlength="24" placeholder="昵称" style="flex:0 0 90px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary);color:var(--text);"><input id="cmTxt_'+pid+'" maxlength="200" placeholder="写评论…" style="flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary);color:var(--text);"><button class="btn" data-act="send">发送</button></div>';
+      const sb=box.querySelector('[data-act="send"]');
+      sb.onclick=async function(){
+        const nm=document.getElementById('cmName_'+pid).value.trim()||'匿名玩家';
+        const tx=document.getElementById('cmTxt_'+pid).value.trim();
+        if(!tx){ showToast('评论不能为空'); return; }
+        try{
+          const r2=await fetch(POST_API+'/comment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({post_id:Number(pid),name:nm,content:tx})});
+          const d2=await r2.json();
+          if(d2&&d2.ok){ btn.textContent='评论 '+d2.comments; toggleCm(btn); }
+          else if(d2&&d2.error==='rate') showToast('操作太快，请稍后再试');
+          else showToast('评论失败');
+        }catch(e){ showToast('网络异常'); }
+      };
+    }catch(e){ box.innerHTML='<p class="post-msg">评论加载失败</p>'; }
+  }
+  async function sendPost(){
+    const name=document.getElementById('poName').value.trim();
+    const content=document.getElementById('poContent').value.trim();
+    const tags=document.getElementById('poTags').value.trim();
+    const card=document.getElementById('poCard').value.trim().toUpperCase();
+    const msg=document.getElementById('poMsg');
+    if(!name){ msg.textContent='请填写游戏昵称'; return; }
+    if(!content){ msg.textContent='请填写内容'; return; }
+    if(!card){ msg.textContent='请填写卡密（内测阶段需要）'; return; }
+    try{
+      const r=await fetch(POST_API+'/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,content:content,tags:tags,card:card,dev:pDev()})});
+      const d=await r.json();
+      if(d&&d.ok){ msg.textContent='发布成功！'; document.getElementById('poName').value=''; document.getElementById('poContent').value=''; document.getElementById('poTags').value=''; document.getElementById('poCard').value=''; loadPosts(); }
+      else if(d&&d.error==='card_invalid'){ msg.textContent=d.msg||'卡密无效'; }
+      else if(d&&d.error==='card_used'){ msg.textContent=d.msg||'卡密已被使用'; }
+      else msg.textContent='发布失败：'+((d&&d.error)||'未知错误');
+    }catch(e){ msg.textContent='网络异常，请稍后重试'; }
+  }
+  function initPost(){
+    const s=document.getElementById('poSendBtn'); if(!s) return;
+    if(s._b) return; s._b=true;
+    s.onclick=sendPost;
+    document.getElementById('poSortNew').onclick=function(){ poSort='new'; this.classList.add('active'); document.getElementById('poSortHot').classList.remove('active'); loadPosts(); };
+    document.getElementById('poSortHot').onclick=function(){ poSort='hot'; this.classList.add('active'); document.getElementById('poSortNew').classList.remove('active'); loadPosts(); };
+    loadPosts();
+  }
+  document.querySelectorAll('.nav-link').forEach(function(b){
+    if(b.dataset.nav==='post') b.addEventListener('click',function(){ setTimeout(initPost,60); });
+  });
+  window.__loadPost=loadPosts;
+})();
+</script>
 
+<script>
+// ===== 发帖管理（管理员：卡密生成/管理 + 帖子管理）=====
+(function(){
+  const POST_API='https://theslowtidefk.pages.dev/api/posts';
+  function pcPwd(){
+    return prompt('请输入反馈站管理员口令（用于发帖管理操作）')||'';
+  }
+  async function pcAdmin(action,payload){
+    const pwd=pcPwd();
+    if(!pwd) return null;
+    try{
+      const r=await fetch(POST_API+'/cards_admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({pw:pwd,action:action},payload||{}))});
+      return await r.json();
+    }catch(e){ return {error:'net'}; }
+  }
+  async function pAdmin(action,payload){
+    const pwd=pcPwd();
+    if(!pwd) return null;
+    try{
+      const r=await fetch(POST_API+'/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({pw:pwd,action:action},payload||{}))});
+      return await r.json();
+    }catch(e){ return {error:'net'}; }
+  }
+  function pTime(ts){
+    if(!ts) return '';
+    var d=new Date(String(ts).replace(' ','T'));
+    if(isNaN(d.getTime())) return String(ts);
+    function p(n){return n<10?'0'+n:''+n;}
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+  }
+  async function loadPostAdmin(){
+    const box=document.getElementById('pcCardList'); if(!box) return;
+    box.innerHTML='<p class="post-msg">加载卡密…</p>';
+    const d=await pcAdmin('list');
+    if(!d||d.error){ box.innerHTML='<p class="post-msg" style="color:var(--danger);">加载失败，请重试</p>'; return; }
+    const cards=d.cards||[];
+    box.innerHTML='<div class="card"><div class="form-row"><label>内测卡密列表（共 '+cards.length+' 张）</label></div><div style="max-height:240px;overflow:auto;">'+
+      (cards.map(function(c){
+        return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;flex-wrap:wrap;"><code style="flex:0 0 auto;">'+esc(c.card)+'</code><span style="flex:1;color:'+(c.used?'var(--danger)':'var(--text-secondary)')+';">'+(c.used?'已使用'+(c.post_id?' · #'+c.post_id:'')+(c.used_at?' · '+esc(c.used_at):''):'未使用')+'</span>'+
+        (c.used?'<button class="btn" data-ca="reset" data-id="'+c.id+'">重置</button>':'<button class="btn" data-ca="del" data-id="'+c.id+'">删除</button>')+
+        '</div>';
+      }).join('')||'<p class="empty-hint">暂无卡密，先在上方生成</p>')+'</div></div>';
+    box.querySelectorAll('[data-ca]').forEach(function(b){
+      b.onclick=async function(){
+        const id=b.getAttribute('data-id'); const act=b.getAttribute('data-ca');
+        const r=await pcAdmin(act,{id:Number(id)});
+        if(r&&r.ok) showToast(act==='reset'?'已重置为未使用':'已删除'); else showToast('操作失败');
+        loadPostAdmin();
+      };
+    });
+    const pbox=document.getElementById('pcPostList');
+    pbox.innerHTML='<p class="post-msg">加载帖子…</p>';
+    try{
+      const rr=await fetch(POST_API+'/list?sort=new&dev='+encodeURIComponent((localStorage.getItem('tst_dev_id')||'admin')),{cache:'no-store'});
+      const dd=await rr.json();
+      const posts=(dd&&dd.posts)||[];
+      pbox.innerHTML='<div class="card"><div class="form-row"><label>帖子管理（共 '+posts.length+' 条）</label></div>'+
+        (posts.map(function(p){
+          return '<div style="padding:8px 0;border-bottom:1px solid var(--border);"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;"><b>'+esc(p.name)+'</b><span style="font-size:12px;color:var(--text-secondary);">'+(p.pinned?'置顶 · ':'')+pTime(p.created_at)+' · 赞 '+p.likes+' · 评 '+p.comments+'</span></div><div style="font-size:13px;color:var(--text-secondary);margin:4px 0;">'+esc(String(p.content).slice(0,80))+'</div><div style="display:flex;gap:8px;"><button class="btn" data-pa="pin" data-id="'+p.id+'">'+(p.pinned?'取消置顶':'置顶')+'</button><button class="btn" data-pa="del" data-id="'+p.id+'">删除</button></div></div>';
+        }).join('')||'<p class="empty-hint">暂无帖子</p>')+'</div>';
+      pbox.querySelectorAll('[data-pa]').forEach(function(b){
+        b.onclick=async function(){
+          const id=b.getAttribute('data-id'); const act=b.getAttribute('data-pa');
+          const r=await pAdmin(act,{id:Number(id)});
+          if(r&&r.ok) showToast(act==='pin'?'置顶已切换':'已删除'); else showToast('操作失败');
+          loadPostAdmin();
+        };
+      });
+    }catch(e){ pbox.innerHTML='<p class="post-msg" style="color:var(--danger);">帖子加载失败</p>'; }
+  }
+  document.querySelectorAll('.admin-tab').forEach(function(t){
+    if(t.dataset.tab==='post') t.addEventListener('click',function(){ setTimeout(loadPostAdmin,80); });
+  });
+  var genBtn=document.getElementById('pcGenBtn');
+  if(genBtn) genBtn.onclick=async function(){
+    const cnt=Math.max(1,Math.min(50,Number(document.getElementById('pcGenCount').value)||5));
+    const d=await pcAdmin('gen',{count:cnt});
+    if(d&&d.ok&&d.cards){ showToast('已生成 '+d.cards.length+' 张卡密'); loadPostAdmin(); }
+    else showToast('生成失败');
+  };
+})();
+</script>
 
 </body>
 
