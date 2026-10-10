@@ -195,6 +195,11 @@ export async function onRequest(context) {
     return proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request);
   }
 
+  // 玩家自由发帖（内测·卡密）转发到 TSTFK
+  if (path.startsWith('/api/posts')) {
+    return proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request);
+  }
+
   // 聊天桥 + 服务器状态转发到 TSTFK
   if (path.startsWith('/api/chat') || path.startsWith('/api/server-status')) {
     return proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request);
