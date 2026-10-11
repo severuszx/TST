@@ -917,6 +917,9 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 .eco-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px;}
 .eco-grid label{display:block;font-size:12.5px;color:var(--text-secondary);margin-bottom:5px;}
 .eco-in,.eco-sel{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:13.5px;transition:border-color .2s,background .2s;}
+.ma-pal-chk{display:flex;flex-wrap:wrap;gap:4px 12px;padding:6px 2px;}
+.ma-chk{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--text);cursor:pointer;}
+.ma-chk input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;}
 .eco-in:hover,.eco-sel:hover{border-color:var(--accent);}
 .eco-in:focus,.eco-sel:focus{outline:none;border-color:var(--accent);}
 .eco-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
@@ -932,6 +935,8 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 .ma-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 14px;margin-top:12px;}
 .ma-grid .mg-item{font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:7px;min-width:0;}
 .ma-grid .mg-swatch{width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.25);flex:none;}
+.b64-prev{margin-top:10px;}
+.b64-prev img{max-width:100%;max-height:240px;border-radius:8px;border:1px solid var(--border);display:block;}
 </style>
 </head>
 <body>
@@ -966,9 +971,17 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <h3>T显编译器</h3>
 <p>生成 Minecraft JSON 文本，支持文本 / 选择器 / 记分板 / 翻译键元素。</p>
 </div>
+<div class="tool-card" onclick="openJson()">
+<h3>JSON 工具</h3>
+<p>格式化 · 压缩 · 转义 · 反转义，快速处理 JSON 文本。</p>
+</div>
 <div class="tool-card" onclick="openMapArt()">
 <h3>地图画生成器</h3>
 <p>图片转方块指令（fill / setblock），在游戏内一键铺出地图画。</p>
+</div>
+<div class="tool-card" onclick="openB64()">
+<h3>Base64 工具</h3>
+<p>图片 ⇄ Base64 互转，压缩图片为字符串，或把字符串还原为图片。</p>
 </div>
 </div>
 </div>
@@ -1010,6 +1023,39 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 </div>
 </div>
 
+<!-- JSON 工具 -->
+<div id="jsonPage" class="compiler-wrap">
+<button class="btn back-btn" onclick="backToList()">← 返回工具列表</button>
+<div class="section-title">JSON 工具</div>
+<div class="compiler-grid">
+<div class="card">
+<h3>输入</h3>
+<div class="form-row">
+<label>JSON 文本</label>
+<textarea id="jsonIn" style="min-height:180px;" placeholder="粘贴 JSON 文本"></textarea>
+</div>
+<div class="btn-row">
+<button class="btn btn-primary" onclick="jTool(1)">格式化</button>
+<button class="btn" onclick="jTool(2)">压缩</button>
+<button class="btn" onclick="jTool(3)">转义</button>
+<button class="btn" onclick="jTool(4)">反转义</button>
+</div>
+</div>
+<div class="card">
+<h3>输出</h3>
+<div class="form-row">
+<label>结果</label>
+<textarea id="jsonOut" style="min-height:180px;" placeholder="结果将显示在这里"></textarea>
+</div>
+<div class="btn-row">
+<button class="btn btn-primary" onclick="copyJson()">复制结果</button>
+<button class="btn" onclick="document.getElementById('jsonIn').value='';document.getElementById('jsonOut').value='';">清空</button>
+</div>
+<div class="hint" id="jsonHint">格式化：美化排版；压缩：去除空白；转义/反转义：处理引号与换行。</div>
+</div>
+</div>
+</div>
+
 <!-- 地图画生成器 -->
 <div id="mapartPage" class="compiler-wrap">
 <button class="btn back-btn" onclick="backToList()">← 返回工具列表</button>
@@ -1020,16 +1066,53 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <div class="eco-grid"><div><label>宽度（方块数）</label><input class="eco-in" id="maW" type="number" value="64" min="16" max="256"></div>
 <div><label>朝向</label><select class="eco-sel" id="maFace"><option value="xy">地面（平面铺开）</option><option value="xz">墙面（竖直挂起）</option></select></div></div>
 <div class="eco-grid" style="grid-template-columns:repeat(3,1fr);"><div><label>起点 X</label><input class="eco-in" id="maX" type="number" value="0"></div><div><label>起点 Y</label><input class="eco-in" id="maY" type="number" value="64"></div><div><label>起点 Z</label><input class="eco-in" id="maZ" type="number" value="0"></div></div>
-<div class="eco-grid"><div><label>输出方式</label><select class="eco-sel" id="maMode"><option value="fill">合并 fill（命令少）</option><option value="setblock">逐格 setblock</option></select></div></div>
-<div class="eco-row"><button class="eco-btn primary" id="maGenBtn">生成地图画指令</button><button class="eco-btn" id="maClearBtn">清空</button></div>
-<p class="eco-sub">图片只在本地浏览器处理，不会上传服务器；颜色映射网易基岩版羊毛 16 色，高度按图片比例自动计算。</p>
+<div class="eco-grid">
+<div><label>方块类型（可多选 / 全选）</label><div class="ma-pal-chk"><label class="ma-chk"><input type="checkbox" id="maPk-wool" checked> 羊毛 16 色</label><label class="ma-chk"><input type="checkbox" id="maPk-concrete"> 混凝土 16 色</label><label class="ma-chk"><input type="checkbox" id="maPk-terracotta"> 陶瓦 16 色</label><label class="ma-chk"><input type="checkbox" id="maPk-glass"> 染色玻璃 16 色</label></div></div>
+<div><label>抖动算法</label><select class="eco-sel" id="maDither"><option value="none">无（最近色）</option><option value="fs">Floyd-Steinberg</option><option value="atk">Atkinson</option><option value="bayer">有序抖动 Bayer 4×4</option></select></div>
+<div><label>透明像素</label><select class="eco-sel" id="maAlpha"><option value="keep">按原色填充</option><option value="fill">填透明方块</option></select></div>
+<div><label>透明方块 ID</label><input class="eco-in" id="maAirId" value="minecraft:air"></div>
+</div>
+<div class="eco-grid">
+<div><label>输出方式</label><select class="eco-sel" id="maMode"><option value="fill">合并 fill（命令少）</option><option value="setblock">逐格 setblock</option></select></div>
+</div>
+<div class="eco-row"><button class="eco-btn primary" id="maGenBtn">生成地图画指令</button><button class="eco-btn" id="maFlipBtn">垂直翻转</button><button class="eco-btn" id="maClearBtn">清空</button></div>
 </div></details>
 <details><summary>② 预览与统计</summary><div class="eco-inner"><canvas id="maPrev" class="ma-prev" width="512" height="512"></canvas><div class="ma-grid" id="maStat"></div></div></details>
 <details open><summary>③ 指令输出</summary><div class="eco-inner">
 <textarea id="maOut" readonly style="width:100%;min-height:240px;font-family:Consolas,monospace;font-size:12px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;box-sizing:border-box;white-space:pre;overflow:auto;"></textarea>
-<div class="eco-row" style="margin-top:8px;"><button class="eco-btn primary" id="maCopyBtn">复制全部指令</button><button class="eco-btn" id="maDlBtn">下载 .txt</button><span id="maOutMsg" style="font-size:12px;color:var(--text-secondary);"></span></div>
-<p class="eco-sub">把指令粘贴到游戏聊天框（需管理员/OP 权限）或命令方块中执行，即可自动铺好地图画。网易山头服封闭环境无法注入行为包，"复制指令在游戏内执行"就是最稳的导入方式。</p>
+<div class="eco-row" style="margin-top:8px;"><button class="eco-btn primary" id="maCopyBtn">复制全部指令</button><button class="eco-btn" id="maDlBtn">下载 .txt</button><span id="maOutMsg" style="font-weight:700;color:var(--accent);"></span></div>
 </div></details>
+</div>
+</div>
+
+<!-- Base64 工具 -->
+<div id="base64Page" class="compiler-wrap">
+<button class="btn back-btn" onclick="backToList()">← 返回工具列表</button>
+<div class="section-title">Base64 工具</div>
+<div class="compiler-grid">
+<div class="card">
+<h3>图片 → Base64</h3>
+<div class="form-row"><label>选择图片（自动压缩）</label><input type="file" id="b64File" accept="image/*"></div>
+<div class="eco-grid" style="grid-template-columns:repeat(2,1fr);">
+<div><label>最大边长（px）</label><input class="eco-in" id="b64Max" type="number" value="512" min="64" max="2048"></div>
+<div><label>质量</label><input class="eco-in" id="b64Q" type="number" value="0.8" min="0.05" max="1" step="0.05"></div>
+</div>
+<div class="btn-row"><button class="btn btn-primary" onclick="b64ToImg()">压缩并转 Base64</button></div>
+<div class="b64-prev" id="b64Prev"></div>
+</div>
+<div class="card">
+<h3>Base64 → 图片</h3>
+<div class="form-row"><label>粘贴 Base64</label><textarea id="b64In" style="min-height:140px;" placeholder="粘贴 Base64 字符串"></textarea></div>
+<div class="btn-row"><button class="btn btn-primary" onclick="b64From()">转为图片</button><button class="btn" onclick="b64Down()">下载图片</button></div>
+<div class="b64-prev" id="b64Out"></div>
+<div class="hint" id="b64Msg"></div>
+</div>
+</div>
+<div class="card" style="margin-top:12px;">
+<h3>Base64 字符串</h3>
+<div class="form-row"><textarea id="b64Text" readonly style="min-height:120px;" placeholder="转换结果将显示在这里"></textarea></div>
+<div class="btn-row"><button class="btn btn-primary" onclick="b64Copy()">复制</button><button class="btn" onclick="b64Clear()">清空</button></div>
+</div>
 </div>
 </div>
 
@@ -1091,16 +1174,110 @@ function openCompiler(){
 $('#toolList').style.display='none';
 $('#compilerPage').classList.add('show');
 $('#mapartPage').classList.remove('show');
+$('#jsonPage').classList.remove('show');
+$('#base64Page').classList.remove('show');
 }
 function openMapArt(){
 $('#toolList').style.display='none';
 $('#mapartPage').classList.add('show');
 $('#compilerPage').classList.remove('show');
+$('#jsonPage').classList.remove('show');
+$('#base64Page').classList.remove('show');
+}
+function openJson(){
+$('#toolList').style.display='none';
+$('#jsonPage').classList.add('show');
+$('#compilerPage').classList.remove('show');
+$('#mapartPage').classList.remove('show');
+$('#base64Page').classList.remove('show');
+}
+function openB64(){
+$('#toolList').style.display='none';
+$('#base64Page').classList.add('show');
+$('#compilerPage').classList.remove('show');
+$('#mapartPage').classList.remove('show');
+$('#jsonPage').classList.remove('show');
 }
 function backToList(){
 $('#compilerPage').classList.remove('show');
 $('#mapartPage').classList.remove('show');
+$('#jsonPage').classList.remove('show');
+$('#base64Page').classList.remove('show');
 $('#toolList').style.display='block';
+}
+function jTool(mode){
+const txt=$('#jsonIn').value;
+const out=$('#jsonOut');
+try{
+  if(mode===1)out.value=JSON.stringify(JSON.parse(txt),null,2);
+  else if(mode===2)out.value=JSON.stringify(JSON.parse(txt));
+  else if(mode===3)out.value=txt.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n');
+  else out.value=txt.replace(/\\\\/g,'\\').replace(/\\"/g,'"').replace(/\\n/g,'\n');
+  $('#jsonHint').textContent='处理成功';
+}catch(e){
+  out.value='';
+  $('#jsonHint').textContent='无效 JSON：'+e.message;
+}
+}
+function copyJson(){
+const o=$('#jsonOut');
+if(o&&o.value){
+  navigator.clipboard.writeText(o.value).then(()=>showToast('已复制')).catch(()=>showToast('请按 Ctrl+C 复制'));
+}
+}
+function b64ToImg(){
+const f=$('#b64File').files[0];
+if(!f){showToast('请先选择图片');return;}
+const max=Math.max(64,Math.min(2048,Number($('#b64Max').value)||512));
+const q=Math.max(0.05,Math.min(1,Number($('#b64Q').value)||0.8));
+const rd=new FileReader();
+rd.onload=function(){
+  const im=new Image();
+  im.onload=function(){
+    let w=im.width,h=im.height;
+    const s=Math.max(w,h);
+    if(s>max){w=Math.round(w*max/s);h=Math.round(h*max/s);}
+    const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+    const ctx=cv.getContext('2d');
+    ctx.drawImage(im,0,0,w,h);
+    let out=cv.toDataURL('image/jpeg',q);
+    $('#b64Text').value=out;
+    $('#b64Prev').innerHTML='<img src="'+out+'" alt="压缩预览">';
+    $('#b64Msg').textContent='';
+    showToast('已生成 Base64（'+(out.length/1024).toFixed(0)+' KB）');
+  };
+  im.src=rd.result;
+};
+rd.readAsDataURL(f);
+}
+function b64From(){
+const t=($('#b64In').value||'').trim();
+if(!t){showToast('请先粘贴 Base64');return;}
+let src=t;
+if(!/^data:image\//i.test(src)) src='data:image/png;base64,'+src;
+const im=new Image();
+im.onload=function(){ $('#b64Out').innerHTML='<img src="'+src+'" alt="还原图片">'; $('#b64Msg').textContent='还原成功'; $('#b64Text').value=src; };
+im.onerror=function(){ $('#b64Msg').textContent='无效的 Base64 或不是图片数据'; };
+im.src=src;
+}
+function b64Down(){
+const src=$('#b64Text').value;
+if(!src){showToast('没有可下载的图片');return;}
+const a=document.createElement('a');
+a.href=src;
+a.download='image_'+(src.length%100000)+'.png';
+document.body.appendChild(a);a.click();setTimeout(function(){a.remove();},300);
+}
+function b64Copy(){
+const o=$('#b64Text');
+if(!o.value){showToast('没有可复制的字符串');return;}
+o.select();o.setSelectionRange(0,999999);
+let ok=false;try{ok=document.execCommand('copy');}catch(e){}
+if(!ok&&navigator.clipboard){navigator.clipboard.writeText(o.value).then(function(){showToast('已复制');},function(){showToast('复制失败');});return;}
+showToast(ok?'已复制':'请手动复制');
+}
+function b64Clear(){
+$('#b64File').value='';$('#b64Text').value='';$('#b64Prev').innerHTML='';$('#b64In').value='';$('#b64Out').innerHTML='';$('#b64Msg').textContent='';
 }
 
 function setVersion(btn){
@@ -1374,24 +1551,66 @@ resetAll();
 
 // ===== 地图画生成器 =====
 (function(){
-  var MA_PALETTE=[
-    {n:'minecraft:white_wool',c:[233,236,236]},{n:'minecraft:orange_wool',c:[240,118,19]},
-    {n:'minecraft:magenta_wool',c:[189,68,179]},{n:'minecraft:light_blue_wool',c:[58,175,217]},
-    {n:'minecraft:yellow_wool',c:[248,196,39]},{n:'minecraft:lime_wool',c:[112,185,25]},
-    {n:'minecraft:pink_wool',c:[237,141,172]},{n:'minecraft:gray_wool',c:[62,68,71]},
-    {n:'minecraft:light_gray_wool',c:[142,142,134]},{n:'minecraft:cyan_wool',c:[21,137,145]},
-    {n:'minecraft:purple_wool',c:[121,42,172]},{n:'minecraft:blue_wool',c:[53,57,157]},
-    {n:'minecraft:brown_wool',c:[114,71,40]},{n:'minecraft:green_wool',c:[84,109,27]},
-    {n:'minecraft:red_wool',c:[161,39,34]},{n:'minecraft:black_wool',c:[20,21,25]}
-  ];
-  function maNearest(r,g,b){
+  var MA_PALETTES={
+    wool:[
+      {n:'minecraft:white_wool',c:[233,236,236]},{n:'minecraft:orange_wool',c:[240,118,19]},
+      {n:'minecraft:magenta_wool',c:[189,68,179]},{n:'minecraft:light_blue_wool',c:[58,175,217]},
+      {n:'minecraft:yellow_wool',c:[248,196,39]},{n:'minecraft:lime_wool',c:[112,185,25]},
+      {n:'minecraft:pink_wool',c:[237,141,172]},{n:'minecraft:gray_wool',c:[62,68,71]},
+      {n:'minecraft:light_gray_wool',c:[142,142,134]},{n:'minecraft:cyan_wool',c:[21,137,145]},
+      {n:'minecraft:purple_wool',c:[121,42,172]},{n:'minecraft:blue_wool',c:[53,57,157]},
+      {n:'minecraft:brown_wool',c:[114,71,40]},{n:'minecraft:green_wool',c:[84,109,27]},
+      {n:'minecraft:red_wool',c:[161,39,34]},{n:'minecraft:black_wool',c:[20,21,25]}
+    ],
+    concrete:[
+      {n:'minecraft:white_concrete',c:[207,213,214]},{n:'minecraft:orange_concrete',c:[224,97,1]},
+      {n:'minecraft:magenta_concrete',c:[169,48,159]},{n:'minecraft:light_blue_concrete',c:[36,137,199]},
+      {n:'minecraft:yellow_concrete',c:[241,175,21]},{n:'minecraft:lime_concrete',c:[94,169,24]},
+      {n:'minecraft:pink_concrete',c:[214,101,143]},{n:'minecraft:gray_concrete',c:[125,125,115]},
+      {n:'minecraft:light_gray_concrete',c:[142,142,134]},{n:'minecraft:cyan_concrete',c:[21,119,136]},
+      {n:'minecraft:purple_concrete',c:[100,32,156]},{n:'minecraft:blue_concrete',c:[45,47,143]},
+      {n:'minecraft:brown_concrete',c:[96,60,32]},{n:'minecraft:green_concrete',c:[73,91,36]},
+      {n:'minecraft:red_concrete',c:[142,33,33]},{n:'minecraft:black_concrete',c:[8,10,15]}
+    ],
+    terracotta:[
+      {n:'minecraft:white_terracotta',c:[210,178,161]},{n:'minecraft:orange_terracotta',c:[161,83,37]},
+      {n:'minecraft:magenta_terracotta',c:[149,87,108]},{n:'minecraft:light_blue_terracotta',c:[113,108,138]},
+      {n:'minecraft:yellow_terracotta',c:[186,133,36]},{n:'minecraft:lime_terracotta',c:[103,117,53]},
+      {n:'minecraft:pink_terracotta',c:[162,78,79]},{n:'minecraft:gray_terracotta',c:[58,42,42]},
+      {n:'minecraft:light_gray_terracotta',c:[135,107,98]},{n:'minecraft:cyan_terracotta',c:[87,92,92]},
+      {n:'minecraft:purple_terracotta',c:[118,70,86]},{n:'minecraft:blue_terracotta',c:[74,60,91]},
+      {n:'minecraft:brown_terracotta',c:[77,51,36]},{n:'minecraft:green_terracotta',c:[76,83,42]},
+      {n:'minecraft:red_terracotta',c:[143,61,47]},{n:'minecraft:black_terracotta',c:[25,20,20]}
+    ],
+    glass:[
+      {n:'minecraft:white_stained_glass',c:[233,236,236]},{n:'minecraft:orange_stained_glass',c:[240,118,19]},
+      {n:'minecraft:magenta_stained_glass',c:[189,68,179]},{n:'minecraft:light_blue_stained_glass',c:[58,175,217]},
+      {n:'minecraft:yellow_stained_glass',c:[248,196,39]},{n:'minecraft:lime_stained_glass',c:[112,185,25]},
+      {n:'minecraft:pink_stained_glass',c:[237,141,172]},{n:'minecraft:gray_stained_glass',c:[62,68,71]},
+      {n:'minecraft:light_gray_stained_glass',c:[142,142,134]},{n:'minecraft:cyan_stained_glass',c:[21,137,145]},
+      {n:'minecraft:purple_stained_glass',c:[121,42,172]},{n:'minecraft:blue_stained_glass',c:[53,57,157]},
+      {n:'minecraft:brown_stained_glass',c:[114,71,40]},{n:'minecraft:green_stained_glass',c:[84,109,27]},
+      {n:'minecraft:red_stained_glass',c:[161,39,34]},{n:'minecraft:black_stained_glass',c:[20,21,25]}
+    ]
+  };
+  var MA_BAYER=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+  var maImg=null;
+  var maFlipY=false;
+  function maPal(){
+    var keys=['wool','concrete','terracotta','glass'].filter(function(k){ return document.getElementById('maPk-'+k).checked; });
+    if(!keys.length) return MA_PALETTES.wool;
+    var pal=[];
+    keys.forEach(function(k){ pal=pal.concat(MA_PALETTES[k]); });
+    return pal;
+  }
+  function maNearest(pal,r,g,b){
     var best=0,bd=1e18;
-    for(var i=0;i<MA_PALETTE.length;i++){
-      var p=MA_PALETTE[i];
+    for(var i=0;i<pal.length;i++){
+      var p=pal[i];
       var d=(p.c[0]-r)*(p.c[0]-r)+(p.c[1]-g)*(p.c[1]-g)+(p.c[2]-b)*(p.c[2]-b);
       if(d<bd){bd=d;best=i;}
     }
-    return MA_PALETTE[best];
+    return pal[best];
   }
   var maImg=null;
   function maToast(s){
@@ -1419,6 +1638,7 @@ resetAll();
     drop.addEventListener('dragover',function(e){ e.preventDefault(); });
     drop.addEventListener('drop',function(e){ e.preventDefault(); if(e.dataTransfer.files[0]) loadImg(e.dataTransfer.files[0]); });
     document.getElementById('maGenBtn').onclick=maGenerate;
+    document.getElementById('maFlipBtn').onclick=function(){ maFlipY=!maFlipY; maToast(maFlipY?'已开启垂直翻转（图片上下颠倒生成）':'已关闭垂直翻转'); };
     document.getElementById('maClearBtn').onclick=function(){
       maImg=null;
       document.getElementById('maPrev').getContext('2d').clearRect(0,0,512,512);
@@ -1448,6 +1668,7 @@ resetAll();
   }
   function maGenerate(){
     if(!maImg){ maToast('请先上传一张图片'); return; }
+    var pal=maPal();
     var W=Math.max(16,Math.min(256,Math.round(Number(document.getElementById('maW').value)||64)));
     var H=Math.max(16,Math.round(W*(maImg.height/maImg.width)));
     if(H>512) H=512;
@@ -1455,35 +1676,84 @@ resetAll();
     cv.width=W; cv.height=H;
     var ctx=cv.getContext('2d',{willReadFrequently:true});
     ctx.drawImage(maImg,0,0,W,H);
-    var px=ctx.getImageData(0,0,W,H).data;
+    var raw=ctx.getImageData(0,0,W,H);
+    var px=raw.data;
+    var alphaMode=document.getElementById('maAlpha').value;
+    var airId=(document.getElementById('maAirId').value||'minecraft:air').trim();
+    if(airId.indexOf(':')<0) airId='minecraft:'+airId;
+    var dither=document.getElementById('maDither').value;
+    var rgb=new Float32Array(W*H*3);
+    var transparent=new Uint8Array(W*H);
+    var airN=0;
+    for(var i=0;i<W*H;i++){
+      var o=i*4;
+      if(alphaMode==='fill' && px[o+3]<128){ transparent[i]=1; airN++; continue; }
+      rgb[i*3]=px[o]; rgb[i*3+1]=px[o+1]; rgb[i*3+2]=px[o+2];
+    }
+    function pickIdx(x,y){
+      var idx=y*W+x;
+      if(transparent[idx]) return -1;
+      var r=rgb[idx*3],g=rgb[idx*3+1],b=rgb[idx*3+2];
+      var best=maNearest(pal,r,g,b);
+      var er=r-best.c[0], eg=g-best.c[1], eb=b-best.c[2];
+      if(dither==='fs'){
+        var d=[[1,0,7],[-1,1,3],[0,1,5],[1,1,1]];
+        for(var k=0;k<d.length;k++){
+          var nx=x+d[k][0], ny=y+d[k][1];
+          if(nx<0||nx>=W||ny<0||ny>=H||transparent[ny*W+nx]) continue;
+          var ni=(ny*W+nx)*3;
+          rgb[ni]+=er*d[k][2]/16; rgb[ni+1]+=eg*d[k][2]/16; rgb[ni+2]+=eb*d[k][2]/16;
+        }
+      } else if(dither==='atk'){
+        var d2=[[1,0,1],[2,0,1],[-1,1,1],[0,1,1],[1,1,1],[0,2,1]];
+        for(var k2=0;k2<d2.length;k2++){
+          var nx2=x+d2[k2][0], ny2=y+d2[k2][1];
+          if(nx2<0||nx2>=W||ny2<0||ny2>=H||transparent[ny2*W+nx2]) continue;
+          var ni2=(ny2*W+nx2)*3;
+          rgb[ni2]+=er*d2[k2][2]/8; rgb[ni2+1]+=eg*d2[k2][2]/8; rgb[ni2+2]+=eb*d2[k2][2]/8;
+        }
+      } else if(dither==='bayer'){
+        var th=(MA_BAYER[x%4][y%4]+0.5)/16-0.5;
+        best=maNearest(pal,r+th*255,g+th*255,b+th*255);
+      }
+      return best;
+    }
     var grid=[];
-    for(var r=0;r<H;r++){
+    for(var y=0;y<H;y++){
       var row=[];
-      for(var c=0;c<W;c++){
-        var i=(r*W+c)*4;
-        row.push(maNearest(px[i],px[i+1],px[i+2]).n);
+      for(var x=0;x<W;x++){
+        var bi=pickIdx(x,y);
+        row.push(bi<0?airId:bi.n);
       }
       grid.push(row);
     }
+    if(maFlipY) grid.reverse();
     var pv=document.getElementById('maPrev');
     var scale=Math.max(1,Math.floor(512/W));
     pv.width=W*scale; pv.height=H*scale;
     var pc=pv.getContext('2d');
-    for(var r2=0;r2<H;r2++){
-      for(var c2=0;c2<W;c2++){
-        var col=[0,0,0];
-        for(var pi=0;pi<MA_PALETTE.length;pi++){ if(MA_PALETTE[pi].n===grid[r2][c2]){ col=MA_PALETTE[pi].c; break; } }
-        pc.fillStyle='rgb('+col[0]+','+col[1]+','+col[2]+')';
-        pc.fillRect(c2*scale,r2*scale,scale,scale);
+    for(var y2=0;y2<H;y2++){
+      for(var x2=0;x2<W;x2++){
+        var id=grid[y2][x2], col=null;
+        for(var pi=0;pi<pal.length;pi++){ if(pal[pi].n===id){ col=pal[pi].c; break; } }
+        if(col){
+          pc.fillStyle='rgb('+col[0]+','+col[1]+','+col[2]+')';
+          pc.fillRect(x2*scale,y2*scale,scale,scale);
+        } else {
+          pc.clearRect(x2*scale,y2*scale,scale,scale);
+          pc.strokeStyle='rgba(255,255,255,.28)';
+          pc.strokeRect(x2*scale+0.5,y2*scale+0.5,scale-1,scale-1);
+        }
       }
     }
     var cnt={};
     grid.forEach(function(row){ row.forEach(function(id){ cnt[id]=(cnt[id]||0)+1; }); });
     var statBox=document.getElementById('maStat');
     statBox.innerHTML=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];}).map(function(id){
-      var col=[0,0,0];
-      for(var pi=0;pi<MA_PALETTE.length;pi++){ if(MA_PALETTE[pi].n===id){ col=MA_PALETTE[pi].c; break; } }
-      return '<div class="mg-item"><span class="mg-swatch" style="background:rgb('+col[0]+','+col[1]+','+col[2]+');"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+id.replace('minecraft:','').replace('_wool','羊毛')+'</span><b style="margin-left:auto;">'+cnt[id]+'</b></div>';
+      var col=null;
+      for(var pi=0;pi<pal.length;pi++){ if(pal[pi].n===id){ col=pal[pi].c; break; } }
+      var sw=col?'background:rgb('+col[0]+','+col[1]+','+col[2]+');':'background:transparent;border:1px dashed rgba(128,128,128,.5);';
+      return '<div class="mg-item"><span class="mg-swatch" style="'+sw+'"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+id.replace('minecraft:','')+'</span><b style="margin-left:auto;">'+cnt[id]+'</b></div>';
     }).join('');
     var face=document.getElementById('maFace').value;
     var mode=document.getElementById('maMode').value;
@@ -1491,25 +1761,25 @@ resetAll();
     var Y=Math.round(Number(document.getElementById('maY').value)||64);
     var Z=Math.round(Number(document.getElementById('maZ').value)||0);
     var lines=[];
-    for(var r3=0;r3<H;r3++){
-      var c3=0;
-      while(c3<W){
-        var id=grid[r3][c3], cEnd=c3;
-        while(cEnd+1<W && grid[r3][cEnd+1]===id) cEnd++;
+    for(var y3=0;y3<H;y3++){
+      var x3=0;
+      while(x3<W){
+        var id2=grid[y3][x3], cEnd=x3;
+        while(cEnd+1<W && grid[y3][cEnd+1]===id2) cEnd++;
         if(mode==='fill'){
-          if(face==='xy') lines.push('/fill '+(X+c3)+' '+Y+' '+(Z+r3)+' '+(X+cEnd)+' '+Y+' '+(Z+r3)+' '+id);
-          else lines.push('/fill '+(X+c3)+' '+(Y+r3)+' '+Z+' '+(X+cEnd)+' '+(Y+r3)+' '+Z+' '+id);
+          if(face==='xy') lines.push('/fill '+(X+x3)+' '+Y+' '+(Z+y3)+' '+(X+cEnd)+' '+Y+' '+(Z+y3)+' '+id2);
+          else lines.push('/fill '+(X+x3)+' '+(Y+y3)+' '+Z+' '+(X+cEnd)+' '+(Y+y3)+' '+Z+' '+id2);
         } else {
-          for(var k=c3;k<=cEnd;k++){
-            if(face==='xy') lines.push('/setblock '+(X+k)+' '+Y+' '+(Z+r3)+' '+id);
-            else lines.push('/setblock '+(X+k)+' '+(Y+r3)+' '+Z+' '+id);
+          for(var k=x3;k<=cEnd;k++){
+            if(face==='xy') lines.push('/setblock '+(X+k)+' '+Y+' '+(Z+y3)+' '+id2);
+            else lines.push('/setblock '+(X+k)+' '+(Y+y3)+' '+Z+' '+id2);
           }
         }
-        c3=cEnd+1;
+        x3=cEnd+1;
       }
     }
     document.getElementById('maOut').value=lines.join('\n');
-    document.getElementById('maOutMsg').textContent='共 '+lines.length+' 条指令 · 画幅 '+W+'×'+H+' 方块';
+    document.getElementById('maOutMsg').textContent='共 '+lines.length+' 条指令 · 画幅 '+W+'×'+H+' 方块'+(airN?' · 透明方块 '+airN+' 格':'');
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',maInit);
   else maInit();
