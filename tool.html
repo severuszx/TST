@@ -906,8 +906,34 @@ body.glass-off html[data-theme="glass"] .team-card{background:rgba(255,255,255,.
 body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:rgba(24,30,48,.97)!important;backdrop-filter:none!important;}
 @media(max-width:900px){.team-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:560px){.team-grid{grid-template-columns:1fr;}.team-avatar{width:56px;height:56px;}}
+/* ===== 地图画生成器 ===== */
+.eco-wrap{font-size:14px;line-height:1.75;color:var(--text);}
+.eco-wrap details{border:1px solid var(--border);border-radius:16px;background:var(--card);margin-bottom:18px;overflow:hidden;box-shadow:0 2px 12px rgba(15,23,42,.06);}
+.eco-wrap summary{cursor:pointer;padding:13px 18px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;gap:10px;position:relative;background:var(--card);border-bottom:1px solid var(--border);}
+.eco-wrap summary::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--accent);flex:none;}
+.eco-wrap summary::after{content:"▾";margin-left:auto;transition:transform .25s;color:var(--text-secondary);font-size:12px;}
+.eco-wrap details[open] summary::after{transform:rotate(180deg);}
+.eco-inner{padding:14px 18px 18px;}
+.eco-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px;}
+.eco-grid label{display:block;font-size:12.5px;color:var(--text-secondary);margin-bottom:5px;}
+.eco-in,.eco-sel{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:13.5px;transition:border-color .2s,background .2s;}
+.eco-in:hover,.eco-sel:hover{border-color:var(--accent);}
+.eco-in:focus,.eco-sel:focus{outline:none;border-color:var(--accent);}
+.eco-row{display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+.eco-btn{cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:6px;padding:8px 18px;font-size:13.5px;transition:all .2s;}
+.eco-btn:hover{background:var(--hover);}
+.eco-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;}
+.eco-btn.primary:hover{filter:brightness(1.08);background:var(--accent);}
+.eco-sub{font-size:12.5px;color:var(--text-secondary);margin:0 0 14px;opacity:.9;}
+.ma-drop{border:2px dashed var(--border);border-radius:12px;padding:26px 14px;text-align:center;color:var(--text-secondary);cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px;font-size:14px;}
+.ma-drop:hover{border-color:var(--accent);background:var(--hover);}
+.ma-drop input{display:none;}
+.ma-prev{max-width:100%;image-rendering:pixelated;border:1px solid var(--border);border-radius:8px;background:#0c0e12;display:block;}
+.ma-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 14px;margin-top:12px;}
+.ma-grid .mg-item{font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:7px;min-width:0;}
+.ma-grid .mg-swatch{width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.25);flex:none;}
 </style>
-<style>/* ===== 移动端适配（The Slow Tide） ===== */@media(max-width:720px){body{padding:10px 12px 24px;}header,nav,.topbar,.nav-bar{flex-wrap:wrap;overflow-x:auto;gap:6px;}.container,.wrap,.main-box,.page-body,.box{width:100%;padding:0;box-sizing:border-box;}textarea,input[type=text],input[type=number],input[type=password],input[type=search],select{font-size:16px;max-width:100%;box-sizing:border-box;}button,.btn,.tool-btn{font-size:14px;max-width:100%;}pre,.json-output,.out-box{overflow-x:auto;max-width:100%;}table{display:block;overflow-x:auto;white-space:nowrap;}img{max-width:100%;height:auto;}.grid,.compiler-grid,.team-grid{grid-template-columns:1fr;}}</style></head>
+</head>
 <body>
 <header class="site-header">
 <div class="container header-inner">
@@ -940,42 +966,9 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <h3>T显编译器</h3>
 <p>生成 Minecraft JSON 文本，支持文本 / 选择器 / 记分板 / 翻译键元素。</p>
 </div>
-<div class="tool-card" onclick="openJson()">
-<h3>JSON 工具</h3>
-<p>格式化 · 压缩 · 转义 · 反转义，快速处理 JSON 文本。</p>
-</div>
-</div>
-</div>
-
-<!-- JSON 工具 -->
-<div id="jsonPage" class="compiler-wrap">
-<button class="btn back-btn" onclick="backToList()">← 返回工具列表</button>
-<div class="section-title">JSON 工具</div>
-<div class="compiler-grid">
-<div class="card">
-<h3>输入</h3>
-<div class="form-row">
-<label>JSON 文本</label>
-<textarea id="jsonIn" style="min-height:180px;" placeholder="粘贴 JSON 文本"></textarea>
-</div>
-<div class="btn-row">
-<button class="btn btn-primary" onclick="jTool(1)">格式化</button>
-<button class="btn" onclick="jTool(2)">压缩</button>
-<button class="btn" onclick="jTool(3)">转义</button>
-<button class="btn" onclick="jTool(4)">反转义</button>
-</div>
-</div>
-<div class="card">
-<h3>输出</h3>
-<div class="form-row">
-<label>结果</label>
-<textarea id="jsonOut" style="min-height:180px;" placeholder="结果将显示在这里"></textarea>
-</div>
-<div class="btn-row">
-<button class="btn btn-primary" onclick="copyJson()">复制结果</button>
-<button class="btn" onclick="document.getElementById('jsonIn').value='';document.getElementById('jsonOut').value='';">清空</button>
-</div>
-<div class="hint" id="jsonHint">格式化：美化排版；压缩：去除空白；转义/反转义：处理引号与换行。</div>
+<div class="tool-card" onclick="openMapArt()">
+<h3>地图画生成器</h3>
+<p>图片转方块指令（fill / setblock），在游戏内一键铺出地图画。</p>
 </div>
 </div>
 </div>
@@ -1014,6 +1007,29 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <button class="btn" onclick="resetAll()">重置</button>
 </div>
 </div>
+</div>
+</div>
+
+<!-- 地图画生成器 -->
+<div id="mapartPage" class="compiler-wrap">
+<button class="btn back-btn" onclick="backToList()">← 返回工具列表</button>
+<div class="section-title">地图画生成器</div>
+<div class="eco-wrap">
+<details open><summary>① 上传图片</summary><div class="eco-inner">
+<div class="ma-drop" id="maDrop">点击选择或拖入图片（JPG / PNG / WEBP）<input type="file" id="maFile" accept="image/*"></div>
+<div class="eco-grid"><div><label>宽度（方块数）</label><input class="eco-in" id="maW" type="number" value="64" min="16" max="256"></div>
+<div><label>朝向</label><select class="eco-sel" id="maFace"><option value="xy">地面（平面铺开）</option><option value="xz">墙面（竖直挂起）</option></select></div></div>
+<div class="eco-grid" style="grid-template-columns:repeat(3,1fr);"><div><label>起点 X</label><input class="eco-in" id="maX" type="number" value="0"></div><div><label>起点 Y</label><input class="eco-in" id="maY" type="number" value="64"></div><div><label>起点 Z</label><input class="eco-in" id="maZ" type="number" value="0"></div></div>
+<div class="eco-grid"><div><label>输出方式</label><select class="eco-sel" id="maMode"><option value="fill">合并 fill（命令少）</option><option value="setblock">逐格 setblock</option></select></div></div>
+<div class="eco-row"><button class="eco-btn primary" id="maGenBtn">生成地图画指令</button><button class="eco-btn" id="maClearBtn">清空</button></div>
+<p class="eco-sub">图片只在本地浏览器处理，不会上传服务器；颜色映射网易基岩版羊毛 16 色，高度按图片比例自动计算。</p>
+</div></details>
+<details><summary>② 预览与统计</summary><div class="eco-inner"><canvas id="maPrev" class="ma-prev" width="512" height="512"></canvas><div class="ma-grid" id="maStat"></div></div></details>
+<details open><summary>③ 指令输出</summary><div class="eco-inner">
+<textarea id="maOut" readonly style="width:100%;min-height:240px;font-family:Consolas,monospace;font-size:12px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;box-sizing:border-box;white-space:pre;overflow:auto;"></textarea>
+<div class="eco-row" style="margin-top:8px;"><button class="eco-btn primary" id="maCopyBtn">复制全部指令</button><button class="eco-btn" id="maDlBtn">下载 .txt</button><span id="maOutMsg" style="font-size:12px;color:var(--text-secondary);"></span></div>
+<p class="eco-sub">把指令粘贴到游戏聊天框（需管理员/OP 权限）或命令方块中执行，即可自动铺好地图画。网易山头服封闭环境无法注入行为包，"复制指令在游戏内执行"就是最稳的导入方式。</p>
+</div></details>
 </div>
 </div>
 
@@ -1074,40 +1090,17 @@ setTimeout(()=>d.remove(),2000);
 function openCompiler(){
 $('#toolList').style.display='none';
 $('#compilerPage').classList.add('show');
+$('#mapartPage').classList.remove('show');
+}
+function openMapArt(){
+$('#toolList').style.display='none';
+$('#mapartPage').classList.add('show');
+$('#compilerPage').classList.remove('show');
 }
 function backToList(){
 $('#compilerPage').classList.remove('show');
-$('#jsonPage').classList.remove('show');
+$('#mapartPage').classList.remove('show');
 $('#toolList').style.display='block';
-}
-
-function openJson(){
-$('#toolList').style.display='none';
-$('#jsonPage').classList.add('show');
-}
-function jTool(mode){
-const txt=$('#jsonIn').value;
-const out=$('#jsonOut');
-try{
-  if(mode===1)out.value=JSON.stringify(JSON.parse(txt),null,2);
-  else if(mode===2)out.value=JSON.stringify(JSON.parse(txt));
-  else if(mode===3)out.value=txt.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n');
-  else out.value=txt.replace(/\\\\/g,'\\').replace(/\\"/g,'"').replace(/\\n/g,'\n');
-  $('#jsonHint').textContent='处理成功';
-}catch(e){
-  out.value='';
-  $('#jsonHint').textContent='无效 JSON：'+e.message;
-}
-}
-function copyJson(){
-const o=$('#jsonOut');
-if(o&&o.value){copyText(o.value);showToast('已复制');}
-}
-function copyText(t){
-const ta=document.createElement('textarea');
-ta.value=t;document.body.appendChild(ta);ta.select();
-try{document.execCommand('copy');}catch(e){}
-document.body.removeChild(ta);
 }
 
 function setVersion(btn){
@@ -1378,6 +1371,149 @@ document.documentElement.setAttribute('data-theme',next);
 
 // 初始化
 resetAll();
+
+// ===== 地图画生成器 =====
+(function(){
+  var MA_PALETTE=[
+    {n:'minecraft:white_wool',c:[233,236,236]},{n:'minecraft:orange_wool',c:[240,118,19]},
+    {n:'minecraft:magenta_wool',c:[189,68,179]},{n:'minecraft:light_blue_wool',c:[58,175,217]},
+    {n:'minecraft:yellow_wool',c:[248,196,39]},{n:'minecraft:lime_wool',c:[112,185,25]},
+    {n:'minecraft:pink_wool',c:[237,141,172]},{n:'minecraft:gray_wool',c:[62,68,71]},
+    {n:'minecraft:light_gray_wool',c:[142,142,134]},{n:'minecraft:cyan_wool',c:[21,137,145]},
+    {n:'minecraft:purple_wool',c:[121,42,172]},{n:'minecraft:blue_wool',c:[53,57,157]},
+    {n:'minecraft:brown_wool',c:[114,71,40]},{n:'minecraft:green_wool',c:[84,109,27]},
+    {n:'minecraft:red_wool',c:[161,39,34]},{n:'minecraft:black_wool',c:[20,21,25]}
+  ];
+  function maNearest(r,g,b){
+    var best=0,bd=1e18;
+    for(var i=0;i<MA_PALETTE.length;i++){
+      var p=MA_PALETTE[i];
+      var d=(p.c[0]-r)*(p.c[0]-r)+(p.c[1]-g)*(p.c[1]-g)+(p.c[2]-b)*(p.c[2]-b);
+      if(d<bd){bd=d;best=i;}
+    }
+    return MA_PALETTE[best];
+  }
+  var maImg=null;
+  function maToast(s){
+    var w=document.getElementById('toastWrap');
+    if(!w) return;
+    var t=document.createElement('div'); t.className='toast'; t.textContent=s;
+    w.appendChild(t);
+    setTimeout(function(){ t.remove(); },2200);
+  }
+  function maInit(){
+    var file=document.getElementById('maFile'); if(!file) return;
+    function loadImg(f){
+      if(!f || f.type.indexOf('image/')!==0) return;
+      var rd=new FileReader();
+      rd.onload=function(){
+        var im=new Image();
+        im.onload=function(){ maImg=im; maToast('图片已载入：'+im.width+'×'+im.height); };
+        im.src=rd.result;
+      };
+      rd.readAsDataURL(f);
+    }
+    file.addEventListener('change',function(){ loadImg(file.files[0]); });
+    var drop=document.getElementById('maDrop');
+    drop.addEventListener('click',function(){ file.click(); });
+    drop.addEventListener('dragover',function(e){ e.preventDefault(); });
+    drop.addEventListener('drop',function(e){ e.preventDefault(); if(e.dataTransfer.files[0]) loadImg(e.dataTransfer.files[0]); });
+    document.getElementById('maGenBtn').onclick=maGenerate;
+    document.getElementById('maClearBtn').onclick=function(){
+      maImg=null;
+      document.getElementById('maPrev').getContext('2d').clearRect(0,0,512,512);
+      document.getElementById('maStat').innerHTML='';
+      document.getElementById('maOut').value='';
+      document.getElementById('maOutMsg').textContent='';
+    };
+    document.getElementById('maCopyBtn').onclick=function(){
+      var ta=document.getElementById('maOut');
+      if(!ta.value){ document.getElementById('maOutMsg').textContent='还没有可复制的指令'; return; }
+      ta.select(); ta.setSelectionRange(0,999999);
+      var ok=false;
+      try{ ok=document.execCommand('copy'); }catch(e){}
+      if(!ok && navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(function(){ document.getElementById('maOutMsg').textContent='已复制 '+ta.value.split('\n').length+' 条指令'; },function(){ document.getElementById('maOutMsg').textContent='复制失败，请手动全选复制'; }); return; }
+      document.getElementById('maOutMsg').textContent=ok?'已复制 '+ta.value.split('\n').length+' 条指令':'复制失败，请手动全选复制';
+    };
+    document.getElementById('maDlBtn').onclick=function(){
+      var ta=document.getElementById('maOut');
+      if(!ta.value){ document.getElementById('maOutMsg').textContent='还没有可下载的指令'; return; }
+      var blob=new Blob([ta.value],{type:'text/plain;charset=utf-8'});
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='mapart_commands.txt';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },300);
+    };
+  }
+  function maGenerate(){
+    if(!maImg){ maToast('请先上传一张图片'); return; }
+    var W=Math.max(16,Math.min(256,Math.round(Number(document.getElementById('maW').value)||64)));
+    var H=Math.max(16,Math.round(W*(maImg.height/maImg.width)));
+    if(H>512) H=512;
+    var cv=document.createElement('canvas');
+    cv.width=W; cv.height=H;
+    var ctx=cv.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(maImg,0,0,W,H);
+    var px=ctx.getImageData(0,0,W,H).data;
+    var grid=[];
+    for(var r=0;r<H;r++){
+      var row=[];
+      for(var c=0;c<W;c++){
+        var i=(r*W+c)*4;
+        row.push(maNearest(px[i],px[i+1],px[i+2]).n);
+      }
+      grid.push(row);
+    }
+    var pv=document.getElementById('maPrev');
+    var scale=Math.max(1,Math.floor(512/W));
+    pv.width=W*scale; pv.height=H*scale;
+    var pc=pv.getContext('2d');
+    for(var r2=0;r2<H;r2++){
+      for(var c2=0;c2<W;c2++){
+        var col=[0,0,0];
+        for(var pi=0;pi<MA_PALETTE.length;pi++){ if(MA_PALETTE[pi].n===grid[r2][c2]){ col=MA_PALETTE[pi].c; break; } }
+        pc.fillStyle='rgb('+col[0]+','+col[1]+','+col[2]+')';
+        pc.fillRect(c2*scale,r2*scale,scale,scale);
+      }
+    }
+    var cnt={};
+    grid.forEach(function(row){ row.forEach(function(id){ cnt[id]=(cnt[id]||0)+1; }); });
+    var statBox=document.getElementById('maStat');
+    statBox.innerHTML=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];}).map(function(id){
+      var col=[0,0,0];
+      for(var pi=0;pi<MA_PALETTE.length;pi++){ if(MA_PALETTE[pi].n===id){ col=MA_PALETTE[pi].c; break; } }
+      return '<div class="mg-item"><span class="mg-swatch" style="background:rgb('+col[0]+','+col[1]+','+col[2]+');"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+id.replace('minecraft:','').replace('_wool','羊毛')+'</span><b style="margin-left:auto;">'+cnt[id]+'</b></div>';
+    }).join('');
+    var face=document.getElementById('maFace').value;
+    var mode=document.getElementById('maMode').value;
+    var X=Math.round(Number(document.getElementById('maX').value)||0);
+    var Y=Math.round(Number(document.getElementById('maY').value)||64);
+    var Z=Math.round(Number(document.getElementById('maZ').value)||0);
+    var lines=[];
+    for(var r3=0;r3<H;r3++){
+      var c3=0;
+      while(c3<W){
+        var id=grid[r3][c3], cEnd=c3;
+        while(cEnd+1<W && grid[r3][cEnd+1]===id) cEnd++;
+        if(mode==='fill'){
+          if(face==='xy') lines.push('/fill '+(X+c3)+' '+Y+' '+(Z+r3)+' '+(X+cEnd)+' '+Y+' '+(Z+r3)+' '+id);
+          else lines.push('/fill '+(X+c3)+' '+(Y+r3)+' '+Z+' '+(X+cEnd)+' '+(Y+r3)+' '+Z+' '+id);
+        } else {
+          for(var k=c3;k<=cEnd;k++){
+            if(face==='xy') lines.push('/setblock '+(X+k)+' '+Y+' '+(Z+r3)+' '+id);
+            else lines.push('/setblock '+(X+k)+' '+(Y+r3)+' '+Z+' '+id);
+          }
+        }
+        c3=cEnd+1;
+      }
+    }
+    document.getElementById('maOut').value=lines.join('\n');
+    document.getElementById('maOutMsg').textContent='共 '+lines.length+' 条指令 · 画幅 '+W+'×'+H+' 方块';
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',maInit);
+  else maInit();
+})();
 </script>
 
 
