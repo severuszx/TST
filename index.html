@@ -3772,8 +3772,6 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <button class="nav-link" data-nav="activity">活动</button>
 
-<button class="nav-link" data-nav="post">发帖</button>
-
 <button class="nav-link" data-nav="vote">投票</button>
 
 <a class="nav-link" href="tool.html">便捷工具</a>
@@ -4217,31 +4215,34 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <div id="feedList"></div>
 
-</div>
+<!-- 玩家社区：并入动态一角 -->
+<div class="post-intro" style="margin-top:20px;"><b>玩家社区</b> — 玩家发帖内测中（发布需卡密，卡密由管理员发放）。官方帖子带 <span class="post-pin">官方</span> 标签，可筛选查看。</div>
 
-</section>
-
-
-
-<!-- 玩家发帖 -->
-<section id="post" class="page">
-<div class="container">
-<div class="section-title">玩家发帖</div>
+<div id="postPanel" style="display:none;">
 <div class="card" style="margin-bottom:14px;">
-<div class="post-intro">发帖功能内测中 · 需要卡密才能发布（卡密由管理员发放）。帖子会显示你填写的游戏昵称，支持点赞与评论。</div>
 <div class="form-row"><label>游戏昵称</label><input type="text" id="poName" maxlength="24" placeholder="你的游戏名称"></div>
 <div class="form-row"><label>内容</label><textarea id="poContent" maxlength="500" placeholder="分享你的服务器见闻、建筑、红石作品…" style="min-height:90px;"></textarea></div>
 <div class="form-row"><label>标签（可选）</label><input type="text" id="poTags" maxlength="60" placeholder="如 建筑 / 红石 / 活动"></div>
 <div class="form-row"><label>卡密</label><input type="text" id="poCard" maxlength="20" placeholder="TSTP-XXXXXXXXXX"></div>
 <div class="form-row"><button class="btn btn-primary" id="poSendBtn">发布帖子</button><span id="poMsg" class="post-msg"></span></div>
 </div>
+</div>
+
 <div class="post-bar">
+<button class="btn" id="poOpenBtn">✍ 发帖</button>
 <button class="btn" id="poSortNew">最新</button>
 <button class="btn" id="poSortHot">热门</button>
+<span style="margin:0 6px;color:var(--text-secondary);font-size:13px;">筛选</span>
+<button class="btn" id="poFAll">全部</button>
+<button class="btn" id="poFOfficial">官方</button>
+<button class="btn" id="poFPlayer">玩家</button>
 <span id="poCount" class="post-msg"></span>
 </div>
+
 <div id="postList"></div>
+
 </div>
+
 </section>
 
 <!-- 活动 -->
@@ -4992,6 +4993,18 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 </div>
 
 <div class="admin-pane" id="panePost">
+
+<div class="card">
+
+<div class="form-row"><label>发布官方帖子</label><input type="text" id="pcOffName" maxlength="24" placeholder="作者（默认 The Slow Tide）"></div>
+
+<div class="form-row"><textarea id="pcOffContent" maxlength="2000" placeholder="官方帖子内容…（如公告、活动说明、服务器通知）" style="min-height:80px;"></textarea></div>
+
+<div class="form-row"><label>标签（可选）</label><input type="text" id="pcOffTags" maxlength="60" placeholder="如 公告 / 活动"></div>
+
+<div class="form-row"><button class="btn btn-primary" id="pcOffBtn">发布官方帖子</button><label style="display:inline-flex;align-items:center;gap:5px;margin-left:10px;font-size:13px;"><input type="checkbox" id="pcOffPin"> 置顶</label><span id="pcOffMsg" class="post-msg"></span></div>
+
+</div>
 
 <div class="card">
 
@@ -6893,7 +6906,7 @@ function switchPage(pid){
 
   const _nm=document.getElementById('navMore');if(_nm)_nm.classList.remove('open');
 
-  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',post:'发帖 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',chat:'聊天室 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
+  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',chat:'聊天室 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
 
   document.title=TITLES[pid]||'The Slow Tide 官网';
 
@@ -14665,11 +14678,12 @@ window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
   }
   function pLink(t){return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">$1</a>');}
   var poSort='new';
+  var poFilter='all';
   async function loadPosts(){
     const box=document.getElementById('postList'); if(!box) return;
     box.innerHTML='<p class="post-msg" style="padding:10px 0;">加载中…</p>';
     try{
-      const r=await fetch(POST_API+'/list?sort='+poSort+'&dev='+encodeURIComponent(pDev()),{cache:'no-store'});
+      const r=await fetch(POST_API+'/list?sort='+poSort+'&filter='+poFilter+'&dev='+encodeURIComponent(pDev()),{cache:'no-store'});
       const d=await r.json();
       const posts=(d&&d.posts)||[];
       const cnt=document.getElementById('poCount'); if(cnt) cnt.textContent='共 '+posts.length+' 条帖子';
@@ -14677,8 +14691,9 @@ window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
       box.innerHTML=posts.map(function(p){
         const tags=p.tags?'<span class="post-tags">'+esc(p.tags)+'</span>':'';
         const pin=p.pinned?'<span class="post-pin">置顶</span>':'';
+        const off=p.official?'<span class="post-pin" style="background:var(--danger);">官方</span>':'';
         return '<div class="card post-pcard" style="margin-bottom:12px;" data-pid="'+p.id+'">'+
-          '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;"><b>'+esc(p.name)+'</b><span style="font-size:12px;color:var(--text-secondary);">'+pin+pTime(p.created_at)+'</span></div>'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;"><b>'+esc(p.name)+'</b><span style="font-size:12px;color:var(--text-secondary);">'+off+pin+pTime(p.created_at)+'</span></div>'+
           '<div style="white-space:pre-wrap;word-break:break-word;line-height:1.7;">'+pLink(p.content)+'</div>'+
           (tags?'<div style="margin-top:8px;">'+tags+'</div>':'')+
           '<div style="display:flex;gap:10px;margin-top:12px;font-size:13px;">'+
@@ -14747,16 +14762,29 @@ window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
       else msg.textContent='发布失败：'+((d&&d.error)||'未知错误');
     }catch(e){ msg.textContent='网络异常，请稍后重试'; }
   }
+  function setPF(btn){
+    document.querySelectorAll('#poFAll,#poFOfficial,#poFPlayer').forEach(function(x){x.classList.remove('active');});
+    if(btn) btn.classList.add('active');
+  }
   function initPost(){
     const s=document.getElementById('poSendBtn'); if(!s) return;
     if(s._b) return; s._b=true;
     s.onclick=sendPost;
+    document.getElementById('poOpenBtn').onclick=function(){
+      const p=document.getElementById('postPanel');
+      p.style.display=(p.style.display==='none')?'block':'none';
+      this.textContent=(p.style.display==='none')?'✍ 发帖':'收起';
+    };
     document.getElementById('poSortNew').onclick=function(){ poSort='new'; this.classList.add('active'); document.getElementById('poSortHot').classList.remove('active'); loadPosts(); };
     document.getElementById('poSortHot').onclick=function(){ poSort='hot'; this.classList.add('active'); document.getElementById('poSortNew').classList.remove('active'); loadPosts(); };
+    document.getElementById('poFAll').onclick=function(){ poFilter='all'; setPF(this); loadPosts(); };
+    document.getElementById('poFOfficial').onclick=function(){ poFilter='official'; setPF(this); loadPosts(); };
+    document.getElementById('poFPlayer').onclick=function(){ poFilter='player'; setPF(this); loadPosts(); };
+    document.getElementById('poFAll').classList.add('active');
     loadPosts();
   }
   document.querySelectorAll('.nav-link').forEach(function(b){
-    if(b.dataset.nav==='post') b.addEventListener('click',function(){ setTimeout(initPost,60); });
+    if(b.dataset.nav==='feed') b.addEventListener('click',function(){ setTimeout(initPost,80); });
   });
   window.__loadPost=loadPosts;
 })();
@@ -14842,8 +14870,25 @@ window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
     if(d&&d.ok&&d.cards){ showToast('已生成 '+d.cards.length+' 张卡密'); loadPostAdmin(); }
     else showToast('生成失败');
   };
+  var offBtn=document.getElementById('pcOffBtn');
+  if(offBtn) offBtn.onclick=async function(){
+    const pwd=pcPwd(); if(!pwd) return;
+    const name=document.getElementById('pcOffName').value.trim();
+    const content=document.getElementById('pcOffContent').value.trim();
+    const tags=document.getElementById('pcOffTags').value.trim();
+    const pinned=document.getElementById('pcOffPin').checked;
+    const msg=document.getElementById('pcOffMsg');
+    if(!content){ msg.textContent='内容不能为空'; return; }
+    try{
+      const r=await fetch(POST_API+'/admin_create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pw:pwd,name:name,content:content,tags:tags,pinned:pinned})});
+      const d=await r.json();
+      if(d&&d.ok){ msg.textContent='官方帖子已发布！'; document.getElementById('pcOffName').value=''; document.getElementById('pcOffContent').value=''; document.getElementById('pcOffTags').value=''; document.getElementById('pcOffPin').checked=false; loadPostAdmin(); }
+      else msg.textContent='发布失败：'+((d&&d.error)||'未知错误');
+    }catch(e){ msg.textContent='网络异常，请稍后重试'; }
+  };
 })();
 </script>
+
 
 </body>
 
