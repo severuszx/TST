@@ -3727,8 +3727,6 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <div class="section-title">服务器动态</div>
 
-<div id="feedList"></div>
-
 <!-- 发帖入口：独立行右对齐 -->
 <div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:24px;"><span id="poCount" class="post-msg" style="margin-left:0;margin-right:auto;"></span><button class="btn post-btn primary" id="poOpenBtn">✍ 发帖</button></div>
 
@@ -6965,8 +6963,6 @@ function renderAll(){
 
   renderNotices();
 
-  renderFeeds();
-
   renderSponsors();
 
   renderReplays();
@@ -7080,14 +7076,6 @@ function feedCard(f){
     ${img}
 
   </div>`;
-
-}
-
-function renderFeeds(){
-
-  const list=SITE_DATA.feeds||[];
-
-  $('#feedList').innerHTML=list.map(feedCard).join('')||'<div class="empty-hint">暂无动态</div>';
 
 }
 
@@ -7661,7 +7649,7 @@ function goToUnit(u,kw){
 
     if(u.ruleSec){ el=document.getElementById(u.ruleSec); }
 
-    else if(u.elId){ el=document.getElementById(u.elId); }
+    else if(u.elId){ el=document.getElementById(u.elId)||document.querySelector('[data-uid="'+u.elId+'"]'); }
 
     if(u.page==='rule' && el){ scrollToSec(u.ruleSec); }
 
@@ -9280,24 +9268,36 @@ try{ eval('const __t=()=>1;'); }catch(e){
     try{
       const r=await fetch(POST_API+'/list?sort='+poSort+'&filter='+poFilter+'&dev='+encodeURIComponent(pDev()),{cache:'no-store'});
       const d=await r.json();
-      const posts=(d&&d.posts)||[];
-      const cnt=document.getElementById('poCount'); if(cnt) cnt.textContent='共 '+posts.length+' 条帖子';
-      if(!posts.length){ box.innerHTML='<p class="post-msg" style="padding:10px 0;">还没有帖子</p>'; return; }
-      box.innerHTML=posts.map(function(p){
+      const apiPosts=(d&&d.posts)||[];
+      const feeds=(window.SITE_DATA&&SITE_DATA.feeds)||[];
+      let list=[];
+      if(poFilter==='all'||poFilter==='official'){
+        feeds.forEach(function(f){
+          list.push({id:'feed-'+f.id, name:'官方', content:(f.title||'')+(f.content?('\n'+f.content):''), image:f.image||'', created_at:f.date||'', official:true, pinned:!!f.pinned, feed:true, uid:'feed-'+f.id});
+        });
+      }
+      apiPosts.forEach(function(p){
+        if(poFilter==='all'||(poFilter==='official'&&p.official)||(poFilter==='player'&&!p.official)) list.push(p);
+      });
+      const cnt=document.getElementById('poCount'); if(cnt) cnt.textContent='共 '+list.length+' 条帖子';
+      if(!list.length){ box.innerHTML='<p class="post-msg" style="padding:10px 0;">还没有帖子</p>'; return; }
+      box.innerHTML=list.map(function(p){
         const tags=p.tags?'<span class="post-tags">'+esc(p.tags)+'</span>':'';
         const pin=p.pinned?'<span class="post-pin">置顶</span>':'';
         const off=p.official?'<span class="post-pin" style="background:var(--danger);">官方</span>':'';
-        return '<div class="card post-pcard" style="margin-bottom:12px;" data-pid="'+p.id+'">'+
+        let body='<div class="card post-pcard" style="margin-bottom:12px;" data-pid="'+(p.id||p.uid||'')+'"'+(p.uid?' data-uid="'+p.uid+'"':'')+'>'+
           '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;"><b>'+esc(p.name)+'</b><span style="font-size:12px;color:var(--text-secondary);">'+off+pin+pTime(p.created_at)+'</span></div>'+
           '<div style="white-space:pre-wrap;word-break:break-word;line-height:1.7;">'+pLink(p.content)+'</div>'+
           (p.image?'<img src="'+esc(p.image)+'" alt="" style="max-width:100%;max-height:280px;border-radius:8px;margin-top:8px;border:1px solid var(--border);">':'')+
-          (tags?'<div style="margin-top:8px;">'+tags+'</div>':'')+
-          '<div style="display:flex;gap:10px;margin-top:12px;font-size:13px;">'+
-          '<button class="btn" data-act="like" '+(p.liked?'style="color:var(--accent);"':'')+'>赞 '+p.likes+'</button>'+
-          '<button class="btn" data-act="cm">评论 '+p.comments+'</button>'+
-          '</div>'+
-          '<div class="post-cm" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"></div>'+
-          '</div>';
+          (tags?'<div style="margin-top:8px;">'+tags+'</div>':'');
+        if(!p.feed){
+          body+='<div style="display:flex;gap:10px;margin-top:12px;font-size:13px;">'+
+            '<button class="btn" data-act="like" '+(p.liked?'style="color:var(--accent);"':'')+'>赞 '+p.likes+'</button>'+
+            '<button class="btn" data-act="cm">评论 '+p.comments+'</button>'+
+            '</div>'+
+            '<div class="post-cm" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"></div>';
+        }
+        return body+'</div>';
       }).join('');
       box.querySelectorAll('[data-act="like"]').forEach(b=>{ b.onclick=function(){ doLike(b); }; });
       box.querySelectorAll('[data-act="cm"]').forEach(b=>{ b.onclick=function(){ toggleCm(b); }; });
