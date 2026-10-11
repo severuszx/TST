@@ -9269,12 +9269,13 @@ try{ eval('const __t=()=>1;'); }catch(e){
       const r=await fetch(POST_API+'/list?sort='+poSort+'&filter='+poFilter+'&dev='+encodeURIComponent(pDev()),{cache:'no-store'});
       const d=await r.json();
       const apiPosts=(d&&d.posts)||[];
-      const feeds=(window.SITE_DATA&&SITE_DATA.feeds)||[];
+      const feeds=(typeof SITE_DATA!=='undefined'&&SITE_DATA&&SITE_DATA.feeds)||[];
       let list=[];
       if(poFilter==='all'||poFilter==='official'){
         feeds.forEach(function(f){
           list.push({id:'feed-'+f.id, name:'官方', content:(f.title||'')+(f.content?('\n'+f.content):''), image:f.image||'', created_at:f.date||'', official:true, pinned:!!f.pinned, feed:true, uid:'feed-'+f.id});
         });
+        list.sort(function(a,b){return (b.created_at||'').localeCompare(a.created_at||'');});
       }
       apiPosts.forEach(function(p){
         if(poFilter==='all'||(poFilter==='official'&&p.official)||(poFilter==='player'&&!p.official)) list.push(p);
