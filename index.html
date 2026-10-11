@@ -4216,14 +4216,14 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <div id="feedList"></div>
 
 <!-- 玩家社区：并入动态一角 -->
-<div class="post-intro" style="margin-top:20px;"><b>玩家社区</b> — 玩家发帖内测中（发布需卡密，卡密由管理员发放）。官方帖子带 <span class="post-pin">官方</span> 标签，可筛选查看。</div>
-
 <div id="postPanel" style="display:none;">
 <div class="card" style="margin-bottom:14px;">
 <div class="form-row"><label>游戏昵称</label><input type="text" id="poName" maxlength="24" placeholder="你的游戏名称"></div>
-<div class="form-row"><label>内容</label><textarea id="poContent" maxlength="500" placeholder="分享你的服务器见闻、建筑、红石作品…" style="min-height:90px;"></textarea></div>
+<div class="form-row"><label>内容</label><textarea id="poContent" maxlength="500" placeholder="写点什么…" style="min-height:90px;"></textarea></div>
 <div class="form-row"><label>标签（可选）</label><input type="text" id="poTags" maxlength="60" placeholder="如 建筑 / 红石 / 活动"></div>
 <div class="form-row"><label>卡密</label><input type="text" id="poCard" maxlength="20" placeholder="TSTP-XXXXXXXXXX"></div>
+<div class="form-row"><label>图片（可选）</label><input type="file" id="poImg" accept="image/*"><span id="poImgName" class="post-msg"></span></div>
+<div id="poImgPrev" style="display:none;margin:6px 0;"><img id="poImgView" alt="" style="max-width:180px;max-height:120px;border-radius:8px;border:1px solid var(--border);"><button type="button" class="btn" id="poImgDel" style="margin-left:8px;">移除</button></div>
 <div class="form-row"><button class="btn btn-primary" id="poSendBtn">发布帖子</button><span id="poMsg" class="post-msg"></span></div>
 </div>
 </div>
@@ -7647,6 +7647,8 @@ function feedCard(f){
   return `
 
   <div class="card" data-uid="feed-${esc(f.id)}" style="margin-bottom:14px;">
+
+    <span class="post-pin" style="background:var(--danger);">官方</span>
 
     <h3>${esc(f.title)}${pin}</h3>
 
@@ -14679,6 +14681,26 @@ window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
   function pLink(t){return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">$1</a>');}
   var poSort='new';
   var poFilter='all';
+  var poImgData='';
+  function poReadImg(file){
+    const rd=new FileReader();
+    rd.onload=function(){
+      const im=new Image();
+      im.onload=function(){
+        const max=640; let w=im.width,h=im.height;
+        const s=Math.max(w,h);
+        if(s>max){w=Math.round(w*max/s);h=Math.round(h*max/s);}
+        const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+        cv.getContext('2d').drawImage(im,0,0,w,h);
+        poImgData=cv.toDataURL('image/jpeg',0.75);
+        document.getElementById('poImgView').src=poImgData;
+        document.getElementById('poImgPrev').style.display='block';
+        document.getElementById('poImgName').textContent='已压缩 '+Math.round(poImgData.length/1024)+' KB';
+      };
+      im.src=rd.result;
+    };
+    rd.readAsDataURL(file);
+  }
   async function loadPosts(){
     const box=document.getElementById('postList'); if(!box) return;
     box.innerHTML='<p class="post-msg" style="padding:10px 0;">加载中…</p>';
@@ -14687,7 +14709,7 @@ window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
       const d=await r.json();
       const posts=(d&&d.posts)||[];
       const cnt=document.getElementById('poCount'); if(cnt) cnt.textContent='共 '+posts.length+' 条帖子';
-      if(!posts.length){ box.innerHTML='<p class="post-msg" style="padding:10px 0;">还没有帖子，来发第一条吧</p>'; return; }
+      if(!posts.length){ box.innerHTML='<p class="post-msg" style="padding:10px 0;">还没有帖子</p>'; return; }
       box.innerHTML=posts.map(function(p){
         const tags=p.tags?'<span class="post-tags">'+esc(p.tags)+'</span>':'';
         const pin=p.pinned?'<span class="post-pin">置顶</span>':'';
@@ -14695,6 +14717,7 @@ window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
         return '<div class="card post-pcard" style="margin-bottom:12px;" data-pid="'+p.id+'">'+
           '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;"><b>'+esc(p.name)+'</b><span style="font-size:12px;color:var(--text-secondary);">'+off+pin+pTime(p.created_at)+'</span></div>'+
           '<div style="white-space:pre-wrap;word-break:break-word;line-height:1.7;">'+pLink(p.content)+'</div>'+
+          (p.image?'<img src="'+esc(p.image)+'" alt="" style="max-width:100%;max-height:280px;border-radius:8px;margin-top:8px;border:1px solid var(--border);">':'')+
           (tags?'<div style="margin-top:8px;">'+tags+'</div>':'')+
           '<div style="display:flex;gap:10px;margin-top:12px;font-size:13px;">'+
           '<button class="btn" data-act="like" '+(p.liked?'style="color:var(--accent);"':'')+'>赞 '+p.likes+'</button>'+
@@ -14754,9 +14777,9 @@ window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
     if(!content){ msg.textContent='请填写内容'; return; }
     if(!card){ msg.textContent='请填写卡密（内测阶段需要）'; return; }
     try{
-      const r=await fetch(POST_API+'/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,content:content,tags:tags,card:card,dev:pDev()})});
+      const r=await fetch(POST_API+'/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,content:content,tags:tags,card:card,dev:pDev(),image:poImgData||''})});
       const d=await r.json();
-      if(d&&d.ok){ msg.textContent='发布成功！'; document.getElementById('poName').value=''; document.getElementById('poContent').value=''; document.getElementById('poTags').value=''; document.getElementById('poCard').value=''; loadPosts(); }
+      if(d&&d.ok){ msg.textContent='发布成功！'; document.getElementById('poName').value=''; document.getElementById('poContent').value=''; document.getElementById('poTags').value=''; document.getElementById('poCard').value=''; poImgData=''; document.getElementById('poImgPrev').style.display='none'; document.getElementById('poImgView').src=''; document.getElementById('poImg').value=''; document.getElementById('poImgName').textContent=''; loadPosts(); }
       else if(d&&d.error==='card_invalid'){ msg.textContent=d.msg||'卡密无效'; }
       else if(d&&d.error==='card_used'){ msg.textContent=d.msg||'卡密已被使用'; }
       else msg.textContent='发布失败：'+((d&&d.error)||'未知错误');
@@ -14770,6 +14793,10 @@ window.ckGet=ckGet;window.ckSet=ckSet;window.ckDel=ckDel;
     const s=document.getElementById('poSendBtn'); if(!s) return;
     if(s._b) return; s._b=true;
     s.onclick=sendPost;
+    const poFile=document.getElementById('poImg');
+    if(poFile) poFile.addEventListener('change',function(){ if(poFile.files[0]) poReadImg(poFile.files[0]); });
+    const poDel=document.getElementById('poImgDel');
+    if(poDel) poDel.onclick=function(){ poImgData=''; document.getElementById('poImgPrev').style.display='none'; document.getElementById('poImgView').src=''; document.getElementById('poImg').value=''; document.getElementById('poImgName').textContent=''; };
     document.getElementById('poOpenBtn').onclick=function(){
       const p=document.getElementById('postPanel');
       p.style.display=(p.style.display==='none')?'block':'none';
