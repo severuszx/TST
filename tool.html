@@ -937,6 +937,12 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 .ma-grid .mg-swatch{width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.25);flex:none;}
 .b64-prev{margin-top:10px;}
 .b64-prev img{max-width:100%;max-height:240px;border-radius:8px;border:1px solid var(--border);display:block;}
+.ma-blocks{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:4px;max-height:230px;overflow:auto;padding:6px;border:1px solid var(--border);border-radius:8px;background:var(--bg);}
+.ma-b{width:34px;height:34px;image-rendering:pixelated;border:1px solid var(--border);border-radius:4px;cursor:pointer;background-color:#0c0e12;background-size:544px 340px;background-repeat:no-repeat;transition:transform .12s,box-shadow .12s,opacity .12s;position:relative;}
+.ma-b:hover{transform:scale(1.18);z-index:2;box-shadow:0 0 0 2px var(--accent);}
+.ma-b.off{opacity:.2;filter:grayscale(1);}
+.ma-b.off::after{content:"✕";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#f87171;font-size:15px;font-weight:700;}
+.ma-blockhint{font-size:12px;color:var(--text-secondary);margin:6px 0 8px;}
 </style>
 </head>
 <body>
@@ -1062,25 +1068,70 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <div class="section-title">地图画生成器</div>
 <div class="eco-wrap">
 <details open><summary>① 上传图片</summary><div class="eco-inner">
+<div class="eco-row" style="margin-bottom:10px;"><span class="eco-sub" style="margin:0 6px 0 0;">快速模板</span>
+<button class="eco-btn" data-tpl="16">16×16 像素图标</button>
+<button class="eco-btn" data-tpl="32">32×32 小头像</button>
+<button class="eco-btn" data-tpl="64">64×64 头像</button>
+<button class="eco-btn" data-tpl="128">128×128 标准图</button>
+<button class="eco-btn" data-tpl="256x128">256×128 横幅</button>
+<button class="eco-btn" data-tpl="128x64">128×64 横幅</button>
+</div>
 <div class="ma-drop" id="maDrop">点击选择或拖入图片（JPG / PNG / WEBP）<input type="file" id="maFile" accept="image/*"></div>
-<div class="eco-grid"><div><label>宽度（方块数）</label><input class="eco-in" id="maW" type="number" value="64" min="16" max="256"></div>
-<div><label>朝向</label><select class="eco-sel" id="maFace"><option value="xy">地面（平面铺开）</option><option value="xz">墙面（竖直挂起）</option></select></div></div>
-<div class="eco-grid" style="grid-template-columns:repeat(3,1fr);"><div><label>起点 X</label><input class="eco-in" id="maX" type="number" value="0"></div><div><label>起点 Y</label><input class="eco-in" id="maY" type="number" value="64"></div><div><label>起点 Z</label><input class="eco-in" id="maZ" type="number" value="0"></div></div>
-<div class="eco-grid">
-<div><label>方块类型（可多选 / 全选）</label><div class="ma-pal-chk"><label class="ma-chk"><input type="checkbox" id="maPk-wool" checked> 羊毛 16 色</label><label class="ma-chk"><input type="checkbox" id="maPk-concrete"> 混凝土 16 色</label><label class="ma-chk"><input type="checkbox" id="maPk-terracotta"> 陶瓦 16 色</label><label class="ma-chk"><input type="checkbox" id="maPk-glass"> 染色玻璃 16 色</label></div></div>
-<div><label>抖动算法</label><select class="eco-sel" id="maDither"><option value="none">无（最近色）</option><option value="fs">Floyd-Steinberg</option><option value="atk">Atkinson</option><option value="bayer">有序抖动 Bayer 4×4</option></select></div>
-<div><label>透明像素</label><select class="eco-sel" id="maAlpha"><option value="keep">按原色填充</option><option value="fill">填透明方块</option></select></div>
-<div><label>透明方块 ID</label><input class="eco-in" id="maAirId" value="minecraft:air"></div>
+<div class="eco-grid" style="grid-template-columns:repeat(4,1fr);">
+<div><label>宽度（格）</label><input class="eco-in" id="maW" type="number" value="128" min="1" max="512"></div>
+<div><label>高度（格）</label><input class="eco-in" id="maH" type="number" value="128" min="1" max="512"></div>
+<div><label>缩放</label><select class="eco-sel" id="maFit"><option value="stretch">拉伸填满</option><option value="fit">等比（留空空气）</option></select></div>
+<div><label>生成倍数</label><input class="eco-in" id="maMult" type="number" value="1" min="1" max="8"></div>
 </div>
-<div class="eco-grid">
-<div><label>输出方式</label><select class="eco-sel" id="maMode"><option value="fill">合并 fill（命令少）</option><option value="setblock">逐格 setblock</option></select></div>
+<div class="eco-grid" style="grid-template-columns:repeat(2,1fr);">
+<div><label>抖动算法</label><select class="eco-sel" id="maDither"><option value="none">无（最近色）</option><option value="fs">Floyd-Steinberg</option><option value="atk">Atkinson</option><option value="bayer">Bayer 4×4</option></select></div>
+<div><label>透明像素</label><select class="eco-sel" id="maAlpha"><option value="air">放空气方块</option><option value="skip">跳过不生成</option><option value="keep">按原色填充</option></select></div>
 </div>
-<div class="eco-row"><button class="eco-btn primary" id="maGenBtn">生成地图画指令</button><button class="eco-btn" id="maFlipBtn">垂直翻转</button><button class="eco-btn" id="maClearBtn">清空</button></div>
 </div></details>
-<details><summary>② 预览与统计</summary><div class="eco-inner"><canvas id="maPrev" class="ma-prev" width="512" height="512"></canvas><div class="ma-grid" id="maStat"></div></div></details>
-<details open><summary>③ 指令输出</summary><div class="eco-inner">
+<details open><summary>② 方块库</summary><div class="eco-inner">
+<div class="ma-pal-chk" id="maCatChk"></div>
+<div class="ma-blocks" id="maBlocks"></div>
+<div class="eco-row" style="margin-top:6px;"><button class="eco-btn" id="maAllBtn">全部选上</button><button class="eco-btn" id="maNoneBtn">全部取消</button><span class="hint" id="maBlockHint" style="margin-left:10px;"></span></div>
+</div></details>
+<details open><summary>③ 指令配置</summary><div class="eco-inner">
+<div class="eco-grid" style="grid-template-columns:repeat(5,1fr);">
+<div><label>计分板名称</label><input class="eco-in" id="maObj" value="n"></div>
+<div><label>盔甲架名称</label><input class="eco-in" id="maTag" value="A"></div>
+<div><label>起点 X</label><input class="eco-in" id="maX" type="number" value="0"></div>
+<div><label>起点 Y</label><input class="eco-in" id="maY" type="number" value="0"></div>
+<div><label>起点 Z</label><input class="eco-in" id="maZ" type="number" value="0"></div>
+</div>
+<div class="eco-grid" style="grid-template-columns:repeat(3,1fr);">
+<div><label>单条字符上限（0=无上限）</label><input class="eco-in" id="maLimit" type="number" value="32000" min="0"></div>
+<div><label>记分板相对起点</label><input class="eco-in" id="maOff" type="number" value="0"></div>
+<div><label>违禁数值（逗号分隔）</label><input class="eco-in" id="maBan" placeholder="例：6489,8964"></div>
+</div>
+<div class="eco-grid" style="grid-template-columns:repeat(3,1fr);">
+<div><label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="maMirV"> 竖向镜像（图片上下翻转）</label></div>
+<div><label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="maMirH"> 横向镜像（图片左右翻转）</label></div>
+<div><label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="maTk" checked> 添加常加载区域</label></div>
+</div>
+<div class="eco-grid" style="grid-template-columns:repeat(4,1fr);">
+<div><label>行进轴</label><select class="eco-sel" id="maMoveAxis"><option value="z" selected>长（Z）</option><option value="x">宽（X）</option><option value="y">深（Y）</option></select></div>
+<div><label>行进移动值</label><input class="eco-in" id="maMoveVal" type="number" value="1" min="-8" max="8"></div>
+<div><label>换行轴</label><select class="eco-sel" id="maWrapAxis"><option value="x" selected>宽（X）</option><option value="z">长（Z）</option><option value="y">深（Y）</option></select></div>
+<div><label>换行移动值</label><input class="eco-in" id="maWrapVal" type="number" value="1" min="-8" max="8"></div>
+</div>
+<div class="hint" id="maAxisHint"></div>
+<div class="eco-row" style="margin-top:8px;"><button class="eco-btn primary" id="maGenBtn">开始生成</button><button class="eco-btn" id="maResetBtn">重置所有配置</button></div>
+</div></details>
+<details><summary>④ 预览与统计</summary><div class="eco-inner"><canvas id="maPrev" class="ma-prev" width="512" height="512"></canvas><div class="ma-grid" id="maStat"></div></div></details>
+<details open><summary>⑤ 指令输出</summary><div class="eco-inner">
+<div class="hint">上半部分是初始化指令（一次性执行），下半部分是循环指令（放进循环命令方块，每行一条）。</div>
 <textarea id="maOut" readonly style="width:100%;min-height:240px;font-family:Consolas,monospace;font-size:12px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;box-sizing:border-box;white-space:pre;overflow:auto;"></textarea>
 <div class="eco-row" style="margin-top:8px;"><button class="eco-btn primary" id="maCopyBtn">复制全部指令</button><button class="eco-btn" id="maDlBtn">下载 .txt</button><span id="maOutMsg" style="font-weight:700;color:var(--accent);"></span></div>
+</div></details>
+<details><summary>⑥ 导入命令转预览</summary><div class="eco-inner">
+<div class="hint">粘贴或导入生成的指令 TXT，可反向还原成地图预览（自己生成的文件或其他人工具生成的都行）。</div>
+<textarea id="maImpIn" style="width:100%;min-height:160px;font-family:Consolas,monospace;font-size:12px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;box-sizing:border-box;white-space:pre;overflow:auto;" placeholder="粘贴指令 TXT，或点击下方导入文件"></textarea>
+<div class="eco-row" style="margin-top:8px;"><button class="eco-btn primary" id="maImpBtn">解析并转预览</button><button class="eco-btn" id="maImpFileBtn">导入 TXT 文件</button><input type="file" id="maImpFile" accept=".txt,.mcfunction" style="display:none"></div>
+<div class="ma-grid" id="maImpInfo"></div>
+<canvas id="maImpPrev" class="ma-prev" width="512" height="512"></canvas>
 </div></details>
 </div>
 </div>
@@ -1551,56 +1602,87 @@ resetAll();
 
 // ===== 地图画生成器 =====
 (function(){
-  var MA_PALETTES={
-    wool:[
-      {n:'minecraft:white_wool',c:[233,236,236]},{n:'minecraft:orange_wool',c:[240,118,19]},
-      {n:'minecraft:magenta_wool',c:[189,68,179]},{n:'minecraft:light_blue_wool',c:[58,175,217]},
-      {n:'minecraft:yellow_wool',c:[248,196,39]},{n:'minecraft:lime_wool',c:[112,185,25]},
-      {n:'minecraft:pink_wool',c:[237,141,172]},{n:'minecraft:gray_wool',c:[62,68,71]},
-      {n:'minecraft:light_gray_wool',c:[142,142,134]},{n:'minecraft:cyan_wool',c:[21,137,145]},
-      {n:'minecraft:purple_wool',c:[121,42,172]},{n:'minecraft:blue_wool',c:[53,57,157]},
-      {n:'minecraft:brown_wool',c:[114,71,40]},{n:'minecraft:green_wool',c:[84,109,27]},
-      {n:'minecraft:red_wool',c:[161,39,34]},{n:'minecraft:black_wool',c:[20,21,25]}
-    ],
-    concrete:[
-      {n:'minecraft:white_concrete',c:[207,213,214]},{n:'minecraft:orange_concrete',c:[224,97,1]},
-      {n:'minecraft:magenta_concrete',c:[169,48,159]},{n:'minecraft:light_blue_concrete',c:[36,137,199]},
-      {n:'minecraft:yellow_concrete',c:[241,175,21]},{n:'minecraft:lime_concrete',c:[94,169,24]},
-      {n:'minecraft:pink_concrete',c:[214,101,143]},{n:'minecraft:gray_concrete',c:[125,125,115]},
-      {n:'minecraft:light_gray_concrete',c:[142,142,134]},{n:'minecraft:cyan_concrete',c:[21,119,136]},
-      {n:'minecraft:purple_concrete',c:[100,32,156]},{n:'minecraft:blue_concrete',c:[45,47,143]},
-      {n:'minecraft:brown_concrete',c:[96,60,32]},{n:'minecraft:green_concrete',c:[73,91,36]},
-      {n:'minecraft:red_concrete',c:[142,33,33]},{n:'minecraft:black_concrete',c:[8,10,15]}
-    ],
-    terracotta:[
-      {n:'minecraft:white_terracotta',c:[210,178,161]},{n:'minecraft:orange_terracotta',c:[161,83,37]},
-      {n:'minecraft:magenta_terracotta',c:[149,87,108]},{n:'minecraft:light_blue_terracotta',c:[113,108,138]},
-      {n:'minecraft:yellow_terracotta',c:[186,133,36]},{n:'minecraft:lime_terracotta',c:[103,117,53]},
-      {n:'minecraft:pink_terracotta',c:[162,78,79]},{n:'minecraft:gray_terracotta',c:[58,42,42]},
-      {n:'minecraft:light_gray_terracotta',c:[135,107,98]},{n:'minecraft:cyan_terracotta',c:[87,92,92]},
-      {n:'minecraft:purple_terracotta',c:[118,70,86]},{n:'minecraft:blue_terracotta',c:[74,60,91]},
-      {n:'minecraft:brown_terracotta',c:[77,51,36]},{n:'minecraft:green_terracotta',c:[76,83,42]},
-      {n:'minecraft:red_terracotta',c:[143,61,47]},{n:'minecraft:black_terracotta',c:[25,20,20]}
-    ],
-    glass:[
-      {n:'minecraft:white_stained_glass',c:[233,236,236]},{n:'minecraft:orange_stained_glass',c:[240,118,19]},
-      {n:'minecraft:magenta_stained_glass',c:[189,68,179]},{n:'minecraft:light_blue_stained_glass',c:[58,175,217]},
-      {n:'minecraft:yellow_stained_glass',c:[248,196,39]},{n:'minecraft:lime_stained_glass',c:[112,185,25]},
-      {n:'minecraft:pink_stained_glass',c:[237,141,172]},{n:'minecraft:gray_stained_glass',c:[62,68,71]},
-      {n:'minecraft:light_gray_stained_glass',c:[142,142,134]},{n:'minecraft:cyan_stained_glass',c:[21,137,145]},
-      {n:'minecraft:purple_stained_glass',c:[121,42,172]},{n:'minecraft:blue_stained_glass',c:[53,57,157]},
-      {n:'minecraft:brown_stained_glass',c:[114,71,40]},{n:'minecraft:green_stained_glass',c:[84,109,27]},
-      {n:'minecraft:red_stained_glass',c:[161,39,34]},{n:'minecraft:black_stained_glass',c:[20,21,25]}
-    ]
-  };
-  var MA_BAYER=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+  var MA_SPRITE='blocks_sprite.png';
+  var MA_MAP={"black_wool":{"cat":"wool","col":0,"row":0,"avg":[21,21,26]},"blue_wool":{"cat":"wool","col":1,"row":0,"avg":[53,57,157]},"brown_wool":{"cat":"wool","col":2,"row":0,"avg":[114,72,41]},"cyan_wool":{"cat":"wool","col":3,"row":0,"avg":[21,138,145]},"gray_wool":{"cat":"wool","col":4,"row":0,"avg":[63,68,72]},"green_wool":{"cat":"wool","col":5,"row":0,"avg":[85,110,28]},"light_blue_wool":{"cat":"wool","col":6,"row":0,"avg":[58,175,217]},"light_gray_wool":{"cat":"wool","col":7,"row":0,"avg":[142,142,135]},"lime_wool":{"cat":"wool","col":8,"row":0,"avg":[112,185,26]},"magenta_wool":{"cat":"wool","col":9,"row":0,"avg":[190,69,180]},"orange_wool":{"cat":"wool","col":10,"row":0,"avg":[241,118,20]},"pink_wool":{"cat":"wool","col":11,"row":0,"avg":[238,141,172]},"purple_wool":{"cat":"wool","col":12,"row":0,"avg":[122,42,173]},"red_wool":{"cat":"wool","col":13,"row":0,"avg":[161,39,35]},"white_wool":{"cat":"wool","col":14,"row":0,"avg":[234,236,237]},"yellow_wool":{"cat":"wool","col":15,"row":0,"avg":[249,198,40]},"black_concrete":{"cat":"concrete","col":0,"row":1,"avg":[8,10,15]},"blue_concrete":{"cat":"concrete","col":1,"row":1,"avg":[45,47,143]},"brown_concrete":{"cat":"concrete","col":2,"row":1,"avg":[96,60,32]},"cyan_concrete":{"cat":"concrete","col":3,"row":1,"avg":[21,119,136]},"gray_concrete":{"cat":"concrete","col":4,"row":1,"avg":[55,58,62]},"green_concrete":{"cat":"concrete","col":5,"row":1,"avg":[73,91,36]},"light_blue_concrete":{"cat":"concrete","col":6,"row":1,"avg":[36,137,199]},"light_gray_concrete":{"cat":"concrete","col":7,"row":1,"avg":[125,125,115]},"lime_concrete":{"cat":"concrete","col":8,"row":1,"avg":[94,169,24]},"magenta_concrete":{"cat":"concrete","col":9,"row":1,"avg":[169,48,159]},"orange_concrete":{"cat":"concrete","col":10,"row":1,"avg":[224,97,1]},"pink_concrete":{"cat":"concrete","col":11,"row":1,"avg":[214,101,143]},"purple_concrete":{"cat":"concrete","col":12,"row":1,"avg":[100,32,156]},"red_concrete":{"cat":"concrete","col":13,"row":1,"avg":[142,33,33]},"white_concrete":{"cat":"concrete","col":14,"row":1,"avg":[207,213,214]},"yellow_concrete":{"cat":"concrete","col":15,"row":1,"avg":[241,175,21]},"black_terracotta":{"cat":"terracotta","col":0,"row":2,"avg":[37,23,16]},"blue_terracotta":{"cat":"terracotta","col":1,"row":2,"avg":[74,60,91]},"brown_terracotta":{"cat":"terracotta","col":2,"row":2,"avg":[77,51,36]},"cyan_terracotta":{"cat":"terracotta","col":3,"row":2,"avg":[87,91,91]},"gray_terracotta":{"cat":"terracotta","col":4,"row":2,"avg":[58,42,36]},"green_terracotta":{"cat":"terracotta","col":5,"row":2,"avg":[76,83,42]},"light_blue_terracotta":{"cat":"terracotta","col":6,"row":2,"avg":[113,109,138]},"light_gray_terracotta":{"cat":"terracotta","col":7,"row":2,"avg":[135,107,98]},"lime_terracotta":{"cat":"terracotta","col":8,"row":2,"avg":[104,118,53]},"magenta_terracotta":{"cat":"terracotta","col":9,"row":2,"avg":[150,88,109]},"orange_terracotta":{"cat":"terracotta","col":10,"row":2,"avg":[162,84,38]},"pink_terracotta":{"cat":"terracotta","col":11,"row":2,"avg":[162,78,79]},"purple_terracotta":{"cat":"terracotta","col":12,"row":2,"avg":[118,70,86]},"terracotta":{"cat":"terracotta","col":13,"row":2,"avg":[152,94,68]},"white_terracotta":{"cat":"terracotta","col":14,"row":2,"avg":[210,178,161]},"yellow_terracotta":{"cat":"terracotta","col":15,"row":2,"avg":[186,133,35]},"black_glazed_terracotta":{"cat":"glazed","col":0,"row":3,"avg":[68,30,32]},"blue_glazed_terracotta":{"cat":"glazed","col":1,"row":3,"avg":[47,65,139]},"brown_glazed_terracotta":{"cat":"glazed","col":2,"row":3,"avg":[120,106,86]},"cyan_glazed_terracotta":{"cat":"glazed","col":3,"row":3,"avg":[52,119,125]},"gray_glazed_terracotta":{"cat":"glazed","col":4,"row":3,"avg":[83,90,94]},"green_glazed_terracotta":{"cat":"glazed","col":5,"row":3,"avg":[117,142,67]},"light_blue_glazed_terracotta":{"cat":"glazed","col":6,"row":3,"avg":[95,165,209]},"lime_glazed_terracotta":{"cat":"glazed","col":7,"row":3,"avg":[163,198,55]},"magenta_glazed_terracotta":{"cat":"glazed","col":8,"row":3,"avg":[208,100,192]},"orange_glazed_terracotta":{"cat":"glazed","col":9,"row":3,"avg":[155,147,92]},"pink_glazed_terracotta":{"cat":"glazed","col":10,"row":3,"avg":[235,155,182]},"purple_glazed_terracotta":{"cat":"glazed","col":11,"row":3,"avg":[110,48,152]},"red_glazed_terracotta":{"cat":"glazed","col":12,"row":3,"avg":[182,60,53]},"silver_glazed_terracotta":{"cat":"glazed","col":13,"row":3,"avg":[144,166,168]},"white_glazed_terracotta":{"cat":"glazed","col":14,"row":3,"avg":[188,212,203]},"yellow_glazed_terracotta":{"cat":"glazed","col":15,"row":3,"avg":[234,192,89]},"black_stained_glass":{"cat":"glass","col":0,"row":4,"avg":[25,25,25]},"blue_stained_glass":{"cat":"glass","col":1,"row":4,"avg":[51,76,178]},"brown_stained_glass":{"cat":"glass","col":2,"row":4,"avg":[102,76,51]},"cyan_stained_glass":{"cat":"glass","col":3,"row":4,"avg":[76,127,153]},"glass":{"cat":"glass","col":4,"row":4,"avg":[176,214,219]},"gray_stained_glass":{"cat":"glass","col":5,"row":4,"avg":[76,76,76]},"green_stained_glass":{"cat":"glass","col":6,"row":4,"avg":[102,127,51]},"light_blue_stained_glass":{"cat":"glass","col":7,"row":4,"avg":[102,153,216]},"light_gray_stained_glass":{"cat":"glass","col":8,"row":4,"avg":[153,153,153]},"lime_stained_glass":{"cat":"glass","col":9,"row":4,"avg":[127,204,25]},"magenta_stained_glass":{"cat":"glass","col":10,"row":4,"avg":[178,76,216]},"orange_stained_glass":{"cat":"glass","col":11,"row":4,"avg":[216,127,51]},"pink_stained_glass":{"cat":"glass","col":12,"row":4,"avg":[242,127,165]},"purple_stained_glass":{"cat":"glass","col":13,"row":4,"avg":[127,63,178]},"red_stained_glass":{"cat":"glass","col":14,"row":4,"avg":[153,51,51]},"tinted_glass":{"cat":"glass","col":15,"row":4,"avg":[44,39,46]},"white_stained_glass":{"cat":"glass","col":0,"row":5,"avg":[255,255,255]},"yellow_stained_glass":{"cat":"glass","col":1,"row":5,"avg":[229,229,51]},"acacia_log":{"cat":"log","col":2,"row":5,"avg":[151,89,55]},"birch_log":{"cat":"log","col":3,"row":5,"avg":[193,179,135]},"cherry_log":{"cat":"log","col":4,"row":5,"avg":[185,141,137]},"dark_oak_log":{"cat":"log","col":5,"row":5,"avg":[68,45,22]},"jungle_log":{"cat":"log","col":6,"row":5,"avg":[150,109,71]},"mangrove_log":{"cat":"log","col":7,"row":5,"avg":[103,49,42]},"oak_log":{"cat":"log","col":8,"row":5,"avg":[151,122,73]},"pale_oak_log":{"cat":"log","col":9,"row":5,"avg":[199,189,188]},"spruce_log":{"cat":"log","col":10,"row":5,"avg":[109,80,47]},"stripped_acacia_log":{"cat":"log","col":11,"row":5,"avg":[166,91,52]},"stripped_birch_log":{"cat":"log","col":12,"row":5,"avg":[191,172,116]},"stripped_cherry_log":{"cat":"log","col":13,"row":5,"avg":[221,165,158]},"stripped_jungle_log":{"cat":"log","col":14,"row":5,"avg":[166,123,82]},"stripped_oak_log":{"cat":"log","col":15,"row":5,"avg":[160,130,77]},"stripped_pale_oak_log":{"cat":"log","col":0,"row":6,"avg":[235,227,226]},"stripped_spruce_log":{"cat":"log","col":1,"row":6,"avg":[106,80,47]},"coal_block":{"cat":"ore","col":2,"row":6,"avg":[16,16,16]},"coal_ore":{"cat":"ore","col":3,"row":6,"avg":[106,106,105]},"copper_block":{"cat":"ore","col":4,"row":6,"avg":[192,108,80]},"copper_ore":{"cat":"ore","col":5,"row":6,"avg":[125,126,120]},"deepslate_coal_ore":{"cat":"ore","col":6,"row":6,"avg":[74,74,76]},"deepslate_copper_ore":{"cat":"ore","col":7,"row":6,"avg":[92,93,89]},"deepslate_diamond_ore":{"cat":"ore","col":8,"row":6,"avg":[83,106,107]},"deepslate_emerald_ore":{"cat":"ore","col":9,"row":6,"avg":[78,104,88]},"deepslate_gold_ore":{"cat":"ore","col":10,"row":6,"avg":[115,103,78]},"deepslate_iron_ore":{"cat":"ore","col":11,"row":6,"avg":[107,100,95]},"deepslate_lapis_ore":{"cat":"ore","col":12,"row":6,"avg":[80,91,115]},"deepslate_redstone_ore":{"cat":"ore","col":13,"row":6,"avg":[105,73,75]},"diamond_block":{"cat":"ore","col":14,"row":6,"avg":[98,237,228]},"diamond_ore":{"cat":"ore","col":15,"row":6,"avg":[121,141,141]},"emerald_block":{"cat":"ore","col":0,"row":7,"avg":[42,203,88]},"emerald_ore":{"cat":"ore","col":1,"row":7,"avg":[108,136,116]},"gold_block":{"cat":"ore","col":2,"row":7,"avg":[246,208,62]},"gold_ore":{"cat":"ore","col":3,"row":7,"avg":[145,134,107]},"iron_block":{"cat":"ore","col":4,"row":7,"avg":[220,220,220]},"iron_ore":{"cat":"ore","col":5,"row":7,"avg":[136,129,123]},"lapis_block":{"cat":"ore","col":6,"row":7,"avg":[31,67,140]},"lapis_ore":{"cat":"ore","col":7,"row":7,"avg":[107,118,141]},"nether_gold_ore":{"cat":"ore","col":8,"row":7,"avg":[115,55,42]},"netherite_block":{"cat":"ore","col":9,"row":7,"avg":[67,61,64]},"quartz_block":{"cat":"ore","col":10,"row":7,"avg":[236,230,223]},"quartz_ore":{"cat":"ore","col":11,"row":7,"avg":[118,66,62]},"raw_copper_block":{"cat":"ore","col":12,"row":7,"avg":[154,106,79]},"raw_gold_block":{"cat":"ore","col":13,"row":7,"avg":[222,169,47]},"raw_iron_block":{"cat":"ore","col":14,"row":7,"avg":[166,136,107]},"redstone_block":{"cat":"ore","col":15,"row":7,"avg":[176,25,5]},"redstone_ore":{"cat":"ore","col":0,"row":8,"avg":[140,110,110]},"blackstone":{"cat":"stone","col":1,"row":8,"avg":[42,36,42]},"chiseled_stone_bricks":{"cat":"stone","col":2,"row":8,"avg":[120,119,120]},"cobblestone":{"cat":"stone","col":3,"row":8,"avg":[128,127,128]},"end_stone":{"cat":"stone","col":4,"row":8,"avg":[220,223,158]},"end_stone_bricks":{"cat":"stone","col":5,"row":8,"avg":[218,224,162]},"sandstone":{"cat":"stone","col":6,"row":8,"avg":[224,214,170]},"smooth_stone":{"cat":"stone","col":7,"row":8,"avg":[159,159,159]},"stone":{"cat":"stone","col":8,"row":8,"avg":[126,126,126]},"stone_bricks":{"cat":"stone","col":9,"row":8,"avg":[122,122,122]},"amethyst_block":{"cat":"other","col":10,"row":8,"avg":[134,98,191]},"bedrock":{"cat":"other","col":11,"row":8,"avg":[85,85,85]},"honeycomb_block":{"cat":"other","col":12,"row":8,"avg":[229,148,30]},"ochre_froglight":{"cat":"other","col":13,"row":8,"avg":[251,245,206]},"pearlescent_froglight":{"cat":"other","col":14,"row":8,"avg":[246,240,240]},"purpur_block":{"cat":"other","col":15,"row":8,"avg":[170,126,170]},"sea_lantern":{"cat":"other","col":0,"row":9,"avg":[172,200,191]},"shroomlight":{"cat":"other","col":1,"row":9,"avg":[241,147,71]},"verdant_froglight":{"cat":"other","col":2,"row":9,"avg":[229,244,228]}};
+  var MA_CATS=[
+    {k:'wool',label:'羊毛 16'},{k:'concrete',label:'混凝土 16'},{k:'terracotta',label:'陶瓦 16'},
+    {k:'glazed',label:'带釉陶瓦 16'},{k:'glass',label:'染色玻璃 18'},{k:'log',label:'原木 16'},
+    {k:'ore',label:'矿石 31'},{k:'stone',label:'石材 9'},{k:'other',label:'其他 9'}
+  ];
+  var MA_ENABLED={};
+  var maSpriteImg=new Image();
   var maImg=null;
-  var maFlipY=false;
+  Object.keys(MA_MAP).forEach(function(k){ MA_ENABLED[k]=true; });
+
+  function ma$_(id){return document.getElementById(id);}
+  function maToast(s){
+    var w=ma$_('toastWrap'); if(!w) return;
+    var t=document.createElement('div'); t.className='toast-item'; t.textContent=s;
+    w.appendChild(t); setTimeout(function(){t.remove();},2200);
+  }
+
+  // ---------- 方块库 UI ----------
+  function maBuildCats(){
+    var box=ma$_('maCatChk'); if(!box) return;
+    box.innerHTML='<label class="ma-chk"><input type="checkbox" id="maCatAll" checked> 全选</label>'
+      +MA_CATS.map(function(c){
+        return '<label class="ma-chk"><input type="checkbox" class="ma-cat" data-cat="'+c.k+'" checked> '+c.label+'</label>';
+      }).join('');
+    box.onchange=function(e){
+      var t=e.target;
+      if(t.id==='maCatAll'){
+        var on=t.checked;
+        MA_CATS.forEach(function(c){
+          Object.keys(MA_MAP).forEach(function(k){ if(MA_MAP[k].cat===c.k) MA_ENABLED[k]=on; });
+        });
+        box.querySelectorAll('.ma-cat').forEach(function(cb){cb.checked=on;});
+      } else if(t.classList&&t.classList.contains('ma-cat')){
+        var on=t.checked;
+        Object.keys(MA_MAP).forEach(function(k){ if(MA_MAP[k].cat===t.dataset.cat) MA_ENABLED[k]=on; });
+        var all=Array.prototype.every.call(box.querySelectorAll('.ma-cat'),function(cb){return cb.checked;});
+        ma$_('maCatAll').checked=all;
+      }
+      maRefreshBlocks(); maBlockHint();
+    };
+  }
+  function maBuildBlocks(){
+    var box=ma$_('maBlocks'); if(!box) return;
+    var html='';
+    Object.keys(MA_MAP).forEach(function(k){
+      var m=MA_MAP[k];
+      html+='<div class="ma-b" data-n="'+k+'" title="'+k+'" style="background-image:url(\''+MA_SPRITE+'\');background-position:-'+(m.col*34)+'px -'+(m.row*34)+'px;"></div>';
+    });
+    box.innerHTML=html;
+    box.onclick=function(e){
+      var d=e.target.closest?e.target.closest('.ma-b'):null;
+      if(!d) return;
+      var k=d.dataset.n;
+      MA_ENABLED[k]=!MA_ENABLED[k];
+      maRefreshBlocks(); maBlockHint();
+    };
+    maRefreshBlocks(); maBlockHint();
+  }
+  function maRefreshBlocks(){
+    Array.prototype.forEach.call(document.querySelectorAll('#maBlocks .ma-b'),function(d){
+      d.classList.toggle('off',!MA_ENABLED[d.dataset.n]);
+    });
+  }
+  function maBlockHint(){
+    var n=Object.keys(MA_MAP).filter(function(k){return MA_ENABLED[k];}).length;
+    var h=ma$_('maBlockHint'); if(h) h.textContent='已启用 '+n+' 种方块';
+  }
+  function maSetAll(on){
+    Object.keys(MA_MAP).forEach(function(k){ MA_ENABLED[k]=on; });
+    var box=ma$_('maCatChk');
+    box.querySelectorAll('.ma-cat').forEach(function(cb){cb.checked=on;});
+    var a=ma$_('maCatAll'); if(a) a.checked=on;
+    maRefreshBlocks(); maBlockHint();
+  }
+
+  // ---------- 颜色匹配 ----------
   function maPal(){
-    var keys=['wool','concrete','terracotta','glass'].filter(function(k){ return document.getElementById('maPk-'+k).checked; });
-    if(!keys.length) return MA_PALETTES.wool;
     var pal=[];
-    keys.forEach(function(k){ pal=pal.concat(MA_PALETTES[k]); });
+    Object.keys(MA_MAP).forEach(function(k){ if(MA_ENABLED[k]) pal.push({n:k,c:MA_MAP[k].avg}); });
     return pal;
   }
   function maNearest(pal,r,g,b){
@@ -1612,1017 +1694,459 @@ resetAll();
     }
     return pal[best];
   }
-  var maImg=null;
-  function maToast(s){
-    var w=document.getElementById('toastWrap');
-    if(!w) return;
-    var t=document.createElement('div'); t.className='toast'; t.textContent=s;
-    w.appendChild(t);
-    setTimeout(function(){ t.remove(); },2200);
-  }
-  function maInit(){
-    var file=document.getElementById('maFile'); if(!file) return;
-    function loadImg(f){
-      if(!f || f.type.indexOf('image/')!==0) return;
-      var rd=new FileReader();
-      rd.onload=function(){
-        var im=new Image();
-        im.onload=function(){ maImg=im; maToast('图片已载入：'+im.width+'×'+im.height); };
-        im.src=rd.result;
-      };
-      rd.readAsDataURL(f);
+
+  // ---------- n 列表压缩与命令拆分 ----------
+  function maCompFrag(ns){
+    if(!ns.length) return [];
+    ns.sort(function(a,b){return a-b;});
+    var parts=[],s=ns[0],p=ns[0];
+    for(var i=1;i<=ns.length;i++){
+      if(i<ns.length&&ns[i]===p+1){p=ns[i];continue;}
+      parts.push(s===p?String(s):s+'..'+p);
+      if(i<ns.length){s=ns[i];p=ns[i];}
     }
-    file.addEventListener('change',function(){ loadImg(file.files[0]); });
-    var drop=document.getElementById('maDrop');
-    drop.addEventListener('click',function(){ file.click(); });
-    drop.addEventListener('dragover',function(e){ e.preventDefault(); });
-    drop.addEventListener('drop',function(e){ e.preventDefault(); if(e.dataTransfer.files[0]) loadImg(e.dataTransfer.files[0]); });
-    document.getElementById('maGenBtn').onclick=maGenerate;
-    document.getElementById('maFlipBtn').onclick=function(){ maFlipY=!maFlipY; maToast(maFlipY?'已开启垂直翻转（图片上下颠倒生成）':'已关闭垂直翻转'); };
-    document.getElementById('maClearBtn').onclick=function(){
-      maImg=null;
-      document.getElementById('maPrev').getContext('2d').clearRect(0,0,512,512);
-      document.getElementById('maStat').innerHTML='';
-      document.getElementById('maOut').value='';
-      document.getElementById('maOutMsg').textContent='';
-    };
-    document.getElementById('maCopyBtn').onclick=function(){
-      var ta=document.getElementById('maOut');
-      if(!ta.value){ document.getElementById('maOutMsg').textContent='还没有可复制的指令'; return; }
-      ta.select(); ta.setSelectionRange(0,999999);
-      var ok=false;
-      try{ ok=document.execCommand('copy'); }catch(e){}
-      if(!ok && navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(function(){ document.getElementById('maOutMsg').textContent='已复制 '+ta.value.split('\n').length+' 条指令'; },function(){ document.getElementById('maOutMsg').textContent='复制失败，请手动全选复制'; }); return; }
-      document.getElementById('maOutMsg').textContent=ok?'已复制 '+ta.value.split('\n').length+' 条指令':'复制失败，请手动全选复制';
-    };
-    document.getElementById('maDlBtn').onclick=function(){
-      var ta=document.getElementById('maOut');
-      if(!ta.value){ document.getElementById('maOutMsg').textContent='还没有可下载的指令'; return; }
-      var blob=new Blob([ta.value],{type:'text/plain;charset=utf-8'});
-      var a=document.createElement('a');
-      a.href=URL.createObjectURL(blob);
-      a.download='mapart_commands.txt';
-      document.body.appendChild(a); a.click();
-      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },300);
-    };
+    return parts;
   }
+  function maScoreFrag(ns,obj){
+    return maCompFrag(ns).map(function(seg){return obj+'=!'+seg;});
+  }
+  function maChunkCmds(prefix,suffix,frags,limit){
+    var out=[];
+    if(!limit||limit<=0){ out.push(prefix+frags.join(',')+suffix); return out; }
+    var cur=[],curLen=prefix.length;
+    for(var i=0;i<frags.length;i++){
+      var add=frags[i],sep=cur.length?',':'';
+      if(curLen+sep.length+add.length+suffix.length<=limit){
+        cur.push(add); curLen+=sep.length+add.length;
+      } else {
+        if(cur.length) out.push(prefix+cur.join(',')+suffix);
+        cur=[add]; curLen=prefix.length+add.length;
+      }
+    }
+    if(cur.length) out.push(prefix+cur.join(',')+suffix);
+    return out;
+  }
+  function maUniqueSort(arr){
+    var u={},out=[];
+    arr.forEach(function(n){ if(n!==undefined&&n!==null&&!u[n]){u[n]=1;out.push(n);} });
+    out.sort(function(a,b){return a-b;});
+    return out;
+  }
+  function maRel(v){ return v===0?'~':'~'+v; }
+  function maTpWrap(mvA,wvA,X0,Y0,Z0,wvV){
+    var x,y,z;
+    if(mvA==='x') x=String(X0); else if(wvA==='x') x=maRel(wvV); else x='~';
+    if(mvA==='y') y=String(Y0); else if(wvA==='y') y=maRel(wvV); else y='~';
+    if(mvA==='z') z=String(Z0); else if(wvA==='z') z=maRel(wvV); else z='~';
+    return 'tp '+x+' '+y+' '+z;
+  }
+  function maTpMove(mvA,mvV){
+    return 'tp '+(mvA==='x'?maRel(mvV):'~')+' '+(mvA==='y'?maRel(mvV):'~')+' '+(mvA==='z'?maRel(mvV):'~');
+  }
+
+  // ---------- 指令生成（照指令音符盒模板：盔甲架游标+计分板穷举） ----------
+  function maBuildCmds(grid,W,H,cfg){
+    var obj=cfg.obj,tag=cfg.tag,X0=cfg.X0,Y0=cfg.Y0,Z0=cfg.Z0;
+    var off=cfg.off,start=1+off,limit=cfg.limit,ban=cfg.ban.slice();
+    var mvA=cfg.mvA,wvA=cfg.wvA,mvV=cfg.mvV,wvV=cfg.wvV;
+    var N=W*H;
+    function coord(c,r){
+      var x=X0,y=Y0,z=Z0;
+      if(mvA==='x') x+=c*mvV; else if(mvA==='y') y+=c*mvV; else z+=c*mvV;
+      if(wvA==='x') x+=r*wvV; else if(wvA==='y') y+=r*wvV; else z+=r*wvV;
+      return [x,y,z];
+    }
+    var minX=X0,maxX=X0,minY=Y0,maxY=Y0,minZ=Z0,maxZ=Z0;
+    for(var r=0;r<H;r++) for(var c=0;c<W;c++){
+      var co=coord(c,r);
+      minX=Math.min(minX,co[0]);maxX=Math.max(maxX,co[0]);
+      minY=Math.min(minY,co[1]);maxY=Math.max(maxY,co[1]);
+      minZ=Math.min(minZ,co[2]);maxZ=Math.max(maxZ,co[2]);
+    }
+    var byBlock={},skipNs=[];
+    for(r=0;r<H;r++) for(c=0;c<W;c++){
+      var id=grid[r][c],n=start+r*W+c;
+      if(!id){ skipNs.push(n); continue; }
+      (byBlock[id]=byBlock[id]||[]).push(n);
+    }
+    var allNs=[]; for(var n=start;n<start+N;n++) allNs.push(n);
+    var wraps=[]; for(var k=1;k<H;k++) wraps.push(start+W*k);
+
+    var init=[],loop=[];
+    if(cfg.tk){
+      init.push('/tickingarea remove_all');
+      init.push('/tickingarea add '+minX+' '+minY+' '+minZ+' '+maxX+' '+maxY+' '+maxZ);
+    }
+    init.push('/scoreboard objectives add '+obj+' dummy');
+    init.push('/summon armor_stand '+X0+' '+Y0+' '+Z0+' ~ ~ . '+tag);
+    init.push('/execute as @e[name="'+tag+'"] run scoreboard players set @s '+obj+' '+start);
+
+    if(wraps.length){
+      loop.push('/execute as @e[scores={'+obj+'=0..}] at @s unless entity @s[scores={'+maScoreFrag(wraps,obj).join(',')+'}] run '+maTpWrap(mvA,wvA,X0,Y0,Z0,wvV));
+    }
+    var ids=Object.keys(byBlock); ids.sort();
+    ids.forEach(function(id){
+      var ns=byBlock[id].slice(),set={};
+      ns.forEach(function(nn){set[nn]=1;});
+      var excl=maUniqueSort(allNs.filter(function(nn){return !set[nn];}).concat(ban).concat(skipNs));
+      var frags=maCompFrag(excl).map(function(seg){return obj+'=!'+seg;});
+      var prefix='/execute as @e[scores={'+obj+'=0..}] at @s unless entity @s[scores={';
+      var suffix='}] run setblock ~ ~ ~ '+id;
+      maChunkCmds(prefix,suffix,frags,limit).forEach(function(cmd){loop.push(cmd);});
+    });
+    loop.push('/execute as @e unless entity @s[name=!'+tag+'] at @s run '+maTpMove(mvA,mvV));
+    loop.push('/execute as @e unless entity @s[name=!'+tag+'] run scoreboard players add @s '+obj+' 1');
+    loop.push('/execute as @e[scores={'+obj+'=0..}] unless entity @s[scores={'+obj+'=!'+(start+N)+'}] run kill @s');
+    return {init:init,loop:loop};
+  }
+
+  // ---------- 预览与统计 ----------
+  function maDrawPrev(grid,W,H,cvId){
+    var cv=ma$_(cvId); if(!cv) return;
+    var cell=Math.max(1,Math.floor(512/Math.max(W,H)));
+    cv.width=Math.max(1,W*cell); cv.height=Math.max(1,H*cell);
+    var ctx=cv.getContext('2d');
+    var useSpr=maSpriteImg.complete&&maSpriteImg.naturalWidth>0;
+    for(var r=0;r<H;r++) for(var c=0;c<W;c++){
+      var id=grid[r][c];
+      var x=c*cell,y=r*cell;
+      if(!id||!MA_MAP[id]){ ctx.clearRect(x,y,cell,cell); continue; }
+      var m=MA_MAP[id];
+      if(useSpr){ ctx.drawImage(maSpriteImg,m.col*16,m.row*16,16,16,x,y,cell,cell); }
+      else { ctx.fillStyle='rgb('+m.avg[0]+','+m.avg[1]+','+m.avg[2]+')'; ctx.fillRect(x,y,cell,cell); }
+    }
+  }
+  function maStat(grid,W,H){
+    var cnt={};
+    grid.forEach(function(row){row.forEach(function(id){ if(id) cnt[id]=(cnt[id]||0)+1; });});
+    var box=ma$_('maStat'); if(!box) return;
+    box.innerHTML=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];}).map(function(id){
+      var m=MA_MAP[id];
+      var sw=m
+        ? 'background-image:url(\''+MA_SPRITE+'\');background-size:224px 140px;background-position:-'+(m.col*14)+'px -'+(m.row*14)+'px;'
+        : 'background:transparent;';
+      return '<div class="mg-item"><span class="mg-swatch" style="'+sw+'"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+id+'</span><b style="margin-left:auto;">'+cnt[id]+'</b></div>';
+    }).join('');
+  }
+
+  // ---------- 生成主流程 ----------
   function maGenerate(){
     if(!maImg){ maToast('请先上传一张图片'); return; }
-    var pal=maPal();
-    var W=Math.max(16,Math.min(256,Math.round(Number(document.getElementById('maW').value)||64)));
-    var H=Math.max(16,Math.round(W*(maImg.height/maImg.width)));
-    if(H>512) H=512;
-    var cv=document.createElement('canvas');
-    cv.width=W; cv.height=H;
+    var mvA=ma$_('maMoveAxis').value,wvA=ma$_('maWrapAxis').value;
+    if(mvA===wvA){ maToast('行进轴和换行轴不能相同'); return; }
+    var W=Math.max(1,Math.min(512,Math.round(Number(ma$_('maW').value)||128)));
+    var H=Math.max(1,Math.min(512,Math.round(Number(ma$_('maH').value)||128)));
+    var mult=Math.max(1,Math.min(8,Math.round(Number(ma$_('maMult').value)||1)));
+    var sw=Math.max(1,Math.round(W/mult)),sh=Math.max(1,Math.round(H/mult));
+    var cv=document.createElement('canvas'); cv.width=sw; cv.height=sh;
     var ctx=cv.getContext('2d',{willReadFrequently:true});
-    ctx.drawImage(maImg,0,0,W,H);
-    var raw=ctx.getImageData(0,0,W,H);
-    var px=raw.data;
-    var alphaMode=document.getElementById('maAlpha').value;
-    var airId=(document.getElementById('maAirId').value||'minecraft:air').trim();
-    if(airId.indexOf(':')<0) airId='minecraft:'+airId;
-    var dither=document.getElementById('maDither').value;
-    var rgb=new Float32Array(W*H*3);
-    var transparent=new Uint8Array(W*H);
+    if(ma$_('maFit').value==='fit'){
+      var k=Math.min(sw/maImg.width,sh/maImg.height);
+      var dw=Math.round(maImg.width*k),dh=Math.round(maImg.height*k);
+      ctx.clearRect(0,0,sw,sh);
+      ctx.drawImage(maImg,(sw-dw)/2,(sh-dh)/2,dw,dh);
+    } else ctx.drawImage(maImg,0,0,sw,sh);
+    var raw=ctx.getImageData(0,0,sw,sh).data;
+    var alpha=ma$_('maAlpha').value;
+    var dither=ma$_('maDither').value;
+    var pal=maPal();
+    if(!pal.length){ maToast('请至少启用一种方块'); return; }
+    var BAYER=[[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+    var rgb=new Float32Array(sw*sh*3);
+    var trans=new Uint8Array(sw*sh);
     var airN=0;
-    for(var i=0;i<W*H;i++){
+    for(var i=0;i<sw*sh;i++){
       var o=i*4;
-      if(alphaMode==='fill' && px[o+3]<128){ transparent[i]=1; airN++; continue; }
-      rgb[i*3]=px[o]; rgb[i*3+1]=px[o+1]; rgb[i*3+2]=px[o+2];
+      if(raw[o+3]<128){
+        if(alpha==='air'){ trans[i]=1; airN++; }
+        else if(alpha==='skip'){ trans[i]=2; }
+        continue;
+      }
+      rgb[i*3]=raw[o]; rgb[i*3+1]=raw[o+1]; rgb[i*3+2]=raw[o+2];
     }
-    function pickIdx(x,y){
-      var idx=y*W+x;
-      if(transparent[idx]) return -1;
+    function pick(x,y){
+      var idx=y*sw+x;
+      if(trans[idx]){
+        if(trans[idx]===2) return null;
+        return 'air';
+      }
       var r=rgb[idx*3],g=rgb[idx*3+1],b=rgb[idx*3+2];
       var best=maNearest(pal,r,g,b);
-      var er=r-best.c[0], eg=g-best.c[1], eb=b-best.c[2];
+      var er=r-best.c[0],eg=g-best.c[1],eb=b-best.c[2];
       if(dither==='fs'){
         var d=[[1,0,7],[-1,1,3],[0,1,5],[1,1,1]];
-        for(var k=0;k<d.length;k++){
-          var nx=x+d[k][0], ny=y+d[k][1];
-          if(nx<0||nx>=W||ny<0||ny>=H||transparent[ny*W+nx]) continue;
-          var ni=(ny*W+nx)*3;
-          rgb[ni]+=er*d[k][2]/16; rgb[ni+1]+=eg*d[k][2]/16; rgb[ni+2]+=eb*d[k][2]/16;
+        for(var q=0;q<d.length;q++){
+          var nx=x+d[q][0],ny=y+d[q][1];
+          if(nx<0||nx>=sw||ny<0||ny>=sh||trans[ny*sw+nx]) continue;
+          var ni=(ny*sw+nx)*3;
+          rgb[ni]+=er*d[q][2]/16; rgb[ni+1]+=eg*d[q][2]/16; rgb[ni+2]+=eb*d[q][2]/16;
         }
       } else if(dither==='atk'){
         var d2=[[1,0,1],[2,0,1],[-1,1,1],[0,1,1],[1,1,1],[0,2,1]];
-        for(var k2=0;k2<d2.length;k2++){
-          var nx2=x+d2[k2][0], ny2=y+d2[k2][1];
-          if(nx2<0||nx2>=W||ny2<0||ny2>=H||transparent[ny2*W+nx2]) continue;
-          var ni2=(ny2*W+nx2)*3;
-          rgb[ni2]+=er*d2[k2][2]/8; rgb[ni2+1]+=eg*d2[k2][2]/8; rgb[ni2+2]+=eb*d2[k2][2]/8;
+        for(var q2=0;q2<d2.length;q2++){
+          var nx2=x+d2[q2][0],ny2=y+d2[q2][1];
+          if(nx2<0||nx2>=sw||ny2<0||ny2>=sh||trans[ny2*sw+nx2]) continue;
+          var ni2=(ny2*sw+nx2)*3;
+          rgb[ni2]+=er*d2[q2][2]/8; rgb[ni2+1]+=eg*d2[q2][2]/8; rgb[ni2+2]+=eb*d2[q2][2]/8;
         }
       } else if(dither==='bayer'){
-        var th=(MA_BAYER[x%4][y%4]+0.5)/16-0.5;
+        var th=(BAYER[x%4][y%4]+0.5)/16-0.5;
         best=maNearest(pal,r+th*255,g+th*255,b+th*255);
       }
-      return best;
+      return best.n;
+    }
+    var gs=[];
+    for(var y=0;y<sh;y++){ var row=[];
+      for(var x=0;x<sw;x++) row.push(pick(x,y));
+      gs.push(row);
     }
     var grid=[];
-    for(var y=0;y<H;y++){
-      var row=[];
-      for(var x=0;x<W;x++){
-        var bi=pickIdx(x,y);
-        row.push(bi<0?airId:bi.n);
+    for(var y2=0;y2<H;y2++){ var r2=[];
+      for(var x2=0;x2<W;x2++) r2.push(gs[Math.min(sh-1,Math.floor(y2/mult))][Math.min(sw-1,Math.floor(x2/mult))]);
+      grid.push(r2);
+    }
+    if(ma$_('maMirV').checked) grid.reverse();
+    if(ma$_('maMirH').checked) grid.forEach(function(r3){r3.reverse();});
+
+    var obj=(ma$_('maObj').value||'n').trim().replace(/[^A-Za-z0-9_]/g,'')||'n';
+    var tag=(ma$_('maTag').value||'A').trim().replace(/[^A-Za-z0-9_]/g,'')||'A';
+    var X0=Math.round(Number(ma$_('maX').value)||0);
+    var Y0=Math.round(Number(ma$_('maY').value)||0);
+    var Z0=Math.round(Number(ma$_('maZ').value)||0);
+    var off=Math.round(Number(ma$_('maOff').value)||0);
+    var limit=Math.round(Number(ma$_('maLimit').value)||0);
+    var ban=ma$_('maBan').value.split(',').map(function(s){return parseInt(s.trim(),10);}).filter(function(n){return !isNaN(n);});
+    var mvV=Math.round(Number(ma$_('maMoveVal').value)||1);
+    var wvV=Math.round(Number(ma$_('maWrapVal').value)||1);
+    var tk=ma$_('maTk').checked;
+    var res=maBuildCmds(grid,W,H,{obj:obj,tag:tag,X0:X0,Y0:Y0,Z0:Z0,off:off,limit:limit,ban:ban,mvA:mvA,wvA:wvA,mvV:mvV,wvV:wvV,tk:tk});
+    var all=res.init.concat([''],res.loop);
+    ma$_('maOut').value=all.join('\n');
+    ma$_('maOutMsg').textContent='初始化 '+res.init.length+' 条 · 循环 '+res.loop.length+' 条 · 合计 '+all.length+' 条 · 总字符 '+(all.join('\n').length)+' · 画幅 '+W+'×'+H+(airN?' · 透明格 '+airN:'');
+    maDrawPrev(grid,W,H,'maPrev');
+    maStat(grid,W,H);
+  }
+
+  // ---------- ⑥ 导入命令转预览（反向解析） ----------
+  function maParseScore(s,set){
+    s.split(',').forEach(function(seg){
+      seg=seg.trim();
+      var mm=seg.match(/=!(\d+)(?:\.\.(\d+))?$/);
+      if(mm){
+        var a=+mm[1],b=mm[2]?+mm[2]:a;
+        for(var n=a;n<=b;n++) set[n]=1;
+      }
+    });
+  }
+  function maLastScores(line){
+    // 取最后一个 scores={...} 块（排除列表在 unless entity 内，位于命令后部）
+    var all=line.match(/scores=\{[^}]*\}/g);
+    return all ? all[all.length-1].slice(8,-1) : null;
+  }
+  function maParse(){
+    var ta=ma$_('maImpIn'); if(!ta) return;
+    var text=ta.value;
+    if(!text.trim()){ maToast('请先粘贴指令或导入 TXT'); return; }
+    var lines=text.split(/\r?\n/);
+    var obj=null,tag=null,X0=0,Y0=0,Z0=0;
+    var setblocks=[],wraps=null,wrapTp=null,moveTp=null,maxN=null;
+    var start=1;
+    lines.forEach(function(line){
+      line=line.trim(); if(!line) return;
+      var m;
+      if(m=line.match(/scoreboard objectives add (\S+)/)){ obj=m[1]; }
+      else if(m=line.match(/summon armor_stand (-?\d+) (-?\d+) (-?\d+)/)){
+        X0=+m[1]; Y0=+m[2]; Z0=+m[3];
+        var nm=line.match(/\s\.\s+["']?([\w#]+)["']?\s*$/);
+        if(nm) tag=nm[1];
+      }
+      else if(line.indexOf('setblock ~ ~ ~')>=0&&line.indexOf('unless')>=0){
+        var idm=line.match(/setblock ~ ~ ~ (\S+)/); if(!idm) return;
+        var sc=maLastScores(line);
+        var excl={};
+        if(sc) maParseScore(sc,excl);
+        setblocks.push({id:idm[1],excl:excl});
+      }
+      else if(line.indexOf('run tp ')>=0&&line.indexOf('unless')>=0&&line.indexOf('scores')>=0){
+        var sc2=maLastScores(line);
+        var ex2={};
+        if(sc2) maParseScore(sc2,ex2);
+        wraps=ex2;
+        var tp=line.match(/run tp (\S+) (\S+) (\S+)/);
+        if(tp) wrapTp=[tp[1],tp[2],tp[3]];
+      }
+      else if(m=line.match(/unless entity @s\[name=!(\S+)\] at @s run tp (\S+) (\S+) (\S+)/)){
+        moveTp=[m[2],m[3],m[4]];
+      }
+      else if(m=line.match(/unless entity @s\[scores=\{[^}]*=!(\d+)\}\] run kill/)){
+        maxN=+m[1];
+      }
+    });
+    if(!setblocks.length){ maToast('没找到 setblock 指令，无法解析'); return; }
+    if(!obj) obj='n';
+    if(maxN==null){ maToast('缺少 kill 上限，无法确定画幅'); return; }
+    var N=maxN-start;
+    var ws=wraps?Object.keys(wraps).map(Number).sort(function(a,b){return a-b;}):[];
+    var W=ws.length?ws[0]-start:N;
+    if(W<=0){ maToast('解析失败：行宽异常'); return; }
+    var H=Math.ceil(N/W);
+    var mvA=null,mvV=1,wvA=null,wvV=1;
+    if(moveTp){
+      if(moveTp[0].indexOf('~')>=0&&moveTp[0].length>1){ mvA='x'; mvV=parseInt(moveTp[0].slice(1),10)||1; }
+      else if(moveTp[1].indexOf('~')>=0&&moveTp[1].length>1){ mvA='y'; mvV=parseInt(moveTp[1].slice(1),10)||1; }
+      else if(moveTp[2].indexOf('~')>=0&&moveTp[2].length>1){ mvA='z'; mvV=parseInt(moveTp[2].slice(1),10)||1; }
+    }
+    if(!mvA) mvA='x';
+    if(wrapTp){
+      if(mvA!=='x'&&wrapTp[0].indexOf('~')>=0&&wrapTp[0].length>1){ wvA='x'; wvV=parseInt(wrapTp[0].slice(1),10)||1; }
+      else if(mvA!=='y'&&wrapTp[1].indexOf('~')>=0&&wrapTp[1].length>1){ wvA='y'; wvV=parseInt(wrapTp[1].slice(1),10)||1; }
+      else if(mvA!=='z'&&wrapTp[2].indexOf('~')>=0&&wrapTp[2].length>1){ wvA='z'; wvV=parseInt(wrapTp[2].slice(1),10)||1; }
+    }
+    if(!wvA) wvA=(mvA==='x'?'z':'x');
+    var grid=[];
+    for(var r=0;r<H;r++){ var row=[];
+      for(var c=0;c<W;c++){
+        var n=start+r*W+c;
+        var id=null;
+        if(n<maxN){
+          for(var i=0;i<setblocks.length;i++){
+            if(!setblocks[i].excl[n]){ id=setblocks[i].id; break; }
+          }
+        }
+        row.push(id);
       }
       grid.push(row);
     }
-    if(maFlipY) grid.reverse();
-    var pv=document.getElementById('maPrev');
-    var scale=Math.max(1,Math.floor(512/W));
-    pv.width=W*scale; pv.height=H*scale;
-    var pc=pv.getContext('2d');
-    for(var y2=0;y2<H;y2++){
-      for(var x2=0;x2<W;x2++){
-        var id=grid[y2][x2], col=null;
-        for(var pi=0;pi<pal.length;pi++){ if(pal[pi].n===id){ col=pal[pi].c; break; } }
-        if(col){
-          pc.fillStyle='rgb('+col[0]+','+col[1]+','+col[2]+')';
-          pc.fillRect(x2*scale,y2*scale,scale,scale);
-        } else {
-          pc.clearRect(x2*scale,y2*scale,scale,scale);
-          pc.strokeStyle='rgba(255,255,255,.28)';
-          pc.strokeRect(x2*scale+0.5,y2*scale+0.5,scale-1,scale-1);
-        }
-      }
-    }
+    maDrawPrev(grid,W,H,'maImpPrev');
     var cnt={};
-    grid.forEach(function(row){ row.forEach(function(id){ cnt[id]=(cnt[id]||0)+1; }); });
-    var statBox=document.getElementById('maStat');
-    statBox.innerHTML=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];}).map(function(id){
-      var col=null;
-      for(var pi=0;pi<pal.length;pi++){ if(pal[pi].n===id){ col=pal[pi].c; break; } }
-      var sw=col?'background:rgb('+col[0]+','+col[1]+','+col[2]+');':'background:transparent;border:1px dashed rgba(128,128,128,.5);';
-      return '<div class="mg-item"><span class="mg-swatch" style="'+sw+'"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+id.replace('minecraft:','')+'</span><b style="margin-left:auto;">'+cnt[id]+'</b></div>';
-    }).join('');
-    var face=document.getElementById('maFace').value;
-    var mode=document.getElementById('maMode').value;
-    var X=Math.round(Number(document.getElementById('maX').value)||0);
-    var Y=Math.round(Number(document.getElementById('maY').value)||64);
-    var Z=Math.round(Number(document.getElementById('maZ').value)||0);
-    var lines=[];
-    for(var y3=0;y3<H;y3++){
-      var x3=0;
-      while(x3<W){
-        var id2=grid[y3][x3], cEnd=x3;
-        while(cEnd+1<W && grid[y3][cEnd+1]===id2) cEnd++;
-        if(mode==='fill'){
-          if(face==='xy') lines.push('/fill '+(X+x3)+' '+Y+' '+(Z+y3)+' '+(X+cEnd)+' '+Y+' '+(Z+y3)+' '+id2);
-          else lines.push('/fill '+(X+x3)+' '+(Y+y3)+' '+Z+' '+(X+cEnd)+' '+(Y+y3)+' '+Z+' '+id2);
-        } else {
-          for(var k=x3;k<=cEnd;k++){
-            if(face==='xy') lines.push('/setblock '+(X+k)+' '+Y+' '+(Z+y3)+' '+id2);
-            else lines.push('/setblock '+(X+k)+' '+(Y+y3)+' '+Z+' '+id2);
-          }
-        }
-        x3=cEnd+1;
-      }
+    grid.forEach(function(row2){row2.forEach(function(id2){ if(id2) cnt[id2]=(cnt[id2]||0)+1; });});
+    var box=ma$_('maImpInfo');
+    box.innerHTML='<div class="mg-item"><b style="font-size:13px;color:var(--text);">解析结果</b></div>'
+      +'<div class="mg-item"><span>画幅</span><b style="margin-left:auto;">'+W+' × '+H+' 格（'+N+' 格）</b></div>'
+      +'<div class="mg-item"><span>计分板</span><b style="margin-left:auto;">'+obj+'</b></div>'
+      +'<div class="mg-item"><span>盔甲架</span><b style="margin-left:auto;">'+(tag||'未知')+'</b></div>'
+      +'<div class="mg-item"><span>起点</span><b style="margin-left:auto;">'+X0+' '+Y0+' '+Z0+'</b></div>'
+      +'<div class="mg-item"><span>行进/换行</span><b style="margin-left:auto;">'+mvA+(mvV>0?'+'+mvV:mvV)+' / '+wvA+(wvV>0?'+'+wvV:wvV)+'</b></div>'
+      +'<div class="mg-item"><span>方块种数</span><b style="margin-left:auto;">'+Object.keys(cnt).length+'</b></div>'
+      +Object.keys(cnt).map(function(id){return '<div class="mg-item"><span>'+id+'</span><b style="margin-left:auto;">'+cnt[id]+'</b></div>';}).join('');
+    maToast('解析完成：'+W+' × '+H);
+  }
+
+  // ---------- 事件与初始化 ----------
+  function maLoadImage(file){
+    var rd=new FileReader();
+    rd.onload=function(){ var im=new Image(); im.onload=function(){ maImg=im; }; im.src=rd.result; };
+    rd.readAsDataURL(file);
+  }
+  function maInit(){
+    maSpriteImg.src=MA_SPRITE;
+    maBuildCats(); maBuildBlocks();
+    var drop=ma$_('maDrop'),fi=ma$_('maFile');
+    if(drop&&fi){
+      fi.onchange=function(){ if(fi.files&&fi.files[0]) maLoadImage(fi.files[0]); };
+      drop.onclick=function(){ fi.click(); };
+      drop.ondragover=function(e){ e.preventDefault(); drop.style.borderColor='var(--accent)'; };
+      drop.ondragleave=function(){ drop.style.borderColor=''; };
+      drop.ondrop=function(e){
+        e.preventDefault(); drop.style.borderColor='';
+        if(e.dataTransfer.files&&e.dataTransfer.files[0]) maLoadImage(e.dataTransfer.files[0]);
+      };
     }
-    document.getElementById('maOut').value=lines.join('\n');
-    document.getElementById('maOutMsg').textContent='共 '+lines.length+' 条指令 · 画幅 '+W+'×'+H+' 方块'+(airN?' · 透明方块 '+airN+' 格':'');
+    var allBtn=ma$_('maAllBtn'); if(allBtn) allBtn.onclick=function(){ maSetAll(true); };
+    var noneBtn=ma$_('maNoneBtn'); if(noneBtn) noneBtn.onclick=function(){ maSetAll(false); };
+    var gen=ma$_('maGenBtn'); if(gen) gen.onclick=maGenerate;
+    var tpls={
+      '16':{W:16,H:16,mult:1,fit:'fill',hint:'像素图标，适合小徽标/图案'},
+      '32':{W:32,H:32,mult:1,fit:'fill',hint:'小头像，文件小、生成快'},
+      '64':{W:64,H:64,mult:1,fit:'fill',hint:'头像/常规图'},
+      '128':{W:128,H:128,mult:1,fit:'fill',hint:'标准图，圈内常见画幅'},
+      '256x128':{W:256,H:128,mult:1,fit:'fill',hint:'横向横幅，建议原图也偏横'},
+      '128x64':{W:128,H:64,mult:1,fit:'fill',hint:'横向长条，适合签名/装饰'}
+    };
+    Array.prototype.forEach.call(document.querySelectorAll('[data-tpl]'),function(btn){
+      btn.onclick=function(){
+        var t=tpls[btn.dataset.tpl]; if(!t) return;
+        ma$_('maW').value=t.W; ma$_('maH').value=t.H; ma$_('maMult').value=t.mult;
+        ma$_('maFit').value=t.fit;
+        maToast('已套用模板 '+btn.textContent+'：'+t.hint);
+      };
+    });
+    var rst=ma$_('maResetBtn');
+    if(rst){
+      rst.onclick=function(){
+        ['maW','maH','maMult','maX','maY','maZ'].forEach(function(id){ var el=ma$_(id); if(el) el.value='0'; });
+        var def={'maW':'128','maH':'128','maMult':'1','maX':'0','maY':'0','maZ':'0','maLimit':'32000','maOff':'0','maMoveVal':'1','maWrapVal':'1','maObj':'n','maTag':'A'};
+        Object.keys(def).forEach(function(id){ var el=ma$_(id); if(el) el.value=def[id]; });
+        ma$_('maFit').value='fill';
+        ma$_('maAlpha').value='keep';
+        ma$_('maDither').value='none';
+        ma$_('maTk').checked=true;
+        ma$_('maMirV').checked=false;
+        ma$_('maMirH').checked=false;
+        ma$_('maMoveAxis').value='z';
+        ma$_('maWrapAxis').value='x';
+        maSetAll(true);
+        ma$_('maOut').value='';
+        ma$_('maOutMsg').textContent='';
+        maToast('已重置');
+      };
+    }
+    var copy=ma$_('maCopyBtn');
+    if(copy){
+      copy.onclick=function(){
+        var v=ma$_('maOut').value; if(!v){ maToast('还没有生成指令'); return; }
+        if(navigator.clipboard&&navigator.clipboard.writeText){
+          navigator.clipboard.writeText(v).then(function(){ maToast('已复制'); },function(){ maFallbackCopy(v); });
+        } else maFallbackCopy(v);
+      };
+    }
+    var dl=ma$_('maDlBtn');
+    if(dl){
+      dl.onclick=function(){
+        var v=ma$_('maOut').value; if(!v){ maToast('还没有生成指令'); return; }
+        var blob=new Blob([v],{type:'text/plain;charset=utf-8'});
+        var a=document.createElement('a');
+        a.href=URL.createObjectURL(blob);
+        a.download='mapart_commands.txt';
+        document.body.appendChild(a); a.click();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },500);
+      };
+    }
+    var impBtn=ma$_('maImpBtn'); if(impBtn) impBtn.onclick=maParse;
+    var impFileBtn=ma$_('maImpFileBtn'),impFile=ma$_('maImpFile');
+    if(impFileBtn&&impFile){
+      impFileBtn.onclick=function(){ impFile.click(); };
+      impFile.onchange=function(){
+        if(!impFile.files||!impFile.files[0]) return;
+        var rd=new FileReader();
+        rd.onload=function(){ ma$_('maImpIn').value=rd.result; maParse(); };
+        rd.readAsText(impFile.files[0],'utf-8');
+      };
+    }
+    var mv=ma$_('maMoveAxis'),wv=ma$_('maWrapAxis'),hint=ma$_('maAxisHint');
+    function axisHint(){
+      if(!mv||!wv||!hint) return;
+      var a=mv.value,b=wv.value;
+      if(a===b){ hint.textContent='行进轴和换行轴不能相同'; hint.style.color='#f87171'; return; }
+      var third=['x','y','z'].filter(function(t){return t!==a&&t!==b;})[0];
+      hint.textContent='当前 '+third+' 已被自动排除，生成不会影响此轴';
+      hint.style.color='';
+    }
+    if(mv) mv.onchange=axisHint;
+    if(wv) wv.onchange=axisHint;
+    axisHint();
+  }
+  function maFallbackCopy(v){
+    var ta=document.createElement('textarea');
+    ta.value=v; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); maToast('已复制'); }catch(e){ maToast('复制失败，请手动复制'); }
+    ta.remove();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',maInit);
   else maInit();
 })();
-</script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<button class="glass-bg-btn" style="position:fixed;top:78px;right:92px;z-index:400;" id="glassBgBtn" title="液态玻璃实验室" aria-label="液态玻璃实验室"></button>
-<div class="glass-bg-picker hidden" id="glassBgPicker">
-<div class="gb-picker-head"><div class="gb-picker-title">液态玻璃实验室</div><button class="gb-close" id="gbClose" title="关闭">&#10005;</button></div>
-<div class="lab-section">
-<div class="lab-title">背景壁纸</div>
-<div class="lab-row">
-<div class="gb-opt active" data-gb="default"><span class="gb-swatch" style="background:linear-gradient(135deg,#dce7ff,#e6e2ff,#f4e8fb)"></span><span>默认</span></div>
-<div class="gb-opt" data-gb="aurora"><span class="gb-swatch" style="background:linear-gradient(135deg,#d3f8f5,#e0f2fe,#ede9fe)"></span><span>极光</span></div>
-<div class="gb-opt" data-gb="sunset"><span class="gb-swatch" style="background:linear-gradient(135deg,#ffe8d6,#ffe4e6,#ffd6e7)"></span><span>日落</span></div>
-<div class="gb-opt" data-gb="mint"><span class="gb-swatch" style="background:linear-gradient(135deg,#d8f8e4,#d9f4f2,#dff0ff)"></span><span>薄荷</span></div>
-<div class="gb-opt" data-gb="cyber"><span class="gb-swatch" style="background:linear-gradient(135deg,#ff5f8f,#c084fc,#7c3aed)"></span><span>赛博</span></div>
-<div class="gb-opt" data-gb="forest"><span class="gb-swatch" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0,#86efac)"></span><span>森林</span></div>
-<div class="gb-opt" data-gb="ocean"><span class="gb-swatch" style="background:linear-gradient(135deg,#cffafe,#a5f3fc,#67e8f9)"></span><span>海洋</span></div>
-<div class="gb-opt" data-gb="sakura"><span class="gb-swatch" style="background:linear-gradient(135deg,#ffe4e6,#fecdd3,#fbcfe8)"></span><span>樱花</span></div>
-<div class="gb-opt" data-gb="plain"><span class="gb-swatch" style="background:#ffffff;border:1px solid #e2e8f0;"></span><span>纯白</span></div>
-<div class="gb-opt" data-gb="transparent"><span class="gb-swatch" style="background:transparent;border:1px dashed #cbd5e1;"></span><span>透明</span></div>
-</div>
-<div class="lab-custom">
-<input type="color" id="gbCustom1" value="#dce7ff" title="背景渐变起始色">
-<input type="color" id="gbCustom2" value="#f4e8fb" title="背景渐变结束色">
-<span style="font-size:11px;color:#5b6675;">自定义（起始 / 结束色）</span>
-<span class="gb-custom-preview" id="gbCustomPrev"></span>
-</div>
-</div>
-<div class="lab-section">
-<div class="lab-title">强度预设</div>
-<div class="gb-seg" id="gbPresetSeg">
-<button class="gb-seg-btn" data-preset="soft">柔和</button>
-<button class="gb-seg-btn active" data-preset="normal">适中</button>
-<button class="gb-seg-btn" data-preset="strong">强烈</button>
-</div>
-</div>
-<div class="lab-section">
-<div class="lab-title">UI 透明度</div>
-<div class="lab-slider">
-<label><span>通透</span><span id="opVal">18%</span></label>
-<input type="range" id="gbOpacity" min="4" max="100" value="18">
-</div>
-</div>
-<div class="lab-section">
-<div class="lab-title">光影 Shadow</div>
-<div class="lab-slider">
-<label><span>阴影扩展</span><span id="shVal1">40px</span></label>
-<input type="range" id="gbSh1" min="12" max="80" value="40">
-</div>
-<div class="lab-slider">
-<label><span>光效强度</span><span id="shVal2">16%</span></label>
-<input type="range" id="gbSh2" min="4" max="40" value="16">
-</div>
-<div class="lab-slider">
-<label><span>偏移</span><span id="shVal3">12px</span></label>
-<input type="range" id="gbSh3" min="-20" max="44" value="12">
-</div>
-</div>
-<div class="lab-section">
-<div class="lab-title">拖动模式</div>
-<div class="gb-seg" id="gbDragSeg">
-<button class="gb-seg-btn active" data-drag="grid">网格排序</button>
-<button class="gb-seg-btn" data-drag="free">自由摆放</button>
-</div>
-</div>
-<div class="lab-section">
-<div class="lab-title">选项</div>
-<div class="gb-switches">
-<label class="gb-switch"><input type="checkbox" id="gbOff"><span>玻璃效果</span></label>
-<label class="gb-switch"><input type="checkbox" id="gbLite"><span>性能优先</span></label>
-<label class="gb-switch"><input type="checkbox" id="gbDark"><span>深色玻璃</span></label>
-</div>
-<div class="gb-actions">
-<button class="gb-mini-btn" id="gbRandom">随机主题</button>
-<button class="gb-mini-btn" id="gbReset">重置默认</button>
-<button class="gb-mini-btn" id="gbShare">生成分享码</button>
-</div>
-<div class="gb-share-row" id="gbShareRow" style="display:none;">
-<input type="text" id="gbShareCode" readonly>
-<button class="gb-mini-btn" id="gbShareCopy">复制</button>
-</div>
-<div class="gb-share-row">
-<input type="text" id="gbShareIn" placeholder="输入分享码…">
-<button class="gb-mini-btn" id="gbShareApply">应用</button>
-</div>
-</div>
-</div>
-
-<div class="tst-debug-mask hidden" id="gbConfirmMask">
-<div class="tst-debug-box" style="width:340px;">
-<div class="db-title">切换液态玻璃主题</div>
-<div class="db-desc">液态玻璃主题对设备配置要求较高，可能影响流畅度。请输入「我确认」三个字后继续切换。</div>
-<input type="text" id="gbConfirmInput" placeholder="输入：我确认" autocomplete="off" style="background:rgba(255,255,255,.5);">
-<div class="db-btns"><button id="gbConfirmOk">确认切换</button><button id="gbConfirmCancel">取消</button></div>
-</div>
-</div>
-<script>
-(function(){
-  const mask=document.getElementById('gbConfirmMask');
-  if(!mask)return;
-  const input=document.getElementById('gbConfirmInput');
-  const ok=document.getElementById('gbConfirmOk');
-  const cancel=document.getElementById('gbConfirmCancel');
-  function close(){mask.classList.add('hidden');}
-  function doSwitch(){
-    if(input.value.trim()==='我确认'){
-      localStorage.setItem('tst-theme','glass');
-      applyTheme();
-      if(typeof syncGlassBgUI==='function')syncGlassBgUI();
-    }else{
-      input.style.borderColor='#ef4444';input.focus();return;
-    }
-    close();
-  }
-  ok.onclick=doSwitch;
-  cancel.onclick=close;
-  input.onkeydown=function(e){if(e.key==='Enter')doSwitch();};
-  mask.onclick=function(e){if(e.target===mask)close();};
-})();
-</script>
-<script>
-if(typeof $==='undefined'){window.$=function(s){return document.querySelector(s)};}
-if(typeof root==='undefined'){window.root=document.documentElement;}
-function themeState(){
-  const v=localStorage.getItem('tst-theme');
-  return (v==='glass'||v==='dark'||v==='light')?v:'light';
-}
-function applyTheme(){
-  const m=themeState();
-  root.setAttribute('data-theme',m);
-  document.body.classList.remove('drag-lock');
-  try{
-    const c=(m==='dark')?'#0f172a':'#f3f5f8';
-    const oldMetas=document.querySelectorAll('meta[name="theme-color"],meta[name="msapplication-navbutton-color"]');
-    for(let i=0;i<oldMetas.length;i++){oldMetas[i].parentNode.removeChild(oldMetas[i]);}
-    const m1=document.createElement('meta');m1.name='theme-color';m1.content=c;(document.head||document.documentElement).appendChild(m1);
-    const m2=document.createElement('meta');m2.name='msapplication-navbutton-color';m2.content=c;(document.head||document.documentElement).appendChild(m2);
-  }catch(e){}
-}
-$('#themeToggle').onclick=()=>{
-  const cur=themeState();
-  const next=cur==='light'?'dark':'light';
-  localStorage.setItem('tst-theme',next);
-  applyTheme();
-  if(window.sfx)window.sfx('toggle');
-  if(typeof syncGlassBgUI==='function')syncGlassBgUI();
-};
-applyTheme();
-if(typeof syncGlassBgUI==='function')syncGlassBgUI();
-
-// ===== 液态玻璃实验室：壁纸/透明度/光影 + 卡片拖动 + 调试入口（仅玻璃主题）=====
-(function(){
-  const gbBtn=document.getElementById('glassBgBtn');
-  const gbPicker=document.getElementById('glassBgPicker');
-  function applyGlassBg(){
-    const bg=localStorage.getItem('tst-glass-bg')||'default';
-    const root=document.documentElement;
-    document.body.classList.toggle('glass-off',localStorage.getItem('tst-glass-off')==='1');
-    document.body.classList.toggle('glass-lite',localStorage.getItem('tst-glass-lite')==='1');
-    root.toggleAttribute('data-glass-dark',localStorage.getItem('tst-glass-dark')==='1');
-    if(bg.indexOf('custom-')===0){
-      root.setAttribute('data-gb','custom');
-      const parts=bg.split('-');
-      const c1=parts[1]||'dce7ff',c2=parts[2]||'f4e8fb';
-      root.style.setProperty('--gb-c1','#'+c1);
-      root.style.setProperty('--gb-c2','#'+c2);
-      const c1in=document.getElementById('gbCustom1'),c2in=document.getElementById('gbCustom2');
-      if(c1in)c1in.value='#'+c1; if(c2in)c2in.value='#'+c2;
-    } else {
-      root.removeAttribute('data-gb');
-      if(bg!=='default'){root.setAttribute('data-gb',bg);}
-    }
-    const opts=document.querySelectorAll('.gb-opt');
-    opts.forEach(function(o){o.classList.toggle('active',o.getAttribute('data-gb')===bg);});
-    applyGlassSliders();
-  }
-  function applyGlassSliders(){
-    const root=document.documentElement;
-    const op=parseFloat(localStorage.getItem('tst-glass-op')||'18');
-    const sh1=parseFloat(localStorage.getItem('tst-glass-sh1')||'40');
-    const sh2=parseFloat(localStorage.getItem('tst-glass-sh2')||'16');
-    const sh3=parseFloat(localStorage.getItem('tst-glass-sh3')||'12');
-    const go=op/100;
-    root.style.setProperty('--go1',Math.min(go*1.45,.92).toFixed(3));
-    root.style.setProperty('--go2',Math.max(go*.45,.06).toFixed(3));
-    root.style.setProperty('--go3',(go*.7).toFixed(3));
-    root.style.setProperty('--gn1',Math.min(go*1.05,.95).toFixed(3));
-    root.style.setProperty('--gb1',Math.min(go*1.6,.95).toFixed(3));
-    root.style.setProperty('--gb2',Math.max(go*.55,.08).toFixed(3));
-    root.style.setProperty('--gsh1',sh1+'px');
-    root.style.setProperty('--gsh2',(sh2/100).toFixed(3));
-    root.style.setProperty('--gsh3',sh3+'px');
-    const set=function(id,val){const el=document.getElementById(id);if(el)el.textContent=val;};
-    set('opVal',op+'%'); set('shVal1',sh1+'px'); set('shVal2',sh2+'%'); set('shVal3',sh3+'px');
-    var pairs=[['gbOpacity','tst-glass-op',op],['gbSh1','tst-glass-sh1',sh1],['gbSh2','tst-glass-sh2',sh2],['gbSh3','tst-glass-sh3',sh3]];
-    pairs.forEach(function(pair){
-      const el=document.getElementById(pair[0]);
-      if(el&&el.value!==String(pair[2]))el.value=pair[2];
-    });
-  }
-  function bindSlider(id,key){
-    const el=document.getElementById(id);
-    if(!el)return;
-    el.addEventListener('input',function(){
-      localStorage.setItem(key,el.value);
-      applyGlassSliders();
-      var tt=document.getElementById('glassToast');
-      if(tt){tt.classList.add('show');clearTimeout(tt._t);tt._t=setTimeout(function(){tt.classList.remove('show');},900);}
-    });
-  }
-  function syncGlassBgUI(){
-    const g=themeState()==='glass';
-    if(gbBtn){gbBtn.style.display='';}
-    if(gbPicker){gbPicker.classList.toggle('hidden',!g);}
-    if(g){applyGlassBg();}
-  }
-  if(gbBtn){
-    gbBtn.addEventListener('click',function(e){
-      e.stopPropagation();
-      if(themeState()==='glass'){gbPicker.classList.toggle('hidden');return;}
-      const mask=document.getElementById('gbConfirmMask');
-      if(mask){mask.classList.remove('hidden');const inp=document.getElementById('gbConfirmInput');if(inp){inp.value='';inp.style.borderColor='';setTimeout(function(){inp.focus();},80);}}
-    });
-  }
-  document.addEventListener('click',function(e){
-    if(gbPicker&&!gbPicker.classList.contains('hidden')&&!e.target.closest('#glassBgPicker')&&!e.target.closest('#glassBgBtn')){
-      gbPicker.classList.add('hidden');
-    }
-  });
-  const opts=document.querySelectorAll('.gb-opt');
-  opts.forEach(function(o){
-    o.addEventListener('click',function(){
-      localStorage.setItem('tst-glass-bg',o.getAttribute('data-gb'));
-      applyGlassBg();
-    });
-  });
-  const c1in=document.getElementById('gbCustom1'),c2in=document.getElementById('gbCustom2');
-  if(c1in&&c2in){
-    const updatePrev=function(){
-      const pv=document.getElementById('gbCustomPrev');
-      if(pv)pv.style.background='linear-gradient(135deg,'+c1in.value+','+c2in.value+')';
-    };
-    const applyCustom=function(){
-      localStorage.setItem('tst-glass-bg','custom-'+c1in.value.replace('#','')+'-'+c2in.value.replace('#',''));
-      applyGlassBg();
-      updatePrev();
-    };
-    updatePrev();
-    c1in.addEventListener('input',applyCustom);
-    c2in.addEventListener('input',applyCustom);
-  }
-  bindSlider('gbOpacity','tst-glass-op');
-  bindSlider('gbSh1','tst-glass-sh1');
-  bindSlider('gbSh2','tst-glass-sh2');
-  bindSlider('gbSh3','tst-glass-sh3');
-  function gbToast(msg){
-    var tt=document.getElementById('glassToast');
-    if(!tt){tt=document.createElement('div');tt.id='glassToast';tt.style.cssText='position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(16px);z-index:1500;padding:9px 18px;border-radius:12px;background:rgba(255,255,255,.9);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.8);box-shadow:0 10px 30px rgba(70,90,160,.25);color:#1f2937;font-size:13px;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;';document.body.appendChild(tt);}
-    tt.textContent=msg;tt.style.opacity='1';tt.style.transform='translateX(-50%) translateY(0)';
-    clearTimeout(tt._t);tt._t=setTimeout(function(){tt.style.opacity='0';tt.style.transform='translateX(-50%) translateY(16px)';},1400);
-  }
-  // 关闭按钮
-  var gbClose=document.getElementById('gbClose');
-  if(gbClose){gbClose.addEventListener('click',function(){gbPicker.classList.add('hidden');});}
-  // 三个开关
-  function bindCheck(id,key,fn){
-    var el=document.getElementById(id);
-    if(!el)return;
-    el.checked=localStorage.getItem(key)==='1';
-    el.addEventListener('change',function(){
-      localStorage.setItem(key,el.checked?'1':'0');
-      applyGlassBg();
-      if(fn)fn(el.checked);
-      gbToast(el.checked?'已开启':'已关闭');
-    });
-  }
-  bindCheck('gbOff','tst-glass-off');
-  bindCheck('gbLite','tst-glass-lite');
-  bindCheck('gbDark','tst-glass-dark');
-  // 强度预设
-  var presetMap={soft:8,normal:18,strong:34};
-  document.querySelectorAll('#gbPresetSeg .gb-seg-btn').forEach(function(b){
-    b.addEventListener('click',function(){
-      document.querySelectorAll('#gbPresetSeg .gb-seg-btn').forEach(function(x){x.classList.remove('active');});
-      b.classList.add('active');
-      var op=presetMap[b.getAttribute('data-preset')];
-      localStorage.setItem('tst-glass-op',op);
-      applyGlassSliders();
-      gbToast('强度预设：'+(b.textContent||''));
-    });
-  });
-  // 随机主题
-  var gbRandom=document.getElementById('gbRandom');
-  if(gbRandom){
-    gbRandom.addEventListener('click',function(){
-      var bgs=['default','aurora','sunset','mint','cyber','forest','ocean','sakura'];
-      var bg=bgs[Math.floor(Math.random()*bgs.length)];
-      var op=6+Math.floor(Math.random()*40);
-      var sh1=20+Math.floor(Math.random()*40);
-      var sh2=8+Math.floor(Math.random()*20);
-      var sh3=0+Math.floor(Math.random()*24)-8;
-      localStorage.setItem('tst-glass-bg',bg);
-      localStorage.setItem('tst-glass-op',op);
-      localStorage.setItem('tst-glass-sh1',sh1);
-      localStorage.setItem('tst-glass-sh2',sh2);
-      localStorage.setItem('tst-glass-sh3',sh3);
-      applyGlassBg();
-      gbToast('已随机一套主题');
-    });
-  }
-  // 重置默认
-  var gbReset=document.getElementById('gbReset');
-  if(gbReset){
-    gbReset.addEventListener('click',function(){
-      ['tst-glass-bg','tst-glass-op','tst-glass-sh1','tst-glass-sh2','tst-glass-sh3','tst-glass-off','tst-glass-lite','tst-glass-dark'].forEach(function(k){localStorage.removeItem(k);});
-      ['gbOff','gbLite','gbDark'].forEach(function(id){var el=document.getElementById(id);if(el)el.checked=false;});
-      applyGlassBg();
-      gbToast('已恢复默认设置');
-    });
-  }
-  // 分享码
-  var gbShare=document.getElementById('gbShare');
-  if(gbShare){
-    function readGlassSettings(){
-      var o={};
-      o.bg=localStorage.getItem('tst-glass-bg')||'default';
-      o.op=localStorage.getItem('tst-glass-op')||'18';
-      o.sh1=localStorage.getItem('tst-glass-sh1')||'40';
-      o.sh2=localStorage.getItem('tst-glass-sh2')||'16';
-      o.sh3=localStorage.getItem('tst-glass-sh3')||'12';
-      o.off=localStorage.getItem('tst-glass-off')||'0';
-      o.lite=localStorage.getItem('tst-glass-lite')||'0';
-      o.dark=localStorage.getItem('tst-glass-dark')||'0';
-      return o;
-    }
-    function b64Encode(s){try{return btoa(unescape(encodeURIComponent(s)));}catch(e){return '';}}
-    function b64Decode(s){try{return decodeURIComponent(escape(atob(s)));}catch(e){return '';}}
-    gbShare.addEventListener('click',function(){
-      var code='TSTGLASS-'+b64Encode(JSON.stringify(readGlassSettings()));
-      var row=document.getElementById('gbShareRow'),inp=document.getElementById('gbShareCode');
-      if(row)row.style.display='flex';
-      if(inp){inp.value=code;inp.select();}
-      gbToast('分享码已生成，可复制给好友');
-    });
-    var gbShareCopy=document.getElementById('gbShareCopy');
-    if(gbShareCopy){
-      gbShareCopy.addEventListener('click',function(){
-        var inp=document.getElementById('gbShareCode');
-        if(!inp)return;
-        inp.select();
-        try{document.execCommand('copy');gbToast('已复制');}
-        catch(e){gbToast('复制失败，请手动复制');}
-      });
-    }
-    var gbShareApply=document.getElementById('gbShareApply');
-    if(gbShareApply){
-      gbShareApply.addEventListener('click',function(){
-        var inp=document.getElementById('gbShareIn');
-        if(!inp)return;
-        var v=(inp.value||'').trim();
-        var m=v.match(/^TSTGLASS-(.+)$/);
-        if(!m){gbToast('分享码无效');return;}
-        var json=b64Decode(m[1]);
-        var o=null;
-        try{o=JSON.parse(json);}catch(e){}
-        if(!o){gbToast('分享码无效');return;}
-        if(o.bg)localStorage.setItem('tst-glass-bg',o.bg);
-        if(o.op)localStorage.setItem('tst-glass-op',o.op);
-        if(o.sh1)localStorage.setItem('tst-glass-sh1',o.sh1);
-        if(o.sh2)localStorage.setItem('tst-glass-sh2',o.sh2);
-        if(o.sh3)localStorage.setItem('tst-glass-sh3',o.sh3);
-        if(o.off)localStorage.setItem('tst-glass-off',o.off);
-        if(o.lite)localStorage.setItem('tst-glass-lite',o.lite);
-        if(o.dark)localStorage.setItem('tst-glass-dark',o.dark);
-        applyGlassBg();
-        gbToast('已应用分享主题');
-      });
-    }
-  }
-  applyGlassBg();
-  window.syncGlassBgUI=syncGlassBgUI;
-})();
-
-// ===== 调试入口（输入代码激活内测功能）=====
-(function(){
-  const link=document.getElementById('debugLink');
-  if(!link)return;
-  let dbBound=false;
-  function dbBind(){
-    if(dbBound)return;dbBound=true;
-    const input=document.getElementById('debugInput');
-    const ok=document.getElementById('debugOk');
-    const cancel=document.getElementById('debugCancel');
-    const hint=document.getElementById('debugHint');
-    if(!input||!ok||!cancel||!hint)return;
-    function close(){const mask=document.getElementById('debugMask');if(mask)mask.classList.add('hidden');}
-    function submit(){
-      const code=(input.value||'').trim().toUpperCase();
-      if(code==='TST-GLASS'){
-        const mask=document.getElementById('gbConfirmMask');
-        if(mask){mask.classList.remove('hidden');const inp=document.getElementById('gbConfirmInput');if(inp){inp.value='';inp.style.borderColor='';setTimeout(function(){inp.focus();},80);}}
-        close();
-      } else if(code==='TST-LIGHT'){
-        localStorage.setItem('tst-theme','light');
-        location.reload();
-      } else {
-        hint.textContent='调试代码无效，请重试';hint.style.color='#dc2626';
-      }
-    }
-    ok.addEventListener('click',submit);
-    cancel.addEventListener('click',close);
-    input.addEventListener('keydown',function(e){if(e.key==='Enter')submit();if(e.key==='Escape')close();});
-    document.addEventListener('click',function(e){const mask=document.getElementById('debugMask');if(mask&&e.target===mask)close();});
-  }
-  link.addEventListener('click',function(){
-    const mask=document.getElementById('debugMask');if(!mask)return;
-    mask.classList.remove('hidden');
-    const input=document.getElementById('debugInput');
-    const hint=document.getElementById('debugHint');
-    if(input)input.value='';
-    if(hint){hint.textContent='输入调试代码可激活对应功能';hint.style.color='#9ca3af';}
-    dbBind();
-    setTimeout(function(){const i=document.getElementById('debugInput');if(i)i.focus();},50);
-  });
-})();
-
-// ===== 卡片拖动（双模式：网格排序 / 自由摆放；全站小卡片通用：公告/动态/赛事回放/赞助/便捷工具，含触屏丝滑 + q弹音效）=====
-(function(){
-  function isGlass(){return themeState()==='glass';}
-  function dragMode(){return localStorage.getItem('tst-drag-mode')||'grid';}
-  const GAP=16;
-  function isDragGrid(g){return g&&g.classList&&(g.classList.contains('card-grid')||g.id==='feedList'||g.classList.contains('tool-grid'));}
-  function nsOf(g){
-    if(g.id)return g.id;
-    if(g.closest&&g.closest('#toolList'))return 'toolList';
-    return 'home';
-  }
-  function orderKeyOf(g){return 'tst-card-order-'+nsOf(g);}
-  function freeKeyOf(g){return 'tst-card-free-'+nsOf(g);}
-  function cardEls(g){
-    return [].slice.call(g.children).filter(function(c){return c.classList&&(c.classList.contains('card')||c.classList.contains('tool-card'));});
-  }
-  function cols(g){return g.clientWidth>=700?2:1;}
-  function cardWidth(g){const gw=g.clientWidth;return gw>=700?(gw-GAP)/2:gw;}
-  function posOf(g,i){const cards=cardEls(g);const c=cols(g),cw=cardWidth(g),ch=(cards[0]&&cards[0].offsetHeight)?cards[0].offsetHeight:118;return {x:(i%c)*(cw+GAP),y:Math.floor(i/c)*(ch+GAP)};}
-  function tagCards(g){cardEls(g).forEach(function(c,i){c.setAttribute('data-card-id',nsOf(g)+'-sc'+i);});}
-  function applyOrder(g,order){
-    const cards=cardEls(g);
-    cards.forEach(function(card){
-      const i=order.indexOf(card.getAttribute('data-card-id'));
-      const p=posOf(g,i<0?0:i);
-      card.style.width=cardWidth(g)+'px';
-      card.style.left=p.x+'px';card.style.top=p.y+'px';
-      card.style.transform='';
-    });
-    updateH(g);
-  }
-  function updateH(g){
-    let mb=0;
-    cardEls(g).forEach(function(c){const b=c.offsetTop+c.offsetHeight;if(b>mb)mb=b;});
-    g.style.height=(mb+GAP)+'px';
-  }
-  function layoutInit(g){
-    const cards=cardEls(g);
-    if(!cards.length)return;
-    tagCards(g);
-    if(dragMode()==='free'){
-      let fp={};try{fp=JSON.parse(localStorage.getItem(freeKeyOf(g))||'null');}catch(e){}
-      if(!fp)fp={};
-      cards.forEach(function(card,i){
-        const id=card.getAttribute('data-card-id');
-        card.style.width=cardWidth(g)+'px';
-        if(fp[id]){card.style.left=fp[id][0]+'px';card.style.top=fp[id][1]+'px';}
-        else{const p=posOf(g,i);card.style.left=p.x+'px';card.style.top=p.y+'px';}
-        card.style.transform='';
-      });
-    }else{
-      let order=[];try{order=JSON.parse(localStorage.getItem(orderKeyOf(g))||'null');}catch(e){}
-      if(!Array.isArray(order)||order.length!==cards.length){order=cards.map(function(c){return c.getAttribute('data-card-id');});}
-      applyOrder(g,order);
-    }
-    updateH(g);
-  }
-  function resetCardFree(g){
-    cardEls(g).forEach(function(card){
-      card.style.left='';card.style.top='';card.style.width='';card.style.transition='';card.style.zIndex='';card.style.transform='';
-      card.classList.remove('dragging');
-    });
-    g.style.height='';
-  }
-  function allGrids(){return [].slice.call(document.querySelectorAll('.card-grid,#feedList,.tool-grid')).filter(function(g){return g.clientWidth;});}
-  function refreshAll(){allGrids().forEach(function(g){if(isGlass())layoutInit(g);else resetCardFree(g);});}
-
-  // ===== q弹音效（Web Audio 合成，无外部文件；圆润正弦波+果冻扫频，仅玻璃主题播放）=====
-  var actx=null,lastSwap=0,sfxThrottle=0,lastDragMove=0,lastEdgeSfx=0;
-  function sfx(kind){
-    if(!isGlass())return;
-    var now=Date.now();
-    if(now-sfxThrottle<40)return;
-    sfxThrottle=now;
-    try{
-      if(!actx){actx=new (window.AudioContext||window.webkitAudioContext)();}
-      if(actx.state==='suspended'){actx.resume();}
-      var t=actx.currentTime;
-      function tone(f0,f1,dur,vol,delay){
-        var o=actx.createOscillator(),g=actx.createGain(),lp=actx.createBiquadFilter();
-        o.type='sine';
-        o.frequency.setValueAtTime(f0,t+delay);
-        o.frequency.exponentialRampToValueAtTime(Math.max(1,f1),t+delay+dur);
-        g.gain.setValueAtTime(0.0001,t+delay);
-        g.gain.exponentialRampToValueAtTime(vol,t+delay+0.008);
-        g.gain.exponentialRampToValueAtTime(0.0001,t+delay+dur);
-        lp.type='lowpass';lp.frequency.value=4200;
-        o.connect(lp);lp.connect(g);g.connect(actx.destination);
-        o.start(t+delay);o.stop(t+delay+dur+0.04);
-      }
-      if(kind==='grab'){tone(300,620,0.09,0.13,0);tone(880,1260,0.05,0.045,0.02);}
-      else if(kind==='swap'){tone(620,940,0.07,0.09,0);tone(940,1280,0.06,0.06,0.05);tone(520,760,0.05,0.045,0.1);}
-      else if(kind==='drop'){tone(420,170,0.1,0.12,0);tone(150,90,0.09,0.065,0.07);tone(90,60,0.08,0.045,0.14);}
-      else if(kind==='edge'){tone(220,140,0.07,0.08,0);}
-      else if(kind==='stick'){tone(280,220,0.06,0.09,0);tone(500,720,0.09,0.07,0.05);tone(240,160,0.06,0.05,0.09);}
-      else if(kind==='click'){tone(840,1120,0.05,0.06,0);}
-      else if(kind==='pop'){tone(440,980,0.13,0.1,0);tone(980,1240,0.08,0.045,0.04);}
-      else if(kind==='toggle'){tone(520,820,0.07,0.08,0);tone(820,620,0.08,0.06,0.05);}
-      else if(kind==='success'){tone(523,660,0.1,0.08,0);tone(784,900,0.11,0.08,0.09);tone(1047,1180,0.14,0.08,0.18);}
-    }catch(e){}
-  }
-  window.sfx=sfx;
-  // 全局按钮音效（玻璃主题下按钮/导航/折叠/背景选项统一 Q弹反馈；拖动刚结束时静默防误触）
-  document.addEventListener('click',function(e){
-    if(!isGlass())return;
-    var t=e.target.closest('button,a,[data-nav],.collapse-btn,.gb-opt,.more-toggle');
-    if(!t)return;
-    if(Date.now()-lastDragMove<380)return;
-    sfx('click');
-  },true);
-
-  let dragEl=null,dragGrid=null,startX=0,startY=0,startIdx=-1,curIdx=-1,dragging=false,dragFrozen=false,merging=false;
-  document.addEventListener('pointerdown',function(e){
-    if(!isGlass())return;
-    const card=e.target.closest('.card,.tool-card');
-    if(!card)return;
-    const g=card.parentNode;
-    if(!isDragGrid(g))return;
-    if(e.target.closest('a,button,input,textarea,select'))return;
-    const cards=cardEls(g);
-    if(!cards.length)return;
-    tagCards(g);
-    layoutInit(g);
-    dragEl=card;dragGrid=g;dragging=false;dragFrozen=false;
-    startX=e.clientX;startY=e.clientY;
-    let order=null;
-    if(dragMode()!=='free'){try{order=JSON.parse(localStorage.getItem(orderKeyOf(g))||'null');}catch(err){order=null;}}
-    startIdx=(order&&order.length)?order.indexOf(card.getAttribute('data-card-id')):cards.indexOf(card);
-    if(startIdx<0)startIdx=0;
-    curIdx=startIdx;
-  });
-  document.addEventListener('pointermove',function(e){
-    if(!dragEl||!dragGrid||!isGlass())return;
-    let g=dragGrid;const card=dragEl;
-    const dx=e.clientX-startX,dy=e.clientY-startY;
-    if(!dragging&&Math.hypot(dx,dy)<8)return;
-    if(!dragging){
-      dragging=true;card.classList.add('dragging');
-      card.style.transition='none';
-      if(!dragFrozen){
-        document.body.classList.add('drag-lock');
-        dragFrozen=true;
-      }
-      sfx('grab');
-    }
-    const cards=cardEls(g);
-    if(dragMode()==='free'){
-      // 跨容器自由排列：拖到其他卡片容器时把卡片迁移过去
-      const hitEl=document.elementFromPoint(e.clientX,e.clientY);
-      const hitGrid=hitEl&&hitEl.closest?hitEl.closest('.card-grid,#feedList,.tool-grid'):null;
-      if(hitGrid&&hitGrid!==g&&g.contains(card)){
-        const srcKey=freeKeyOf(g),dstKey=freeKeyOf(hitGrid);
-        const savedSrc=JSON.parse(localStorage.getItem(srcKey)||'{}')||{};
-        delete savedSrc[card.getAttribute('data-card-id')];
-        localStorage.setItem(srcKey,JSON.stringify(savedSrc));
-        g.removeChild(card);
-        tagCards(g);layoutInit(g);
-        hitGrid.appendChild(card);
-        tagCards(hitGrid);layoutInit(hitGrid);
-        dragGrid=hitGrid;g=hitGrid;
-        card.style.zIndex='999';
-        const gr=hitGrid.getBoundingClientRect();
-        card.style.left=Math.max(0,Math.min(hitGrid.clientWidth-card.offsetWidth,(e.clientX-gr.left)-card.offsetWidth/2))+'px';
-        card.style.top=Math.max(0,(e.clientY-gr.top)-18)+'px';
-        const savedDst=JSON.parse(localStorage.getItem(dstKey)||'{}')||{};
-        savedDst[card.getAttribute('data-card-id')]=[Math.round(parseFloat(card.style.left)),Math.round(parseFloat(card.style.top))];
-        localStorage.setItem(dstKey,JSON.stringify(savedDst));
-        sfx('drop');
-      }
-      card.style.zIndex='999';
-      const gr=g.getBoundingClientRect();
-      const cw=cardWidth(g);
-      const nx=(e.clientX-gr.left)-card.offsetWidth/2;
-      const ny=(e.clientY-gr.top)-18;
-      const px=Math.max(0,Math.min(g.clientWidth-cw,nx));
-      const py=Math.max(0,ny);
-      if((px<=0.5||px>=g.clientWidth-cw-0.5)&&Date.now()-lastEdgeSfx>420){
-        sfx('stick');lastEdgeSfx=Date.now();
-        card.classList.add('stick-pair');
-        setTimeout(function(){card.classList.remove('stick-pair');},360);
-      }
-      card.style.left=px+'px';card.style.top=py+'px';
-    }else{
-      const c=cols(g),cw=cardWidth(g),ch=cards[0]?cards[0].offsetHeight:0;
-      const sp=posOf(g,startIdx);
-      // 跟手用 transform（GPU 丝滑），释放后过渡归位
-      card.style.transform='translate('+dx+'px,'+dy+'px) translateZ(0) scale(1.02) rotate('+(dx*0.0012)+'deg)';
-      lastDragMove=Date.now();
-      const col=Math.round(dx/(cw+GAP))+(startIdx%c);
-      const row=Math.round(dy/(ch+GAP))+Math.floor(startIdx/c);
-      const rawNi=row*c+col;
-      const ni=Math.max(0,Math.min(cards.length-1,rawNi));
-      if(ni!==rawNi&&Date.now()-lastEdgeSfx>420){
-        sfx('stick');lastEdgeSfx=Date.now();
-        const target=cards[ni];
-        if(target&&target!==card&&!merging){
-          merging=true;
-          const cr=card.getBoundingClientRect(),tr=target.getBoundingClientRect();
-          card.style.transition='none';
-          card.style.transform='';
-          card.style.setProperty('--mx',(tr.left-cr.left)+'px');
-          card.style.setProperty('--my',(tr.top-cr.top)+'px');
-          card.classList.add('merge-anim');
-          target.classList.add('merge-hit');
-          setTimeout(function(){
-            merging=false;
-            card.classList.remove('merge-anim');
-            target.classList.remove('merge-hit');
-            card.style.setProperty('--mx','0px');card.style.setProperty('--my','0px');
-          },460);
-        }
-      }
-      if(merging){return;}
-      if(ni!==curIdx){
-        curIdx=ni;
-        const id=card.getAttribute('data-card-id');
-        let order=[];try{order=JSON.parse(localStorage.getItem(orderKeyOf(g))||'null');}catch(err){order=[];}
-        if(!Array.isArray(order)||order.length!==cards.length){order=cards.map(function(c){return c.getAttribute('data-card-id');});}
-        const from=order.indexOf(id);
-        order.splice(from,1);order.splice(ni,0,id);
-        cards.forEach(function(c){
-          if(c===card)return;
-          const pi=order.indexOf(c.getAttribute('data-card-id'));
-          const p=posOf(g,pi);
-          c.style.transition='left .38s cubic-bezier(.34,1.56,.64,1),top .38s cubic-bezier(.34,1.56,.64,1)';
-          c.style.left=p.x+'px';c.style.top=p.y+'px';
-          c.classList.add('swap-bounce');
-          setTimeout(function(){c.classList.remove('swap-bounce');},340);
-        });
-        if(Date.now()-lastSwap>90){sfx('swap');lastSwap=Date.now();}
-      }
-    }
-  });
-  function endDrag(){
-    if(!dragEl||!dragGrid||!isGlass())return;
-    const card=dragEl,g=dragGrid;
-    dragEl=null;dragGrid=null;merging=false;
-    if(!dragging)return;
-    dragging=false;
-    if(dragFrozen){
-      document.body.classList.remove('drag-lock');
-      dragFrozen=false;
-    }
-    card.classList.remove('dragging');card.style.zIndex='';
-    const cards=cardEls(g);
-    if(dragMode()==='free'){
-      const saved=JSON.parse(localStorage.getItem(freeKeyOf(g))||'{}')||{};
-      cards.forEach(function(c){saved[c.getAttribute('data-card-id')]=[Math.round(c.offsetLeft),Math.round(c.offsetTop)];});
-      localStorage.setItem(freeKeyOf(g),JSON.stringify(saved));
-    }else{
-      card.style.transition='left .4s cubic-bezier(.34,1.56,.64,1),top .4s cubic-bezier(.34,1.56,.64,1),transform .4s cubic-bezier(.34,1.56,.64,1)';
-      card.style.transform='';
-      let order=[];try{order=JSON.parse(localStorage.getItem(orderKeyOf(g))||'null');}catch(err){order=[];}
-      if(!Array.isArray(order)||order.length!==cards.length){order=cards.map(function(c){return c.getAttribute('data-card-id');});}
-      const pi=order.indexOf(card.getAttribute('data-card-id'));
-      const p=posOf(g,pi);
-      card.style.left=p.x+'px';card.style.top=p.y+'px';
-      localStorage.setItem(orderKeyOf(g),JSON.stringify(order));
-      setTimeout(function(){cards.forEach(function(c){c.style.transition='';});card.style.transition='';},450);
-    }
-    card.style.animation='none';void card.offsetWidth;
-    card.style.animation='dropBounce .6s cubic-bezier(.34,1.56,.64,1)';
-    setTimeout(function(){card.style.animation='';},700);
-    sfx('drop');
-  }
-  document.addEventListener('pointerup',endDrag);
-  document.addEventListener('pointercancel',endDrag);
-
-  const themeObs=new MutationObserver(function(){refreshAll();});
-  themeObs.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-gb']});
-  const contentObs=new MutationObserver(function(){
-    if(!isGlass())return;
-    allGrids().forEach(function(g){tagCards(g);layoutInit(g);});
-  });
-  ['.card-grid','#feedList','.tool-grid'].forEach(function(sel){
-    const els=document.querySelectorAll(sel);
-    for(let i=0;i<els.length;i++)contentObs.observe(els[i],{childList:true});
-  });
-  refreshAll();
-  window.addEventListener('resize',function(){
-    if(!isGlass())return;
-    allGrids().forEach(function(g){
-      const cards=cardEls(g);
-      if(dragMode()==='free'){cards.forEach(function(card){card.style.width=cardWidth(g)+'px';});}
-      else{let order=[];try{order=JSON.parse(localStorage.getItem(orderKeyOf(g))||'null');}catch(e){} if(!Array.isArray(order)||order.length!==cards.length){order=cards.map(function(c){return c.getAttribute('data-card-id');});} applyOrder(g,order);}
-    });
-  });
-  window.resetCardFree=function(){allGrids().forEach(function(g){resetCardFree(g);});};
-  window.applyDragMode=function(){allGrids().forEach(function(g){resetCardFree(g);});refreshAll();};
-  // 切页后重新布局（修复：隐藏页容器宽度为 0 导致玻璃卡片重叠）
-  window.refreshGlassLayout=function(){
-    if(!isGlass())return;
-    allGrids().forEach(function(g){
-      if(g.clientWidth>0){tagCards(g);layoutInit(g);}
-    });
-  };
-})();
-
-
-// ===== 拖动模式切换（玻璃实验室面板）=====
-(function(){
-  var seg=document.getElementById('gbDragSeg');
-  if(!seg)return;
-  var btns=seg.querySelectorAll('.gb-seg-btn');
-  function sync(){
-    var m=localStorage.getItem('tst-drag-mode')||'grid';
-    btns.forEach(function(b){b.classList.toggle('active',b.getAttribute('data-drag')===m);});
-  }
-  function tip(text){
-    var t=document.createElement('div');
-    t.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:999;padding:11px 20px;border-radius:14px;background:rgba(255,255,255,.85);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.75);box-shadow:0 16px 50px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,.9);color:#1f2937;font-size:14px;opacity:0;transition:opacity .4s ease,transform .45s cubic-bezier(.34,1.56,.64,1);pointer-events:none;';
-    t.textContent=text;
-    document.body.appendChild(t);
-    requestAnimationFrame(function(){t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';});
-    setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';setTimeout(function(){t.remove();},450);},1800);
-  }
-  seg.addEventListener('click',function(e){
-    var b=e.target.closest('.gb-seg-btn');
-    if(!b)return;
-    var m=b.getAttribute('data-drag');
-    localStorage.setItem('tst-drag-mode',m);
-    sync();
-    if(window.applyDragMode)applyDragMode();
-    tip(m==='free'?'已切换：自由摆放（拖到哪放哪）':'已切换：网格排序（自动对齐）');
-  });
-  sync();
-})();
-
-// ===== 液态玻璃特效：鼠标光晕 + 卡片反光 + 滚动渐入 =====
-(function(){
-  function gs(){return themeState()==='glass';}
-  var m=document.createElement('div');
-  m.style.cssText='position:fixed;left:0;top:0;width:340px;height:340px;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle,rgba(255,255,255,.3),transparent 66%);mix-blend-mode:screen;transform:translate(-50%,-50%);opacity:0;transition:opacity .5s ease;';
-  document.body.appendChild(m);
-  var shown=false;
-  document.addEventListener('mousemove',function(e){
-    if(!gs()){m.style.opacity='0';return;}
-    if(!shown){shown=true;m.style.opacity='1';}
-    m.style.left=e.clientX+'px';m.style.top=e.clientY+'px';
-  });
-  function bindCard(card){
-    card.addEventListener('mousemove',function(e){
-      var r=card.getBoundingClientRect();
-      var x=((e.clientX-r.left)/r.width*100).toFixed(1),y=((e.clientY-r.top)/r.height*100).toFixed(1);
-      card.style.setProperty('--mx',x+'%');card.style.setProperty('--my',y+'%');
-    });
-  }
-  var cards=document.querySelectorAll('.card-grid .card');
-  for(var i=0;i<cards.length;i++)bindCard(cards[i]);
-  var els=[].slice.call(document.querySelectorAll('.section-title,.card-grid,.notice-ticker,.hero-slider-wrap,.server-card'));
-  els.forEach(function(el){el.classList.add('gb-wait');});
-  var io=null;
-  if('IntersectionObserver' in window){
-    io=new IntersectionObserver(function(es){
-      es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('gb-in');io.unobserve(en.target);}});
-    },{threshold:.05});
-    els.forEach(function(el){io.observe(el);});
-  }
-  // 兜底：1.2s 后仍未进入视口的元素强制显示，避免卡白
-  setTimeout(function(){
-    els.forEach(function(el){el.classList.add('gb-in');});
-    if(io)io.disconnect();
-  },1200);
-})();
-
-// 首次玻璃主题提示：小卡片可自由拖动
-(function(){
-  if(localStorage.getItem('tst-card-drag-hint'))return;
-  let shown=false;
-  const showHint=function(){
-    if(shown||themeState()!=='glass')return;
-    shown=true;
-    localStorage.setItem('tst-card-drag-hint','1');
-    const tip=document.createElement('div');
-    tip.id='glassDragTip';
-    tip.textContent='液态玻璃主题下，亮点小卡片可自由拖动排列';
-    tip.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:999;padding:11px 20px;border-radius:14px;background:rgba(255,255,255,.7);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.75);box-shadow:0 16px 50px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,.9);color:#1f2937;font-size:14px;opacity:0;transition:opacity .4s ease,transform .45s cubic-bezier(.34,1.56,.64,1);pointer-events:none;';
-    document.body.appendChild(tip);
-    requestAnimationFrame(function(){tip.style.opacity='1';tip.style.transform='translateX(-50%) translateY(0)';});
-    setTimeout(function(){tip.style.opacity='0';tip.style.transform='translateX(-50%) translateY(20px)';setTimeout(function(){tip.remove();},500);},3400);
-  };
-  showHint();
-})();
 </script>
 </body>
 </html>
