@@ -1125,6 +1125,8 @@ padding:7px 10px;border-radius:6px;border:none;background:transparent;
 
 color:var(--text);font-size:14px;cursor:pointer;white-space:nowrap;
 
+text-decoration:none;
+
 }
 
 .nav-link:hover{background:var(--hover);}
@@ -1560,11 +1562,37 @@ background:var(--bg);color:var(--text);font-size:14px;outline:none;font-family:i
 .admin-tab.active{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;}
 
 .post-intro{font-size:13px;color:var(--text-secondary);margin-bottom:12px;line-height:1.7;}
-.post-bar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.feed-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 16px;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;}
+.feed-bar-item{display:flex;align-items:center;gap:2px;}
+.feed-bar-label{font-size:13px;color:var(--text-secondary);margin-right:6px;white-space:nowrap;}
+.feed-bar-tab{padding:5px 12px;font-size:14px;color:var(--text);background:transparent;border:none;cursor:pointer;border-radius:8px;transition:all .15s;white-space:nowrap;}
+.feed-bar-tab:hover{color:var(--accent);background:var(--hover);}
+.feed-bar-tab.active{color:var(--accent);font-weight:700;background:var(--accent-soft);}
+.feed-bar-sep{width:1px;height:16px;background:var(--border);}
+.filter-btn{display:flex;align-items:center;gap:5px;padding:5px 14px;font-size:14px;color:var(--text);background:transparent;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent);}
+.filter-btn.open{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+.filter-caret{font-size:10px;opacity:.7;transition:transform .15s;}
+.filter-btn.open .filter-caret{transform:rotate(180deg);}
+.filter-panel{display:none;position:absolute;top:calc(100% + 6px);left:0;min-width:240px;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;z-index:100;animation:fadeIn .12s ease;}
+.filter-group{margin-bottom:10px;}
+.filter-group-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.filter-opts{display:flex;flex-wrap:wrap;gap:8px;}
+.filter-opt{padding:5px 14px;font-size:13px;color:var(--text);background:transparent;border:1px solid var(--border);border-radius:999px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.filter-opt:hover{border-color:var(--accent);color:var(--accent);}
+.filter-opt.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
+.filter-panel-foot{display:flex;justify-content:flex-end;border-top:1px solid var(--border);padding-top:10px;margin-top:4px;}
+.filter-clear{font-size:12px;color:var(--text-secondary);background:transparent;border:none;cursor:pointer;}
+.filter-clear:hover{color:var(--danger);}
 .post-msg{font-size:13px;color:var(--text-secondary);margin-left:10px;}
 .post-tags{display:inline-block;font-size:12px;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:1px 8px;margin-right:6px;}
 .post-pin{display:inline-block;font-size:12px;color:#fff;background:var(--accent);border-radius:4px;padding:1px 8px;margin-right:6px;}
 .post-pcard{word-break:break-word;}
+.post-panel-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow);}
+.post-panel-head{font-size:15px;font-weight:700;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.post-btn.primary{background:var(--accent);color:#fff;border:none;padding:8px 20px;font-size:14px;font-weight:600;border-radius:10px;box-shadow:0 2px 10px rgba(56,189,248,.35);transition:all .15s;white-space:nowrap;}
+.post-btn.primary:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.post-btn.primary:active{transform:scale(.96);}
 
 .admin-pane{display:none;}
 
@@ -3701,9 +3729,34 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <div id="feedList"></div>
 
-<!-- 玩家社区：并入动态一角 -->
+<!-- 发帖入口：独立行右对齐 -->
+<div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:24px;"><span id="poCount" class="post-msg" style="margin-left:0;margin-right:auto;"></span><button class="btn post-btn primary" id="poOpenBtn">✍ 发帖</button></div>
+
+<!-- 工具条：排序 tab + 筛选下拉（常规筛选交互） -->
+<div class="feed-bar">
+<div class="feed-bar-item"><span class="feed-bar-label">排序</span><button class="feed-bar-tab active" id="poSortNew">最新</button><button class="feed-bar-tab" id="poSortHot">热门</button></div>
+<div class="feed-bar-sep"></div>
+<div class="feed-bar-item">
+<button class="filter-btn" id="poFilterBtn">筛选<span class="filter-caret">▾</span></button>
+<div class="filter-panel" id="poFilterPanel">
+<div class="filter-group">
+<div class="filter-group-title">帖子类型</div>
+<div class="filter-opts">
+<button class="filter-opt active" id="poFAll">全部</button>
+<button class="filter-opt" id="poFOfficial">官方</button>
+<button class="filter-opt" id="poFPlayer">玩家</button>
+</div>
+</div>
+<div class="filter-panel-foot"><button class="filter-clear" id="poFilterClear">清空选择</button></div>
+</div>
+</div>
+<span id="poCount" class="post-msg" style="margin-left:auto;margin-right:0;"></span>
+</div>
+
+<!-- 发帖面板：独立卡片（默认收起，点「发帖」展开） -->
 <div id="postPanel" style="display:none;">
-<div class="card" style="margin-bottom:14px;">
+<div class="post-panel-card">
+<div class="post-panel-head"><span>发布帖子</span><span class="post-msg">内测阶段需填写卡密</span></div>
 <div class="form-row"><label>游戏昵称</label><input type="text" id="poName" maxlength="24" placeholder="你的游戏名称"></div>
 <div class="form-row"><label>内容</label><textarea id="poContent" maxlength="500" placeholder="写点什么…" style="min-height:90px;"></textarea></div>
 <div class="form-row"><label>标签（可选）</label><input type="text" id="poTags" maxlength="60" placeholder="如 建筑 / 红石 / 活动"></div>
@@ -3712,17 +3765,6 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <div id="poImgPrev" style="display:none;margin:6px 0;"><img id="poImgView" alt="" style="max-width:180px;max-height:120px;border-radius:8px;border:1px solid var(--border);"><button type="button" class="btn" id="poImgDel" style="margin-left:8px;">移除</button></div>
 <div class="form-row"><button class="btn btn-primary" id="poSendBtn">发布帖子</button><span id="poMsg" class="post-msg"></span></div>
 </div>
-</div>
-
-<div class="post-bar">
-<button class="btn" id="poOpenBtn">✍ 发帖</button>
-<button class="btn" id="poSortNew">最新</button>
-<button class="btn" id="poSortHot">热门</button>
-<span style="margin:0 6px;color:var(--text-secondary);font-size:13px;">筛选</span>
-<button class="btn" id="poFAll">全部</button>
-<button class="btn" id="poFOfficial">官方</button>
-<button class="btn" id="poFPlayer">玩家</button>
-<span id="poCount" class="post-msg"></span>
 </div>
 
 <div id="postList"></div>
@@ -9190,4 +9232,183 @@ try{ eval('const __t=()=>1;'); }catch(e){
 
 </div>
 
+
+
+
+<script>
+// ===== 玩家发帖（PC · 内测卡密，数据存储于反馈站 D1）=====
+(function(){
+  const POST_API='https://theslowtidefk.pages.dev/api/posts';
+  function pDev(){
+    var d=localStorage.getItem('tst_dev_id');
+    if(!d){d='d'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('tst_dev_id',d);}
+    return d;
+  }
+  function pTime(ts){
+    if(!ts) return '';
+    var d=new Date(String(ts).replace(' ','T'));
+    if(isNaN(d.getTime())) return String(ts);
+    function p(n){return n<10?'0'+n:''+n;}
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+  }
+  function pLink(t){return esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">$1</a>');}
+  var poSort='new';
+  var poFilter='all';
+  var poImgData='';
+  function poReadImg(file){
+    const rd=new FileReader();
+    rd.onload=function(){
+      const im=new Image();
+      im.onload=function(){
+        const max=640; let w=im.width,h=im.height;
+        const s=Math.max(w,h);
+        if(s>max){w=Math.round(w*max/s);h=Math.round(h*max/s);}
+        const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+        cv.getContext('2d').drawImage(im,0,0,w,h);
+        poImgData=cv.toDataURL('image/jpeg',0.75);
+        document.getElementById('poImgView').src=poImgData;
+        document.getElementById('poImgPrev').style.display='block';
+        document.getElementById('poImgName').textContent='已压缩 '+Math.round(poImgData.length/1024)+' KB';
+      };
+      im.src=rd.result;
+    };
+    rd.readAsDataURL(file);
+  }
+  async function loadPosts(){
+    const box=document.getElementById('postList'); if(!box) return;
+    box.innerHTML='<p class="post-msg" style="padding:10px 0;">加载中…</p>';
+    try{
+      const r=await fetch(POST_API+'/list?sort='+poSort+'&filter='+poFilter+'&dev='+encodeURIComponent(pDev()),{cache:'no-store'});
+      const d=await r.json();
+      const posts=(d&&d.posts)||[];
+      const cnt=document.getElementById('poCount'); if(cnt) cnt.textContent='共 '+posts.length+' 条帖子';
+      if(!posts.length){ box.innerHTML='<p class="post-msg" style="padding:10px 0;">还没有帖子</p>'; return; }
+      box.innerHTML=posts.map(function(p){
+        const tags=p.tags?'<span class="post-tags">'+esc(p.tags)+'</span>':'';
+        const pin=p.pinned?'<span class="post-pin">置顶</span>':'';
+        const off=p.official?'<span class="post-pin" style="background:var(--danger);">官方</span>':'';
+        return '<div class="card post-pcard" style="margin-bottom:12px;" data-pid="'+p.id+'">'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;"><b>'+esc(p.name)+'</b><span style="font-size:12px;color:var(--text-secondary);">'+off+pin+pTime(p.created_at)+'</span></div>'+
+          '<div style="white-space:pre-wrap;word-break:break-word;line-height:1.7;">'+pLink(p.content)+'</div>'+
+          (p.image?'<img src="'+esc(p.image)+'" alt="" style="max-width:100%;max-height:280px;border-radius:8px;margin-top:8px;border:1px solid var(--border);">':'')+
+          (tags?'<div style="margin-top:8px;">'+tags+'</div>':'')+
+          '<div style="display:flex;gap:10px;margin-top:12px;font-size:13px;">'+
+          '<button class="btn" data-act="like" '+(p.liked?'style="color:var(--accent);"':'')+'>赞 '+p.likes+'</button>'+
+          '<button class="btn" data-act="cm">评论 '+p.comments+'</button>'+
+          '</div>'+
+          '<div class="post-cm" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"></div>'+
+          '</div>';
+      }).join('');
+      box.querySelectorAll('[data-act="like"]').forEach(b=>{ b.onclick=function(){ doLike(b); }; });
+      box.querySelectorAll('[data-act="cm"]').forEach(b=>{ b.onclick=function(){ toggleCm(b); }; });
+    }catch(e){ box.innerHTML='<p class="post-msg" style="padding:10px 0;color:var(--danger);">加载失败，请稍后重试</p>'; }
+  }
+  async function doLike(btn){
+    const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
+    try{
+      const r=await fetch(POST_API+'/like',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({post_id:Number(pid),dev:pDev()})});
+      const d=await r.json();
+      if(d&&d.ok){ btn.textContent='赞 '+d.likes; btn.style.color='var(--accent)'; }
+      else if(d&&d.error==='already_liked'){ btn.style.color='var(--accent)'; showToast('你已经赞过这条帖子了'); }
+      else showToast('点赞失败');
+    }catch(e){ showToast('网络异常，请稍后再试'); }
+  }
+  async function toggleCm(btn){
+    const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
+    const box=card.querySelector('.post-cm');
+    if(box.style.display!=='none'){ box.style.display='none'; return; }
+    box.style.display='block';
+    box.innerHTML='<p class="post-msg">加载评论…</p>';
+    try{
+      const r=await fetch(POST_API+'/comments?post_id='+pid,{cache:'no-store'});
+      const d=await r.json();
+      const cs=(d&&d.comments)||[];
+      box.innerHTML=cs.map(function(c){return '<div style="margin-bottom:8px;"><b>'+esc(c.name)+'</b> <span style="font-size:12px;color:var(--text-secondary);">'+pTime(c.created_at)+'</span><div style="font-size:14px;margin-top:2px;">'+pLink(c.content)+'</div></div>';}).join('')+
+        '<div style="display:flex;gap:6px;margin-top:10px;"><input id="cmName_'+pid+'" maxlength="24" placeholder="昵称" style="flex:0 0 90px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary);color:var(--text);"><input id="cmTxt_'+pid+'" maxlength="200" placeholder="写评论…" style="flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary);color:var(--text);"><button class="btn" data-act="send">发送</button></div>';
+      const sb=box.querySelector('[data-act="send"]');
+      sb.onclick=async function(){
+        const nm=document.getElementById('cmName_'+pid).value.trim()||'匿名玩家';
+        const tx=document.getElementById('cmTxt_'+pid).value.trim();
+        if(!tx){ showToast('评论不能为空'); return; }
+        try{
+          const r2=await fetch(POST_API+'/comment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({post_id:Number(pid),name:nm,content:tx})});
+          const d2=await r2.json();
+          if(d2&&d2.ok){ btn.textContent='评论 '+d2.comments; toggleCm(btn); }
+          else if(d2&&d2.error==='rate') showToast('操作太快，请稍后再试');
+          else showToast('评论失败');
+        }catch(e){ showToast('网络异常'); }
+      };
+    }catch(e){ box.innerHTML='<p class="post-msg">评论加载失败</p>'; }
+  }
+  async function sendPost(){
+    const name=document.getElementById('poName').value.trim();
+    const content=document.getElementById('poContent').value.trim();
+    const tags=document.getElementById('poTags').value.trim();
+    const card=document.getElementById('poCard').value.trim().toUpperCase();
+    const msg=document.getElementById('poMsg');
+    if(!name){ msg.textContent='请填写游戏昵称'; return; }
+    if(!content){ msg.textContent='请填写内容'; return; }
+    if(!card){ msg.textContent='请填写卡密（内测阶段需要）'; return; }
+    try{
+      const r=await fetch(POST_API+'/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,content:content,tags:tags,card:card,dev:pDev(),image:poImgData||''})});
+      const d=await r.json();
+      if(d&&d.ok){ msg.textContent='发布成功！'; document.getElementById('poName').value=''; document.getElementById('poContent').value=''; document.getElementById('poTags').value=''; document.getElementById('poCard').value=''; poImgData=''; document.getElementById('poImgPrev').style.display='none'; document.getElementById('poImgView').src=''; document.getElementById('poImg').value=''; document.getElementById('poImgName').textContent=''; loadPosts(); }
+      else if(d&&d.error==='card_invalid'){ msg.textContent=d.msg||'卡密无效'; }
+      else if(d&&d.error==='card_used'){ msg.textContent=d.msg||'卡密已被使用'; }
+      else msg.textContent='发布失败：'+((d&&d.error)||'未知错误');
+    }catch(e){ msg.textContent='网络异常，请稍后重试'; }
+  }
+  function setPF(btn){
+    document.querySelectorAll('#poFAll,#poFOfficial,#poFPlayer').forEach(function(x){x.classList.remove('active');});
+    if(btn) btn.classList.add('active');
+  }
+  function initPost(){
+    const s=document.getElementById('poSendBtn'); if(!s) return;
+    if(s._b) return; s._b=true;
+    s.onclick=sendPost;
+    const poFile=document.getElementById('poImg');
+    if(poFile) poFile.addEventListener('change',function(){ if(poFile.files[0]) poReadImg(poFile.files[0]); });
+    const poDel=document.getElementById('poImgDel');
+    if(poDel) poDel.onclick=function(){ poImgData=''; document.getElementById('poImgPrev').style.display='none'; document.getElementById('poImgView').src=''; document.getElementById('poImg').value=''; document.getElementById('poImgName').textContent=''; };
+    document.getElementById('poOpenBtn').onclick=function(){
+      const p=document.getElementById('postPanel');
+      p.style.display=(p.style.display==='none')?'block':'none';
+      this.textContent=(p.style.display==='none')?'✍ 发帖':'收起';
+    };
+    document.getElementById('poSortNew').onclick=function(){ poSort='new'; this.classList.add('active'); document.getElementById('poSortHot').classList.remove('active'); loadPosts(); };
+    document.getElementById('poSortHot').onclick=function(){ poSort='hot'; this.classList.add('active'); document.getElementById('poSortNew').classList.remove('active'); loadPosts(); };
+    document.getElementById('poFAll').onclick=function(){ poFilter='all'; setPF(this); closeFilterPanel(); loadPosts(); };
+    document.getElementById('poFOfficial').onclick=function(){ poFilter='official'; setPF(this); closeFilterPanel(); loadPosts(); };
+    document.getElementById('poFPlayer').onclick=function(){ poFilter='player'; setPF(this); closeFilterPanel(); loadPosts(); };
+    var fb=document.getElementById('poFilterBtn');
+    if(fb){
+      fb.onclick=function(e){
+        e.stopPropagation();
+        var p=document.getElementById('poFilterPanel');
+        var show=(p.style.display!=='block');
+        p.style.display=show?'block':'none';
+        this.classList.toggle('open',show);
+      };
+      document.addEventListener('click',function(e){
+        var p=document.getElementById('poFilterPanel');
+        if(p&&p.style.display==='block'&&!p.contains(e.target)) closeFilterPanel();
+      });
+    }
+    var fc=document.getElementById('poFilterClear');
+    if(fc) fc.onclick=function(){ poFilter='all'; setPF(document.getElementById('poFAll')); closeFilterPanel(); loadPosts(); };
+    document.getElementById('poFAll').classList.add('active');
+    loadPosts();
+  }
+  function closeFilterPanel(){
+    var p=document.getElementById('poFilterPanel');
+    var b=document.getElementById('poFilterBtn');
+    if(p) p.style.display='none';
+    if(b) b.classList.remove('open');
+  }
+  document.querySelectorAll('.nav-link').forEach(function(b){
+    if(b.dataset.nav==='feed') b.addEventListener('click',function(){ setTimeout(initPost,80); });
+  });
+  window.__loadPost=loadPosts;
+})();
+</script>
 
