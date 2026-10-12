@@ -1102,13 +1102,49 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 
 <h2 style="margin:20px 0 16px;font-size:26px;">我的</h2>
 
-<div class="card" style="display:flex;align-items:center;gap:14px;padding:18px;margin-bottom:16px;cursor:pointer;" onclick="showToast('登录功能即将开放，敬请期待')">
+<div class="card" id="lgLoginCard" style="padding:18px;margin-bottom:16px;">
+<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
 <div style="width:52px;height:52px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;">👤</div>
 <div style="flex:1;">
-<div style="font-size:17px;font-weight:600;">点击登录</div>
-<div style="font-size:13px;color:var(--text-secondary);margin-top:2px;">登录后可查看游戏数据与专属内容</div>
+<div style="font-size:17px;font-weight:600;">登录 The Slow Tide</div>
+<div style="font-size:13px;color:var(--text-secondary);margin-top:2px;">登录后可发帖、绑定游戏 UID</div>
 </div>
-<span style="color:var(--text-secondary);">&#8250;</span>
+</div>
+<div style="margin-bottom:10px;">
+<div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">邮箱</div>
+<input type="email" id="lgEmail" maxlength="100" placeholder="输入邮箱" style="width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary);color:var(--text);font-size:14px;box-sizing:border-box;">
+</div>
+<div style="margin-bottom:14px;">
+<div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">验证码</div>
+<div style="display:flex;gap:8px;">
+<input type="text" id="lgCode" maxlength="6" placeholder="6 位验证码" style="flex:1;min-width:0;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary);color:var(--text);font-size:14px;">
+<button id="lgSendBtn" style="padding:9px 12px;border:none;border-radius:8px;background:var(--border);color:var(--text);font-size:13px;cursor:pointer;white-space:nowrap;">获取验证码</button>
+</div>
+</div>
+<button id="lgLoginBtn" style="width:100%;padding:10px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer;">登录 / 注册</button>
+<div id="lgMsg" style="font-size:12px;color:var(--text-secondary);margin-top:8px;"></div>
+</div>
+
+<div class="card" id="lgUserCard" style="display:none;padding:18px;margin-bottom:16px;">
+<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+<div style="width:52px;height:52px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;">👤</div>
+<div style="flex:1;">
+<div style="font-size:17px;font-weight:600;" id="lgUserEmail">--</div>
+<div style="font-size:13px;color:var(--text-secondary);margin-top:2px;">已登录</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:var(--bg-secondary);">
+<div>
+<div style="font-size:12px;color:var(--text-secondary);">游戏 UID</div>
+<div style="font-size:15px;font-weight:600;" id="lgUserUid">未绑定</div>
+</div>
+<button id="lgLogoutBtn" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);font-size:13px;cursor:pointer;">退出登录</button>
+</div>
+<div style="display:flex;gap:8px;">
+<input type="text" id="lgUidInput" maxlength="7" placeholder="输入游戏 UID（7 位数字）" style="flex:1;min-width:0;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary);color:var(--text);font-size:14px;">
+<button id="lgBindBtn" style="padding:9px 12px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">绑定 UID</button>
+</div>
+<div id="lgBindMsg" style="font-size:12px;color:var(--text-secondary);margin-top:8px;"></div>
 </div>
 
 <div class="card" style="background:linear-gradient(135deg,#facc15,#eab308);color:#1f2937;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
@@ -3354,6 +3390,75 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     setTimeout(function(){tip.style.opacity='0';tip.style.transform='translateX(-50%) translateY(20px)';setTimeout(function(){tip.remove();},500);},3400);
   };
   showHint();
+})();
+</script>
+<script>
+(function(){
+  var AUTH='https://theslowtidefk.pages.dev/api';
+  function setToken(t,e,u){
+    if(t)localStorage.setItem('tst_token',t); else localStorage.removeItem('tst_token');
+    if(e)localStorage.setItem('tst_email',e); else localStorage.removeItem('tst_email');
+    if(u)localStorage.setItem('tst_uid',u); else localStorage.removeItem('tst_uid');
+  }
+  function refresh(){
+    var token=localStorage.getItem('tst_token')||'';
+    var lc=document.getElementById('lgLoginCard');
+    var uc=document.getElementById('lgUserCard');
+    if(!lc||!uc) return;
+    if(!token){ lc.style.display='block'; uc.style.display='none'; return; }
+    fetch(AUTH+'/me',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      if(d&&d.ok){
+        lc.style.display='none'; uc.style.display='block';
+        document.getElementById('lgUserEmail').textContent=d.email;
+        document.getElementById('lgUserUid').textContent=d.uid||'未绑定';
+        setToken(null,null,d.uid);
+      }else{
+        setToken(null,null,null);
+        lc.style.display='block'; uc.style.display='none';
+      }
+    }).catch(function(){ lc.style.display='block'; uc.style.display='none'; });
+  }
+  var sendBtn=document.getElementById('lgSendBtn');
+  if(sendBtn) sendBtn.onclick=function(){
+    var email=document.getElementById('lgEmail').value.trim();
+    var msg=document.getElementById('lgMsg');
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ msg.textContent='请输入正确的邮箱'; return; }
+    sendBtn.disabled=true; sendBtn.textContent='发送中…';
+    fetch(AUTH+'/send-code',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})}).then(function(r){return r.json();}).then(function(d){
+      sendBtn.disabled=false; sendBtn.textContent='获取验证码';
+      if(d&&d.ok){ msg.textContent=d.debug?('验证码：'+d.debug):(d.msg||'验证码已发送'); }
+      else msg.textContent=(d&&d.msg)||'发送失败，请稍后再试';
+    }).catch(function(){ sendBtn.disabled=false; sendBtn.textContent='获取验证码'; msg.textContent='网络异常，请稍后再试'; });
+  };
+  var loginBtn=document.getElementById('lgLoginBtn');
+  if(loginBtn) loginBtn.onclick=function(){
+    var email=document.getElementById('lgEmail').value.trim();
+    var code=document.getElementById('lgCode').value.trim();
+    var msg=document.getElementById('lgMsg');
+    if(!email||!code){ msg.textContent='请填写邮箱和验证码'; return; }
+    loginBtn.disabled=true; loginBtn.textContent='登录中…';
+    fetch(AUTH+'/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,code:code})}).then(function(r){return r.json();}).then(function(d){
+      loginBtn.disabled=false; loginBtn.textContent='登录 / 注册';
+      if(d&&d.ok){ setToken(d.token,d.email,d.uid); showToast('登录成功'); refresh(); }
+      else msg.textContent=(d&&d.msg)||'登录失败';
+    }).catch(function(){ loginBtn.disabled=false; loginBtn.textContent='登录 / 注册'; msg.textContent='网络异常，请稍后再试'; });
+  };
+  var bindBtn=document.getElementById('lgBindBtn');
+  if(bindBtn) bindBtn.onclick=function(){
+    var uid=document.getElementById('lgUidInput').value.trim();
+    var token=localStorage.getItem('tst_token')||'';
+    var msg=document.getElementById('lgBindMsg');
+    if(!/^\d{7}$/.test(uid)||Number(uid)<1229000){ msg.textContent='UID 需为 7 位纯数字且不小于 1229000'; return; }
+    bindBtn.disabled=true; bindBtn.textContent='绑定中…';
+    fetch(AUTH+'/bind-uid',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({uid:uid})}).then(function(r){return r.json();}).then(function(d){
+      bindBtn.disabled=false; bindBtn.textContent='绑定 UID';
+      if(d&&d.ok){ localStorage.setItem('tst_uid',d.uid); showToast('UID 绑定成功'); refresh(); }
+      else msg.textContent=(d&&d.msg)||'绑定失败';
+    }).catch(function(){ bindBtn.disabled=false; bindBtn.textContent='绑定 UID'; msg.textContent='网络异常，请稍后再试'; });
+  };
+  var outBtn=document.getElementById('lgLogoutBtn');
+  if(outBtn) outBtn.onclick=function(){ setToken(null,null,null); showToast('已退出登录'); refresh(); };
+  refresh();
 })();
 </script>
 </body>
