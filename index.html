@@ -3755,11 +3755,11 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <!-- 发帖面板：独立卡片（默认收起，点「发帖」展开） -->
 <div id="postPanel" style="display:none;">
 <div class="post-panel-card">
-<div class="post-panel-head"><span>发布帖子</span><span class="post-msg">内测阶段需填写卡密</span></div>
+<div class="post-panel-head"><span>发布帖子</span><span class="post-msg">需登录后发帖</span></div>
 <div class="form-row"><label>游戏昵称</label><input type="text" id="poName" maxlength="24" placeholder="你的游戏名称"></div>
 <div class="form-row"><label>内容</label><textarea id="poContent" maxlength="500" placeholder="写点什么…" style="min-height:90px;"></textarea></div>
 <div class="form-row"><label>标签（可选）</label><input type="text" id="poTags" maxlength="60" placeholder="如 建筑 / 红石 / 活动"></div>
-<div class="form-row"><label>卡密</label><input type="text" id="poCard" maxlength="20" placeholder="TSTP-XXXXXXXXXX"></div>
+<div class="form-row" style="display:none;"><label>卡密</label><input type="text" id="poCard" maxlength="20" placeholder="TSTP-XXXXXXXXXX"></div>
 <div class="form-row"><label>图片（可选）</label><input type="file" id="poImg" accept="image/*"><span id="poImgName" class="post-msg"></span></div>
 <div id="poImgPrev" style="display:none;margin:6px 0;"><img id="poImgView" alt="" style="max-width:180px;max-height:120px;border-radius:8px;border:1px solid var(--border);"><button type="button" class="btn" id="poImgDel" style="margin-left:8px;">移除</button></div>
 <div class="form-row"><button class="btn btn-primary" id="poSendBtn">发布帖子</button><span id="poMsg" class="post-msg"></span></div>
@@ -9353,13 +9353,11 @@ try{ eval('const __t=()=>1;'); }catch(e){
     const name=document.getElementById('poName').value.trim();
     const content=document.getElementById('poContent').value.trim();
     const tags=document.getElementById('poTags').value.trim();
-    const card=document.getElementById('poCard').value.trim().toUpperCase();
     const msg=document.getElementById('poMsg');
     if(!name){ msg.textContent='请填写游戏昵称'; return; }
     if(!content){ msg.textContent='请填写内容'; return; }
-    if(!card){ msg.textContent='请填写卡密（内测阶段需要）'; return; }
     try{
-      const r=await fetch(POST_API+'/create',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({name:name,content:content,tags:tags,card:card,dev:pDev(),image:poImgData||''})});
+      const r=await fetch(POST_API+'/create',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({name:name,content:content,tags:tags,dev:pDev(),image:poImgData||''})});
       const d=await r.json();
       if(d&&d.ok){ msg.textContent='发布成功！'; document.getElementById('poName').value=''; document.getElementById('poContent').value=''; document.getElementById('poTags').value=''; document.getElementById('poCard').value=''; poImgData=''; document.getElementById('poImgPrev').style.display='none'; document.getElementById('poImgView').src=''; document.getElementById('poImg').value=''; document.getElementById('poImgName').textContent=''; loadPosts(); }
       else if(d&&d.error==='login_required'){ showToast(d.msg||'请先登录后再发帖'); localStorage.removeItem('tst_token'); localStorage.removeItem('tst_email'); localStorage.removeItem('tst_uid'); location.href='profile.html'; }
