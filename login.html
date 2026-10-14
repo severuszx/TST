@@ -6,133 +6,293 @@
 <title>登录 - The Slow Tide</title>
 <meta name="description" content="The Slow Tide 玩家登录：邮箱验证码登录，登录后可发布动态、绑定游戏 UID。">
 <style>
+:root{
+color-scheme:light;
+--bg:#f3f5f8;
+--text:#1f2937;
+--text-secondary:#5b6675;
+--border:#e2e8f0;
+--card:#ffffff;
+--hover:#eef2f7;
+--header-bg:rgba(255,255,255,.92);
+--primary:#0f172a;
+--accent:#52525b;
+--accent-soft:rgba(82,82,91,.1);
+--shadow:0 4px 14px rgba(15,23,42,.07);
+--hero-grad:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
+}
+html[data-theme="dark"]{
+color-scheme:dark;
+--bg:#111113;
+--text:#e5e5e7;
+--text-secondary:#9a9aa0;
+--border:#26262b;
+--card:#18181b;
+--hover:#222226;
+--header-bg:rgba(17,17,19,.92);
+--primary:#f4f4f5;
+--accent:#a1a1aa;
+--accent-soft:rgba(161,161,170,.14);
+--shadow:0 4px 14px rgba(0,0,0,.5);
+--hero-grad:linear-gradient(135deg,#0a0a0b 0%,#18181b 100%);
+}
+html[data-theme="dark"] .btn-primary{background:#71717a;}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',Arial,sans-serif;background:#f6f7f9;color:#1f2937;min-height:100vh;display:flex;flex-direction:column;}
-a{color:#4a6cf7;text-decoration:none;}
-a:hover{text-decoration:underline;}
+body{
+background:var(--bg);color:var(--text);
+font-family:system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+line-height:1.65;min-height:100vh;display:flex;flex-direction:column;
+}
+a{color:var(--accent);}
+button{font-family:inherit;}
+.container{max-width:1140px;margin:0 auto;padding:0 16px;}
 
-/* ===== 顶部品牌栏 ===== */
-.topbar{background:#0f1115;padding:14px 20px;display:flex;align-items:center;gap:12px;}
-.topbar .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#7ea2ff,#4a6cf7);color:#fff;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;}
-.topbar .name{color:#fff;font-size:16px;font-weight:700;}
-.topbar .sub{color:#8a94a6;font-size:11px;letter-spacing:1px;margin-left:2px;}
-.topbar .home{margin-left:auto;color:#c7cdd8;font-size:13px;padding:7px 14px;border:1px solid #2a2f3a;border-radius:8px;transition:background .2s;}
-.topbar .home:hover{background:#1a1f2a;text-decoration:none;}
+/* ===== 顶部导航（与官网一致）===== */
+.site-header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+.header-inner{display:flex;align-items:center;gap:12px;min-height:56px;}
+.logo{font-size:20px;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.logo-mark{width:34px;height:34px;border-radius:4px;background:var(--hero-grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.feedback-btn{padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:600;text-decoration:none;font-size:14px;white-space:nowrap;transition:background-color .2s ease;}
+.feedback-btn:hover{background:var(--hover);}
 
-/* ===== 登录卡片 ===== */
-.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:32px 16px;}
-.card{width:100%;max-width:440px;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:32px 30px;box-shadow:0 10px 34px rgba(15,20,35,.06);}
-.card h1{font-size:22px;font-weight:700;margin-bottom:6px;}
-.card .desc{font-size:13px;color:#6b7280;margin-bottom:24px;line-height:1.7;}
+/* ===== 登录区 ===== */
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:36px 16px;}
+.card{width:100%;max-width:460px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px 26px;box-shadow:var(--shadow);}
+.section-title{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:700;margin-bottom:6px;color:var(--primary);}
+.section-title::before{content:'';width:5px;height:22px;background:var(--accent);}
+.card .sub{font-size:13px;color:var(--text-secondary);margin-bottom:20px;line-height:1.7;}
 .field{margin-bottom:16px;}
-.field label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;}
-.input{width:100%;padding:11px 13px;border:1px solid #d1d5db;border-radius:10px;font-size:15px;color:#1f2937;background:#fff;outline:none;transition:border-color .2s,box-shadow .2s;font-family:inherit;}
-.input:focus{border-color:#4a6cf7;box-shadow:0 0 0 3px rgba(74,108,247,.14);}
-.input.err{border-color:#ef4444;animation:shake .4s;}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.inp{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;font-family:inherit;}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+.inp.err{border-color:#dc2626;animation:shake .4s;}
 @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-5px);}40%{transform:translateX(5px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
-.hint{font-size:12px;color:#9ca3af;margin-top:5px;line-height:1.5;}
-.hint.err{color:#ef4444;}
+.hint{font-size:12px;color:var(--text-secondary);margin-top:5px;line-height:1.5;}
+.hint.err{color:#dc2626;}
 .hint.ok{color:#16a34a;}
 .row{display:flex;gap:8px;}
-.row .input{flex:1;min-width:0;}
+.row .inp{flex:1;min-width:0;}
 
 /* ===== 按钮 ===== */
-.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s,opacity .2s;font-family:inherit;white-space:nowrap;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:14px;white-space:nowrap;transition:background-color .2s ease,filter .2s;font-family:inherit;}
+.btn:hover{background:var(--hover);}
 .btn:disabled{cursor:not-allowed;opacity:.65;}
-.btn-primary{background:#4a6cf7;color:#fff;width:100%;}
-.btn-primary:not(:disabled):hover{background:#3b5bd9;}
-.btn-send{background:#eef1fb;color:#4a6cf7;border:1px solid #d5ddfa;font-size:13px;font-weight:600;padding:10px 13px;border-radius:10px;cursor:pointer;white-space:nowrap;transition:background .2s;min-width:108px;justify-content:center;}
-.btn-send:not(:disabled):hover{background:#e3e9fa;}
+.btn-primary{background:#52525b;border:none;color:#fff;font-weight:600;width:100%;padding:11px 14px;font-size:15px;}
+html[data-theme="dark"] .btn-primary{background:#71717a;}
+.btn-primary:not(:disabled):hover{filter:brightness(1.08);}
+.btn-send{padding:10px 13px;background:var(--hover);border:1px solid var(--border);border-radius:6px;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s;min-width:112px;justify-content:center;}
+.btn-send:not(:disabled):hover{background:var(--accent-soft);}
 .btn-send:disabled{opacity:.7;cursor:not-allowed;}
 
-/* ===== spinner 加载动画 ===== */
-.spinner{width:17px;height:17px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
-.spinner.dark{border-color:rgba(74,108,247,.25);border-top-color:#4a6cf7;}
+/* ===== spinner ===== */
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+.spinner.dark{border-color:rgba(82,82,91,.25);border-top-color:#52525b;}
+html[data-theme="dark"] .spinner.dark{border-color:rgba(161,161,170,.3);border-top-color:#a1a1aa;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* ===== 协议勾选 ===== */
-.agree{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:#6b7280;margin:4px 0 16px;line-height:1.6;}
-.agree input{width:15px;height:15px;margin-top:2px;accent-color:#4a6cf7;flex-shrink:0;}
-.agree.err{color:#ef4444;}
+.agree{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text-secondary);margin:2px 0 16px;line-height:1.7;}
+.agree input{width:15px;height:15px;margin-top:2px;accent-color:var(--accent);flex-shrink:0;}
+.agree.err{color:#dc2626;}
+.agree a{color:var(--accent);text-decoration:underline;}
+.foot{text-align:center;font-size:12.5px;color:var(--text-secondary);margin-top:20px;line-height:2;}
+.foot a{color:var(--accent);}
 
 /* ===== toast ===== */
-#toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-70px);background:#111827;color:#fff;font-size:14px;padding:11px 22px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s;z-index:999;pointer-events:none;}
+#toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-70px);background:#111827;color:#fff;font-size:14px;padding:11px 22px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s;z-index:999;pointer-events:none;}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 #toast.ok{background:#16a34a;}
 #toast.err{background:#dc2626;}
 
-/* ===== 帮助/状态 ===== */
-.foot{text-align:center;font-size:12.5px;color:#9ca3af;margin-top:20px;line-height:2;}
-.foot a{color:#4a6cf7;}
-
 /* ===== 协议弹窗 ===== */
-.modal-mask{position:fixed;inset:0;background:rgba(15,20,35,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;}
 .modal-mask.show{display:flex;}
-.modal{background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:70vh;overflow-y:auto;padding:26px 28px;}
-.modal h3{font-size:17px;margin-bottom:12px;}
-.modal p{font-size:13.5px;color:#4b5563;line-height:1.9;margin-bottom:12px;}
-.modal .close{margin-top:14px;width:100%;padding:10px;border:none;border-radius:10px;background:#f3f4f6;color:#374151;font-size:14px;font-weight:600;cursor:pointer;}
-.modal .close:hover{background:#e5e7eb;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:12px;max-width:640px;width:100%;max-height:74vh;overflow-y:auto;padding:26px 28px;box-shadow:var(--shadow);}
+.modal h3{font-size:17px;color:var(--primary);margin-bottom:12px;}
+.modal p{font-size:13.5px;color:var(--text);line-height:1.9;margin-bottom:10px;}
+.modal h4{font-size:14px;font-weight:700;color:var(--primary);margin:14px 0 6px;}
+.modal .close{margin-top:16px;width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;background:var(--hover);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;}
+.modal .close:hover{background:var(--accent-soft);}
 
-@media (max-width:520px){
-  .card{padding:24px 18px;}
-}
+@media (max-width:520px){.card{padding:20px 16px;}}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="logo">TST</div>
-  <div>
-    <div class="name">The Slow Tide</div>
-    <div class="sub">PLAYER SIGN IN</div>
-  </div>
-  <a class="home" href="https://theslowtide.pages.dev/">← 返回官网</a>
+<header class="site-header">
+<div class="container header-inner">
+<div class="logo"><span class="logo-mark">TST</span><span>The Slow Tide</span></div>
+<div class="header-right">
+<a class="feedback-btn" href="https://theslowtide.pages.dev/">返回官网</a>
 </div>
+</div>
+</header>
 
 <div class="wrap">
-  <div class="card">
-    <h1>登录 / 注册</h1>
-    <div class="desc">输入邮箱获取验证码即可登录，新邮箱将自动注册。<br>登录后可发布动态、绑定游戏 UID。</div>
+<div class="card">
+<div class="section-title">登录 / 注册</div>
+<div class="sub">输入邮箱获取验证码即可登录，新邮箱将自动注册。<br>登录后可发布动态、绑定游戏 UID。</div>
 
-    <div class="field">
-      <label for="email">邮箱</label>
-      <input class="input" id="email" type="email" maxlength="100" placeholder="name@example.com" autocomplete="email" inputmode="email">
-      <div class="hint" id="emailHint">用于接收验证码，不会公开。</div>
-    </div>
+<div class="field">
+<label for="email">邮箱</label>
+<input class="inp" id="email" type="email" maxlength="100" placeholder="name@example.com" autocomplete="email" inputmode="email">
+<div class="hint" id="emailHint">用于接收验证码，不会公开。</div>
+</div>
 
-    <div class="field">
-      <label for="code">验证码</label>
-      <div class="row">
-        <input class="input" id="code" type="text" maxlength="6" placeholder="6 位数字" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
-        <button class="btn-send" id="sendBtn">获取验证码</button>
-      </div>
-      <div class="hint" id="codeHint">6 位数字，10 分钟内有效。</div>
-    </div>
+<div class="field">
+<label for="code">验证码</label>
+<div class="row">
+<input class="inp" id="code" type="text" maxlength="6" placeholder="6 位数字" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+<button class="btn-send" id="sendBtn">获取验证码</button>
+</div>
+<div class="hint" id="codeHint">6 位数字，10 分钟内有效。</div>
+</div>
 
-    <div class="agree" id="agreeRow">
-      <input type="checkbox" id="agree">
-      <span>我已阅读并同意 <a href="javascript:;" onclick="showModal('terms')">《用户协议》</a> 与 <a href="javascript:;" onclick="showModal('privacy')">《隐私政策》</a>，并同意使用邮箱作为登录账号。</span>
-    </div>
+<div class="agree" id="agreeRow">
+<input type="checkbox" id="agree">
+<span>我已阅读并同意 <a href="javascript:;" onclick="showModal('terms1')">《商城用户协议及赞助协议》</a>、<a href="javascript:;" onclick="showModal('terms2')">《商城与赞助专项协议（网易平台版）》</a> 与 <a href="javascript:;" onclick="showModal('terms3')">《服务器隐私政策》</a></span>
+</div>
 
-    <button class="btn btn-primary" id="loginBtn">登录 / 注册</button>
-    <div class="hint" id="loginHint" style="margin-top:10px;"></div>
+<button class="btn btn-primary" id="loginBtn">登录 / 注册</button>
+<div class="hint" id="loginHint" style="margin-top:10px;"></div>
 
-    <div class="foot">
-      <a href="javascript:;" onclick="showModal('help')">遇到问题？查看帮助</a><br>
-      登录状态保持 30 天 · 邮箱仅用于登录验证
-    </div>
-  </div>
+<div class="foot">
+<a href="javascript:;" onclick="showModal('help')">遇到问题？查看帮助</a><br>
+登录状态保持 30 天 · 邮箱仅用于登录验证
+</div>
+</div>
 </div>
 
 <div id="toast"></div>
 
 <div class="modal-mask" id="modalMask">
-  <div class="modal">
-    <h3 id="modalTitle"></h3>
-    <div id="modalBody"></div>
-    <button class="close" onclick="closeModal()">知道了</button>
-  </div>
+<div class="modal">
+<h3 id="modalTitle"></h3>
+<div id="modalBody"></div>
+<button class="close" onclick="closeModal()">知道了</button>
+</div>
+</div>
+
+<!-- ===== 协议一：商城用户协议及赞助协议 ===== -->
+<div id="terms1" style="display:none">
+<p><b>最后更新日期：2026年10月13日　生效日期：2026年10月13日</b></p>
+<h4>第一章 总则</h4>
+<p><b>第1条 协议目的</b><br>本协议旨在规范 The Slow Tide 服务器官方网站商城（以下简称"官网商城"）的用户行为，明确积分获取与使用规则、赞助规则，保障服务器与用户的合法权益，确保官网商城运营符合 Mojang AB 及 Microsoft 的相关规定。</p>
+<p><b>第2条 协议范围</b><br>本协议适用于所有注册、访问、使用官网商城的用户。用户在使用官网商城前，应完整阅读并同意本协议全部条款。用户开始使用官网商城，即视为已阅读、理解并同意本协议。</p>
+<p><b>第3条 合规依据</b><br>本协议依据以下文件制定：<br>· 《Minecraft 最终用户许可协议》（EULA）：https://www.minecraft.net/zh-hans/eula<br>· 《Minecraft 使用准则》：https://www.minecraft.net/zh-hans/usage-guidelines<br>· 《微软服务协议》：https://www.microsoft.com/servicesagreement<br>· Mojang AB《商业使用指南》：https://account.mojang.com/terms#commercial<br>· 中华人民共和国相关法律法规</p>
+<h4>第二章 定义</h4>
+<p><b>第4条 术语定义</b><br>4.1 "官网商城"：指 The Slow Tide 服务器官方网站内设的积分兑换与赞助支持平台。<br>4.2 "积分"：指用户在官网商城中通过签到、参与活动、赞助支持等方式获得的虚拟计数单位，不具备法定货币属性，不可兑换为真实货币。<br>4.3 "商品"：指官网商城中可供积分兑换的虚拟物品或服务，包括但不限于：服务器内装饰性效果、称号、纪念品、体验权限等。<br>4.4 "赞助"：指用户自愿向服务器运营方提供的资金支持，用于覆盖服务器运营成本。<br>4.5 "用户"：指注册并使用官网商城的自然人。</p>
+<h4>第三章 积分获取规则</h4>
+<p><b>第5条 积分获取方式</b><br>5.1 用户可通过以下方式获取积分：<br>（一）每日签到：用户每日登录官网商城并完成签到，可获得固定积分。签到周期及积分数量由运营方在官网商城中公示。<br>（二）参与官网活动：用户参与官网商城举办的限时活动（如投票、答题、抽奖等），按活动规则获得积分。<br>（三）赞助支持：用户自愿提供资金赞助后，运营方以积分形式表示感谢。赞助与积分之间不存在等价交换关系，积分仅为感谢性质的赠予。<br>（四）其他运营方公示的获取方式。<br>5.2 积分获取的具体数量、频率及上限，由运营方根据运营需要制定并在官网商城中公示。运营方有权根据服务器运营状况调整积分获取规则，调整前将提前公告。</p>
+<p><b>第6条 积分性质</b><br>6.1 积分是官网商城内部的虚拟计数单位，仅用于在官网商城中兑换商品，不具备任何法定货币价值，不可提现、不可转让、不可兑换为真实货币或其他平台的服务。<br>6.2 积分不可在服务器之间转移或跨平台使用。<br>6.3 积分与任何真实货币之间不存在固定兑换比率。运营方有权根据运营需要调整积分获取与消耗的比例。</p>
+<h4>第四章 积分使用与兑换规则</h4>
+<p><b>第7条 商品分类</b><br>7.1 官网商城中的商品分为以下类别：<br>（一）纯装饰性商品：包括但不限于粒子效果、称号显示、聊天前缀颜色、纪念性物品等。此类商品仅改变外观表现，不影响游戏玩法平衡，不赋予用户任何竞技优势。<br>（二）便利性体验：包括但不限于优先排队、服务器访问权限等。此类体验不改变用户在游戏内的核心能力，不构成对其他用户的竞技优势。<br>（三）纪念性商品：包括但不限于活动限定纪念品、服务器里程碑物品等。此类商品仅具有纪念与收藏价值。<br>7.2 运营方承诺不通过官网商城出售任何影响游戏竞技公平性的物品或能力。</p>
+<p><b>第8条 兑换规则</b><br>8.1 用户使用积分兑换商品，即表示确认该商品符合自身需求，且知晓该商品的属性与限制。<br>8.2 商品兑换成功后，积分将相应扣除。已兑换的商品不支持退回积分，但因运营方原因导致商品无法正常发放的除外。<br>8.3 运营方有权根据运营需要调整商品的种类、所需积分数量及库存限制，调整前将提前公告。<br>8.4 商品的实际发放方式由运营方根据服务器技术条件确定。由于技术限制，部分商品的发放可能存在延迟，运营方将尽合理努力完成发放。</p>
+<p><b>第9条 禁止行为</b><br>9.1 用户不得通过以下方式获取或使用积分：<br>（一）利用技术手段恶意刷取积分；<br>（二）通过欺诈、虚假交易等方式获取积分；<br>（三）将积分用于任何形式的真实货币交易、兑现或变相变现；<br>（四）将积分或兑换所得商品转售给第三方以获取真实货币利益；<br>（五）利用积分系统从事任何违反中华人民共和国法律法规的行为。<br>9.2 如发现用户存在上述行为，运营方有权采取以下措施：<br>（一）扣除违规获取的积分；<br>（二）收回已兑换的违规商品；<br>（三）暂停或永久限制该用户的官网商城使用权限；<br>（四）情节严重者，同步暂停或永久限制其服务器访问权限。</p>
+<h4>第五章 赞助协议</h4>
+<p><b>第10条 赞助性质</b><br>10.1 赞助是用户自愿提供的资金支持，用于覆盖服务器运营成本，包括但不限于服务器租赁、插件开发、维护费用等。<br>10.2 赞助不是购买行为，不构成用户与运营方之间的买卖关系。赞助提供者不因赞助行为获得任何游戏内的竞技优势或特权。<br>10.3 运营方对赞助者的感谢形式仅限于：官网公示鸣谢、积分感谢、专属纪念称号等不影响游戏公平性的形式。<br>10.4 赞助行为应遵循 Mojang AB《商业使用指南》中关于服务器接受捐赠的规定，不得以赞助为名出售游戏内影响平衡的物品或能力。</p>
+<p><b>第11条 赞助限制</b><br>11.1 运营方不接受以下形式的赞助：<br>（一）以获取游戏内竞技优势为目的的赞助；<br>（二）附带条件要求运营方给予特定游戏内特权的赞助；<br>（三）来自未成年人未经监护人同意的赞助；<br>（四）涉及洗钱、非法资金等违法来源的赞助。<br>11.2 运营方有权拒绝任何不符合本协议规定的赞助，并有权退回已接收的不合规赞助。</p>
+<p><b>第12条 赞助者鸣谢</b><br>12.1 运营方将在官网商城设立鸣谢页面，公示赞助者名单（经赞助者同意）。<br>12.2 鸣谢形式包括但不限于：官网昵称展示、纪念称号、游戏内告示牌鸣谢等，具体形式由运营方确定。<br>12.3 赞助者如需匿名，可向运营方提出，运营方将尊重其意愿。</p>
+<h4>第六章 活动规则</h4>
+<p><b>第13条 活动参与</b><br>13.1 官网商城举办的活动，用户应按照活动公告中载明的规则参与。<br>13.2 活动奖励以积分、称号、纪念品等形式发放，不涉及真实货币奖励。<br>13.3 运营方有权根据活动实际情况调整活动规则，调整前将提前公告。活动最终解释权归运营方所有。</p>
+<p><b>第14条 活动公平性</b><br>14.1 用户在参与活动时，不得使用任何作弊手段或利用系统漏洞获取不正当利益。<br>14.2 如发现用户存在作弊行为，运营方有权取消其活动参与资格及已获得的奖励。</p>
+<h4>第七章 用户权利与义务</h4>
+<p><b>第15条 用户权利</b><br>15.1 用户有权查询自己的积分余额及获取、消耗记录。<br>15.2 用户有权对积分异常、商品发放问题提出申诉，运营方应在合理时间内予以回应。<br>15.3 用户有权对官网商城的规则提出建议，建议可通过官网反馈页面提交。</p>
+<p><b>第16条 用户义务</b><br>16.1 用户应遵守本协议及服务器玩家条约的全部规定。<br>16.2 用户应保证注册信息的真实性，不得冒用他人身份。<br>16.3 用户应妥善保管自己的账号信息，因账号泄露导致的积分损失，运营方不承担责任。</p>
+<h4>第八章 免责声明</h4>
+<p><b>第17条 服务中断</b><br>17.1 因服务器维护、升级、故障、不可抗力等原因导致官网商城无法正常使用的，运营方不承担赔偿责任，但应尽合理努力恢复服务。<br>17.2 因网络服务商、支付平台等第三方原因导致的服务异常，运营方不承担责任。</p>
+<p><b>第18条 积分风险</b><br>18.1 用户知晓并同意：积分不具有保值属性，运营方有权根据运营需要调整积分的获取与消耗规则。<br>18.2 因服务器运营终止导致积分无法继续使用的，运营方将提前公告并给予合理的处理方案，但不承担超出运营方合理承受范围的赔偿责任。</p>
+<p><b>第19条 合规免责</b><br>19.1 本协议的制定以符合 Mojang AB 及 Microsoft 相关规定为前提。如 Mojang AB 或 Microsoft 的规则发生变化，运营方有权据此调整本协议相关条款。<br>19.2 运营方不对用户因违反 Mojang AB 或 Microsoft 相关规定而导致的后果承担责任。</p>
+<h4>第九章 争议解决</h4>
+<p><b>第20条 协商解决</b>　因本协议产生的争议，双方应首先通过友好协商解决。<br><b>第21条 申诉渠道</b>　用户可通过官网反馈页面提交申诉，运营方应在收到申诉后七个工作日内予以回应。<br><b>第22条 适用法律</b>　本协议适用中华人民共和国法律。</p>
+<h4>第十章 协议变更</h4>
+<p><b>第23条 变更通知</b><br>23.1 运营方有权根据运营需要或合规要求修改本协议。<br>23.2 协议修改后，运营方将在官网商城显著位置发布变更公告，公告期不少于七日。<br>23.3 用户在协议变更后继续使用官网商城，即视为同意变更后的协议。如不同意变更内容，用户应停止使用官网商城。</p>
+<h4>第十一章 附则</h4>
+<p><b>第24条 协议效力</b>　本协议自发布之日起生效。<br><b>第25条 解释权</b>　本协议的解释权归 The Slow Tide 运营方所有。运营方对本协议的解释不得违反 Mojang AB 及 Microsoft 的相关规定。<br><b>第26条 联系方式</b>　如有疑问，可通过以下方式联系运营方：官网反馈页面、官方 QQ 群。</p>
+</div>
+
+<!-- ===== 协议二：商城与赞助专项协议（网易平台版）===== -->
+<div id="terms2" style="display:none">
+<p><b>最后更新日期：2026年10月13日　生效日期：2026年10月13日</b></p>
+<h4>第一章 总则</h4>
+<p><b>第1条 协议目的</b><br>本协议旨在规范 The Slow Tide 服务器官方网站商城（以下简称"官网商城"）的积分获取、商品兑换及赞助行为，明确用户与运营方之间的权利义务，确保相关运营符合网易《我的世界》中国版平台规则及 Mojang AB 相关规定。</p>
+<p><b>第2条 适用范围</b><br>本协议仅适用于官网商城的积分获取、积分兑换及赞助行为，不涉及服务器内游戏规则、玩家行为规范等其他事项。用户使用官网商城即视为同意本协议。</p>
+<p><b>第3条 合规依据</b><br>本协议依据以下文件制定：<br>· 《网易游戏使用许可及服务协议》<br>· 《网易游戏隐私政策》<br>· 《网易游戏儿童个人信息保护规则及监护人须知》<br>· 《Minecraft 最终用户许可协议》（EULA）<br>· Mojang AB《商业使用指南》<br>· 中华人民共和国相关法律法规</p>
+<h4>第二章 定义</h4>
+<p><b>第4条 术语</b><br>4.1 "官网商城"：指 The Slow Tide 官方网站内设的积分兑换与赞助平台。<br>4.2 "积分"：指用户通过签到、参与活动、赞助支持等方式获得的虚拟计数单位，仅用于官网商城兑换，不具备法定货币属性。<br>4.3 "商品"：指官网商城中可供积分兑换的虚拟物品或服务，包括装饰性效果、称号、纪念品等。<br>4.4 "赞助"：指用户自愿向运营方提供的资金支持，用于覆盖服务器运营成本。</p>
+<h4>第三章 积分获取与使用</h4>
+<p><b>第5条 积分获取</b><br>5.1 用户可通过以下方式获取积分：<br>· 每日签到：每日登录官网商城签到，获得固定积分。<br>· 参与活动：按活动规则获得积分。<br>· 赞助感谢：赞助后运营方以积分形式表示感谢，赞助与积分无等价交换关系。<br>· 其他公示方式。<br>5.2 积分数量、频率及上限由运营方公示，运营方有权调整并提前公告。</p>
+<p><b>第6条 积分性质</b><br>6.1 积分不可提现、不可转让、不可兑换为真实货币。<br>6.2 积分与真实货币无固定兑换比率。</p>
+<p><b>第7条 商品兑换</b><br>7.1 商品仅限纯装饰性、便利性体验及纪念性物品，不包含任何影响游戏竞技公平性的物品。<br>7.2 兑换成功后积分扣除，除运营方原因外不支持退回积分。<br>7.3 运营方有权调整商品种类与所需积分，提前公告。</p>
+<p><b>第8条 禁止行为</b><br>8.1 禁止利用技术手段刷取积分、欺诈获取积分、将积分用于真实货币交易或转售。<br>8.2 违规者运营方有权扣除积分、收回商品、限制商城权限，情节严重者同步限制服务器访问。</p>
+<h4>第四章 赞助规则</h4>
+<p><b>第9条 赞助性质</b><br>9.1 赞助是自愿的资金支持，用于服务器运营成本，不构成买卖关系。<br>9.2 赞助者不因赞助获得任何游戏内竞技优势。感谢形式仅限于官网鸣谢、积分感谢、纪念称号等非竞技性内容。<br>9.3 赞助应遵循 Mojang AB《商业使用指南》中关于服务器接受捐赠的规定。</p>
+<p><b>第10条 赞助限制</b><br>10.1 运营方不接受以获取竞技优势为目的、附带特权条件、未成年人未经监护人同意、涉及违法资金的赞助。<br>10.2 运营方有权拒绝或退回不合规赞助。</p>
+<p><b>第11条 鸣谢</b><br>11.1 运营方将在官网设立鸣谢页，经赞助者同意后公示名单。<br>11.2 赞助者可选择匿名。</p>
+<h4>第五章 网易平台特别条款</h4>
+<p><b>第12条 账号与支付</b><br>12.1 用户须使用网易《我的世界》中国版账号登录官网商城。<br>12.2 赞助支付应通过网易官方认可的支付渠道进行，遵守网易平台的支付规则。</p>
+<p><b>第13条 未成年人保护</b><br>13.1 未满18周岁的用户进行赞助或积分兑换前，须取得法定监护人同意。<br>13.2 运营方遵循《网易游戏儿童个人信息保护规则及监护人须知》，对涉及未成年人的赞助与兑换进行严格审核。<br>13.3 如发现未成年人未经监护人同意进行赞助，运营方将配合网易平台及监护人进行退款处理。</p>
+<p><b>第14条 违规处理</b><br>14.1 如用户在官网商城存在违法违规行为，运营方将配合网易公司依据《网易游戏使用许可及服务协议》进行处理。<br>14.2 网易公司有权对违规账号进行封停，运营方将同步限制该账号的商城权限。</p>
+<p><b>第15条 争议管辖</b><br>15.1 本协议适用中华人民共和国法律。<br>15.2 因本协议产生的争议，参照《网易游戏使用许可及服务协议》的约定，提交广州市天河区有管辖权的法院处理。</p>
+<h4>第六章 免责与变更</h4>
+<p><b>第16条 免责</b><br>16.1 因服务器维护、故障、不可抗力导致商城无法使用的，运营方不承担赔偿责任。<br>16.2 积分不具有保值属性，运营方有权调整规则，因服务器终止导致积分无法使用的，将提前公告并给予合理处理方案。</p>
+<p><b>第17条 协议变更</b><br>17.1 运营方有权修改本协议，修改后将在官网商城显著位置公告不少于七日。<br>17.2 用户继续使用即视为同意变更。</p>
+<h4>第七章 附则</h4>
+<p><b>第18条 解释权</b>　本协议解释权归 The Slow Tide 运营方所有，解释不得违反网易及 Mojang 相关规定。<br><b>第19条 联系方式</b>　官网反馈页面、官方 QQ 群。</p>
+<p><b>引用文档链接：</b><br>· 《网易游戏使用许可及服务协议》：https://protocol.unisdk.netease.com/release/latest_v15.html<br>· 《网易游戏隐私政策》：https://protocol.unisdk.netease.com/release/latest_v90.html<br>· 《网易游戏儿童个人信息保护规则及监护人须知》：https://protocol.unisdk.netease.com/release/latest_v106.html<br>· 《Minecraft 最终用户许可协议》：https://www.minecraft.net/zh-hans/eula<br>· Mojang AB《商业使用指南》：https://account.mojang.com/terms#commercial</p>
+</div>
+
+<!-- ===== 协议三：服务器隐私政策 ===== -->
+<div id="terms3" style="display:none">
+<p><b>最后更新日期：2026年10月13日　生效日期：2026年10月13日</b></p>
+<p>The Slow Tide 服务器（以下简称"本服务器"或"我们"）深知个人信息对您的重要性，并庄严承诺保护所有使用本服务器官方网站及相关服务的用户（以下简称"用户"或"您"）的个人信息与隐私安全。</p>
+<p>本政策旨在向您清晰说明我们在您使用本服务器官网及相关服务时，如何收集、使用、存储、共享和保护您的个人信息，以及您对自身个人信息享有的权利和行使方式。请您在使用本服务器服务前，仔细阅读并透彻理解本政策全部内容。</p>
+<p>本政策适用于 The Slow Tide 官方网站（theslowtide.pages.dev）、反馈中心（theslowtidefk.pages.dev）及本服务器提供的所有相关服务。</p>
+<h4>一、我们如何收集和使用个人信息</h4>
+<p>我们收集您的个人信息主要是为了向您提供更优质、更稳定的服务体验。我们仅会出于本政策所述的目的收集和使用您的个人信息。</p>
+<p><b>1.1 您主动提供的信息</b><br>当您使用本服务器官网的以下功能时，您可能会主动向我们提供以下信息：<br>（1）官网账户注册与登录：当您注册或登录官网账户时，我们会收集您的邮箱地址及验证码，用于账户身份验证和安全登录。<br>（2）游戏账号绑定：当您在官网绑定游戏账号时，我们会收集您的游戏 UID，用于关联您的游戏数据。该数据仅用于在您登录后向您本人提供个人数据查询服务，不会在官网公开展示。<br>（3）反馈中心提交：当您通过官网反馈中心提交问题或建议时，我们会收集您填写的游戏 ID、反馈类型、发生时间、联系方式、问题描述及您主动上传的截图。其中"联系方式"为选填项。您可以选择是否将反馈内容对外显示；若取消勾选，该反馈仅管理员可见。<br>（4）商城兑换与赞助：当您使用官网商城的积分兑换功能时，我们会记录您的兑换记录；当您进行赞助时，我们会记录您的赞助金额及您选择是否公开鸣谢的意愿。<br>（5）抽奖活动：当您参与官网抽奖活动时，我们会记录您的抽奖结果及参与时间。</p>
+<p><b>1.2 我们自动收集的信息</b><br>当您访问本服务器官网时，我们可能会自动收集以下技术信息：<br>（1）设备信息：官网部分页面（如"我的"页面）会在您的浏览器中本地检测并显示 CPU 核心数、GPU 信息、内存大小、网络类型、屏幕分辨率等信息，此类信息不会上传至服务器。但当您参与官网抽奖活动时，为防范刷奖行为，我们会收集并上传设备指纹信息（包括设备特征标识、浏览器 User-Agent、Sec-CH-UA、Sec-CH-UA-Platform 等）至服务器端，用于防刷验证。<br>（2）IP 地址：当您访问本服务器官网、提交反馈、参与抽奖时，我们会主动收集您的 IP 地址（包括通过 CF-Connecting-IP、X-Forwarded-For 等请求头获取），并将 IP 地址与访问日期一同记录至服务器端数据库，用于防刷验证、异常访问检测及安全审计。<br>（3）日志信息：访问时间、访问页面、操作记录等，用于服务维护与安全审计。</p>
+<p><b>1.3 我们如何使用您的信息</b><br>我们将收集到的信息用于以下目的：<br>· 提供、维护和改进本服务器的各项功能与服务；<br>· 验证您的身份，保障账户安全；<br>· 处理您的反馈、建议与申诉；<br>· 管理积分、抽奖与赞助相关的记录；<br>· 防刷验证与异常访问检测；<br>· 供您本人查询您的游戏数据（如您主动绑定游戏 UID）；<br>· 预防、发现和调查违反本服务器规则或法律法规的行为。<br>我们承诺不会将您的个人信息用于本政策未载明的其他用途。</p>
+<h4>二、我们如何使用 Cookie 或同类技术</h4>
+<p><b>2.1 Cookie 的使用</b><br>当您访问本服务器官网时，我们可能会在您的设备上存储小型数据文件（Cookie）或使用同类技术（如 localStorage），用于：维持您的登录状态；记住您的偏好设置（如深色模式、界面主题等）；记录您的签到状态与积分信息。</p>
+<p><b>2.2 本地存储</b><br>本服务器官网的部分数据（如签到记录、积分余额、界面偏好设置）存储在您的浏览器本地（localStorage）中。您可以随时通过浏览器设置清除本地数据，清除后相关记录将无法恢复。</p>
+<p><b>2.3 您对 Cookie 的控制</b><br>您可以通过浏览器设置管理或删除 Cookie。但请注意，禁用 Cookie 可能导致部分功能无法正常使用。</p>
+<h4>三、我们如何存储和保护个人信息</h4>
+<p><b>3.1 存储地点</b><br>您的个人信息存储于以下位置：<br>· Cloudflare Pages / GitHub Pages：用于承载官网静态页面与部分服务端逻辑；<br>· Supabase 云数据库（域名：jilcbcodphxpasicjghv.supabase.co）：用于存储反馈记录、兑换码数据、抽奖防刷标记、IP 记录等结构化数据；<br>· 您的浏览器本地：签到记录、界面偏好等。<br>上述服务提供商的服务器可能位于中国大陆境外，您的个人信息可能因此涉及跨境传输。我们会要求相关服务提供商遵守适用的数据保护法律法规。</p>
+<p><b>3.2 存储期限</b><br>我们仅在实现本政策所述目的所必需的期限内保留您的个人信息，法律法规另有规定的除外。具体而言：<br>· 账户信息：在您的账户存续期间保留；<br>· 反馈记录：保留至问题处理完毕后合理期限；<br>· 积分与抽奖记录：保留至服务器运营期间及合理必要的期限；<br>· IP 与设备指纹记录：保留至验证目的达成后的合理期限；<br>· 浏览器本地数据：由您自行控制，可随时清除。</p>
+<p><b>3.3 安全措施</b><br>我们采取合理可行的技术和管理措施保护您的个人信息安全，包括但不限于：使用 HTTPS 加密传输数据；限制对个人信息的访问权限，仅授权必要的人员访问；定期审查数据收集、存储和使用流程；对数据库访问密钥进行管理，避免密钥公开暴露。<br>我们注意到，本服务器官网所使用的 Supabase 匿名密钥（anon key）曾在公开代码仓库中可见。我们已对该情况予以关注，并正在采取措施加强密钥管理与访问控制。请您理解，互联网环境并非绝对安全，我们无法保证信息的绝对安全。若发生个人信息安全事件，我们将依法及时通知您并向有关部门报告。</p>
+<h4>四、我们如何共享、转让、公开披露个人信息</h4>
+<p><b>4.1 共享</b><br>我们不会与任何第三方共享您的个人信息，但以下情况除外：获得您的明确同意；根据法律法规的规定或行政、司法机关的合法要求；为保护本服务器、用户或公众的合法权益所必需；为提供服务所必需，与我们的服务提供商共享。具体而言，您的反馈记录、兑换码数据、抽奖防刷标记、IP 记录等存储于 Supabase 云数据库。我们已要求 Supabase 按照适用的数据保护法律法规处理您的个人信息。</p>
+<p><b>4.2 转让</b><br>我们不会将您的个人信息转让给任何第三方，但以下情况除外：获得您的明确同意；在涉及合并、收购或破产清算时，如涉及个人信息转让，我们将要求新的持有方继续受本政策约束。</p>
+<p><b>4.3 公开披露</b><br>我们仅会在以下情况下公开披露您的个人信息：获得您的明确同意；根据法律法规的强制性要求。</p>
+<h4>五、如何管理您的个人信息</h4>
+<p><b>5.1 访问和更正</b><br>您可以通过官网"我的"页面访问和更正您的账户信息（如邮箱、绑定的游戏 UID等）。</p>
+<p><b>5.2 删除</b><br>您可以通过以下方式删除您的个人信息：清除浏览器本地存储数据（Cookie、localStorage）；通过官网反馈页面或官方 QQ 群联系管理员，申请删除您的账户信息及相关记录。</p>
+<p><b>5.3 注销账户</b><br>如需注销官网账户，请通过官网反馈页面或官方 QQ 群联系管理员。注销后，我们将删除或匿名化处理您的个人信息，法律法规另有规定的除外。</p>
+<p><b>5.4 撤回同意</b><br>您有权随时撤回对个人信息收集和使用的同意。撤回同意后，我们可能无法继续为您提供相应的服务，但您撤回同意的决定不会影响撤回前基于同意已进行的个人信息处理活动的效力。</p>
+<h4>六、未成年人保护</h4>
+<p><b>6.1 特别提示</b><br>本服务器面向网易《我的世界》中国版用户，其中可能包含未成年人用户。我们高度重视未成年人个人信息的保护。若您未满18周岁，请在法定监护人的陪同下阅读本政策，并在取得监护人同意后使用本服务器的相关服务。若您未满14周岁，我们将同时适用《网易游戏儿童个人信息保护规则及监护人须知》的相关规定。</p>
+<p><b>6.2 监护人权利</b><br>如您是未成年人的监护人，当您对您所监护的未成年人的个人信息有相关疑问时，或发现未成年人未经您同意向我们提供了个人信息，请通过本政策"如何联系我们"章节所列的反馈渠道联系我们，我们将及时处理。</p>
+<h4>七、第三方服务</h4>
+<p>本服务器官网可能包含指向第三方服务的链接（如 QQ 群链接、Mojang 官网链接等）。当您点击这些链接时，您将离开本服务器官网，并受该第三方服务的隐私政策约束。我们建议您在使用第三方服务前仔细阅读其隐私政策。</p>
+<p>本服务器官网使用以下第三方服务：<br>· Cloudflare Pages / GitHub Pages：用于承载官网页面与部分服务端逻辑，可能会自动记录您的 IP 地址和访问日志；<br>· Supabase：用于存储反馈记录、兑换码、抽奖防刷标记等数据。<br>具体的数据处理规则请参阅相应服务提供商的隐私政策。</p>
+<h4>八、隐私政策的修订和通知</h4>
+<p><b>8.1 修订</b>　我们有权根据服务器运营需要、法律法规变化或监管要求适时修订本政策。<br><b>8.2 通知</b>　本政策修订后，我们将在官网显著位置发布变更公告，公告期不少于七日。对于重大变更，我们将以更显著的方式通知您（如弹窗提示、群公告等）。<br><b>8.3 继续使用</b>　若您在本政策修订后继续使用本服务器服务，即视为您同意修订后的政策。如您不同意修订内容，请停止使用本服务器服务。</p>
+<h4>九、如何联系我们</h4>
+<p>如您对本政策或与个人信息保护相关的事宜有任何疑问、意见或建议，可通过以下渠道联系我们：<br>· 官网反馈页面：https://theslowtidefk.pages.dev/<br>· 官方 QQ 群：833470853<br>我们将在收到您的反馈后七个工作日内予以回复。</p>
+<h4>十、附录：相关定义</h4>
+<p>个人信息：指以电子或者其他方式记录的能够单独或者与其他信息结合识别特定自然人身份或者反映特定自然人活动情况的各种信息。<br>个人敏感信息：指一旦泄露、非法提供或滥用可能危害人身和财产安全，极易导致个人名誉、身心健康受到损害或歧视性待遇的个人信息。<br>匿名化：指通过对个人信息的技术处理，使得个人信息主体无法被识别，且处理后的信息不能被复原的过程。<br>去标识化：指通过对个人信息的技术处理，使其在不借助额外信息的情况下无法识别个人信息主体的过程。</p>
+<p><b>引用文档链接：</b><br>· 《网易游戏隐私政策》：https://protocol.unisdk.netease.com/release/latest_v90.html<br>· 《网易游戏儿童个人信息保护规则及监护人须知》：https://protocol.unisdk.netease.com/release/latest_v106.html<br>· 《Minecraft 最终用户许可协议》：https://www.minecraft.net/zh-hans/eula<br>· 《微软服务协议》：https://www.microsoft.com/servicesagreement<br>· Supabase 隐私政策：https://supabase.com/privacy<br>· Cloudflare 隐私政策：https://www.cloudflare.com/privacypolicy/</p>
+</div>
+
+<!-- ===== 帮助 ===== -->
+<div id="help" style="display:none">
+<p><b>常见问题</b></p>
+<p>1. <b>收不到验证码？</b> 请检查垃圾箱；确认邮箱填写正确；若 60 秒内多次点击会被限频，请稍等再试。</p>
+<p>2. <b>验证码错误/过期？</b> 验证码 10 分钟内有效且一次性使用，请重新获取。</p>
+<p>3. <b>连续输错被锁定？</b> 同一邮箱连续 5 次输错会锁定 10 分钟，请稍后再试。</p>
+<p>4. 仍无法解决？请联系管理员：QQ 交流群 <b>833470853</b>。</p>
 </div>
 
 <script>
@@ -140,12 +300,19 @@ a:hover{text-decoration:underline;}
   var AUTH='https://theslowtidefk.pages.dev/api';
   var $=function(id){return document.getElementById(id);};
   var emailEl=$('email'),codeEl=$('code'),sendBtn=$('sendBtn'),loginBtn=$('loginBtn');
-  var emailHint=$('emailHint'),codeHint=$('codeHint'),loginHint=$('loginHint');
+  var emailHint=$('emailHint'),codeHint=$('codeHint');
+
+  // ===== 主题跟随官网（tst-theme；glass 回退 light）=====
+  try{
+    var mode=localStorage.getItem('tst-theme');
+    if(mode==='dark') document.documentElement.setAttribute('data-theme','dark');
+    else document.documentElement.setAttribute('data-theme','light');
+  }catch(e){}
 
   // 自动聚焦邮箱
   emailEl.focus();
 
-  // ===== 邮箱即时校验（失焦 + 输入）=====
+  // ===== 邮箱即时校验 =====
   var EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   function checkEmail(){
     var v=emailEl.value.trim();
@@ -162,7 +329,7 @@ a:hover{text-decoration:underline;}
   emailEl.addEventListener('blur',checkEmail);
   emailEl.addEventListener('input',function(){ if(EMAIL_RE.test(emailEl.value.trim())){ emailEl.classList.remove('err'); emailHint.className='hint ok'; emailHint.textContent='邮箱格式正确。'; } });
 
-  // ===== 验证码输入（仅数字）=====
+  // ===== 验证码仅数字 =====
   codeEl.addEventListener('input',function(){ codeEl.value=codeEl.value.replace(/\D/g,'').slice(0,6); codeEl.classList.remove('err'); codeHint.className='hint'; codeHint.textContent='6 位数字，10 分钟内有效。'; });
 
   function toast(msg,type){
@@ -173,10 +340,12 @@ a:hover{text-decoration:underline;}
     t._timer=setTimeout(function(){ t.className=''; },2600);
   }
 
+  function agreed(){ return $('agree').checked; }
+
   // ===== 发送验证码：倒计时 + spinner =====
   sendBtn.addEventListener('click',function(){
     if(!checkEmail()){ toast('请输入正确的邮箱','err'); emailEl.focus(); return; }
-    if(!$('agree').checked){ $('agreeRow').classList.add('err'); toast('请先勾选同意用户协议与隐私政策','err'); return; }
+    if(!agreed()){ $('agreeRow').classList.add('err'); toast('请先勾选同意全部协议','err'); return; }
     $('agreeRow').classList.remove('err');
     var btn=sendBtn;
     btn.disabled=true;
@@ -199,7 +368,6 @@ a:hover{text-decoration:underline;}
       });
   });
 
-  // ===== 60 秒倒计时 =====
   function startCountdown(btn){
     var left=60;
     btn.innerHTML=left+'s 后重发';
@@ -218,7 +386,7 @@ a:hover{text-decoration:underline;}
     var email=emailEl.value.trim(),code=codeEl.value.trim();
     if(!checkEmail()){ emailEl.focus(); return; }
     if(!code){ codeEl.classList.add('err'); codeHint.className='hint err'; codeHint.textContent='请输入 6 位验证码。'; codeEl.focus(); return; }
-    if(!$('agree').checked){ $('agreeRow').classList.add('err'); toast('请先勾选同意用户协议与隐私政策','err'); return; }
+    if(!agreed()){ $('agreeRow').classList.add('err'); toast('请先勾选同意全部协议','err'); return; }
     $('agreeRow').classList.remove('err');
     loginBtn.disabled=true;
     loginBtn.innerHTML='<span class="spinner"></span>登录中…';
@@ -246,14 +414,12 @@ a:hover{text-decoration:underline;}
 })();
 
 // ===== 协议/帮助弹窗 =====
-var TEXTS={
-  terms:'<p>《用户协议》</p><p>1. 本账号用于访问 The Slow Tide 官网的登录、发布动态、绑定游戏 UID 等功能。</p><p>2. 使用本服务即代表您为完全民事行为能力人，或已获得监护人同意。</p><p>3. 禁止利用账号进行刷屏、辱骂、发布违规内容等影响社区秩序的行为，违者将被限制或封禁相关功能。</p><p>4. 账号仅限本人使用，因出借、转让账号导致的损失由用户自行承担。</p><p>5. The Slow Tide 保留对本协议的解释与修改权利，修改后将在官网公示。</p>',
-  privacy:'<p>《隐私政策》</p><p>1. 我们仅收集登录所必需的邮箱地址，用于发送验证码与识别账号身份。</p><p>2. 邮箱不会公开显示、不会出售或提供给任何第三方。</p><p>3. 您绑定的游戏 UID 仅用于服务器身份关联，用于发帖身份标识。</p><p>4. 数据存储于安全环境，您可随时联系管理员注销账号。</p><p>5. 开始使用本服务即视为您同意本政策。</p>',
-  help:'<p>常见问题</p><p>1. <b>收不到验证码？</b> 请检查垃圾箱；确认邮箱填写正确；若 60 秒内多次点击会被限频，请稍等再试。</p><p>2. <b>验证码错误/过期？</b> 验证码 10 分钟内有效且一次性使用，请重新获取。</p><p>3. <b>连续输错被锁定？</b> 同一邮箱连续 5 次输错会锁定 10 分钟，请稍后再试。</p><p>4. 仍无法解决？请联系管理员：QQ 交流群 <b>833470853</b>。</p>'
-};
+var MODALS={terms1:['商城用户协议及赞助协议','terms1'],terms2:['商城与赞助专项协议（网易平台版）','terms2'],terms3:['服务器隐私政策','terms3'],help:['帮助中心','help']};
 function showModal(k){
-  document.getElementById('modalTitle').textContent=k==='help'?'帮助中心':(k==='terms'?'用户协议':'隐私政策');
-  document.getElementById('modalBody').innerHTML=TEXTS[k];
+  var m=MODALS[k];
+  if(!m) return;
+  document.getElementById('modalTitle').textContent=m[0];
+  document.getElementById('modalBody').innerHTML=document.getElementById(m[1]).innerHTML;
   document.getElementById('modalMask').classList.add('show');
 }
 function closeModal(){ document.getElementById('modalMask').classList.remove('show'); }

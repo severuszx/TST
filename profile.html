@@ -1102,20 +1102,6 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 
 <h2 style="margin:20px 0 16px;font-size:26px;">我的</h2>
 
-<div class="card" id="lgLoginCard" style="padding:18px;margin-bottom:16px;">
-<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
-<div style="width:52px;height:52px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;">👤</div>
-<div style="flex:1;">
-<div style="font-size:17px;font-weight:600;">尚未登录</div>
-<div style="font-size:13px;color:var(--text-secondary);margin-top:2px;">登录后可发帖、绑定游戏 UID</div>
-</div>
-</div>
-<div style="display:flex;flex-direction:column;gap:8px;">
-<a href="login.html" style="display:block;text-align:center;padding:10px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;text-decoration:none;">去登录 / 注册</a>
-<div style="font-size:12px;color:var(--text-secondary);text-align:center;">邮箱验证码登录 · 新邮箱自动注册 · 登录状态保持 30 天</div>
-</div>
-</div>
-
 <div class="card" id="lgUserCard" style="display:none;padding:18px;margin-bottom:16px;">
 <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
 <div style="width:52px;height:52px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;">👤</div>
@@ -3393,21 +3379,20 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   }
   function refresh(){
     var token=localStorage.getItem('tst_token')||'';
-    var lc=document.getElementById('lgLoginCard');
     var uc=document.getElementById('lgUserCard');
-    if(!lc||!uc) return;
-    if(!token){ lc.style.display='block'; uc.style.display='none'; return; }
+    if(!uc) return;
+    if(!token){ location.href='login.html'; return; }
     fetch(AUTH+'/me',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
       if(d&&d.ok){
-        lc.style.display='none'; uc.style.display='block';
+        uc.style.display='block';
         document.getElementById('lgUserEmail').textContent=maskEmail(d.email);
         document.getElementById('lgUserUid').textContent=d.uid||'未绑定';
         setToken(null,null,d.uid);
       }else{
         setToken(null,null,null);
-        lc.style.display='block'; uc.style.display='none';
+        location.href='login.html';
       }
-    }).catch(function(){ lc.style.display='block'; uc.style.display='none'; });
+    }).catch(function(){ uc.style.display='none'; });
   }
   function maskEmail(e){
     if(!e) return '--';

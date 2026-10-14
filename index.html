@@ -3323,9 +3323,9 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 </div>
 
-<a class="feedback-btn" href="profile.html" id="navProfileLink">我的</a>
+<a class="feedback-btn" href="login.html" id="navProfileLink">登录</a>
 
-<a class="feedback-btn" href="login.html" id="navLoginBtn" style="background:var(--accent,#4a6cf7);color:#fff;border-color:transparent;font-weight:600;">登录 / 注册</a>
+<a class="feedback-btn" href="profile.html" id="navLoginBtn">我的</a>
 
 <a class="feedback-btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
 
@@ -9428,10 +9428,16 @@ try{ eval('const __t=()=>1;'); }catch(e){
 <script>
 (function(){
   function navAuth(){
+    var p=document.getElementById('navProfileLink');
     var b=document.getElementById('navLoginBtn');
-    if(!b) return;
-    if(localStorage.getItem('tst_token')){ b.style.display='none'; }
-    else { b.style.display=''; }
+    var logged=!!localStorage.getItem('tst_token');
+    if(logged){
+      if(p) p.style.display='none';
+      if(b){ b.style.display=''; b.textContent='我的'; b.href='profile.html'; }
+    } else {
+      if(p){ p.style.display=''; p.textContent='登录'; p.href='login.html'; }
+      if(b) b.style.display='none';
+    }
   }
   navAuth();
   window.addEventListener('storage',navAuth);
