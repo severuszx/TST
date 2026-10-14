@@ -51,7 +51,8 @@ button{font-family:inherit;}
 .site-header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
 .header-inner{display:flex;align-items:center;gap:12px;min-height:56px;}
 .logo{font-size:20px;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:8px;white-space:nowrap;}
-.logo-mark{width:34px;height:34px;border-radius:4px;background:var(--hero-grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none;}
+.logo-img{width:34px;height:34px;border-radius:4px;object-fit:cover;flex:none;display:block;}
+html[data-theme="dark"] .logo-img{filter:invert(1);mix-blend-mode:screen;}
 .header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
 .feedback-btn{padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:600;text-decoration:none;font-size:14px;white-space:nowrap;transition:background-color .2s ease;}
 .feedback-btn:hover{background:var(--hover);}
@@ -122,7 +123,7 @@ html[data-theme="dark"] .spinner.dark{border-color:rgba(161,161,170,.3);border-t
 
 <header class="site-header">
 <div class="container header-inner">
-<div class="logo"><span class="logo-mark">TST</span><span>The Slow Tide</span></div>
+<div class="logo"><img src="logo.jpg" alt="The Slow Tide" class="logo-img"> The Slow Tide</div>
 <div class="header-right">
 <a class="feedback-btn" href="https://theslowtide.pages.dev/">返回官网</a>
 </div>
