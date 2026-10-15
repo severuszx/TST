@@ -9345,7 +9345,9 @@ try{ eval('const __t=()=>1;'); }catch(e){
         const pin=p.pinned?'<span class="post-pin">置顶</span>':'';
         const off=p.official?'<span class="post-badge" title="官方认证">✓</span>':'';
         const aAv=p.author_avatar||'';
-        const aNick=p.author_nickname||(p.author_email?('玩家·'+esc(p.author_email.split('@')[0].slice(0,2))):'');
+        const aNick=p.author_nickname||'';
+        // 显示名：优先昵称；无昵称且原名含 @（邮箱）则不显示邮箱
+        const shownName=(aNick&&aNick!==p.name)?aNick:((p.name&&!/@/.test(p.name))?p.name:'玩家');
         const pFav=p.favorited;
         const fav=pFav?'♥ 已收藏':'♡ 收藏';
         const favCol=pFav?'color:#e11d48;':'';
@@ -9353,8 +9355,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
           '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;">'+
             '<div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">'+
               (aAv?'<img src="'+esc(aAv)+'" alt="" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;">':'<span style="width:26px;height:26px;border-radius:50%;background:var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">👤</span>')+
-              '<b style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(p.name)+'</b>'+
-              (aNick?'<span style="font-size:12px;color:var(--text-secondary);flex-shrink:0;">'+aNick+'</span>':'')+
+              '<b style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(shownName)+'</b>'+
             '</div>'+
             '<span style="font-size:12px;color:var(--text-secondary);flex-shrink:0;">'+off+pin+pTime(p.created_at)+'</span>'+
           '</div>'+
