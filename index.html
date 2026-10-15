@@ -3330,7 +3330,7 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <a class="feedback-btn" href="login.html" id="navProfileLink">登录</a>
 
-<a class="feedback-btn" href="shop.html">积分商店</a>
+<span class="points-badge" id="ptsBadge" style="display:none;" onclick="openPtsModal()" title="查看积分明细"><span id="ptsNum">--</span><span style="font-size:12px;opacity:.8;margin-left:2px;">积分</span></span>
 
 <a class="feedback-btn" href="profile.html" id="navLoginBtn">我的</a>
 
@@ -3872,6 +3872,20 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 
 
+<!-- 积分商店 -->
+<section id="shop-entry" class="page">
+<div class="container">
+<div class="section-title">积分商店</div>
+<div class="card-grid">
+<div class="card" style="cursor:pointer;" onclick="location.href='shop.html'">
+<h3>🏪 积分商店</h3>
+<p class="empty-hint">签到、投币、互动获取积分<br>兑换服务器物资 / 游戏金币 / 永久增益 / 称号</p>
+<div style="text-align:center;margin-top:10px;"><span class="feedback-btn" style="display:inline-flex;">进入商店 →</span></div>
+</div>
+</div>
+</div>
+</section>
+
 <!-- 赞助 -->
 
 <section id="sponsor" class="page">
@@ -4194,6 +4208,31 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 </div>
 
 
+
+<!-- 积分明细弹窗 -->
+<div class="modal-mask" id="ptsModal">
+<div class="modal">
+<button class="modal-close" onclick="document.getElementById('ptsModal').classList.remove('open')">✕</button>
+<h2>我的积分</h2>
+<div style="display:flex;gap:12px;margin-bottom:14px;">
+<div style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:12px;color:var(--text-secondary);">当前积分</div><div id="pmPoints" style="font-size:24px;font-weight:800;color:var(--accent);">--</div></div>
+<div style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:12px;color:var(--text-secondary);">今日已投币</div><div id="pmGiven" style="font-size:24px;font-weight:800;">--</div></div>
+</div>
+<div style="font-size:14px;font-weight:600;margin-bottom:8px;">积分明细</div>
+<div id="pmLog" style="max-height:180px;overflow:auto;"></div>
+<div style="font-size:14px;font-weight:600;margin:14px 0 8px;">如何增加积分</div>
+<div id="pmWays"></div>
+</div>
+</div>
+
+<!-- 赞助弹窗 -->
+<div class="modal-mask" id="sponsorModal">
+<div class="modal">
+<button class="modal-close" onclick="document.getElementById('sponsorModal').classList.remove('open')">✕</button>
+<h2>赞助支持</h2>
+<div id="sponsorBody"></div>
+</div>
+</div>
 
 <!-- 管理面板 -->
 
@@ -7019,6 +7058,17 @@ function linkify(t){
 
 }
 
+function lazyImgs(html){
+
+  // 图片懒加载：视口外图片延迟下载，避免首屏一次拉全部 base64 大图
+  return String(html||'').replace(/<img\b([^>]*?)(\/?)>/gi,function(m,attrs,selfc){
+    if(/\sloading=/.test(attrs)) return m;
+    var a=attrs.replace(/\s?\/$/, '');
+    return '<img loading="lazy" decoding="async"'+a+selfc+'>';
+  });
+
+}
+
 function renderNotices(){
 
   const list=(SITE_DATA.announcements||[]).filter(a=>!String(a.title||'').startsWith('hist:'));
@@ -7031,7 +7081,7 @@ function renderNotices(){
 
       <div class="date">${esc(a.date||'')}</div>
 
-      <div class="content collapse-box" id="nbox-${esc(a.id)}">${linkify(a.content)}</div>
+      <div class="content collapse-box" id="nbox-${esc(a.id)}">${lazyImgs(linkify(a.content))}</div>
 
       <button class="collapse-btn" data-box="nbox-${esc(a.id)}" style="display:none;">展开全部</button>
 
@@ -9309,15 +9359,17 @@ try{ eval('const __t=()=>1;'); }catch(e){
             '<span style="font-size:12px;color:var(--text-secondary);flex-shrink:0;">'+off+pin+pTime(p.created_at)+'</span>'+
           '</div>'+
           '<div style="white-space:pre-wrap;word-break:break-word;line-height:1.7;">'+pLink(p.content)+'</div>'+
-          (p.image?'<img src="'+esc(p.image)+'" alt="" style="max-width:100%;max-height:280px;border-radius:8px;margin-top:8px;border:1px solid var(--border);">':'')+
+          (p.image?'<img src="'+esc(p.image)+'" alt="" loading="lazy" decoding="async" style="max-width:100%;max-height:280px;border-radius:8px;margin-top:8px;border:1px solid var(--border);">':'')+
           (tags?'<div style="margin-top:8px;">'+tags+'</div>':'');
         if(!p.feed){
           const myEmail=localStorage.getItem('tst_email')||'';
           const canDel=p.author_email&&p.author_email===myEmail;
+          const canCoin=!!p.author_email&&p.author_email!==myEmail;
           body+='<div style="display:flex;gap:10px;margin-top:12px;font-size:13px;">'+
             '<button class="btn" data-act="like" '+(p.liked?'style="color:var(--accent);"':'')+'>赞 '+p.likes+'</button>'+
             '<button class="btn" data-act="cm">评论 '+p.comments+'</button>'+
             '<button class="btn" data-act="fav" style="'+favCol+'">'+fav+'</button>'+
+            (canCoin?'<button class="btn" data-act="coin" title="投币支持作者（80% 归作者）">投币</button>':'')+
             (canDel?'<button class="btn" data-act="del" style="color:#dc2626;">删除</button>':'')+
             '</div>'+
             '<div class="post-cm" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"></div>';
@@ -9328,6 +9380,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
       box.querySelectorAll('[data-act="cm"]').forEach(b=>{ b.onclick=function(){ toggleCm(b); }; });
       box.querySelectorAll('[data-act="fav"]').forEach(b=>{ b.onclick=function(){ doFav(b); }; });
       box.querySelectorAll('[data-act="del"]').forEach(b=>{ b.onclick=function(){ doDel(b); }; });
+      box.querySelectorAll('[data-act="coin"]').forEach(b=>{ b.onclick=function(){ doCoin(b); }; });
     }catch(e){ box.innerHTML='<p class="post-msg" style="padding:10px 0;color:var(--danger);">加载失败，请稍后重试</p>'; }
   }
   async function doLike(btn){
@@ -9353,6 +9406,23 @@ try{ eval('const __t=()=>1;'); }catch(e){
       if(d&&d.ok){ showToast('已删除'); loadPosts(); }
       else showToast((d&&d.msg)||'删除失败');
     }catch(e){ btn.disabled=false; btn.textContent='删除'; showToast('网络异常，请稍后再试'); }
+  }
+  async function doCoin(btn){
+    const token=localStorage.getItem('tst_token')||'';
+    if(!token){ showToast('请先登录后再投币'); location.href='login.html'; return; }
+    const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
+    const amt=prompt('投币支持作者（80% 归作者，20% 销毁）\n输入投币积分（1~500）：\n\n每日投币上限 2000，同一帖子每天最多投 3 次');
+    if(amt===null) return;
+    const n=Number(amt);
+    if(!n||n<1||n>500){ showToast('投币金额需在 1~500 积分之间'); return; }
+    btn.disabled=true;
+    try{
+      const r=await fetch('https://theslowtidefk.pages.dev/api/shop/coin',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({post_id:Number(pid),amount:n})});
+      const d=await r.json();
+      btn.disabled=false;
+      if(d&&d.ok){ showToast('投币成功！作者获得 '+d.to_author+' 积分'); refreshPts(); }
+      else showToast((d&&d.msg)||'投币失败');
+    }catch(e){ btn.disabled=false; showToast('网络异常，请稍后再试'); }
   }
   async function doFav(btn){
     const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
@@ -9476,6 +9546,15 @@ try{ eval('const __t=()=>1;'); }catch(e){
 
 <script>
 (function(){
+  function refreshPts(){
+    var logged=!!localStorage.getItem('tst_token');
+    var badge=document.getElementById('ptsBadge');
+    if(!logged){ if(badge) badge.style.display='none'; return; }
+    if(!badge) return;
+    fetch('https://theslowtidefk.pages.dev/api/shop/state',{headers:{'Authorization':'Bearer '+localStorage.getItem('tst_token')},cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      if(d&&d.ok){ badge.style.display='inline-flex'; document.getElementById('ptsNum').textContent=d.points; }
+    }).catch(function(){});
+  }
   function navAuth(){
     var p=document.getElementById('navProfileLink');
     var b=document.getElementById('navLoginBtn');
@@ -9487,8 +9566,72 @@ try{ eval('const __t=()=>1;'); }catch(e){
       if(p){ p.style.display=''; p.textContent='登录'; p.href='login.html'; }
       if(b) b.style.display='none';
     }
+    refreshPts();
   }
+  window.refreshPts=refreshPts;
   navAuth();
   window.addEventListener('storage',navAuth);
+})();
+</script>
+<script>
+(function(){
+  function openPtsModal(){
+    var token=localStorage.getItem('tst_token');
+    if(!token){ location.href='login.html'; return; }
+    var A='https://theslowtidefk.pages.dev/api';
+    fetch(A+'/shop/state',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      if(d&&d.ok){ document.getElementById('pmPoints').textContent=d.points; document.getElementById('pmGiven').textContent=d.today_given; }
+    }).catch(function(){});
+    fetch(A+'/shop/points_log',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      var box=document.getElementById('pmLog');
+      var R={'checkin':'每日签到','checkin_bonus':'连续签到奖励','daily_post':'每日发帖','post_coin_give':'投币','post_coin_received':'收到投币','shop_buy':'兑换商品','admin':'管理员发放','name_change':'改名','avatar_change':'改头像','prize':'活动奖励'};
+      if(!d||!d.log||!d.log.length){ box.innerHTML='<div class="empty-hint" style="padding:8px 0;">暂无记录</div>'; }
+      else box.innerHTML=d.log.slice(0,50).map(function(l){
+        return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="flex:1;">'+(R[l.reason]||esc(l.reason))+'</span><span style="font-size:12px;color:var(--text-secondary);">'+String(l.created_at||'').replace('T',' ').slice(5,16)+'</span><b style="'+(Number(l.delta)>=0?'color:var(--ok);':'color:var(--danger);')+'">'+(Number(l.delta)>=0?'+':'')+l.delta+'</b></div>';
+      }).join('');
+    }).catch(function(){});
+    var WAYS=[
+      {t:'每日签到', s:'个人中心每天签到，连续签到额外奖励', act:'p'},
+      {t:'给帖子投币 / 收到投币', s:'在帖子卡片上投币，作者获得 80%', act:'h'},
+      {t:'每日首次发帖', s:'+20 积分', act:'h'},
+      {t:'参与活动 / 抽奖 / 提交反馈', s:'按活动规则获得积分', act:'f'},
+      {t:'赞助支持', s:'自愿赞助覆盖运营成本，按档位感谢积分', act:'s'},
+    ];
+    document.getElementById('pmWays').innerHTML=WAYS.map(function(w,i){
+      return '<div class="way-card" data-w="'+i+'" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-weight:600;font-size:14px;">'+w.t+'</div><div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">'+w.s+'</div></div><span style="color:var(--text-secondary);">›</span></div>';
+    }).join('');
+    document.querySelectorAll('#pmWays .way-card').forEach(function(c){
+      c.onclick=function(){
+        var i=Number(c.getAttribute('data-w'));
+        if(i===4){ openSponsor(); return; }
+        document.getElementById('ptsModal').classList.remove('open');
+        if(i===0) location.href='profile.html';
+        else if(i===1||i===2) location.href='index.html';
+        else location.href='https://theslowtidefk.pages.dev/';
+      };
+    });
+    document.getElementById('ptsModal').classList.add('open');
+  }
+  function openSponsor(){
+    var TIERS=[{m:10,p:500,r:'1:50'},{m:30,p:2000,r:'1:66'},{m:60,p:5000,r:'1:83'},{m:100,p:12000,r:'1:120'},{m:200,p:30000,r:'1:150'},{m:500,p:90000,r:'1:180'}];
+    document.getElementById('sponsorBody').innerHTML=
+      '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">赞助为自愿的资金支持，用于覆盖服务器运营成本，不构成任何游戏内权益购买。赞助后将以积分形式表达感谢，并遵循网易与 Mojang 相关规定。</div>'+
+      TIERS.map(function(t,i){
+        return '<div class="sp-tier" data-tier="'+i+'" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-weight:600;font-size:14px;">赞助 '+t.m+' 元</div><div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">感谢积分 +'+t.p+'（折合 '+t.r+'）</div></div><span style="color:var(--text-secondary);">›</span></div>';
+      }).join('')+
+      '<div style="font-size:12px;color:var(--text-secondary);margin-top:10px;">赞助后请通过官方 QQ 群或反馈页联系管理员登记，感谢积分将在核实后发放。</div>';
+    document.querySelectorAll('#sponsorBody .sp-tier').forEach(function(c){
+      c.onclick=function(){
+        var t=TIERS[Number(c.getAttribute('data-tier'))];
+        document.getElementById('sponsorBody').innerHTML=
+          '<div style="text-align:center;padding:8px 0;"><div style="font-size:15px;font-weight:700;margin-bottom:4px;">赞助 '+t.m+' 元</div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;">感谢积分 +'+t.p+'（折合 '+t.r+'）</div>'+
+          '<img src="wechat-qrcode.jpg" alt="赞助收款码" style="max-width:220px;width:100%;border:1px solid var(--border);border-radius:10px;">'+
+          '<div style="font-size:12px;color:var(--text-secondary);margin-top:14px;">微信扫码赞助后，添加官方 QQ 群 <b>833470853</b> 联系管理员登记发放</div></div>'+
+          '<div style="text-align:center;margin-top:14px;"><button class="btn" onclick="openSponsor()">返回档位</button></div>';
+      };
+    });
+    document.getElementById('sponsorModal').classList.add('open');
+  }
+  window.openPtsModal=openPtsModal; window.openSponsor=openSponsor;
 })();
 </script>
