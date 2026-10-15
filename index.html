@@ -3330,6 +3330,8 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <a class="feedback-btn" href="login.html" id="navProfileLink">登录</a>
 
+<a class="feedback-btn" href="shop.html">积分商店</a>
+
 <a class="feedback-btn" href="profile.html" id="navLoginBtn">我的</a>
 
 <a class="feedback-btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
@@ -3762,11 +3764,9 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <!-- 发帖面板：独立卡片（默认收起，点「发帖」展开） -->
 <div id="postPanel" style="display:none;">
 <div class="post-panel-card">
-<div class="post-panel-head"><span>发布帖子</span><span class="post-msg">内测阶段需填写卡密</span></div>
-<div class="form-row"><label>游戏昵称</label><input type="text" id="poName" maxlength="24" placeholder="你的游戏名称"></div>
+<div class="post-panel-head"><span>发布帖子</span><span class="post-msg">昵称自动使用官网昵称</span></div>
 <div class="form-row"><label>内容</label><textarea id="poContent" maxlength="500" placeholder="写点什么…" style="min-height:90px;"></textarea></div>
 <div class="form-row"><label>标签（可选）</label><input type="text" id="poTags" maxlength="60" placeholder="如 建筑 / 红石 / 活动"></div>
-<div class="form-row"><label>卡密</label><input type="text" id="poCard" maxlength="20" placeholder="TSTP-XXXXXXXXXX"></div>
 <div class="form-row"><label>图片（可选）</label><input type="file" id="poImg" accept="image/*"><span id="poImgName" class="post-msg"></span></div>
 <div id="poImgPrev" style="display:none;margin:6px 0;"><img id="poImgView" alt="" style="max-width:180px;max-height:120px;border-radius:8px;border:1px solid var(--border);"><button type="button" class="btn" id="poImgDel" style="margin-left:8px;">移除</button></div>
 <div class="form-row"><button class="btn btn-primary" id="poSendBtn">发布帖子</button><span id="poMsg" class="post-msg"></span></div>
@@ -9273,9 +9273,6 @@ try{ eval('const __t=()=>1;'); }catch(e){
   async function loadPosts(){
     const box=document.getElementById('postList'); if(!box) return;
     box.innerHTML='<div class="load-box"><span class="load-spinner"></span><span class="load-text">加载中…</span></div>';
-    let favIds=[];
-    const tok0=localStorage.getItem('tst_token');
-    if(tok0){ try{ const fr0=await fetch(POST_API+'/fav_ids',{headers:{'Authorization':'Bearer '+tok0},cache:'no-store'}); const fd0=await fr0.json(); favIds=(fd0&&fd0.ids)||[]; }catch(e){} }
     try{
       const r=await fetch(POST_API+'/list?sort='+poSort+'&filter='+poFilter+'&dev='+encodeURIComponent(pDev()),{cache:'no-store'});
       const d=await r.json();
@@ -9299,7 +9296,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
         const off=p.official?'<span class="post-badge" title="官方认证">✓</span>':'';
         const aAv=p.author_avatar||'';
         const aNick=p.author_nickname||(p.author_email?('玩家·'+esc(p.author_email.split('@')[0].slice(0,2))):'');
-        const pFav=favIds.indexOf(Number(p.id))>=0;
+        const pFav=p.favorited;
         const fav=pFav?'♥ 已收藏':'♡ 收藏';
         const favCol=pFav?'color:#e11d48;':'';
         let body='<div class="card post-pcard" style="margin-bottom:12px;" data-pid="'+(p.id||p.uid||'')+'"'+(p.uid?' data-uid="'+p.uid+'"':'')+'>'+
@@ -9315,10 +9312,13 @@ try{ eval('const __t=()=>1;'); }catch(e){
           (p.image?'<img src="'+esc(p.image)+'" alt="" style="max-width:100%;max-height:280px;border-radius:8px;margin-top:8px;border:1px solid var(--border);">':'')+
           (tags?'<div style="margin-top:8px;">'+tags+'</div>':'');
         if(!p.feed){
+          const myEmail=localStorage.getItem('tst_email')||'';
+          const canDel=p.author_email&&p.author_email===myEmail;
           body+='<div style="display:flex;gap:10px;margin-top:12px;font-size:13px;">'+
             '<button class="btn" data-act="like" '+(p.liked?'style="color:var(--accent);"':'')+'>赞 '+p.likes+'</button>'+
             '<button class="btn" data-act="cm">评论 '+p.comments+'</button>'+
             '<button class="btn" data-act="fav" style="'+favCol+'">'+fav+'</button>'+
+            (canDel?'<button class="btn" data-act="del" style="color:#dc2626;">删除</button>':'')+
             '</div>'+
             '<div class="post-cm" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"></div>';
         }
@@ -9327,29 +9327,48 @@ try{ eval('const __t=()=>1;'); }catch(e){
       box.querySelectorAll('[data-act="like"]').forEach(b=>{ b.onclick=function(){ doLike(b); }; });
       box.querySelectorAll('[data-act="cm"]').forEach(b=>{ b.onclick=function(){ toggleCm(b); }; });
       box.querySelectorAll('[data-act="fav"]').forEach(b=>{ b.onclick=function(){ doFav(b); }; });
+      box.querySelectorAll('[data-act="del"]').forEach(b=>{ b.onclick=function(){ doDel(b); }; });
     }catch(e){ box.innerHTML='<p class="post-msg" style="padding:10px 0;color:var(--danger);">加载失败，请稍后重试</p>'; }
   }
   async function doLike(btn){
     const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
+    const oldTxt=btn.textContent; const oldCol=btn.style.color;
+    btn.style.color='var(--accent)';
     try{
       const r=await fetch(POST_API+'/like',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({post_id:Number(pid),dev:pDev()})});
       const d=await r.json();
       if(d&&d.ok){ btn.textContent='赞 '+d.likes; btn.style.color='var(--accent)'; }
       else if(d&&d.error==='already_liked'){ btn.style.color='var(--accent)'; showToast('你已经赞过这条帖子了'); }
-      else showToast('点赞失败');
-    }catch(e){ showToast('网络异常，请稍后再试'); }
+      else { btn.textContent=oldTxt; btn.style.color=oldCol; showToast('点赞失败'); }
+    }catch(e){ btn.textContent=oldTxt; btn.style.color=oldCol; showToast('网络异常，请稍后再试'); }
+  }
+  async function doDel(btn){
+    if(!confirm('确定删除这条帖子吗？删除后不可恢复。')) return;
+    const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
+    const token=localStorage.getItem('tst_token')||'';
+    btn.disabled=true; btn.textContent='删除中…';
+    try{
+      const r=await fetch(POST_API+'/delete',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({post_id:Number(pid)})});
+      const d=await r.json();
+      if(d&&d.ok){ showToast('已删除'); loadPosts(); }
+      else showToast((d&&d.msg)||'删除失败');
+    }catch(e){ btn.disabled=false; btn.textContent='删除'; showToast('网络异常，请稍后再试'); }
   }
   async function doFav(btn){
     const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
     const token=localStorage.getItem('tst_token')||'';
     if(!token){ showToast('请先登录后再收藏'); location.href='login.html'; return; }
-    const act=btn.textContent.indexOf('已收藏')>=0?'remove':'add';
+    const wasFav=btn.textContent.indexOf('已收藏')>=0;
+    const oldTxt=btn.textContent; const oldCol=btn.style.color;
+    // 乐观切换
+    btn.textContent=wasFav?'♡ 收藏':'♥ 已收藏'; btn.style.color=wasFav?'':'#e11d48';
+    const act=wasFav?'remove':'add';
     try{
       const r=await fetch(POST_API+'/favorite',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({post_id:Number(pid),act:act})});
       const d=await r.json();
-      if(d&&d.ok){ if(d.favorited){ btn.textContent='♥ 已收藏'; btn.style.color='#e11d48'; showToast('已收藏'); } else { btn.textContent='♡ 收藏'; btn.style.color=''; showToast('已取消收藏'); } }
-      else showToast((d&&d.msg)||'操作失败');
-    }catch(e){ showToast('网络异常，请稍后再试'); }
+      if(d&&d.ok){ showToast(d.favorited?'已收藏':'已取消收藏'); }
+      else { btn.textContent=oldTxt; btn.style.color=oldCol; showToast((d&&d.msg)||'操作失败'); }
+    }catch(e){ btn.textContent=oldTxt; btn.style.color=oldCol; showToast('网络异常，请稍后再试'); }
   }
   async function toggleCm(btn){
     const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
@@ -9362,17 +9381,19 @@ try{ eval('const __t=()=>1;'); }catch(e){
       const d=await r.json();
       const cs=(d&&d.comments)||[];
       box.innerHTML=cs.map(function(c){return '<div style="margin-bottom:8px;"><b>'+esc(c.name)+'</b> <span style="font-size:12px;color:var(--text-secondary);">'+pTime(c.created_at)+'</span><div style="font-size:14px;margin-top:2px;">'+pLink(c.content)+'</div></div>';}).join('')+
-        '<div style="display:flex;gap:6px;margin-top:10px;"><input id="cmName_'+pid+'" maxlength="24" placeholder="昵称" style="flex:0 0 90px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary);color:var(--text);"><input id="cmTxt_'+pid+'" maxlength="200" placeholder="写评论…" style="flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary);color:var(--text);"><button class="btn" data-act="send">发送</button></div>';
+        '<div style="display:flex;gap:6px;margin-top:10px;"><input id="cmTxt_'+pid+'" maxlength="200" placeholder="写评论…（使用官网昵称）" style="flex:1;min-width:0;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-secondary);color:var(--text);"><button class="btn" data-act="send">发送</button></div>';
       const sb=box.querySelector('[data-act="send"]');
       sb.onclick=async function(){
-        const nm=document.getElementById('cmName_'+pid).value.trim()||'匿名玩家';
         const tx=document.getElementById('cmTxt_'+pid).value.trim();
         if(!tx){ showToast('评论不能为空'); return; }
+        const token=localStorage.getItem('tst_token')||'';
+        if(!token){ showToast('请先登录后再评论'); location.href='login.html'; return; }
         try{
-          const r2=await fetch(POST_API+'/comment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({post_id:Number(pid),name:nm,content:tx})});
+          const r2=await fetch(POST_API+'/comment',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({post_id:Number(pid),content:tx})});
           const d2=await r2.json();
           if(d2&&d2.ok){ btn.textContent='评论 '+d2.comments; toggleCm(btn); }
           else if(d2&&d2.error==='rate') showToast('操作太快，请稍后再试');
+          else if(d2&&d2.error==='unauthorized'){ showToast(d2.msg||'请先登录'); location.href='login.html'; }
           else showToast('评论失败');
         }catch(e){ showToast('网络异常'); }
       };
@@ -9386,21 +9407,15 @@ try{ eval('const __t=()=>1;'); }catch(e){
       const md=await mr.json();
       if(!(md&&md.ok)){ localStorage.removeItem('tst_token'); localStorage.removeItem('tst_email'); localStorage.removeItem('tst_uid'); showToast('登录已过期，请重新登录'); location.href='login.html'; return; }
     }catch(e){ showToast('网络异常，请稍后再试'); return; }
-    const name=document.getElementById('poName').value.trim();
     const content=document.getElementById('poContent').value.trim();
     const tags=document.getElementById('poTags').value.trim();
-    const card=document.getElementById('poCard').value.trim().toUpperCase();
     const msg=document.getElementById('poMsg');
-    if(!name){ msg.textContent='请填写游戏昵称'; return; }
     if(!content){ msg.textContent='请填写内容'; return; }
-    if(!card){ msg.textContent='请填写卡密（内测阶段需要）'; return; }
     try{
-      const r=await fetch(POST_API+'/create',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({name:name,content:content,tags:tags,card:card,dev:pDev(),image:poImgData||''})});
+      const r=await fetch(POST_API+'/create',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({content:content,tags:tags,dev:pDev(),image:poImgData||''})});
       const d=await r.json();
-      if(d&&d.ok){ msg.textContent='发布成功！'; document.getElementById('poName').value=''; document.getElementById('poContent').value=''; document.getElementById('poTags').value=''; document.getElementById('poCard').value=''; poImgData=''; document.getElementById('poImgPrev').style.display='none'; document.getElementById('poImgView').src=''; document.getElementById('poImg').value=''; document.getElementById('poImgName').textContent=''; loadPosts(); }
+      if(d&&d.ok){ msg.textContent='发布成功！'; document.getElementById('poContent').value=''; document.getElementById('poTags').value=''; poImgData=''; document.getElementById('poImgPrev').style.display='none'; document.getElementById('poImgView').src=''; document.getElementById('poImg').value=''; document.getElementById('poImgName').textContent=''; loadPosts(); }
       else if(d&&d.error==='login_required'){ showToast(d.msg||'请先登录后再发帖'); localStorage.removeItem('tst_token'); localStorage.removeItem('tst_email'); localStorage.removeItem('tst_uid'); location.href='login.html'; }
-      else if(d&&d.error==='card_invalid'){ msg.textContent=d.msg||'卡密无效'; }
-      else if(d&&d.error==='card_used'){ msg.textContent=d.msg||'卡密已被使用'; }
       else msg.textContent='发布失败：'+((d&&d.error)||'未知错误');
     }catch(e){ msg.textContent='网络异常，请稍后重试'; }
   }
