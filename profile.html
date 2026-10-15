@@ -1116,35 +1116,31 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="lgUserEmail">--</div>
 </div>
 </div>
-<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:var(--bg-secondary);">
-<div>
-<div style="font-size:12px;color:var(--text-secondary);">游戏 UID</div>
-<div style="font-size:15px;font-weight:600;" id="lgUserUid">未绑定</div>
-</div>
+<!-- 资料设置 -->
+<div class="card" style="padding:18px;margin-bottom:16px;">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+<div style="font-size:15px;font-weight:600;">资料设置</div>
 <button id="lgLogoutBtn" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);font-size:13px;cursor:pointer;">退出登录</button>
 </div>
-<div style="display:flex;gap:8px;">
-<input type="text" id="lgUidInput" maxlength="7" placeholder="输入游戏 UID（7 位数字）" style="flex:1;min-width:0;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary);color:var(--text);font-size:14px;">
-<button id="lgBindBtn" style="padding:9px 12px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">绑定 UID</button>
-</div>
-<div id="lgBindMsg" style="font-size:12px;color:var(--text-secondary);margin-top:8px;"></div>
-</div>
-
-<!-- 编辑资料 -->
-<div class="card" id="lgEditCard" style="display:none;padding:18px;margin-bottom:16px;">
-<div style="font-size:15px;font-weight:600;margin-bottom:12px;">编辑资料</div>
 <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
 <div id="lgEditAvatar" style="width:56px;height:56px;border-radius:50%;background:var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;">👤</div>
 <div>
 <button id="lgAvatarBtn" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--hover);color:var(--text);font-size:13px;cursor:pointer;">上传头像</button>
 <input type="file" id="lgAvatarFile" accept="image/*" style="display:none;">
-<div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">JPG/PNG，自动压缩</div>
+<div id="lgAvatarCost" style="font-size:12px;color:var(--text-secondary);margin-top:4px;">首次免费，之后每次 1300 积分</div>
 </div>
 </div>
 <div style="margin-bottom:12px;">
 <div style="font-size:13px;font-weight:600;margin-bottom:6px;">昵称</div>
 <input type="text" id="lgNickInput" maxlength="16" placeholder="输入昵称（最多 16 字）" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;">
+<div id="lgNickCost" style="font-size:12px;color:var(--text-secondary);margin-top:4px;">首次免费，之后每次 1000 积分</div>
 </div>
+<div style="margin-bottom:12px;">
+<div style="font-size:13px;font-weight:600;margin-bottom:6px;">游戏 UID</div>
+<div id="lgUidRow"></div>
+<div id="lgBindMsg" style="font-size:12px;color:var(--text-secondary);margin-top:8px;"></div>
+</div>
+<div style="margin-bottom:12px;font-size:12px;color:var(--text-secondary);" id="lgPointsRow">当前积分：--</div>
 <button id="lgSaveProfileBtn" style="padding:10px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer;width:100%;">保存资料</button>
 <div id="lgProfileMsg" style="font-size:12px;color:var(--text-secondary);margin-top:8px;"></div>
 </div>
@@ -3425,11 +3421,14 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
         var mc=document.getElementById('lgMineCard'); if(mc) mc.style.display='block';
         curNick=d.nickname||''; curAvatar=d.avatar||''; newAvatar='';
         document.getElementById('lgUserEmail').textContent=maskEmail(d.email);
-        document.getElementById('lgUserUid').textContent=d.uid||'未绑定';
         document.getElementById('lgUserNick').textContent=curNick||maskEmail(d.email);
         setAvatarBox(document.getElementById('lgUserAvatar'), curAvatar);
         setAvatarBox(document.getElementById('lgEditAvatar'), curAvatar);
         var ni=document.getElementById('lgNickInput'); if(ni) ni.value=curNick;
+        var pr=document.getElementById('lgPointsRow'); if(pr) pr.textContent='当前积分：'+(d.points||0);
+        var nc=document.getElementById('lgNickCost'); if(nc) nc.textContent=(d.name_changes||0)>=1?'本次改名需 1000 积分':'首次免费，之后每次 1000 积分';
+        var ac=document.getElementById('lgAvatarCost'); if(ac) ac.textContent=(d.avatar_changes||0)>=1?'本次改头像需 1300 积分':'首次免费，之后每次 1300 积分';
+        renderUidRow(d.uid);
         setToken(token, d.email, d.uid);
         loadMine('posts');
       }else{
@@ -3486,10 +3485,31 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     if(newAvatar) body.avatar=newAvatar;
     fetch(AUTH+'/me',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)}).then(function(r){return r.json();}).then(function(d){
       saveBtn.disabled=false; saveBtn.textContent='保存资料';
-      if(d&&d.ok){ newAvatar=''; showToast('资料已保存'); refresh(); }
+      if(d&&d.ok){ newAvatar=''; showToast(d.cost>0?('资料已保存，扣除 '+d.cost+' 积分'):'资料已保存'); refresh(); }
       else msgEl.textContent=(d&&d.msg)||'保存失败';
     }).catch(function(){ saveBtn.disabled=false; saveBtn.textContent='保存资料'; msgEl.textContent='网络异常，请稍后再试'; });
   };
+  function renderUidRow(uid){
+    var row=document.getElementById('lgUidRow'); if(!row) return;
+    if(uid){
+      row.innerHTML='<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;font-weight:600;">'+esc(uid)+'</span><span style="font-size:12px;color:var(--text-secondary);">（已绑定，不可更改）</span></div>';
+      return;
+    }
+    row.innerHTML='<div style="display:flex;gap:8px;"><input type="text" id="lgUidInput" maxlength="7" placeholder="输入游戏 UID（7 位数字）" style="flex:1;min-width:0;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary);color:var(--text);font-size:14px;"><button id="lgBindBtn" style="padding:9px 12px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">绑定 UID</button></div>';
+    var bindBtn=document.getElementById('lgBindBtn');
+    if(bindBtn) bindBtn.onclick=function(){
+      var uid=document.getElementById('lgUidInput').value.trim();
+      var token=localStorage.getItem('tst_token')||'';
+      var msg=document.getElementById('lgBindMsg');
+      if(!/^\d{7}$/.test(uid)||Number(uid)<1229000){ msg.textContent='UID 需为 7 位纯数字且不小于 1229000'; return; }
+      bindBtn.disabled=true; bindBtn.textContent='绑定中…';
+      fetch(AUTH+'/bind-uid',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({uid:uid})}).then(function(r){return r.json();}).then(function(d){
+        bindBtn.disabled=false; bindBtn.textContent='绑定 UID';
+        if(d&&d.ok){ localStorage.setItem('tst_uid',d.uid); showToast('UID 绑定成功'); refresh(); }
+        else msg.textContent=(d&&d.msg)||'绑定失败';
+      }).catch(function(){ bindBtn.disabled=false; bindBtn.textContent='绑定 UID'; msg.textContent='网络异常，请稍后再试'; });
+    };
+  }
 
   // ===== 我的内容：帖子 / 评论 / 收藏 =====
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
@@ -3536,19 +3556,6 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     }).catch(function(){ mineList.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; });
   }
   mineTabs.forEach(function(b){ b.onclick=function(){ loadMine(b.getAttribute('data-mine')); }; });
-  var bindBtn=document.getElementById('lgBindBtn');
-  if(bindBtn) bindBtn.onclick=function(){
-    var uid=document.getElementById('lgUidInput').value.trim();
-    var token=localStorage.getItem('tst_token')||'';
-    var msg=document.getElementById('lgBindMsg');
-    if(!/^\d{7}$/.test(uid)||Number(uid)<1229000){ msg.textContent='UID 需为 7 位纯数字且不小于 1229000'; return; }
-    bindBtn.disabled=true; bindBtn.textContent='绑定中…';
-    fetch(AUTH+'/bind-uid',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({uid:uid})}).then(function(r){return r.json();}).then(function(d){
-      bindBtn.disabled=false; bindBtn.textContent='绑定 UID';
-      if(d&&d.ok){ localStorage.setItem('tst_uid',d.uid); showToast('UID 绑定成功'); refresh(); }
-      else msg.textContent=(d&&d.msg)||'绑定失败';
-    }).catch(function(){ bindBtn.disabled=false; bindBtn.textContent='绑定 UID'; msg.textContent='网络异常，请稍后再试'; });
-  };
   var outBtn=document.getElementById('lgLogoutBtn');
   if(outBtn) outBtn.onclick=function(){ setToken(null,null,null); showToast('已退出登录'); refresh(); };
   refresh();
