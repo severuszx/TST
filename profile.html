@@ -3500,7 +3500,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     mineTabs.forEach(function(b){ var on=b.getAttribute('data-mine')===kind; b.classList.toggle('active',on); b.style.background=on?'var(--hover)':'var(--card)'; b.style.color=on?'var(--text)':'var(--text-secondary)'; });
     mineList.innerHTML='<div class="load-box"><span class="load-spinner"></span><span class="load-text">加载中…</span></div>';
     var token=localStorage.getItem('tst_token')||'';
-    var ep=kind==='comments'?'/api/posts/my_comments':(kind==='favorites'?'/api/posts/my_favorites':'/api/posts/mine');
+    var ep=kind==='comments'?'/posts/my_comments':(kind==='favorites'?'/posts/my_favorites':'/posts/mine');
     fetch(AUTH+ep,{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
       if(!d){ mineList.innerHTML='<p class="empty-hint">加载失败</p>'; return; }
       if(kind==='posts'){
