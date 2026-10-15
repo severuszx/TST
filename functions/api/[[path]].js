@@ -184,7 +184,11 @@ export async function onRequest(context) {
 
   // 数据/管理接口：转发到数据服务站点
   if (path === '/api/data' || path.startsWith('/api/data/')) {
-    return proxyFetch(DATA_ORIGIN + '/api/data' + url.search, request);
+    const upstream = await proxyFetch(DATA_ORIGIN + '/api/data' + url.search, request);
+    // 公告/动态为公开数据，命中 Cloudflare 边缘缓存，避免每次回源 1.8MB
+    upstream.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+    upstream.headers.set('CDN-Cache-Control', 'public, max-age=300');
+    return upstream;
   }
   if (path === '/api/admin' || path.startsWith('/api/admin/')) {
     return proxyFetch(DATA_ORIGIN + '/api/admin' + url.search, request);
