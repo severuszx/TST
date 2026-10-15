@@ -119,6 +119,12 @@ background:#52525b;
 border:none;color:#fff;font-weight:600;
 }
 .btn-primary:hover{filter:brightness(1.06);}
+/* 加载占位（转圈 + 文字）*/
+.load-box{display:flex;align-items:center;justify-content:center;gap:10px;padding:28px 0;color:var(--text-secondary);font-size:14px;}
+.load-spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:loadspin .8s linear infinite;flex-shrink:0;}
+.load-text{white-space:nowrap;}
+@keyframes loadspin{to{transform:rotate(360deg);}}
+.mine-tab.active{background:var(--accent-soft);color:var(--accent) !important;}
 .btn-danger{background:#fee2e2;border-color:#fecaca;color:#b91c1c;}
 .btn-danger:hover{background:#fecaca;}
 .feedback-btn{
@@ -1104,10 +1110,10 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 
 <div class="card" id="lgUserCard" style="display:none;padding:18px;margin-bottom:16px;">
 <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
-<div style="width:52px;height:52px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;">👤</div>
-<div style="flex:1;">
-<div style="font-size:17px;font-weight:600;" id="lgUserEmail">--</div>
-<div style="font-size:13px;color:var(--text-secondary);margin-top:2px;">已登录</div>
+<div id="lgUserAvatar" style="width:52px;height:52px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;flex-shrink:0;">👤</div>
+<div style="flex:1;min-width:0;">
+<div style="font-size:17px;font-weight:600;" id="lgUserNick">--</div>
+<div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="lgUserEmail">--</div>
 </div>
 </div>
 <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:var(--bg-secondary);">
@@ -1122,6 +1128,25 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <button id="lgBindBtn" style="padding:9px 12px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">绑定 UID</button>
 </div>
 <div id="lgBindMsg" style="font-size:12px;color:var(--text-secondary);margin-top:8px;"></div>
+</div>
+
+<!-- 编辑资料 -->
+<div class="card" id="lgEditCard" style="display:none;padding:18px;margin-bottom:16px;">
+<div style="font-size:15px;font-weight:600;margin-bottom:12px;">编辑资料</div>
+<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+<div id="lgEditAvatar" style="width:56px;height:56px;border-radius:50%;background:var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;">👤</div>
+<div>
+<button id="lgAvatarBtn" style="padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--hover);color:var(--text);font-size:13px;cursor:pointer;">上传头像</button>
+<input type="file" id="lgAvatarFile" accept="image/*" style="display:none;">
+<div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">JPG/PNG，自动压缩</div>
+</div>
+</div>
+<div style="margin-bottom:12px;">
+<div style="font-size:13px;font-weight:600;margin-bottom:6px;">昵称</div>
+<input type="text" id="lgNickInput" maxlength="16" placeholder="输入昵称（最多 16 字）" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;">
+</div>
+<button id="lgSaveProfileBtn" style="padding:10px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer;width:100%;">保存资料</button>
+<div id="lgProfileMsg" style="font-size:12px;color:var(--text-secondary);margin-top:8px;"></div>
 </div>
 
 <div class="card" style="background:linear-gradient(135deg,#facc15,#eab308);color:#1f2937;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
@@ -1181,6 +1206,17 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 </div>
 </div>
 <div style="font-size:12px;color:var(--text-secondary);margin-top:12px;line-height:1.6;">以上设备信息仅在本机检测显示，不会上传服务器。</div>
+</div>
+
+<!-- 我的内容 -->
+<div class="card" id="lgMineCard" style="display:none;padding:18px;margin-bottom:16px;">
+<div style="font-size:15px;font-weight:600;margin-bottom:12px;">我的内容</div>
+<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+<button class="mine-tab active" data-mine="posts" style="padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--hover);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">我的帖子</button>
+<button class="mine-tab" data-mine="comments" style="padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text-secondary);font-size:13px;cursor:pointer;">我的评论</button>
+<button class="mine-tab" data-mine="favorites" style="padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text-secondary);font-size:13px;cursor:pointer;">我的收藏</button>
+</div>
+<div id="lgMineList"><div class="load-box"><span class="load-spinner"></span><span class="load-text">加载中…</span></div></div>
 </div>
 
 <div class="card" style="padding:18px;margin-bottom:16px;text-align:center;">
@@ -3385,9 +3421,17 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     fetch(AUTH+'/me',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
       if(d&&d.ok){
         uc.style.display='block';
+        var ec=document.getElementById('lgEditCard'); if(ec) ec.style.display='block';
+        var mc=document.getElementById('lgMineCard'); if(mc) mc.style.display='block';
+        curNick=d.nickname||''; curAvatar=d.avatar||''; newAvatar='';
         document.getElementById('lgUserEmail').textContent=maskEmail(d.email);
         document.getElementById('lgUserUid').textContent=d.uid||'未绑定';
+        document.getElementById('lgUserNick').textContent=curNick||maskEmail(d.email);
+        setAvatarBox(document.getElementById('lgUserAvatar'), curAvatar);
+        setAvatarBox(document.getElementById('lgEditAvatar'), curAvatar);
+        var ni=document.getElementById('lgNickInput'); if(ni) ni.value=curNick;
         setToken(null,null,d.uid);
+        loadMine('posts');
       }else{
         setToken(null,null,null);
         location.href='login.html';
@@ -3400,6 +3444,98 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     if(n.length<=2) return n+'***@'+d;
     return n.slice(0,2)+'***@'+d;
   }
+  function setAvatarBox(el, avatar){
+    if(!el) return;
+    if(avatar){ el.innerHTML='<img src="'+avatar+'" alt="头像" style="width:100%;height:100%;object-fit:cover;display:block;">'; }
+    else { el.innerHTML=''; el.textContent='👤'; el.style.background='var(--border)'; }
+  }
+  var curNick='', curAvatar='', newAvatar='';
+
+  // ===== 编辑资料：头像上传（canvas 压缩）+ 昵称 =====
+  var avatarBtn=document.getElementById('lgAvatarBtn');
+  var avatarFile=document.getElementById('lgAvatarFile');
+  if(avatarBtn) avatarBtn.onclick=function(){ avatarFile.click(); };
+  if(avatarFile) avatarFile.addEventListener('change',function(){
+    var f=avatarFile.files[0]; if(!f) return;
+    if(f.size>5*1024*1024){ var m=document.getElementById('lgProfileMsg'); if(m) m.textContent='图片过大，请选择 5MB 以内'; return; }
+    var reader=new FileReader();
+    reader.onload=function(){
+      var img=new Image();
+      img.onload=function(){
+        var cv=document.createElement('canvas'); var sz=128;
+        cv.width=sz; cv.height=sz;
+        var ctx=cv.getContext('2d');
+        var s=Math.min(img.width,img.height);
+        ctx.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,sz,sz);
+        newAvatar=cv.toDataURL('image/jpeg',0.85);
+        setAvatarBox(document.getElementById('lgEditAvatar'), newAvatar);
+        var m=document.getElementById('lgProfileMsg'); if(m) m.textContent='头像已选择，点保存生效';
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(f);
+  });
+  var saveBtn=document.getElementById('lgSaveProfileBtn');
+  if(saveBtn) saveBtn.onclick=function(){
+    var nick=document.getElementById('lgNickInput').value.trim().slice(0,16);
+    var msgEl=document.getElementById('lgProfileMsg');
+    if(!nick){ msgEl.textContent='请输入昵称'; return; }
+    var token=localStorage.getItem('tst_token')||'';
+    saveBtn.disabled=true; saveBtn.textContent='保存中…';
+    var body={nickname:nick};
+    if(newAvatar) body.avatar=newAvatar;
+    fetch(AUTH+'/me',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)}).then(function(r){return r.json();}).then(function(d){
+      saveBtn.disabled=false; saveBtn.textContent='保存资料';
+      if(d&&d.ok){ newAvatar=''; showToast('资料已保存'); refresh(); }
+      else msgEl.textContent=(d&&d.msg)||'保存失败';
+    }).catch(function(){ saveBtn.disabled=false; saveBtn.textContent='保存资料'; msgEl.textContent='网络异常，请稍后再试'; });
+  };
+
+  // ===== 我的内容：帖子 / 评论 / 收藏 =====
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function pTime(s){ if(!s) return ''; var d=new Date(String(s).replace(' ','T')+'Z'); if(isNaN(d)) return String(s).slice(0,16); var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0'),h=String(d.getHours()).padStart(2,'0'),mm=String(d.getMinutes()).padStart(2,'0'); return y+'-'+m+'-'+dd+' '+h+':'+mm; }
+  var mineTabs=document.querySelectorAll('.mine-tab');
+  var mineList=document.getElementById('lgMineList');
+  function loadMine(kind){
+    mineTabs.forEach(function(b){ var on=b.getAttribute('data-mine')===kind; b.classList.toggle('active',on); b.style.background=on?'var(--hover)':'var(--card)'; b.style.color=on?'var(--text)':'var(--text-secondary)'; });
+    mineList.innerHTML='<div class="load-box"><span class="load-spinner"></span><span class="load-text">加载中…</span></div>';
+    var token=localStorage.getItem('tst_token')||'';
+    var ep=kind==='comments'?'/api/posts/my_comments':(kind==='favorites'?'/api/posts/my_favorites':'/api/posts/mine');
+    fetch(AUTH+ep,{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      if(!d){ mineList.innerHTML='<p class="empty-hint">加载失败</p>'; return; }
+      if(kind==='posts'){
+        var list=d.posts||[];
+        if(!list.length){ mineList.innerHTML='<p class="empty-hint">还没有发过帖子</p>'; return; }
+        mineList.innerHTML=list.map(function(p){
+          return '<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;">'
+            +'<div style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">'+pTime(p.created_at)+' · '+p.likes+' 赞 · '+p.comments+' 评论</div>'
+            +'<div style="font-size:14px;word-break:break-word;">'+esc(p.content)+'</div>'
+            +(p.image?'<img src="'+p.image+'" alt="帖子图片" style="max-width:100%;max-height:200px;border-radius:6px;margin-top:8px;">':'')
+            +'</div>';
+        }).join('');
+      } else if(kind==='comments'){
+        var list=d.comments||[];
+        if(!list.length){ mineList.innerHTML='<p class="empty-hint">还没有评论过帖子</p>'; return; }
+        mineList.innerHTML=list.map(function(c){
+          return '<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;">'
+            +'<div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">评论于 '+pTime(c.created_at)+'</div>'
+            +'<div style="font-size:14px;">'+esc(c.content)+'</div>'
+            +'<div style="font-size:12px;color:var(--text-secondary);margin-top:6px;border-top:1px dashed var(--border);padding-top:6px;">原帖：'+esc(c.post_name||'')+'</div>'
+            +'</div>';
+        }).join('');
+      } else {
+        var list=d.favorites||[];
+        if(!list.length){ mineList.innerHTML='<p class="empty-hint">还没有收藏过帖子</p>'; return; }
+        mineList.innerHTML=list.map(function(f){
+          return '<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;">'
+            +'<div style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">收藏于 '+pTime(f.created_at)+'</div>'
+            +'<div style="font-size:14px;">'+esc(f.content)+'</div>'
+            +'</div>';
+        }).join('');
+      }
+    }).catch(function(){ mineList.innerHTML='<p class="empty-hint">加载失败，请稍后重试</p>'; });
+  }
+  mineTabs.forEach(function(b){ b.onclick=function(){ loadMine(b.getAttribute('data-mine')); }; });
   var bindBtn=document.getElementById('lgBindBtn');
   if(bindBtn) bindBtn.onclick=function(){
     var uid=document.getElementById('lgUidInput').value.trim();

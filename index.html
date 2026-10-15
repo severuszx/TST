@@ -9273,6 +9273,9 @@ try{ eval('const __t=()=>1;'); }catch(e){
   async function loadPosts(){
     const box=document.getElementById('postList'); if(!box) return;
     box.innerHTML='<div class="load-box"><span class="load-spinner"></span><span class="load-text">加载中…</span></div>';
+    let favIds=[];
+    const tok0=localStorage.getItem('tst_token');
+    if(tok0){ try{ const fr0=await fetch(POST_API+'/fav_ids',{headers:{'Authorization':'Bearer '+tok0},cache:'no-store'}); const fd0=await fr0.json(); favIds=(fd0&&fd0.ids)||[]; }catch(e){} }
     try{
       const r=await fetch(POST_API+'/list?sort='+poSort+'&filter='+poFilter+'&dev='+encodeURIComponent(pDev()),{cache:'no-store'});
       const d=await r.json();
@@ -9294,8 +9297,20 @@ try{ eval('const __t=()=>1;'); }catch(e){
         const tags=p.tags?'<span class="post-tags">'+esc(p.tags)+'</span>':'';
         const pin=p.pinned?'<span class="post-pin">置顶</span>':'';
         const off=p.official?'<span class="post-badge" title="官方认证">✓</span>':'';
+        const aAv=p.author_avatar||'';
+        const aNick=p.author_nickname||(p.author_email?('玩家·'+esc(p.author_email.split('@')[0].slice(0,2))):'');
+        const pFav=favIds.indexOf(Number(p.id))>=0;
+        const fav=pFav?'♥ 已收藏':'♡ 收藏';
+        const favCol=pFav?'color:#e11d48;':'';
         let body='<div class="card post-pcard" style="margin-bottom:12px;" data-pid="'+(p.id||p.uid||'')+'"'+(p.uid?' data-uid="'+p.uid+'"':'')+'>'+
-          '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;"><b>'+esc(p.name)+'</b><span style="font-size:12px;color:var(--text-secondary);">'+off+pin+pTime(p.created_at)+'</span></div>'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;">'+
+            '<div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">'+
+              (aAv?'<img src="'+esc(aAv)+'" alt="" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;">':'<span style="width:26px;height:26px;border-radius:50%;background:var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">👤</span>')+
+              '<b style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(p.name)+'</b>'+
+              (aNick?'<span style="font-size:12px;color:var(--text-secondary);flex-shrink:0;">'+aNick+'</span>':'')+
+            '</div>'+
+            '<span style="font-size:12px;color:var(--text-secondary);flex-shrink:0;">'+off+pin+pTime(p.created_at)+'</span>'+
+          '</div>'+
           '<div style="white-space:pre-wrap;word-break:break-word;line-height:1.7;">'+pLink(p.content)+'</div>'+
           (p.image?'<img src="'+esc(p.image)+'" alt="" style="max-width:100%;max-height:280px;border-radius:8px;margin-top:8px;border:1px solid var(--border);">':'')+
           (tags?'<div style="margin-top:8px;">'+tags+'</div>':'');
@@ -9303,6 +9318,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
           body+='<div style="display:flex;gap:10px;margin-top:12px;font-size:13px;">'+
             '<button class="btn" data-act="like" '+(p.liked?'style="color:var(--accent);"':'')+'>赞 '+p.likes+'</button>'+
             '<button class="btn" data-act="cm">评论 '+p.comments+'</button>'+
+            '<button class="btn" data-act="fav" style="'+favCol+'">'+fav+'</button>'+
             '</div>'+
             '<div class="post-cm" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"></div>';
         }
@@ -9310,6 +9326,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
       }).join('');
       box.querySelectorAll('[data-act="like"]').forEach(b=>{ b.onclick=function(){ doLike(b); }; });
       box.querySelectorAll('[data-act="cm"]').forEach(b=>{ b.onclick=function(){ toggleCm(b); }; });
+      box.querySelectorAll('[data-act="fav"]').forEach(b=>{ b.onclick=function(){ doFav(b); }; });
     }catch(e){ box.innerHTML='<p class="post-msg" style="padding:10px 0;color:var(--danger);">加载失败，请稍后重试</p>'; }
   }
   async function doLike(btn){
@@ -9320,6 +9337,18 @@ try{ eval('const __t=()=>1;'); }catch(e){
       if(d&&d.ok){ btn.textContent='赞 '+d.likes; btn.style.color='var(--accent)'; }
       else if(d&&d.error==='already_liked'){ btn.style.color='var(--accent)'; showToast('你已经赞过这条帖子了'); }
       else showToast('点赞失败');
+    }catch(e){ showToast('网络异常，请稍后再试'); }
+  }
+  async function doFav(btn){
+    const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
+    const token=localStorage.getItem('tst_token')||'';
+    if(!token){ showToast('请先登录后再收藏'); location.href='login.html'; return; }
+    const act=btn.textContent.indexOf('已收藏')>=0?'remove':'add';
+    try{
+      const r=await fetch(POST_API+'/favorite',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({post_id:Number(pid),act:act})});
+      const d=await r.json();
+      if(d&&d.ok){ if(d.favorited){ btn.textContent='♥ 已收藏'; btn.style.color='#e11d48'; showToast('已收藏'); } else { btn.textContent='♡ 收藏'; btn.style.color=''; showToast('已取消收藏'); } }
+      else showToast((d&&d.msg)||'操作失败');
     }catch(e){ showToast('网络异常，请稍后再试'); }
   }
   async function toggleCm(btn){
