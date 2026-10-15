@@ -3430,7 +3430,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
         setAvatarBox(document.getElementById('lgUserAvatar'), curAvatar);
         setAvatarBox(document.getElementById('lgEditAvatar'), curAvatar);
         var ni=document.getElementById('lgNickInput'); if(ni) ni.value=curNick;
-        setToken(null,null,d.uid);
+        setToken(token, d.email, d.uid);
         loadMine('posts');
       }else{
         setToken(null,null,null);
