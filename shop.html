@@ -171,6 +171,13 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 </style>
 </head>
 <body>
+<div id="glbLoad" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;display:none;align-items:center;gap:10px;background:rgba(0,0,0,.6);border-radius:12px;padding:16px 22px;color:#fff;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);"><span style="width:26px;height:26px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:gspin .8s linear infinite;display:inline-block;"></span><span>处理中…</span></div>
+<style>@keyframes gspin{to{transform:rotate(360deg)}}button:active{transform:scale(.96);filter:brightness(.92)}</style>
+<script>
+function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);if(t>0)el._t=setTimeout(hideLoad,t);}
+function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);}}
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(b)showLoad(900);});
+</script>
 <div class="boot-load" id="bootLoad"><div class="bl-sp"></div><div class="bl-t">加载中…</div></div>
 <header class="site-header">
   <div class="container header-inner">
@@ -481,9 +488,13 @@ function buyItem(id){
 
 /* ===== 积分明细弹窗（含如何增加积分 + 赞助档位） ===== */
 function openPointsModal(){
+  document.getElementById('ptsMask').classList.add('show');
+  var pmPts=document.getElementById('pmPoints'), pmGv=document.getElementById('pmGiven');
+  if(pmPts) pmPts.textContent='…'; if(pmGv) pmGv.textContent='…';
+  var box=document.getElementById('pmLog'); if(box) box.innerHTML='<div class="load-box"><span class="load-spinner"></span><span class="load-text">流水加载中…</span></div>';
   api('/shop/state',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(st){
-    document.getElementById('pmPoints').textContent=fmt((st&&st.points)||0);
-    document.getElementById('pmGiven').textContent=fmt((st&&st.today_given)||0);
+    if(pmPts) pmPts.textContent=fmt((st&&st.points)||0);
+    if(pmGv) pmGv.textContent=fmt((st&&st.today_given)||0);
   });
   api('/shop/points_log',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(d){
     var box=document.getElementById('pmLog');
@@ -508,7 +519,6 @@ function openPointsModal(){
       else { closeMask('ptsMask'); if(i===0) location.href='profile.html'; else if(i===1||i===2) location.href='index.html'; else location.href='https://theslowtidefk.pages.dev/'; }
     };
   });
-  document.getElementById('ptsMask').classList.add('show');
 }
 function openSponsor(){
   var TIERS=[{m:10,p:500,r:'1:50'},{m:30,p:2000,r:'1:66'},{m:60,p:5000,r:'1:83'},{m:100,p:12000,r:'1:120'},{m:200,p:30000,r:'1:150'},{m:500,p:90000,r:'1:180'}];

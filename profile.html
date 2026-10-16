@@ -1061,6 +1061,13 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 </style>
 <style>/* ===== 移动端适配（The Slow Tide） ===== */@media(max-width:720px){body{padding:10px 12px 24px;}header,nav,.topbar,.nav-bar{flex-wrap:wrap;overflow-x:auto;gap:6px;}.container,.wrap,.main-box,.page-body,.box{width:100%;padding:0;box-sizing:border-box;}textarea,input[type=text],input[type=number],input[type=password],input[type=search],select{font-size:16px;max-width:100%;box-sizing:border-box;}button,.btn,.tool-btn{font-size:14px;max-width:100%;}pre,.json-output,.out-box{overflow-x:auto;max-width:100%;}table{display:block;overflow-x:auto;white-space:nowrap;}img{max-width:100%;height:auto;}.grid,.compiler-grid,.team-grid{grid-template-columns:1fr;}}</style></head>
 <body>
+<div id="glbLoad" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;display:none;align-items:center;gap:10px;background:rgba(0,0,0,.6);border-radius:12px;padding:16px 22px;color:#fff;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);"><span style="width:26px;height:26px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:gspin .8s linear infinite;display:inline-block;"></span><span>处理中…</span></div>
+<style>@keyframes gspin{to{transform:rotate(360deg)}}button:active{transform:scale(.96);filter:brightness(.92)}</style>
+<script>
+function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);if(t>0)el._t=setTimeout(hideLoad,t);}
+function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);}}
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(b)showLoad(900);});
+</script>
 <div class="boot-load" id="bootLoad"><div class="bl-sp"></div><div class="bl-t">加载中…</div></div>
 
 <header class="site-header">
@@ -2531,25 +2538,43 @@ setInterval(updateProfileClock, 1000);
   document.getElementById("weekDots").innerHTML = html;
 })();
 
-// 签到
-function doCheckin(){
-  const today = new Date().toDateString();
-  const last = localStorage.getItem("tst_last_checkin");
-  if(last === today){
-    showToast("今天已签到");
-    return;
-  }
-  localStorage.setItem("tst_last_checkin", today);
-  let days = parseInt(localStorage.getItem("tst_checkin_days")||"0");
-  days++;
-  localStorage.setItem("tst_checkin_days", days);
-  document.getElementById("checkinDays").textContent = days;
-  showToast("签到成功！连续 "+days+" 天");
+// 签到（真实后端积分）
+function setCheckinDone(done){
+  var btn = document.querySelector('[onclick="doCheckin()"]');
+  if(btn){ btn.disabled=done; btn.textContent=done?'今日已签':'点击签到'; btn.style.opacity=done?0.6:1; }
 }
-// 恢复签到天数
+function doCheckin(){
+  var token = localStorage.getItem("tst_token")||'';
+  if(!token){ showToast("请先登录"); return; }
+  var btn = document.querySelector('[onclick="doCheckin()"]');
+  if(btn){ btn.disabled=true; btn.textContent="处理中…"; }
+  fetch(AUTH+'/shop/checkin',{method:'POST',headers:{'Authorization':'Bearer '+token}}).then(function(r){return r.json();}).then(function(d){
+    if(btn){ btn.disabled=false; btn.textContent="点击签到"; }
+    if(d&&d.ok){
+      document.getElementById("checkinDays").textContent = d.streak;
+      var pr=document.getElementById('lgPointsRow'); if(pr) pr.textContent='当前积分：'+(d.points||0);
+      showToast('签到成功！+50 积分'+(d.bonus?('，连续 '+d.streak+' 天额外 +'+d.bonus):''));
+      setCheckinDone(true);
+    }else{
+      if(d&&d.error==='already'){ setCheckinDone(true); showToast((d&&d.msg)||'今天已签到'); }
+      else showToast((d&&d.msg)||'签到失败，请重试');
+    }
+  }).catch(function(){ if(btn){ btn.disabled=false; btn.textContent="点击签到"; } showToast('网络错误，请重试'); });
+}
+// 恢复签到状态（真实积分与连续天数）
 (function(){
-  const days = parseInt(localStorage.getItem("tst_checkin_days")||"0");
-  document.getElementById("checkinDays").textContent = days;
+  var token = localStorage.getItem("tst_token")||'';
+  if(token){
+    fetch(AUTH+'/shop/state',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      if(d&&d.ok){
+        document.getElementById("checkinDays").textContent = d.streak||0;
+        if(d.today_checked) setCheckinDone(true);
+        var pr=document.getElementById('lgPointsRow'); if(pr) pr.textContent='当前积分：'+(d.points||0);
+      }
+    }).catch(function(){});
+  } else {
+    document.getElementById("checkinDays").textContent = 0;
+  }
 })();
 
 

@@ -780,6 +780,13 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 </style>
 </head>
 <body>
+<div id="glbLoad" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;display:none;align-items:center;gap:10px;background:rgba(0,0,0,.6);border-radius:12px;padding:16px 22px;color:#fff;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);"><span style="width:26px;height:26px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:gspin .8s linear infinite;display:inline-block;"></span><span>处理中…</span></div>
+<style>@keyframes gspin{to{transform:rotate(360deg)}}button:active{transform:scale(.96);filter:brightness(.92)}</style>
+<script>
+function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);if(t>0)el._t=setTimeout(hideLoad,t);}
+function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);}}
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(b)showLoad(900);});
+</script>
 <header class="site-header">
 <div class="container header-inner">
 <a class="logo" href="index.html"><img src="logo.jpg" alt="The Slow Tide" class="logo-img"> The Slow Tide</a>
@@ -816,6 +823,9 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <button class="admin-tab" data-tab="replay">赛事管理</button>
 <button class="admin-tab" data-tab="image">图片管理</button>
 <button class="admin-tab" data-tab="lottery">抽奖管理</button>
+<button class="admin-tab" data-tab="shop">商店管理</button>
+<button class="admin-tab" data-tab="users">玩家管理</button>
+<button class="admin-tab" data-tab="posts">帖子管理</button>
 </div>
 <div class="admin-pane active" id="paneNotice">
 <div class="card">
@@ -894,6 +904,48 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 </div>
 <div id="ltList"></div>
 </div>
+<div class="admin-pane" id="paneShop">
+<div class="card">
+<div class="form-row"><label>管理员密码（商店操作校验）</label><input type="password" id="shopPwd" placeholder="请输入管理员密码"></div>
+<button class="btn btn-primary" id="shopPwdBtn" style="width:100%;">解锁商店管理</button>
+</div>
+<div class="card" id="shopMgr" style="display:none;">
+<div class="form-row"><label>商品名称</label><input type="text" id="spiName" placeholder="如 钻石 32 个"></div>
+<div class="form-row"><label>分类</label><select id="spiCat"><option>金币</option><option>物资</option><option>增益</option><option>称号</option></select></div>
+<div class="form-row"><label>价格（积分）</label><input type="text" id="spiPrice" placeholder="如 500"></div>
+<div class="form-row"><label>图标文件名（shop-icons/ 下）</label><input type="text" id="spiIcon" placeholder="如 diamond.png"></div>
+<div class="form-row"><label>描述</label><input type="text" id="spiDesc" placeholder="商品描述"></div>
+<div class="form-row"><label>限购（如 day:3 / week:1 / month:1 / none）</label><input type="text" id="spiLimit" placeholder="day:3"></div>
+<div class="form-row"><label>库存（-1 不限）</label><input type="text" id="spiStock" placeholder="-1"></div>
+<button class="btn btn-primary" id="spiAddBtn">新增商品</button>
+<button class="btn" id="spiCancelBtn" style="display:none;">取消编辑</button>
+</div>
+<div id="spiList"></div>
+<div class="card" id="shopPointsBox" style="display:none;margin-top:14px;">
+<div class="form-row"><label>给玩家加/减积分（按邮箱）</label><input type="text" id="spuEmail" placeholder="玩家邮箱"></div>
+<div class="form-row"><label>数量（正加负减）</label><input type="text" id="spuDelta" placeholder="如 100 或 -100"></div>
+<div class="form-row"><label>原因（可选）</label><input type="text" id="spuReason" placeholder="如 活动奖励"></div>
+<button class="btn btn-primary" id="spuBtn">发放/扣除积分</button>
+</div>
+</div>
+<div class="admin-pane" id="paneUsers">
+<div class="card">
+<div class="form-row"><label>搜索玩家（昵称/邮箱/UID，留空显示最近 100 个）</label><input type="text" id="usrQ" placeholder="输入关键词后回车"></div>
+<button class="btn btn-primary" id="usrSearchBtn">搜索</button>
+</div>
+<div id="usrList"></div>
+</div>
+<div class="admin-pane" id="panePosts">
+<div class="card">
+<div class="form-row"><label>官方帖名称</label><input type="text" id="poName" placeholder="留空为 The Slow Tide"></div>
+<div class="form-row"><label>官方帖内容</label><textarea id="poContent" placeholder="发布官方公告帖"></textarea></div>
+<div class="form-row"><label>标签</label><input type="text" id="poTags" placeholder="如 官方,活动"></div>
+<div class="form-row form-check"><input type="checkbox" id="poPinned"> 置顶</div>
+<button class="btn btn-primary" id="poAddBtn">发布官方帖</button>
+<button class="btn" id="poRefreshBtn">刷新全部帖子</button>
+</div>
+<div id="poList"></div>
+</div>
 </div>
 </div>
 </main>
@@ -959,6 +1011,158 @@ function lotteryApi(action,payload){
   if(!pwd){showToast('请输入管理员密码');return Promise.resolve(null);}
   return fetch('/api/rest/rpc/admin_lottery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({p_pwd:pwd,p_action:action,p_payload:payload||{}})}).then(r=>r.json()).catch(()=>{showToast('请求失败');return null;});
 }
+const FK='https://theslowtidefk.pages.dev/api';
+function getPw(){ return ($('#shopPwd').value||'').trim(); }
+async function shopApi(action,data){
+  const pw=getPw(); if(!pw){showToast('请先输入管理员密码');return null;}
+  try{
+    const r=await fetch(FK+'/shop/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action,pw},data||{}))});
+    const d=await r.json();
+    if(d&&d.ok) return d;
+    showToast(d&&d.msg?d.msg:(d&&d.error?('操作失败：'+d.error):'操作失败'));
+    return null;
+  }catch(e){showToast('网络错误，请重试');return null;}
+}
+async function usersApi(action,data){
+  const pw=getPw(); if(!pw){showToast('请先输入管理员密码');return null;}
+  try{
+    const r=await fetch(FK+'/admin/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action,pw},data||{}))});
+    const d=await r.json();
+    if(d&&d.ok) return d;
+    showToast(d&&d.msg?d.msg:(d&&d.error?('操作失败：'+d.error):'操作失败'));
+    return null;
+  }catch(e){showToast('网络错误，请重试');return null;}
+}
+async function postsApi(action,data){
+  const pw=getPw(); if(!pw){showToast('请先输入管理员密码');return null;}
+  try{
+    const r=await fetch(FK+'/posts/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action,pw},data||{}))});
+    const d=await r.json();
+    if(d&&d.ok) return d;
+    showToast(d&&d.msg?d.msg:(d&&d.error?('操作失败：'+d.error):'操作失败'));
+    return null;
+  }catch(e){showToast('网络错误，请重试');return null;}
+}
+async function postsCreateApi(data){
+  try{
+    const r=await fetch(FK+'/posts/admin_create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})});
+    const d=await r.json();
+    if(d&&d.ok) return d;
+    showToast(d&&d.msg?d.msg:(d&&d.error?('操作失败：'+d.error):'操作失败'));
+    return null;
+  }catch(e){showToast('网络错误，请重试');return null;}
+}
+// ===== 商店管理 =====
+$('#shopPwdBtn').onclick=async()=>{
+  const pw=getPw(); if(!pw){showToast('请输入管理员密码');return;}
+  const d=await shopApi('item_list',{});
+  if(d){$('#shopMgr').style.display='block';$('#shopPointsBox').style.display='block';renderShopItems(d.items);showToast('商店管理已解锁');}
+};
+async function renderShopItems(items){
+  $('#spiList').innerHTML=(items||[]).map(it=>{
+    const lim=it.period==='none'?'不限购':(it.period==='day'?'每日 ':(it.period==='week'?'每周 ':'每月 '))+(it.period_limit||0)+' 次';
+    return '<div class="card" style="padding:10px 14px;margin-bottom:8px;">'+
+      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'+
+        (it.icon?'<img src="https://theslowtide.pages.dev/shop-icons/'+esc(it.icon)+'" style="width:36px;height:36px;object-fit:contain;image-rendering:pixelated;" alt="">':'')+
+        '<div style="flex:1;min-width:130px;"><b>'+esc(it.name)+'</b> <span style="color:var(--text-secondary);font-size:12px;">['+esc(it.category||'物资')+']</span><br>'+
+        '<span style="color:var(--warn);font-size:13px;font-weight:600;">'+it.price+' 积分</span> · <span style="font-size:12px;color:var(--text-secondary);">'+lim+'</span> · 库存 '+((it.stock==null||it.stock<0)?'不限':it.stock)+' · '+((it.active?'<span style="color:#22c55e;">上架中</span>':'<span style="color:#ef4444;">已下架</span>'))+'</div>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;">'+
+          '<button class="btn sm" onclick="toggleItem('+it.id+')">'+(it.active?'下架':'上架')+'</button>'+
+          '<button class="btn sm" onclick="editItem('+it.id+')">编辑</button>'+
+          '<button class="btn sm" onclick="toggleCodes('+it.id+',\''+esc(String(it.name).replace(/'/g,"\\'"))+'\')">兑换码</button>'+
+        '</div>'+
+      '</div>'+
+      '<div id="codes-'+it.id+'" style="display:none;"></div>'+
+    '</div>';
+  }).join('')||'<div class="empty-hint">暂无商品</div>';
+  $('#spiList').innerHTML=$('#spiList').innerHTML.replace(/\$\{'/g,''); // no-op safeguard
+}
+async function reloadShop(){ const d=await shopApi('item_list',{}); if(d) renderShopItems(d.items); }
+async function toggleItem(id){ const d=await shopApi('item_active',{id,active:1}); if(d){ const r=await shopApi('item_list',{}); if(r) renderShopItems(r.items); } }
+async function editItem(id){ const r=await shopApi('item_list',{}); if(!r) return; const it=(r.items||[]).find(x=>x.id===id); if(!it){showToast('未找到商品');return;} $('#spiName').value=it.name||''; $('#spiCat').value=it.category||'物资'; $('#spiPrice').value=it.price||''; $('#spiIcon').value=it.icon||''; $('#spiDesc').value=it.desc||''; $('#spiLimit').value=(it.period&&it.period!=='none'?it.period+':'+(it.period_limit||0):'none'); $('#spiStock').value=(it.stock==null||it.stock<0)?'':it.stock; $('#spiAddBtn').textContent='保存修改'; $('#spiAddBtn').dataset.editId=String(id); $('#spiCancelBtn').style.display='inline-block'; window.scrollTo(0,0); }
+async function toggleCodes(id,name){ const box=$('#codes-'+id); if(!box) return; const show=box.style.display!=='block'; box.style.display=show?'block':'none'; if(show){ await renderCodes(id,name); } }
+async function renderCodes(itemId,name){
+  const box=$('#codes-'+itemId); if(!box) return;
+  const d=await shopApi('codes_list',{item_id:itemId});
+  const rows=(d&&d.codes)||[];
+  box.innerHTML='<div style="font-size:12px;color:var(--text-secondary);">'+esc(name)+' · 兑换码 '+rows.length+' 个</div>'+
+    '<div style="display:flex;gap:6px;margin:6px 0;flex-wrap:wrap;">'+
+      '<input type="text" id="cdInput-'+itemId+'" placeholder="粘贴多个码（逗号/换行分隔），留空自动生成 10 个" style="flex:1;min-width:160px;padding:6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);">'+
+      '<button class="btn btn-primary" onclick="addCodes('+itemId+')">生成/添加</button>'+
+    '</div>'+
+    '<div style="max-height:240px;overflow:auto;">'+
+      rows.map(r=>'<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px;">'+
+        '<span '+(r.used?'style="text-decoration:line-through;opacity:.5;"':'')+(r.disabled?'style="opacity:.5;"':'')+'>'+esc(r.code)+'</span>'+
+        '<span style="color:var(--text-secondary);font-size:11px;">'+(r.used?('已用 @ '+(r.used_by||'')+(r.used_at?' · '+esc(String(r.used_at).slice(0,16)):'')):(r.disabled?'已禁用':'未用'))+'</span>'+
+        '<span style="margin-left:auto;display:flex;gap:4px;">'+
+          (r.used?'':'<button class="btn sm" onclick="resetCode('+r.id+','+itemId+')">重置</button>')+
+          '<button class="btn sm" onclick="disableCode('+r.id+','+itemId+')">'+(r.disabled?'启用':'禁用')+'</button>'+
+        '</span></div>').join('')||'<div class="empty-hint">暂无兑换码，先添加再上架</div>'+
+    '</div>';
+}
+function genCode(){ const pool='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s='TSTC-'; for(let i=0;i<8;i++) s+=pool[Math.floor(Math.random()*pool.length)]; return s; }
+async function addCodes(itemId){ const inp=$('#cdInput-'+itemId); if(!inp) return; const raw=inp.value.trim(); let codes=[]; if(raw){ codes=raw.split(/[,，\n\r]+/).map(s=>s.trim()).filter(Boolean).slice(0,200); } else { codes=Array.from({length:10},genCode); } const d=await shopApi('codes_add',{item_id:itemId,codes}); if(d){ showToast('已添加 '+d.added+' 个兑换码'); const r=await shopApi('codes_list',{item_id:itemId}); const nm=inp.closest('div').parentElement?document.querySelector('#codes-'+itemId)?.dataset.nm:''; } }
+async function resetCode(id,itemId){ const d=await shopApi('codes_reset',{id}); if(d){ showToast('已重置为未使用'); renderCodes(itemId,''); } }
+async function disableCode(id,itemId){ const d=await shopApi('codes_disable',{id}); if(d){ showToast('已禁用'); renderCodes(itemId,''); } }
+$('#spiAddBtn').onclick=async()=>{
+  const id=$('#spiAddBtn').dataset.editId;
+  const payload={ name:$('#spiName').value.trim(), desc:$('#spiDesc').value.trim(), icon:$('#spiIcon').value.trim(), price:parseInt($('#spiPrice').value)||0, category:$('#spiCat').value, stock:$('#spiStock').value===''?-1:(parseInt($('#spiStock').value)||0), period:'none', period_limit:0 };
+  const lim=($('#spiLimit').value.trim()||'none');
+  const mm=lim.match(/^(day|week|month):(\d+)$/);
+  if(mm){ payload.period=mm[1]; payload.period_limit=parseInt(mm[2])||0; }
+  if(!payload.name){ showToast('请输入商品名称'); return; }
+  const d=await shopApi(id?'item_update':'item_add', id?Object.assign(payload,{id:Number(id)}):payload);
+  if(d){ showToast(id?'商品已更新':'商品已添加'); $('#spiAddBtn').dataset.editId=''; $('#spiAddBtn').textContent='新增商品'; $('#spiCancelBtn').style.display='none'; ['spiName','spiPrice','spiIcon','spiDesc','spiLimit','spiStock'].forEach(x=>{ const el=$('#'+x); if(el) el.value=''; }); reloadShop(); }
+};
+$('#spiCancelBtn').onclick=()=>{ $('#spiAddBtn').dataset.editId=''; $('#spiAddBtn').textContent='新增商品'; $('#spiCancelBtn').style.display='none'; };
+$('#spuBtn').onclick=async()=>{ const email=$('#spuEmail').value.trim(); const delta=parseInt($('#spuDelta').value)||0; if(!email||!delta){showToast('请填写邮箱和数量');return;} const d=await shopApi('points_set',{email,delta,reason:$('#spuReason').value.trim()||'admin'}); if(d){ showToast('已操作，当前积分 '+d.points); } };
+// ===== 玩家管理 =====
+async function renderUsers(q){
+  $('#usrList').innerHTML='<div class="load-box"><span class="load-spinner"></span><span>加载中…</span></div>';
+  const d=await usersApi('list',{q:q||''});
+  if(!d){ $('#usrList').innerHTML=''; return; }
+  $('#usrList').innerHTML=(d.users||[]).map(u=>{
+    return '<div class="card" style="padding:10px 14px;margin-bottom:8px;">'+
+      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'+
+        (u.avatar?'<img src="'+esc(u.avatar)+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="">':'<div style="width:36px;height:36px;border-radius:50%;background:var(--hover);display:flex;align-items:center;justify-content:center;">👤</div>')+
+        '<div style="flex:1;min-width:130px;"><b>'+esc(u.nickname||'未设置昵称')+'</b> '+(u.banned?'<span style="color:#ef4444;font-size:12px;">已封禁</span>':'')+'<br>'+
+        '<span style="font-size:12px;color:var(--text-secondary);">'+esc(u.email)+' · UID:'+esc(u.uid||'-')+' · 注册 '+esc((u.created_at||'').slice(0,10))+'</span></div>'+
+        '<div style="font-weight:700;color:var(--warn);">'+u.points+' 积分</div>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;">'+
+          '<button class="btn sm" onclick="userPoints(\''+esc(u.email).replace(/'/g,"\\'")+'\',100)">+100</button>'+
+          '<button class="btn sm" onclick="userPoints(\''+esc(u.email).replace(/'/g,"\\'")+'\',-100)">-100</button>'+
+          '<button class="btn sm" onclick="userBan(\''+esc(u.email).replace(/'/g,"\\'")+'\','+(u.banned?0:1)+')">'+(u.banned?'解封':'封禁')+'</button>'+
+          '<button class="btn sm" style="color:#ef4444;" onclick="userDelete(\''+esc(u.email).replace(/'/g,"\\'")+'\')">删除账号</button>'+
+        '</div>'+
+      '</div></div>';
+  }).join('')||'<div class="empty-hint">没有找到玩家</div>';
+}
+async function userPoints(email,delta){ const d=await usersApi('points',{email,delta,reason:'admin'}); if(d){ showToast('已操作，当前积分 '+d.points); renderUsers($('#usrQ').value.trim()); } }
+async function userBan(email,ban){ if(!confirm((ban?'确定封禁 ':'确定解封 ')+email+'？')) return; const d=await usersApi('ban',{email,ban:ban?1:0}); if(d){ showToast('已'+(ban?'封禁':'解封')); renderUsers($('#usrQ').value.trim()); } }
+async function userDelete(email){ if(!confirm('确定永久删除 '+email+' 及其全部帖子/评论/积分记录？此操作不可撤销！')) return; if(!confirm('再次确认：删除 '+email+'？')) return; const d=await usersApi('delete',{email}); if(d){ showToast('已删除该账号'); renderUsers($('#usrQ').value.trim()); } }
+$('#usrSearchBtn').onclick=()=>{ renderUsers($('#usrQ').value.trim()); };
+$('#usrQ').addEventListener('keydown',e=>{ if(e.key==='Enter') renderUsers($('#usrQ').value.trim()); });
+// ===== 帖子管理 =====
+async function renderPosts(){
+  $('#poList').innerHTML='<div class="load-box"><span class="load-spinner"></span><span>加载中…</span></div>';
+  const d=await postsApi('list_posts',{});
+  if(!d){ $('#poList').innerHTML=''; return; }
+  $('#poList').innerHTML=(d.posts||[]).map(p=>{
+    return '<div class="card" style="padding:10px 14px;margin-bottom:8px;">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'+
+        '<b>'+esc(p.name||'匿名')+'</b>'+(p.is_official?' <span style="color:#2563eb;font-size:12px;">官方</span>':'')+(p.pinned?' <span style="color:#f59e0b;font-size:12px;">置顶</span>':'')+
+        '<span style="font-size:12px;color:var(--text-secondary);margin-left:auto;">'+esc((p.created_at||'').slice(0,16))+' · '+(p.comments||0)+' 评论</span>'+
+        '<button class="btn sm" onclick="pinPost('+p.id+')">'+(p.pinned?'取消置顶':'置顶')+'</button>'+
+        '<button class="btn sm" style="color:#ef4444;" onclick="delPost('+p.id+')">删除</button>'+
+      '</div>'+
+      '<div style="font-size:13px;color:var(--text-secondary);margin-top:4px;word-break:break-all;">'+esc((p.content||'').slice(0,120))+(String(p.content||'').length>120?'…':'')+'</div>'+
+    '</div>';
+  }).join('')||'<div class="empty-hint">暂无帖子</div>';
+}
+async function delPost(id){ if(!confirm('确定删除此帖子及其全部评论/点赞/收藏？')) return; const d=await postsApi('del_post',{id}); if(d){ showToast('已删除'); renderPosts(); } }
+async function pinPost(id){ const d=await postsApi('pin',{id}); if(d){ showToast('已切换置顶'); renderPosts(); } }
+$('#poAddBtn').onclick=async()=>{ const content=$('#poContent').value.trim(); if(!content){showToast('请输入内容');return;} const d=await postsCreateApi({pw:getPw(),name:$('#poName').value.trim(),content,tags:$('#poTags').value.trim(),pinned:$('#poPinned').checked?1:0}); if(d){ showToast('官方帖已发布'); $('#poContent').value=''; $('#poName').value=''; $('#poTags').value=''; $('#poPinned').checked=false; renderPosts(); } };
+$('#poRefreshBtn').onclick=()=>{ renderPosts(); };
 async function renderLottery(){
   const el=$('#ltList');if(!el)return;
   const pwd=$('#ltPwd').value.trim();
