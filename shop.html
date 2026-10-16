@@ -95,6 +95,26 @@ a{color:var(--text);text-decoration:none}
 .form-row input,.form-row select,.form-row textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px;}
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--primary);color:var(--bg);padding:10px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:200;opacity:0;transition:opacity .2s;pointer-events:none;}
 .toast.show{opacity:1;}
+/* 购物车 */
+.cart-bar{position:relative;}
+.cart-count{position:absolute;top:-6px;right:-6px;background:var(--danger);color:#fff;font-size:11px;min-width:16px;height:16px;line-height:16px;border-radius:8px;text-align:center;padding:0 4px;font-weight:700;}
+.cart-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:85;display:none;}
+.cart-mask.show{display:block;}
+.cart-drawer{position:fixed;top:0;right:0;bottom:0;width:360px;max-width:92vw;background:var(--card);border-left:1px solid var(--border);box-shadow:-8px 0 30px rgba(0,0,0,.25);z-index:90;display:flex;flex-direction:column;transform:translateX(105%);transition:transform .25s;}
+.cart-drawer.show{transform:translateX(0);}
+.cart-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);font-size:15px;font-weight:700;}
+.cart-body{flex:1;overflow:auto;padding:12px 18px;}
+.cart-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.cart-item img{width:36px;height:36px;object-fit:contain;image-rendering:pixelated;flex-shrink:0;}
+.cart-item .ci-n{flex:1;color:var(--text);word-break:break-all;}
+.cart-item .ci-p{color:var(--warn);font-weight:700;width:58px;text-align:right;flex-shrink:0;}
+.cart-item .ci-q{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.cart-item .ci-q button{width:22px;height:22px;border:1px solid var(--border);background:var(--bg);border-radius:5px;cursor:pointer;color:var(--text);line-height:1;font-size:13px;}
+.cart-item .ci-q button:hover{border-color:var(--accent);}
+.cart-item .ci-q span{min-width:20px;text-align:center;}
+.cart-item .ci-del{color:var(--danger);cursor:pointer;font-size:16px;padding:2px 6px;flex-shrink:0;}
+.cart-foot{padding:14px 18px;border-top:1px solid var(--border);}
+.cart-total{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-bottom:12px;}
 @media(max-width:760px){.shop-layout{flex-direction:column;}.sidebar{flex:none;width:100%;position:static;display:flex;flex-wrap:wrap;padding:8px;}.sidebar .sb-head{display:none;}.sidebar .sb-item{width:auto;padding:8px 14px;border-radius:8px;}.sidebar .sb-item.active{border-left:none;background:var(--accent-soft);}}
 </style>
 </head>
@@ -108,6 +128,7 @@ a{color:var(--text);text-decoration:none}
   </div>
   <div class="right">
     <span class="points-badge" id="ptsBadge" onclick="openPointsModal()" title="点击查看积分明细"><span class="plbl">积分</span><span id="ptsNum">--</span></span>
+    <button class="fb-btn cart-bar" id="cartBtn" onclick="toggleCart()">购物车<span class="cart-count" id="cartCount" style="display:none;">0</span></button>
     <button class="fb-btn" id="themeBtn" title="切换主题">主题</button>
     <span class="u-name" id="uName" style="display:none;"></span>
     <button class="fb-btn" id="uBtn" style="display:none;">退出</button>
@@ -223,6 +244,16 @@ a{color:var(--text);text-decoration:none}
 <div class="modal-mask" id="sponsorMask"><div class="modal"><h3>赞助感谢</h3><div id="sponsorBody"></div><div class="m-actions"><button class="btn" onclick="closeMask('sponsorMask')">关闭</button></div></div></div>
 
 <div class="toast" id="toast"></div>
+<!-- 购物车 -->
+<div class="cart-mask" id="cartMask" onclick="toggleCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-head"><span>购物车</span><button class="fb-btn" onclick="toggleCart()">关闭</button></div>
+  <div class="cart-body" id="cartBody"></div>
+  <div class="cart-foot">
+    <div class="cart-total"><span>合计</span><span id="cartTotal">0 积分</span></div>
+    <button class="btn primary" id="cartCheckout" onclick="checkout()">结算</button>
+  </div>
+</div>
 <script>
 var API='https://theslowtidefk.pages.dev/api';
 var ICON_BASE='https://theslowtide.pages.dev/';
@@ -230,6 +261,50 @@ var token=localStorage.getItem('tst_token')||'';
 var email=localStorage.getItem('tst_email')||'';
 var CAT='全部', ADMIN_ON=false, editingId=0, myName='';
 var ALL_ITEMS=[], myPoints=0;
+var cart=JSON.parse(localStorage.getItem('tst_cart')||'[]');
+function saveCart(){ localStorage.setItem('tst_cart',JSON.stringify(cart)); renderCartBtn(); }
+function renderCartBtn(){ var n=cart.reduce(function(a,b){return a+b.qty;},0); var c=document.getElementById('cartCount'); c.style.display=n?'':'none'; c.textContent=n; }
+function addCart(id){ var it=ALL_ITEMS.find(function(x){return x.id===id;}); if(!it) return; var f=cart.find(function(x){return x.id===id;}); if(f) f.qty++; else cart.push({id:id,qty:1}); saveCart(); renderCart(); toast('已加入购物车'); }
+function incCart(id,d){ var f=cart.find(function(x){return x.id===id;}); if(!f) return; f.qty+=d; if(f.qty<=0) cart=cart.filter(function(x){return x.id!==id;}); saveCart(); renderCart(); }
+function delCart(id){ cart=cart.filter(function(x){return x.id!==id;}); saveCart(); renderCart(); }
+function toggleCart(){ var d=document.getElementById('cartDrawer'); var m=document.getElementById('cartMask'); var show=d.classList.toggle('show'); m.classList.toggle('show',show); if(show) renderCart(); }
+function cartTotal(){ return cart.reduce(function(a,b){ var it=ALL_ITEMS.find(function(x){return x.id===b.id;}); return a+(it?it.price*b.qty:0); },0); }
+function renderCart(){
+  var box=document.getElementById('cartBody');
+  if(!cart.length){ box.innerHTML='<div class="empty-hint">购物车是空的，去挑点商品吧</div>'; document.getElementById('cartTotal').textContent='0 积分'; return; }
+  box.innerHTML=cart.map(function(c){
+    var it=ALL_ITEMS.find(function(x){return x.id===c.id;}); if(!it) return '';
+    return '<div class="cart-item"><img src="'+(it.icon?ICON_BASE+it.icon:'')+'" alt="" onerror="this.style.visibility=\'hidden\'"><span class="ci-n">'+esc(it.name)+'</span><span class="ci-p">'+fmt(it.price)+'</span><span class="ci-q"><button onclick="incCart('+it.id+',-1)">−</button><span>'+c.qty+'</span><button onclick="incCart('+it.id+',1)">+</button></span><span class="ci-del" title="移除" onclick="delCart('+it.id+')">✕</span></div>';
+  }).join('');
+  document.getElementById('cartTotal').textContent=fmt(cartTotal())+' 积分';
+}
+function checkout(){
+  if(!cart.length){ toast('购物车是空的'); return; }
+  var btn=document.getElementById('cartCheckout'); btn.disabled=true; btn.textContent='结算中…';
+  var total0=cartTotal(), out=[], idx=0, fail=false;
+  function finish(){ btn.disabled=false; btn.textContent='结算'; }
+  function buyOne(){
+    if(fail||idx>=cart.length){
+      if(out.length){
+        var html='<div style="max-height:50vh;overflow:auto;">'+out.map(function(r){return '<div style="padding:9px 0;border-bottom:1px solid var(--border);"><div style="font-weight:600;">'+esc(r.name)+'</div><div class="code" style="font-size:15px;">'+esc(r.code||'无需兑换码')+'</div></div>';}).join('')+'</div>';
+        document.getElementById('buyBody').innerHTML='<div style="text-align:center;padding:4px 0 12px;">已成功兑换 <b>'+out.length+'</b> 件商品，共扣除 '+fmt(total0)+' 积分<br><br><div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">兑换码如下（游戏内使用，仅一次有效）：</div></div>'+html;
+        document.getElementById('buyMask').classList.add('show');
+      }
+      cart=[]; saveCart(); renderCart(); finish(); loadAll();
+      return;
+    }
+    var c=cart[idx]; idx++;
+    postJson('/shop/buy',{item_id:c.id}).then(function(d){
+      if(d&&d.ok){ out.push({name:d.name,code:d.code||''}); buyOne(); }
+      else if(d&&d.error==='no_stock'){ toast((d.msg||'库存不足')); buyOne(); }
+      else if(d&&d.error==='limit'){ toast((d.msg||'限购次数已用完')); buyOne(); }
+      else if(d&&d.error==='coin_total'){ toast((d.msg||'金币累计上限已达')); buyOne(); }
+      else if(d&&d.error==='no_points'){ toast('积分不足，结算中断'); fail=true; finish(); cart=[]; saveCart(); renderCart(); loadAll(); }
+      else { toast((d&&d.msg)||'兑换失败'); buyOne(); }
+    }).catch(function(){ toast('网络异常，结算中断'); fail=true; finish(); cart=[]; saveCart(); renderCart(); loadAll(); });
+  }
+  buyOne();
+}
 
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function pTime(t){ if(!t) return ''; return String(t).replace('T',' ').slice(0,16); }
@@ -282,7 +357,7 @@ function renderItems(){
     if(it.stock!=null&&it.stock>=0) quota+=(quota?'<br>':'')+'库存余 '+it.stock+'';
     if(it.type==='coin'&&it.coin_total>=0) quota+='<br>已累计兑换 '+fmt(it.coin_total)+' / 200000 金币';
     var soldout=it.bought===0;
-    return '<div class="item"><img class="ic" src="'+(it.icon?ICON_BASE+it.icon:'')+'" alt="" onerror="this.style.visibility=\'hidden\'"><div class="nm">'+esc(it.name)+'</div><div class="ds">'+esc(it.desc||'')+'</div><div class="pr">'+fmt(it.price)+' 积分</div><div class="quota'+(soldout?' soldout':'')+'">'+quota+'</div><button class="btn primary" onclick="buyItem('+it.id+')" '+(soldout?'disabled':'')+'>兑换</button></div>';
+    return '<div class="item"><img class="ic" src="'+(it.icon?ICON_BASE+it.icon:'')+'" alt="" onerror="this.style.visibility=\'hidden\'"><div class="nm">'+esc(it.name)+'</div><div class="ds">'+esc(it.desc||'')+'</div><div class="pr">'+fmt(it.price)+' 积分</div><div class="quota'+(soldout?' soldout':'')+'">'+quota+'</div><div style="display:flex;gap:8px;"><button class="btn" style="flex:1;" onclick="addCart('+it.id+')" '+(soldout?'disabled':'')+'>加购</button><button class="btn primary" style="flex:1;" onclick="buyItem('+it.id+')" '+(soldout?'disabled':'')+'>兑换</button></div></div>';
   }).join('');
 }
 function buyItem(id){
@@ -482,6 +557,7 @@ function loadAdminOrders(){
 
 /* ===== 初始化 ===== */
 themeInit();
+renderCartBtn();
 document.getElementById('navLogo').src='https://theslowtide.pages.dev/logo.jpg';
 var themeBtn=document.getElementById('themeBtn');
 themeBtn.textContent=document.documentElement.getAttribute('data-theme')==='dark'?'亮色':'暗色';
