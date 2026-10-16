@@ -44,20 +44,21 @@ a{color:var(--text);text-decoration:none}
 .load-spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .empty-hint{color:var(--text-secondary);font-size:14px;padding:16px 0;text-align:center;}
-/* 商品网格 */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:14px;}
-.item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow);transition:border-color .15s;}
+/* 商品网格（紧凑） */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;}
+.item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 12px 14px;display:flex;flex-direction:column;gap:5px;box-shadow:var(--shadow);transition:border-color .15s;}
 .item:hover{border-color:var(--accent);}
-.item .ic{width:64px;height:64px;object-fit:contain;margin:0 auto;image-rendering:pixelated;}
-.item .nm{font-weight:700;text-align:center;line-height:1.3;color:var(--text);}
-.item .ds{font-size:12px;color:var(--text-secondary);text-align:center;line-height:1.5;min-height:34px;}
-.item .pr{text-align:center;color:var(--warn);font-weight:700;font-size:15px;}
-.item .quota{text-align:center;font-size:12px;color:var(--text-secondary);min-height:16px;}
+.item .ic{width:52px;height:52px;object-fit:contain;margin:2px auto 4px;image-rendering:pixelated;}
+.item .nm{font-weight:700;text-align:center;line-height:1.3;color:var(--text);font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.item .ds{font-size:12px;color:var(--text-secondary);text-align:center;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:0;}
+.item .pr{text-align:center;color:var(--warn);font-weight:700;font-size:14px;}
+.item .quota{text-align:center;font-size:11px;color:var(--text-secondary);min-height:14px;line-height:1.35;}
 .item .quota.soldout{color:var(--danger);}
 .btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:13px;cursor:pointer;font-weight:600;transition:all .15s;}
 .btn:hover{border-color:var(--accent);color:var(--primary);}
 .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff;width:100%;}
 .btn.primary:hover{opacity:.9;}
+.btn.sm{padding:5px 8px;font-size:12px;border-radius:7px;font-weight:600;}
 .btn.danger{color:var(--danger);}
 .btn:disabled{opacity:.5;cursor:not-allowed;}
 /* 表格 */
@@ -357,7 +358,7 @@ function renderItems(){
     if(it.stock!=null&&it.stock>=0) quota+=(quota?'<br>':'')+'库存余 '+it.stock+'';
     if(it.type==='coin'&&it.coin_total>=0) quota+='<br>已累计兑换 '+fmt(it.coin_total)+' / 200000 金币';
     var soldout=it.bought===0;
-    return '<div class="item"><img class="ic" src="'+(it.icon?ICON_BASE+it.icon:'')+'" alt="" onerror="this.style.visibility=\'hidden\'"><div class="nm">'+esc(it.name)+'</div><div class="ds">'+esc(it.desc||'')+'</div><div class="pr">'+fmt(it.price)+' 积分</div><div class="quota'+(soldout?' soldout':'')+'">'+quota+'</div><div style="display:flex;gap:8px;"><button class="btn" style="flex:1;" onclick="addCart('+it.id+')" '+(soldout?'disabled':'')+'>加购</button><button class="btn primary" style="flex:1;" onclick="buyItem('+it.id+')" '+(soldout?'disabled':'')+'>兑换</button></div></div>';
+    return '<div class="item"><img class="ic" src="'+(it.icon?ICON_BASE+it.icon:'')+'" alt="" onerror="this.style.visibility=\'hidden\'"><div class="nm">'+esc(it.name)+'</div><div class="ds">'+esc(it.desc||'')+'</div><div class="pr">'+fmt(it.price)+' 积分</div><div class="quota'+(soldout?' soldout':'')+'">'+quota+'</div><div style="display:flex;gap:6px;margin-top:2px;"><button class="btn sm" style="flex:1;" onclick="addCart('+it.id+')" '+(soldout?'disabled':'')+'>加购</button><button class="btn sm primary" style="flex:1;" onclick="buyItem('+it.id+')" '+(soldout?'disabled':'')+'>兑换</button></div></div>';
   }).join('');
 }
 function buyItem(id){
