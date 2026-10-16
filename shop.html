@@ -53,13 +53,18 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 .footer-links a{color:var(--accent);text-decoration:none;}
 .footer-links a:hover{text-decoration:underline;}
 .footer-bottom{padding-top:14px;text-align:center;color:var(--text-secondary);font-size:12px;}
-/* 骨架屏加载动画 */
-.skel{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;}
-.skel .sk{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;}
-.skel .sk-i{width:52px;height:52px;border-radius:8px;margin:2px auto 10px;}
-.skel .sk-l{height:12px;border-radius:4px;margin:6px auto;}
+/* 骨架屏加载动画（2 列大卡） */
+.skel{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.skel .sk{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
+.skel .sk-i{width:68px;height:68px;border-radius:10px;flex:none;}
+.skel .sk-l{height:12px;border-radius:4px;}
 .sk-shimmer{background:linear-gradient(90deg,var(--hover) 25%,var(--card) 50%,var(--hover) 75%);background-size:200% 100%;animation:sk-shimmer 1.2s infinite;}
 @keyframes sk-shimmer{to{background-position:-200% 0}}
+/* 全页加载指示 */
+.boot-load{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:300;transition:opacity .3s;}
+.boot-load.hide{opacity:0;pointer-events:none;}
+.boot-load .bl-sp{width:42px;height:42px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+.boot-load .bl-t{font-size:14px;color:var(--text-secondary);letter-spacing:2px;}
 @media(max-width:720px){.footer-grid{grid-template-columns:1fr;gap:16px;}.header-inner{gap:8px;flex-wrap:wrap;}.time-badge{display:none;}}
 @media(max-width:760px){.shop-layout{flex-direction:column;}.sidebar{flex:none;width:100%;position:static;display:flex;flex-wrap:wrap;padding:8px;}.sidebar .sb-head{display:none;}.sidebar .sb-item{width:auto;padding:8px 14px;border-radius:8px;}.sidebar .sb-item.active{border-left:none;background:var(--accent-soft);}}
 .points-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--border);border-radius:20px;background:var(--card);cursor:pointer;font-size:13px;font-weight:600;color:var(--warn);}
@@ -87,16 +92,19 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 .load-spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .empty-hint{color:var(--text-secondary);font-size:14px;padding:16px 0;text-align:center;}
-/* 商品网格（紧凑） */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;}
-.item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 12px 14px;display:flex;flex-direction:column;gap:5px;box-shadow:var(--shadow);transition:border-color .15s;}
+/* 商品网格（一行 2 个大卡片） */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);transition:border-color .15s;}
 .item:hover{border-color:var(--accent);}
-.item .ic{width:52px;height:52px;object-fit:contain;margin:2px auto 4px;image-rendering:pixelated;}
-.item .nm{font-weight:700;text-align:center;line-height:1.3;color:var(--text);font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.item .ds{font-size:12px;color:var(--text-secondary);text-align:center;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:0;}
-.item .pr{text-align:center;color:var(--warn);font-weight:700;font-size:14px;}
-.item .quota{text-align:center;font-size:11px;color:var(--text-secondary);min-height:14px;line-height:1.35;}
+.item .ic{width:68px;height:68px;object-fit:contain;flex:none;image-rendering:pixelated;}
+.item .info{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+.item .nm{font-weight:700;color:var(--text);font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+.item .ds{font-size:12px;color:var(--text-secondary);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.item .pr{color:var(--warn);font-weight:700;font-size:15px;}
+.item .quota{font-size:11px;color:var(--text-secondary);line-height:1.35;}
 .item .quota.soldout{color:var(--danger);}
+.item .btns{flex:none;display:flex;flex-direction:column;gap:6px;width:88px;}
+.item .btns .btn{width:100%;}
 .btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:13px;cursor:pointer;font-weight:600;transition:all .15s;}
 .btn:hover{border-color:var(--accent);color:var(--primary);}
 .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff;width:100%;}
@@ -163,6 +171,7 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 </style>
 </head>
 <body>
+<div class="boot-load" id="bootLoad"><div class="bl-sp"></div><div class="bl-t">加载中…</div></div>
 <header class="site-header">
   <div class="container header-inner">
     <div class="logo"><img src="https://theslowtide.pages.dev/logo.jpg" alt="The Slow Tide" class="logo-img"> The Slow Tide</div>
@@ -172,12 +181,12 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
       <a class="nav-link" href="index.html#feed">动态</a>
       <a class="nav-link" href="index.html#vote">投票</a>
       <a class="nav-link" href="tool.html">便捷工具</a>
-      <a class="nav-link" href="index.html#tools">服务器工具</a>
       <a class="nav-link active" href="shop.html">积分商店</a>
-      <a class="nav-link" href="index.html#rule">玩家公约</a>
       <div class="nav-more" id="navMore">
         <button class="nav-link" id="navMoreBtn">更多<span class="more-caret">&#9662;</span></button>
         <div class="more-menu" id="moreMenu">
+          <a class="nav-link" href="index.html#tools">服务器工具</a>
+          <a class="nav-link" href="index.html#rule">玩家公约</a>
           <a class="nav-link" href="index.html#event">赛事活动</a>
           <a class="nav-link" href="index.html#cdkey">兑换码</a>
           <a class="nav-link" href="index.html#sponsor">服务器赞助</a>
@@ -211,17 +220,11 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 </div>
 
 <div class="wrap" id="mainWrap" style="display:none;">
-  <div class="panel" style="display:flex;align-items:center;gap:10px;padding:12px 16px;">
-    <span style="font-size:13px;color:var(--text-secondary);">每日签到与投币入口：</span>
-    <a class="btn" href="profile.html">个人中心签到</a>
-    <span style="font-size:13px;color:var(--text-secondary);">投币请直接在帖子卡片上操作</span>
-    <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);" id="hudState"></span>
-  </div>
   <div class="shop-layout">
     <div class="sidebar" id="catSide"><div class="sb-head">商品分类</div><div class="load-box"><span class="load-spinner"></span></div></div>
     <div class="main">
       <div class="section-title">商品兑换</div>
-      <div id="shopGrid"><div class="skel"><div class="sk"><div class="sk-i sk-shimmer"></div><div class="sk-l sk-shimmer" style="width:82%;"></div><div class="sk-l sk-shimmer" style="width:64%;"></div><div class="sk-l sk-shimmer" style="width:44%;margin-bottom:12px;"></div></div><div class="sk"><div class="sk-i sk-shimmer"></div><div class="sk-l sk-shimmer" style="width:82%;"></div><div class="sk-l sk-shimmer" style="width:64%;"></div><div class="sk-l sk-shimmer" style="width:44%;margin-bottom:12px;"></div></div><div class="sk"><div class="sk-i sk-shimmer"></div><div class="sk-l sk-shimmer" style="width:82%;"></div><div class="sk-l sk-shimmer" style="width:64%;"></div><div class="sk-l sk-shimmer" style="width:44%;margin-bottom:12px;"></div></div><div class="sk"><div class="sk-i sk-shimmer"></div><div class="sk-l sk-shimmer" style="width:82%;"></div><div class="sk-l sk-shimmer" style="width:64%;"></div><div class="sk-l sk-shimmer" style="width:44%;margin-bottom:12px;"></div></div><div class="sk"><div class="sk-i sk-shimmer"></div><div class="sk-l sk-shimmer" style="width:82%;"></div><div class="sk-l sk-shimmer" style="width:64%;"></div><div class="sk-l sk-shimmer" style="width:44%;margin-bottom:12px;"></div></div><div class="sk"><div class="sk-i sk-shimmer"></div><div class="sk-l sk-shimmer" style="width:82%;"></div><div class="sk-l sk-shimmer" style="width:64%;"></div><div class="sk-l sk-shimmer" style="width:44%;margin-bottom:12px;"></div></div></div></div>
+      <div id="shopGrid"><div class="skel"><div class="sk"><div class="sk-i sk-shimmer"></div><div class="sk-l sk-shimmer" style="flex:1;align-self:center;"></div><div class="sk-l sk-shimmer" style="width:72px;"></div></div><div class="sk"><div class="sk-i sk-shimmer"></div><div class="sk-l sk-shimmer" style="flex:1;align-self:center;"></div><div class="sk-l sk-shimmer" style="width:72px;"></div></div></div></div>
     </div>
   </div>
 </div>
@@ -410,6 +413,7 @@ function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,
 function pTime(t){ if(!t) return ''; return String(t).replace('T',' ').slice(0,16); }
 function fmt(n){ return Number(n||0).toLocaleString('zh-CN'); }
 function toast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._tm); t._tm=setTimeout(function(){ t.classList.remove('show'); },2200); }
+function hideBoot(){ var b=document.getElementById('bootLoad'); if(b) b.classList.add('hide'); }
 function api(path,opt){ return fetch(API+path,opt).then(function(r){ return r.json().catch(function(){ return {}; }); }); }
 function postJson(path,body){ return api(path,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body||{})}); }
 function closeMask(id){ document.getElementById(id).classList.remove('show'); }
@@ -422,16 +426,17 @@ function loadAll(){
   var itP=api('/shop/items',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).catch(function(){return null;});
   Promise.all([meP,stP,itP]).then(function(res){
     var d=res[0];
+    hideBoot();
     if(!(d&&d.ok)){ document.getElementById('gateWrap').style.display='block'; return; }
     myName=d.nickname||email.split('@')[0];
     document.getElementById('mainWrap').style.display='block';
     var nb=document.getElementById('navLoginBtn');
     nb.textContent=myName; nb.href='profile.html'; nb.title=myName;
     var st=res[1];
-    if(st&&st.ok){ myPoints=st.points; document.getElementById('ptsNum').textContent=fmt(st.points); document.getElementById('hudState').textContent='连续签到 '+st.streak+' 天'; }
+    if(st&&st.ok){ myPoints=st.points; document.getElementById('ptsNum').textContent=fmt(st.points); }
     var it=res[2];
     if(it&&it.ok){ ALL_ITEMS=(it.items||[]).filter(function(x){ return x.active!==0; }); renderSide(); renderItems(); }
-  }).catch(function(){ document.getElementById('gateWrap').style.display='block'; });
+  }).catch(function(){ hideBoot(); document.getElementById('gateWrap').style.display='block'; });
 }
 function renderSide(){
   var cats=['全部'];
@@ -456,7 +461,7 @@ function renderItems(){
     if(it.stock!=null&&it.stock>=0) quota+=(quota?'<br>':'')+'库存余 '+it.stock+'';
     if(it.type==='coin'&&it.coin_total>=0) quota+='<br>已累计兑换 '+fmt(it.coin_total)+' / 200000 金币';
     var soldout=it.bought===0;
-    return '<div class="item"><img class="ic" src="'+(it.icon?ICON_BASE+it.icon:'')+'" alt="" onerror="this.style.visibility=\'hidden\'"><div class="nm">'+esc(it.name)+'</div><div class="ds">'+esc(it.desc||'')+'</div><div class="pr">'+fmt(it.price)+' 积分</div><div class="quota'+(soldout?' soldout':'')+'">'+quota+'</div><div style="display:flex;gap:6px;margin-top:2px;"><button class="btn sm" style="flex:1;" onclick="addCart('+it.id+')" '+(soldout?'disabled':'')+'>加购</button><button class="btn sm primary" style="flex:1;" onclick="buyItem('+it.id+')" '+(soldout?'disabled':'')+'>兑换</button></div></div>';
+    return '<div class="item"><img class="ic" src="'+(it.icon?ICON_BASE+it.icon:'')+'" alt="" onerror="this.style.visibility=\'hidden\'"><div class="info"><div class="nm">'+esc(it.name)+'</div><div class="ds">'+esc(it.desc||'')+'</div><div class="pr">'+fmt(it.price)+' 积分</div><div class="quota'+(soldout?' soldout':'')+'">'+quota+'</div></div><div class="btns"><button class="btn sm" onclick="addCart('+it.id+')" '+(soldout?'disabled':'')+'>加购</button><button class="btn sm primary" onclick="buyItem('+it.id+')" '+(soldout?'disabled':'')+'>兑换</button></div></div>';
   }).join('');
 }
 function buyItem(id){
@@ -666,7 +671,7 @@ themeToggle.onclick=function(){ var cur=document.documentElement.getAttribute('d
 var navMoreBtn=document.getElementById('navMoreBtn');
 navMoreBtn.onclick=function(e){ e.stopPropagation(); document.getElementById('navMore').classList.toggle('open'); };
 document.addEventListener('click',function(){ document.getElementById('navMore').classList.remove('open'); });
-if(!token){ document.getElementById('gateWrap').style.display='block'; }
+if(!token){ hideBoot(); document.getElementById('gateWrap').style.display='block'; }
 else loadAll();
 api('/shop/items',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(d){
   var sel=document.getElementById('cdItemSel');

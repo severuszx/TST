@@ -122,6 +122,11 @@ border:none;color:#fff;font-weight:600;
 /* 加载占位（转圈 + 文字）*/
 .load-box{display:flex;align-items:center;justify-content:center;gap:10px;padding:28px 0;color:var(--text-secondary);font-size:14px;}
 .load-spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:loadspin .8s linear infinite;flex-shrink:0;}
+/* 全页加载指示 */
+.boot-load{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:300;transition:opacity .3s;}
+.boot-load.hide{opacity:0;pointer-events:none;}
+.boot-load .bl-sp{width:42px;height:42px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:loadspin .8s linear infinite;}
+.boot-load .bl-t{font-size:14px;color:var(--text-secondary);letter-spacing:2px;}
 .load-text{white-space:nowrap;}
 @keyframes loadspin{to{transform:rotate(360deg);}}
 .mine-tab.active{background:var(--accent-soft);color:var(--accent) !important;}
@@ -1056,6 +1061,7 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 </style>
 <style>/* ===== 移动端适配（The Slow Tide） ===== */@media(max-width:720px){body{padding:10px 12px 24px;}header,nav,.topbar,.nav-bar{flex-wrap:wrap;overflow-x:auto;gap:6px;}.container,.wrap,.main-box,.page-body,.box{width:100%;padding:0;box-sizing:border-box;}textarea,input[type=text],input[type=number],input[type=password],input[type=search],select{font-size:16px;max-width:100%;box-sizing:border-box;}button,.btn,.tool-btn{font-size:14px;max-width:100%;}pre,.json-output,.out-box{overflow-x:auto;max-width:100%;}table{display:block;overflow-x:auto;white-space:nowrap;}img{max-width:100%;height:auto;}.grid,.compiler-grid,.team-grid{grid-template-columns:1fr;}}</style></head>
 <body>
+<div class="boot-load" id="bootLoad"><div class="bl-sp"></div><div class="bl-t">加载中…</div></div>
 
 <header class="site-header">
 <div class="container header-inner">
@@ -1535,10 +1541,12 @@ if($('#openQQGroup')) $('#openQQGroup').onclick=()=>{
 // 数据加载（公开 API）
 // ============================================================
 
+function hideBoot(){ var b=document.getElementById('bootLoad'); if(b) b.classList.add('hide'); }
 async function loadData(){
   try{
     const r=await fetch('/api/data');
     const d=await r.json();
+    hideBoot();
     if(d.ok){
     SITE_DATA=d;
     // 提取服务器状态（隐藏系统条目）
@@ -1554,6 +1562,7 @@ async function loadData(){
       renderAll();
     }
   }catch(e){
+    hideBoot();
     var nlEl = document.getElementById('noticeList');
     if (nlEl) { nlEl.innerHTML='<div class="empty-hint">数据加载失败，请刷新重试</div>'; }
     if (typeof showToast === 'function') { showToast('数据加载失败，请刷新重试'); }
