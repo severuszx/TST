@@ -9342,7 +9342,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
       });
       const cnt=document.getElementById('poCount'); if(cnt) cnt.textContent='共 '+list.length+' 条帖子';
       if(!list.length){ box.innerHTML='<p class="post-msg" style="padding:10px 0;">还没有帖子</p>'; return; }
-      box.innerHTML=list.map(function(p){
+      function buildPostCard(p){
         const tags=p.tags?'<span class="post-tags">'+esc(p.tags)+'</span>':'';
         const pin=p.pinned?'<span class="post-pin">置顶</span>':'';
         const off=p.official?'<span class="post-badge" title="官方认证">✓</span>':'';
@@ -9378,12 +9378,17 @@ try{ eval('const __t=()=>1;'); }catch(e){
             '<div class="post-cm" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"></div>';
         }
         return body+'</div>';
-      }).join('');
+      }
+      var __more=list.length>10;
+      var __lst=__more?list.slice(0,10):list;
+      box.innerHTML=__lst.map(buildPostCard).join('')+(__more?'<button class="btn" id="poMoreBtn" style="margin:12px auto;display:block;max-width:300px;">加载更多 · 还剩 '+(list.length-10)+' 条</button>':'');
       box.querySelectorAll('[data-act="like"]').forEach(b=>{ b.onclick=function(){ doLike(b); }; });
       box.querySelectorAll('[data-act="cm"]').forEach(b=>{ b.onclick=function(){ toggleCm(b); }; });
       box.querySelectorAll('[data-act="fav"]').forEach(b=>{ b.onclick=function(){ doFav(b); }; });
       box.querySelectorAll('[data-act="del"]').forEach(b=>{ b.onclick=function(){ doDel(b); }; });
       box.querySelectorAll('[data-act="coin"]').forEach(b=>{ b.onclick=function(){ doCoin(b); }; });
+      var __pm=document.getElementById('poMoreBtn');
+      if(__pm){ __pm.onclick=function(){ __pm.remove(); box.insertAdjacentHTML('beforeend', list.slice(10).map(buildPostCard).join('')); box.querySelectorAll('[data-act="like"]').forEach(b=>{ b.onclick=function(){ doLike(b); }; }); box.querySelectorAll('[data-act="cm"]').forEach(b=>{ b.onclick=function(){ toggleCm(b); }; }); box.querySelectorAll('[data-act="fav"]').forEach(b=>{ b.onclick=function(){ doFav(b); }; }); box.querySelectorAll('[data-act="del"]').forEach(b=>{ b.onclick=function(){ doDel(b); }; }); box.querySelectorAll('[data-act="coin"]').forEach(b=>{ b.onclick=function(){ doCoin(b); }; }); }; }
     }catch(e){ box.innerHTML='<p class="post-msg" style="padding:10px 0;color:var(--danger);">加载失败，请稍后重试</p>'; }
   }
   async function doLike(btn){
