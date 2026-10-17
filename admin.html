@@ -1072,6 +1072,18 @@ async function usersApi(action,data){
     return null;
   }catch(e){hideLoad();showToast('网络错误，请重试');return null;}
 }
+async function adminUsersApi(action,data){
+  const tok=getTok(); if(!tok){showToast('请先登录官网账号');return null;}
+  showLoad(15000);
+  try{
+    const r=await fetch(FK+'/admin-users',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(Object.assign({action},data||{}))});
+    const d=await r.json();
+    hideLoad();
+    if(d&&d.ok) return d;
+    showToast(d&&d.msg?d.msg:(d&&d.error?('操作失败：'+d.error):'操作失败'));
+    return null;
+  }catch(e){hideLoad();showToast('网络错误，请重试');return null;}
+}
 async function postsApi(action,data){
   const tok=getTok(); if(!tok){showToast('请先登录官网账号');return null;}
   showLoad(15000);
@@ -1184,17 +1196,21 @@ $('#spuBtn').onclick=async()=>{ const email=$('#spuEmail').value.trim(); const d
 // ===== 玩家管理 =====
 async function renderUsers(q){
   $('#usrList').innerHTML='<div class="load-box"><span class="load-spinner"></span><span>加载中…</span></div>';
-  const d=await usersApi('list',{q:q||''});
+  const d=await adminUsersApi('list',{q:q||''});
   if(!d){ $('#usrList').innerHTML=''; return; }
   $('#usrList').innerHTML=(d.users||[]).map(u=>{
     const al=u.admin_level||0;
     const tag=al>=9?'<span style="color:#f59e0b;font-size:12px;font-weight:700;">站长</span>':(al>=1?'<span style="color:#2563eb;font-size:12px;font-weight:700;">管理员</span>':'');
     const ownerBtn=(window.__IS_OWNER&&al<9)?'<button class="btn sm" onclick="userSetAdmin(\''+esc(u.email).replace(/'/g,"\\'")+'\','+(al>=1?0:1)+')">'+(al>=1?'取消管理员':'设为管理员')+'</button>':'';
+    const lastLog=u.last_login?('<span style="font-size:12px;color:var(--text-secondary);"> · 最后登录 '+esc(String(u.last_login).slice(0,16))+'</span>'):'';
+    const gameTxt=(u.game_uid||u.game_name)?(' · 游戏内 <b style="color:var(--accent);">'+esc(u.game_uid||'-')+'</b>'+(u.game_name?' ('+esc(u.game_name)+')':'')):'';
     return '<div class="card" style="padding:10px 14px;margin-bottom:8px;">'+
       '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'+
         (u.avatar?'<img src="'+esc(u.avatar)+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="">':'<div style="width:36px;height:36px;border-radius:50%;background:var(--hover);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--text-secondary);">'+esc((u.nickname||u.email||'?').slice(0,1).toUpperCase())+'</div>')+
         '<div style="flex:1;min-width:130px;"><b>'+esc(u.nickname||'未设置昵称')+'</b> '+tag+(u.banned?'<span style="color:#ef4444;font-size:12px;">已封禁</span>':'')+'<br>'+
-        '<span style="font-size:12px;color:var(--text-secondary);">'+esc(u.email)+' · UID:'+esc(u.uid||'-')+' · 注册 '+esc((u.created_at||'').slice(0,10))+'</span></div>'+
+        '<span style="font-size:12px;color:var(--text-secondary);">'+esc(u.email)+' · 官网UID:'+esc(u.uid||'-')+gameTxt+' · 注册 '+esc((u.created_at||'').slice(0,10))+lastLog+'</span>'+
+        (u.note?'<br><span style="font-size:12px;color:#a16207;">备注：'+esc(u.note)+'</span>':'')+
+        '</div>'+
         '<div style="font-weight:700;color:var(--warn);">'+u.points+' 积分</div>'+
         '<div style="display:flex;gap:6px;flex-wrap:wrap;">'+
           ownerBtn+
@@ -1202,6 +1218,10 @@ async function renderUsers(q){
           '<button class="btn sm" onclick="userPoints(\''+esc(u.email).replace(/'/g,"\\'")+'\',-100)">-100</button>'+
           '<button class="btn sm" onclick="userSetPts(\''+esc(u.email).replace(/'/g,"\\'")+'\')">设积分</button>'+
           '<button class="btn sm" onclick="userRename(\''+esc(u.email).replace(/'/g,"\\'")+'\')">改昵称</button>'+
+          '<button class="btn sm" onclick="userResetAvatar(\''+esc(u.email).replace(/'/g,"\\'")+'\')">重置头像</button>'+
+          '<button class="btn sm" onclick="userSetGame(\''+esc(u.email).replace(/'/g,"\\'")+'\',\''+esc(u.game_uid||'').replace(/'/g,"\\'")+'\',\''+esc(u.game_name||'').replace(/'/g,"\\'")+'\')">游戏内UID</button>'+
+          '<button class="btn sm" onclick="userSetNote(\''+esc(u.email).replace(/'/g,"\\'")+'\')">备注</button>'+
+          '<button class="btn sm" onclick="userLog(\''+esc(u.email).replace(/'/g,"\\'")+'\')">积分流水</button>'+
           '<button class="btn sm" onclick="userBan(\''+esc(u.email).replace(/'/g,"\\'")+'\','+(u.banned?0:1)+')">'+(u.banned?'解封':'封禁')+'</button>'+
           '<button class="btn sm" style="color:#ef4444;" onclick="userDelete(\''+esc(u.email).replace(/'/g,"\\'")+'\')">删除账号</button>'+
         '</div>'+
@@ -1246,6 +1266,10 @@ async function userSetAdmin(email,level){
 async function userPoints(email,delta){ const d=await usersApi('points',{email,delta,reason:'admin'}); if(d){ showToast('已操作，当前积分 '+d.points); renderUsers($('#usrQ').value.trim()); } }
 async function userSetPts(email){ const v=prompt('设置 '+email+' 的积分数值（直接设定，不是加减）：','100'); if(v===null) return; const n=Number(v); if(isNaN(n)||n<0){ showToast('请输入不小于 0 的整数'); return; } const d=await usersApi('set_points',{email,points:n}); if(d){ showToast('已设为 '+d.points+' 积分'); renderUsers($('#usrQ').value.trim()); } }
 async function userRename(email){ const v=prompt('修改 '+email+' 的昵称（处理违规昵称）：',''); if(v===null) return; const n=v.trim().slice(0,16); if(!n){ showToast('昵称不能为空'); return; } const d=await usersApi('rename',{email,nickname:n}); if(d){ showToast('已修改昵称'); renderUsers($('#usrQ').value.trim()); } }
+async function userResetAvatar(email){ if(!confirm('确定重置 '+email+' 的头像（违规头像恢复默认）？')) return; const d=await adminUsersApi('reset_avatar',{email}); if(d){ showToast('头像已重置'); renderUsers($('#usrQ').value.trim()); } }
+async function userSetGame(email,curUid,curName){ const v=prompt('设置 '+email+' 的游戏内 UID（玩家在 MC 服务器里的编号）\n当前：'+(curUid||'未设置')+'\n\n格式建议：UID|游戏名，例如 1229000|SeverusZx',''+(curUid||'')+'|'+(curName||'')); if(v===null) return; const s=v.trim(); if(!s){ showToast('输入不能为空'); return; } const sep=s.lastIndexOf('|'); const gUid=sep>=0?s.slice(0,sep).trim():s.trim(); const gName=sep>=0?s.slice(sep+1).trim():''; const d=await adminUsersApi('set_game',{email,game_uid:gUid,game_name:gName}); if(d){ showToast('游戏内信息已更新：'+gUid+(gName?' ('+gName+')':'')); renderUsers($('#usrQ').value.trim()); } }
+async function userSetNote(email){ const v=prompt('为 '+email+' 添加管理员备注（内部记录，玩家不可见）：',''); if(v===null) return; const d=await adminUsersApi('set_note',{email,note:v.trim()}); if(d){ showToast('备注已保存'); renderUsers($('#usrQ').value.trim()); } }
+async function userLog(email){ const d=await adminUsersApi('log',{email}); if(!d) return; const rows=d.rows||[]; if(!rows.length){ showToast('该玩家暂无积分流水'); return; } const body=rows.map(function(r){ return (r.created_at||'').slice(0,16)+'  '+(r.delta>=0?'+':'')+r.delta+'  '+(r.reason||'')+(r.ref?' ['+r.ref+']':''); }).join('\n'); const m=document.createElement('div'); m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99999;display:flex;align-items:center;justify-content:center;'; m.innerHTML='<div style="background:var(--card,#fff);border-radius:14px;padding:20px;max-width:520px;width:90%;max-height:70vh;display:flex;flex-direction:column;"><div style="font-weight:700;margin-bottom:10px;">'+esc(email)+' 的积分流水（最近 '+rows.length+' 条）</div><pre style="flex:1;overflow:auto;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-all;margin:0;">'+esc(body)+'</pre><button class="btn" style="margin-top:12px;align-self:flex-end;" onclick="this.closest(\'div[style*="position:fixed"]\').remove()">关闭</button></div>'; document.body.appendChild(m); }
 async function userBan(email,ban){ if(!confirm((ban?'确定封禁 ':'确定解封 ')+email+'？')) return; const d=await usersApi('ban',{email,ban:ban?1:0}); if(d){ showToast('已'+(ban?'封禁':'解封')); renderUsers($('#usrQ').value.trim()); } }
 async function userDelete(email){ if(!confirm('确定永久删除 '+email+' 及其全部帖子/评论/积分记录？此操作不可撤销！')) return; if(!confirm('再次确认：删除 '+email+'？')) return; const d=await usersApi('delete',{email}); if(d){ showToast('已删除该账号'); renderUsers($('#usrQ').value.trim()); } }
 $('#usrSearchBtn').onclick=()=>{ renderUsers($('#usrQ').value.trim()); };
