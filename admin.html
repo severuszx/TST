@@ -792,6 +792,19 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
   .admin-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:6px;}
   .admin-tabs::-webkit-scrollbar{display:none;}
   .admin-tabs .admin-tab{flex-shrink:0;white-space:nowrap;}
+  /* 手机专属排版（二改） */
+  body{padding:8px 12px 28px;}
+  .wrap,.container{width:100%;padding:0;box-sizing:border-box;}
+  .admin-pane .card,.admin-pane .panel{border-radius:14px;padding:14px;}
+  .admin-list-item{flex-direction:column;gap:8px;}
+  .admin-list-item .ops{flex-wrap:wrap;width:100%;}
+  .admin-list-item .ops .btn{flex:1;min-height:36px;font-size:13px;}
+  .form-row input,.form-row textarea,.form-row select{min-height:42px;font-size:16px;}
+  .form-row textarea{min-height:90px;}
+  .btn{min-height:36px;}
+  table,table.tbl{display:block;overflow-x:auto;white-space:nowrap;}
+  .header-inner{flex-wrap:wrap;gap:6px;}
+  .admin-pane{overflow-x:visible;}
 }
 </style>
 </head>
