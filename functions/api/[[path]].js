@@ -194,12 +194,29 @@ export async function onRequest(context) {
       } catch (e) { /* KV 不可用则回源 */ }
     }
     const upstream = await proxyFetch(DATA_ORIGIN + '/api/data' + url.search, request);
+    // 瘦身：剥离动态内嵌 base64 大图（如 1MB 截图），单条内容截断，避免 1.9MB 拖垮主线程
+    let slimText = null;
+    try {
+      const raw = await upstream.clone().text();
+      const obj = JSON.parse(raw);
+      if (obj && Array.isArray(obj.feeds)) {
+        obj.feeds = obj.feeds.map(function (f) {
+          if (!f) return f;
+          var c = String(f.content || '');
+          c = c.replace(/<img[^>]*src=["']data:image[^"']*["'][^>]*>/gi, '');
+          c = c.replace(/data:image\\?\s*\/?[^"'\s,;]{10,}/gi, '');
+          if (c.length > 6000) c = c.slice(0, 6000);
+          f.content = c;
+          return f;
+        });
+        slimText = JSON.stringify(obj);
+      }
+    } catch (e) { /* 解析失败则原样返回 */ }
+    if (slimText === null) slimText = await upstream.text();
     if (kv) {
-      try { await kv.put('site_data_v1', await upstream.clone().text(), { expirationTtl: 300 }); } catch (e) { /* 写缓存失败不影响响应 */ }
+      try { await kv.put('site_data_v1', slimText, { expirationTtl: 300 }); } catch (e) { /* 写缓存失败不影响响应 */ }
     }
-    upstream.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
-    upstream.headers.set('CDN-Cache-Control', 'public, max-age=300');
-    return upstream;
+    return new Response(slimText, { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev', 'Cache-Control': 'public, max-age=300, s-maxage=300', 'CDN-Cache-Control': 'public, max-age=300' } });
   }
   if (path === '/api/admin' || path.startsWith('/api/admin/')) {
     return proxyFetch(DATA_ORIGIN + '/api/admin' + url.search, request);
