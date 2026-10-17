@@ -990,7 +990,7 @@ function themeState(){const v=localStorage.getItem('tst-theme');return(v==='dark
 function applyTheme(){document.documentElement.setAttribute('data-theme',themeState());}
 $('#themeToggle').onclick=()=>{localStorage.setItem('tst-theme',themeState()==='dark'?'light':'dark');applyTheme();};
 let SITE_DATA={announcements:[],feeds:[],sponsors:[],replays:[],images:[]};
-let ADMIN_TOKEN=sessionStorage.getItem('tst_admin_token')||'';
+let ADMIN_TOKEN=localStorage.getItem('tst_token')||'';
 async function loadData(){
 let lastErr=null;
 for(let attempt=0;attempt<3;attempt++){
@@ -1171,7 +1171,7 @@ async function renderUsers(q){
     const ownerBtn=(window.__IS_OWNER&&al<9)?'<button class="btn sm" onclick="userSetAdmin(\''+esc(u.email).replace(/'/g,"\\'")+'\','+(al>=1?0:1)+')">'+(al>=1?'取消管理员':'设为管理员')+'</button>':'';
     return '<div class="card" style="padding:10px 14px;margin-bottom:8px;">'+
       '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'+
-        (u.avatar?'<img src="'+esc(u.avatar)+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="">':'<div style="width:36px;height:36px;border-radius:50%;background:var(--hover);display:flex;align-items:center;justify-content:center;">👤</div>')+
+        (u.avatar?'<img src="'+esc(u.avatar)+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="">':'<div style="width:36px;height:36px;border-radius:50%;background:var(--hover);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--text-secondary);">'+esc((u.nickname||u.email||'?').slice(0,1).toUpperCase())+'</div>')+
         '<div style="flex:1;min-width:130px;"><b>'+esc(u.nickname||'未设置昵称')+'</b> '+tag+(u.banned?'<span style="color:#ef4444;font-size:12px;">已封禁</span>':'')+'<br>'+
         '<span style="font-size:12px;color:var(--text-secondary);">'+esc(u.email)+' · UID:'+esc(u.uid||'-')+' · 注册 '+esc((u.created_at||'').slice(0,10))+'</span></div>'+
         '<div style="font-weight:700;color:var(--warn);">'+u.points+' 积分</div>'+
@@ -1179,6 +1179,8 @@ async function renderUsers(q){
           ownerBtn+
           '<button class="btn sm" onclick="userPoints(\''+esc(u.email).replace(/'/g,"\\'")+'\',100)">+100</button>'+
           '<button class="btn sm" onclick="userPoints(\''+esc(u.email).replace(/'/g,"\\'")+'\',-100)">-100</button>'+
+          '<button class="btn sm" onclick="userSetPts(\''+esc(u.email).replace(/'/g,"\\'")+'\')">设积分</button>'+
+          '<button class="btn sm" onclick="userRename(\''+esc(u.email).replace(/'/g,"\\'")+'\')">改昵称</button>'+
           '<button class="btn sm" onclick="userBan(\''+esc(u.email).replace(/'/g,"\\'")+'\','+(u.banned?0:1)+')">'+(u.banned?'解封':'封禁')+'</button>'+
           '<button class="btn sm" style="color:#ef4444;" onclick="userDelete(\''+esc(u.email).replace(/'/g,"\\'")+'\')">删除账号</button>'+
         '</div>'+
@@ -1221,6 +1223,8 @@ async function userSetAdmin(email,level){
   if(d){ showToast('权限已更新'); loadAdmins(); loadUsers(); }
 }
 async function userPoints(email,delta){ const d=await usersApi('points',{email,delta,reason:'admin'}); if(d){ showToast('已操作，当前积分 '+d.points); renderUsers($('#usrQ').value.trim()); } }
+async function userSetPts(email){ const v=prompt('设置 '+email+' 的积分数值（直接设定，不是加减）：','100'); if(v===null) return; const n=Number(v); if(isNaN(n)||n<0){ showToast('请输入不小于 0 的整数'); return; } const d=await usersApi('set_points',{email,points:n}); if(d){ showToast('已设为 '+d.points+' 积分'); renderUsers($('#usrQ').value.trim()); } }
+async function userRename(email){ const v=prompt('修改 '+email+' 的昵称（处理违规昵称）：',''); if(v===null) return; const n=v.trim().slice(0,16); if(!n){ showToast('昵称不能为空'); return; } const d=await usersApi('rename',{email,nickname:n}); if(d){ showToast('已修改昵称'); renderUsers($('#usrQ').value.trim()); } }
 async function userBan(email,ban){ if(!confirm((ban?'确定封禁 ':'确定解封 ')+email+'？')) return; const d=await usersApi('ban',{email,ban:ban?1:0}); if(d){ showToast('已'+(ban?'封禁':'解封')); renderUsers($('#usrQ').value.trim()); } }
 async function userDelete(email){ if(!confirm('确定永久删除 '+email+' 及其全部帖子/评论/积分记录？此操作不可撤销！')) return; if(!confirm('再次确认：删除 '+email+'？')) return; const d=await usersApi('delete',{email}); if(d){ showToast('已删除该账号'); renderUsers($('#usrQ').value.trim()); } }
 $('#usrSearchBtn').onclick=()=>{ renderUsers($('#usrQ').value.trim()); };
