@@ -9651,7 +9651,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
     var logged=!!localStorage.getItem('tst_token');
     if(logged){
       if(p) p.style.display='none';
-      if(b){ b.style.display=''; b.textContent='我的'; b.href='profile.html'; }
+      if(b){ b.style.display=''; var uid=localStorage.getItem('tst_uid')||''; b.textContent=uid?'我的 '+uid:'我的'; b.href='profile.html'; }
     } else {
       if(p){ p.style.display=''; p.textContent='登录'; p.href='login.html'; }
       if(b) b.style.display='none';
