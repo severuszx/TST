@@ -994,7 +994,7 @@ let ADMIN_TOKEN=sessionStorage.getItem('tst_admin_token')||'';
 async function loadData(){
 let lastErr=null;
 for(let attempt=0;attempt<3;attempt++){
-try{const r=await fetch('https://tst-server-site.pages.dev/api/data');
+try{const r=await fetch('/api/data');
 if(r.status===503||r.status===502||r.status===504){lastErr='service_unavailable';if(attempt<2){await new Promise(res=>setTimeout(res,2000));continue;}break;}
 const d=await r.json();
 if(d&&d.ok){SITE_DATA={announcements:d.announcements||[],feeds:d.feeds||[],sponsors:d.sponsors||[],replays:d.replays||[],images:d.images||[]};try{localStorage.setItem('tst_site_cache',JSON.stringify(SITE_DATA));}catch(e){}return;}
@@ -1005,16 +1005,15 @@ try{const cached=localStorage.getItem('tst_site_cache');if(cached){const d=JSON.
 showToast(lastErr==='service_unavailable'?'数据服务暂时不可用，已显示缓存数据':'数据加载失败');
 }
 async function adminApi(action,data,extra){
-let r;
-try{r=await fetch('https://tst-server-site.pages.dev/api/admin',{method:'POST',
-headers:{'Content-Type':'application/json','Authorization':'Bearer '+ADMIN_TOKEN},
-body:JSON.stringify({action,data,...(extra||{})})});}catch(err){showToast('网络错误：数据服务暂时不可用，请稍后重试');return null;}
-if(r.status===503||r.status===502||r.status===504){showToast('数据服务暂时不可用，请稍后重试');return null;}
-let d;
-try{d=await r.json();}catch(err){showToast('服务响应异常，请重试');return null;}
-if(!d.ok&&r.status===401){ADMIN_TOKEN='';sessionStorage.removeItem('tst_admin_token');showToast('站点内容管理权限不足（该板块尚未接入官网登录，暂不可用）');return null;}
-if(!d.ok){showToast(d.error||d.msg||'操作失败，请重试');return null;}
-return d;
+  const tok=getTok(); if(!tok){ showToast('请先登录官网账号'); return null; }
+  let r;
+  try{r=await fetch('/api/dadmin',{method:'POST',
+  headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},
+  body:JSON.stringify({action,data,...(extra||{})})});}catch(err){showToast('网络错误：请稍后重试');return null;}
+  let d;
+  try{d=await r.json();}catch(err){showToast('服务响应异常，请重试');return null;}
+  if(!d.ok){showToast(d.error||d.msg||'操作失败，请重试');return null;}
+  return d;
 }
 $('#adminGoLogin').onclick=()=>{ location.href='login.html'; };
 function showAdminPanel(){$('#loginBox').style.display='none';$('#adminPanel').style.display='block';refreshLists();}
@@ -1291,9 +1290,9 @@ function renderReplays(){const list=SITE_DATA.replays||[];$('#rpList').innerHTML
 function renderImages(){const list=SITE_DATA.images||[];$('#imList').innerHTML='<div class="img-grid">'+list.map(im=>'<div class="img-item"><img src="'+esc(im.data)+'" alt=""><div class="im-name">'+esc(im.name||im.id)+'</div><div class="im-meta">'+esc(im.id)+'</div><div style="display:flex;gap:5px;"><button class="btn btn-sm" data-copy="img:'+esc(im.id)+'">复制引用</button><button class="btn btn-sm btn-danger" data-del-img="'+esc(im.id)+'">删除</button></div></div>').join('')+'</div>';}
 document.addEventListener('click',async e=>{
 const del=e.target.closest('[data-del]');
-if(del&&ADMIN_TOKEN){const kind=del.dataset.del,id=del.dataset.id;const action=kind==='announcement'||kind==='history'?'deleteAnnouncement':kind==='feed'?'deleteFeed':kind==='sponsor'?'deleteSponsor':'deleteReplay';if(!confirm('确定删除？'))return;const d=await adminApi(action,{id});if(d&&d.ok){if(d.announcements)SITE_DATA.announcements=d.announcements;if(d.feeds)SITE_DATA.feeds=d.feeds;if(d.sponsors)SITE_DATA.sponsors=d.sponsors;if(d.replays)SITE_DATA.replays=d.replays;showToast('已删除');refreshLists();}return;}
+if(del&&getTok()){const kind=del.dataset.del,id=del.dataset.id;const action=kind==='announcement'||kind==='history'?'deleteAnnouncement':kind==='feed'?'deleteFeed':kind==='sponsor'?'deleteSponsor':'deleteReplay';if(!confirm('确定删除？'))return;const d=await adminApi(action,{id});if(d&&d.ok){if(d.announcements)SITE_DATA.announcements=d.announcements;if(d.feeds)SITE_DATA.feeds=d.feeds;if(d.sponsors)SITE_DATA.sponsors=d.sponsors;if(d.replays)SITE_DATA.replays=d.replays;showToast('已删除');refreshLists();}return;}
 const delImg=e.target.closest('[data-del-img]');
-if(delImg&&ADMIN_TOKEN){if(!confirm('确定删除这张图片？'))return;const d=await adminApi('deleteImage',{id:delImg.dataset.delImg});if(d&&d.ok){SITE_DATA.images=d.images||[];showToast('图片已删除');renderImages();}return;}
+if(delImg&&getTok()){if(!confirm('确定删除这张图片？'))return;const d=await adminApi('deleteImage',{id:delImg.dataset.delImg});if(d&&d.ok){SITE_DATA.images=d.images||[];showToast('图片已删除');renderImages();}return;}
 const copy=e.target.closest('[data-copy]');
 if(copy){navigator.clipboard.writeText(copy.dataset.copy).then(()=>showToast('已复制: '+copy.dataset.copy));return;}
 });
