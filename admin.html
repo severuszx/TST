@@ -783,9 +783,9 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <div id="glbLoad" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;display:none;align-items:center;gap:10px;background:rgba(0,0,0,.6);border-radius:12px;padding:16px 22px;color:#fff;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);"><span style="width:26px;height:26px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:gspin .8s linear infinite;display:inline-block;"></span><span>处理中…</span></div>
 <style>@keyframes gspin{to{transform:rotate(360deg)}}button:active{transform:scale(.96);filter:brightness(.92)}</style>
 <script>
-function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);if(t>0)el._t=setTimeout(hideLoad,t);}
-function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);}}
-document.addEventListener('click',function(e){var b=e.target.closest('button');if(b)showLoad(900);});
+function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);clearTimeout(el._t2);if(t>0)el._t2=setTimeout(hideLoad,t);}
+function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);clearTimeout(el._t2);}}
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(b){var el=document.getElementById('glbLoad');if(el){clearTimeout(el._t);el._t=setTimeout(function(){el.style.display='flex';clearTimeout(el._t2);el._t2=setTimeout(hideLoad,2500);},350);}}});
 </script>
 <header class="site-header">
 <div class="container header-inner">
@@ -1015,38 +1015,46 @@ const FK='https://theslowtidefk.pages.dev/api';
 function getPw(){ return ($('#shopPwd').value||'').trim(); }
 async function shopApi(action,data){
   const pw=getPw(); if(!pw){showToast('请先输入管理员密码');return null;}
+  showLoad(15000);
   try{
     const r=await fetch(FK+'/shop/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action,pw},data||{}))});
     const d=await r.json();
+    hideLoad();
     if(d&&d.ok) return d;
     showToast(d&&d.msg?d.msg:(d&&d.error?('操作失败：'+d.error):'操作失败'));
     return null;
-  }catch(e){showToast('网络错误，请重试');return null;}
+  }catch(e){hideLoad();showToast('网络错误，请重试');return null;}
 }
 async function usersApi(action,data){
   const pw=getPw(); if(!pw){showToast('请先输入管理员密码');return null;}
+  showLoad(15000);
   try{
     const r=await fetch(FK+'/admin/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action,pw},data||{}))});
     const d=await r.json();
+    hideLoad();
     if(d&&d.ok) return d;
     showToast(d&&d.msg?d.msg:(d&&d.error?('操作失败：'+d.error):'操作失败'));
     return null;
-  }catch(e){showToast('网络错误，请重试');return null;}
+  }catch(e){hideLoad();showToast('网络错误，请重试');return null;}
 }
 async function postsApi(action,data){
   const pw=getPw(); if(!pw){showToast('请先输入管理员密码');return null;}
+  showLoad(15000);
   try{
     const r=await fetch(FK+'/posts/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action,pw},data||{}))});
     const d=await r.json();
+    hideLoad();
     if(d&&d.ok) return d;
     showToast(d&&d.msg?d.msg:(d&&d.error?('操作失败：'+d.error):'操作失败'));
     return null;
-  }catch(e){showToast('网络错误，请重试');return null;}
+  }catch(e){hideLoad();showToast('网络错误，请重试');return null;}
 }
 async function postsCreateApi(data){
+  showLoad(15000);
   try{
     const r=await fetch(FK+'/posts/admin_create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})});
     const d=await r.json();
+    hideLoad();
     if(d&&d.ok) return d;
     showToast(d&&d.msg?d.msg:(d&&d.error?('操作失败：'+d.error):'操作失败'));
     return null;

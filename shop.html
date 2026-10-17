@@ -174,9 +174,9 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 <div id="glbLoad" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;display:none;align-items:center;gap:10px;background:rgba(0,0,0,.6);border-radius:12px;padding:16px 22px;color:#fff;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);"><span style="width:26px;height:26px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:gspin .8s linear infinite;display:inline-block;"></span><span>处理中…</span></div>
 <style>@keyframes gspin{to{transform:rotate(360deg)}}button:active{transform:scale(.96);filter:brightness(.92)}</style>
 <script>
-function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);if(t>0)el._t=setTimeout(hideLoad,t);}
-function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);}}
-document.addEventListener('click',function(e){var b=e.target.closest('button');if(b)showLoad(900);});
+function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);clearTimeout(el._t2);if(t>0)el._t2=setTimeout(hideLoad,t);}
+function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);clearTimeout(el._t2);}}
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(b){var el=document.getElementById('glbLoad');if(el){clearTimeout(el._t);el._t=setTimeout(function(){el.style.display='flex';clearTimeout(el._t2);el._t2=setTimeout(hideLoad,2500);},350);}}});
 </script>
 <div class="boot-load" id="bootLoad"><div class="bl-sp"></div><div class="bl-t">加载中…</div></div>
 <header class="site-header">
@@ -391,8 +391,9 @@ function renderCart(){
 function checkout(){
   if(!cart.length){ toast('购物车是空的'); return; }
   var btn=document.getElementById('cartCheckout'); btn.disabled=true; btn.textContent='结算中…';
+  showLoad(15000);
   var total0=cartTotal(), out=[], idx=0, fail=false;
-  function finish(){ btn.disabled=false; btn.textContent='结算'; }
+  function finish(){ btn.disabled=false; btn.textContent='结算'; hideLoad(); }
   function buyOne(){
     if(fail||idx>=cart.length){
       if(out.length){
@@ -472,7 +473,9 @@ function renderItems(){
   }).join('');
 }
 function buyItem(id){
+  showLoad(12000);
   postJson('/shop/buy',{item_id:id}).then(function(d){
+    hideLoad();
     if(d&&d.ok){
       document.getElementById('buyBody').innerHTML='<div style="text-align:center;padding:10px 0;">已兑换 <b>'+esc(d.name)+'</b>，扣除 '+fmt(d.points)+' 积分<br><br><div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">兑换码（游戏内兑换用，仅可使用一次）：</div><div class="code" style="font-size:17px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;">'+esc(d.code||'无')+'</div></div>';
       document.getElementById('buyMask').classList.add('show');
@@ -483,7 +486,7 @@ function buyItem(id){
     else if(d&&d.error==='coin_total'){ toast(d.msg||'金币累计上限已达'); loadAll(); }
     else if(d&&d.error==='no_points'){ toast(d.msg||'积分不足'); }
     else toast((d&&d.msg)||'兑换失败');
-  }).catch(function(){ toast('网络异常，请稍后再试'); });
+  }).catch(function(){ hideLoad(); toast('网络异常，请稍后再试'); });
 }
 
 /* ===== 积分明细弹窗（含如何增加积分 + 赞助档位） ===== */

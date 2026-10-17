@@ -1064,9 +1064,9 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <div id="glbLoad" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;display:none;align-items:center;gap:10px;background:rgba(0,0,0,.6);border-radius:12px;padding:16px 22px;color:#fff;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);"><span style="width:26px;height:26px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:gspin .8s linear infinite;display:inline-block;"></span><span>处理中…</span></div>
 <style>@keyframes gspin{to{transform:rotate(360deg)}}button:active{transform:scale(.96);filter:brightness(.92)}</style>
 <script>
-function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);if(t>0)el._t=setTimeout(hideLoad,t);}
-function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);}}
-document.addEventListener('click',function(e){var b=e.target.closest('button');if(b)showLoad(900);});
+function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);clearTimeout(el._t2);if(t>0)el._t2=setTimeout(hideLoad,t);}
+function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);clearTimeout(el._t2);}}
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(b){var el=document.getElementById('glbLoad');if(el){clearTimeout(el._t);el._t=setTimeout(function(){el.style.display='flex';clearTimeout(el._t2);el._t2=setTimeout(hideLoad,2500);},350);}}});
 </script>
 <div class="boot-load" id="bootLoad"><div class="bl-sp"></div><div class="bl-t">加载中…</div></div>
 
@@ -2548,7 +2548,9 @@ function doCheckin(){
   if(!token){ showToast("请先登录"); return; }
   var btn = document.querySelector('[onclick="doCheckin()"]');
   if(btn){ btn.disabled=true; btn.textContent="处理中…"; }
+  showLoad(10000);
   fetch(AUTH+'/shop/checkin',{method:'POST',headers:{'Authorization':'Bearer '+token}}).then(function(r){return r.json();}).then(function(d){
+    hideLoad();
     if(btn){ btn.disabled=false; btn.textContent="点击签到"; }
     if(d&&d.ok){
       document.getElementById("checkinDays").textContent = d.streak;
@@ -2559,7 +2561,7 @@ function doCheckin(){
       if(d&&d.error==='already'){ setCheckinDone(true); showToast((d&&d.msg)||'今天已签到'); }
       else showToast((d&&d.msg)||'签到失败，请重试');
     }
-  }).catch(function(){ if(btn){ btn.disabled=false; btn.textContent="点击签到"; } showToast('网络错误，请重试'); });
+  }).catch(function(){ hideLoad(); if(btn){ btn.disabled=false; btn.textContent="点击签到"; } showToast('网络错误，请重试'); });
 }
 // 恢复签到状态（真实积分与连续天数）
 (function(){
@@ -3515,9 +3517,11 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     if(!nick){ msgEl.textContent='请输入昵称'; return; }
     var token=localStorage.getItem('tst_token')||'';
     saveBtn.disabled=true; saveBtn.textContent='保存中…';
+    showLoad(12000);
     var body={nickname:nick};
     if(newAvatar) body.avatar=newAvatar;
     fetch(AUTH+'/me',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(body)}).then(function(r){return r.json();}).then(function(d){
+      hideLoad();
       saveBtn.disabled=false; saveBtn.textContent='保存资料';
       if(d&&d.ok){ newAvatar=''; showToast(d.cost>0?('资料已保存，扣除 '+d.cost+' 积分'):'资料已保存'); refresh(); }
       else msgEl.textContent=(d&&d.msg)||'保存失败';
@@ -3537,7 +3541,9 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
       var msg=document.getElementById('lgBindMsg');
       if(!/^\d{7}$/.test(uid)||Number(uid)<1229000){ msg.textContent='UID 需为 7 位纯数字且不小于 1229000'; return; }
       bindBtn.disabled=true; bindBtn.textContent='绑定中…';
+      showLoad(12000);
       fetch(AUTH+'/bind-uid',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({uid:uid})}).then(function(r){return r.json();}).then(function(d){
+        hideLoad();
         bindBtn.disabled=false; bindBtn.textContent='绑定 UID';
         if(d&&d.ok){ localStorage.setItem('tst_uid',d.uid); showToast('UID 绑定成功'); refresh(); }
         else msg.textContent=(d&&d.msg)||'绑定失败';

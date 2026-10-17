@@ -3243,9 +3243,9 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <div id="glbLoad" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;display:none;align-items:center;gap:10px;background:rgba(0,0,0,.6);border-radius:12px;padding:16px 22px;color:#fff;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);"><span style="width:26px;height:26px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:gspin .8s linear infinite;display:inline-block;"></span><span>处理中…</span></div>
 <style>@keyframes gspin{to{transform:rotate(360deg)}}button:active{transform:scale(.96);filter:brightness(.92)}</style>
 <script>
-function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);if(t>0)el._t=setTimeout(hideLoad,t);}
-function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);}}
-document.addEventListener('click',function(e){var b=e.target.closest('button');if(b)showLoad(900);});
+function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);clearTimeout(el._t2);if(t>0)el._t2=setTimeout(hideLoad,t);}
+function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);clearTimeout(el._t2);}}
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(b){var el=document.getElementById('glbLoad');if(el){clearTimeout(el._t);el._t=setTimeout(function(){el.style.display='flex';clearTimeout(el._t2);el._t2=setTimeout(hideLoad,2500);},350);}}});
 </script>
 
 <script>
@@ -9395,13 +9395,15 @@ try{ eval('const __t=()=>1;'); }catch(e){
     const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
     const oldTxt=btn.textContent; const oldCol=btn.style.color;
     btn.style.color='var(--accent)';
+    showLoad(10000);
     try{
       const r=await fetch(POST_API+'/like',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({post_id:Number(pid),dev:pDev()})});
       const d=await r.json();
+      hideLoad();
       if(d&&d.ok){ btn.textContent='赞 '+d.likes; btn.style.color='var(--accent)'; }
       else if(d&&d.error==='already_liked'){ btn.style.color='var(--accent)'; showToast('你已经赞过这条帖子了'); }
       else { btn.textContent=oldTxt; btn.style.color=oldCol; showToast('点赞失败'); }
-    }catch(e){ btn.textContent=oldTxt; btn.style.color=oldCol; showToast('网络异常，请稍后再试'); }
+    }catch(e){ hideLoad(); btn.textContent=oldTxt; btn.style.color=oldCol; showToast('网络异常，请稍后再试'); }
   }
   async function doDel(btn){
     if(!confirm('确定删除这条帖子吗？删除后不可恢复。')) return;
@@ -9424,13 +9426,15 @@ try{ eval('const __t=()=>1;'); }catch(e){
     const n=Number(amt);
     if(!n||n<1||n>500){ showToast('投币金额需在 1~500 积分之间'); return; }
     btn.disabled=true;
+    showLoad(10000);
     try{
       const r=await fetch('https://theslowtidefk.pages.dev/api/shop/coin',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({post_id:Number(pid),amount:n})});
       const d=await r.json();
+      hideLoad();
       btn.disabled=false;
       if(d&&d.ok){ showToast('投币成功！作者获得 '+d.to_author+' 积分'); refreshPts(); }
       else showToast((d&&d.msg)||'投币失败');
-    }catch(e){ btn.disabled=false; showToast('网络异常，请稍后再试'); }
+    }catch(e){ hideLoad(); btn.disabled=false; showToast('网络异常，请稍后再试'); }
   }
   async function doFav(btn){
     const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
@@ -9441,12 +9445,14 @@ try{ eval('const __t=()=>1;'); }catch(e){
     // 乐观切换
     btn.textContent=wasFav?'♡ 收藏':'♥ 已收藏'; btn.style.color=wasFav?'':'#e11d48';
     const act=wasFav?'remove':'add';
+    showLoad(10000);
     try{
       const r=await fetch(POST_API+'/favorite',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({post_id:Number(pid),act:act})});
       const d=await r.json();
+      hideLoad();
       if(d&&d.ok){ showToast(d.favorited?'已收藏':'已取消收藏'); }
       else { btn.textContent=oldTxt; btn.style.color=oldCol; showToast((d&&d.msg)||'操作失败'); }
-    }catch(e){ btn.textContent=oldTxt; btn.style.color=oldCol; showToast('网络异常，请稍后再试'); }
+    }catch(e){ hideLoad(); btn.textContent=oldTxt; btn.style.color=oldCol; showToast('网络异常，请稍后再试'); }
   }
   async function toggleCm(btn){
     const card=btn.closest('.card'); const pid=card.getAttribute('data-pid');
@@ -9489,13 +9495,15 @@ try{ eval('const __t=()=>1;'); }catch(e){
     const tags=document.getElementById('poTags').value.trim();
     const msg=document.getElementById('poMsg');
     if(!content){ msg.textContent='请填写内容'; return; }
+    showLoad(15000);
     try{
       const r=await fetch(POST_API+'/create',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({content:content,tags:tags,dev:pDev(),image:poImgData||''})});
       const d=await r.json();
+      hideLoad();
       if(d&&d.ok){ msg.textContent='发布成功！'; document.getElementById('poContent').value=''; document.getElementById('poTags').value=''; poImgData=''; document.getElementById('poImgPrev').style.display='none'; document.getElementById('poImgView').src=''; document.getElementById('poImg').value=''; document.getElementById('poImgName').textContent=''; loadPosts(); }
       else if(d&&d.error==='login_required'){ showToast(d.msg||'请先登录后再发帖'); localStorage.removeItem('tst_token'); localStorage.removeItem('tst_email'); localStorage.removeItem('tst_uid'); location.href='login.html'; }
       else msg.textContent='发布失败：'+((d&&d.error)||'未知错误');
-    }catch(e){ msg.textContent='网络异常，请稍后重试'; }
+    }catch(e){ hideLoad(); msg.textContent='网络异常，请稍后重试'; }
   }
   function setPF(btn){
     document.querySelectorAll('#poFAll,#poFOfficial,#poFPlayer').forEach(function(x){x.classList.remove('active');});
