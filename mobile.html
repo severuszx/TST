@@ -1762,6 +1762,73 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 
 }
 
+/* ===== 手机专属排版（网站式二改：布局重排，非 PC 缩小） ===== */
+@media (max-width:820px){
+
+  .container{padding:0 14px;}
+  .header-inner{flex-wrap:nowrap;gap:6px;}
+  .logo{font-size:15px;gap:5px;white-space:nowrap;}
+  .logo-img{width:24px;height:24px;}
+  .time-badge{display:none;}
+  .main-nav{order:3;flex-basis:100%;padding:3px 0 5px;}
+  .nav-link{padding:8px 11px;font-size:13.5px;}
+  .header-right{gap:6px;}
+  .header-right .feedback-btn{padding:6px 10px;font-size:12px;}
+
+  /* 首屏轮播：大图全宽 */
+  .hero{padding:10px 0 2px;}
+  .hero-slider-wrap{border-radius:16px;overflow:hidden;}
+  .slide-item img{height:340px;}
+  .hero-slider{scroll-snap-type:x mandatory;}
+  .slide-item{scroll-snap-align:center;}
+
+  /* 首页介绍卡：2×2 布局 */
+  #home .card-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  #home .card{padding:14px 12px;border-radius:14px;min-height:108px;display:flex;flex-direction:column;}
+  #home .card h3{font-size:15px;margin-bottom:6px;}
+  #home .card .content{font-size:13px;line-height:1.55;color:var(--text-secondary);}
+
+  /* 服务器信息卡：竖排突出 */
+  .server-bar{padding:8px 0;}
+  .server-card{padding:16px;border-radius:16px;}
+  .server-card .item{justify-content:space-between;font-size:14px;padding:7px 0;border-bottom:1px dashed var(--border);}
+  .server-card .item:last-child{border-bottom:none;}
+  .server-card .label{font-size:12px;}
+  .server-card .val{font-weight:700;}
+
+  /* 区块标题 */
+  .section-title{font-size:18px;margin-bottom:10px;padding-left:0;}
+  .section-title::before{display:none;}
+
+  /* 公告 / 动态大卡片 */
+  #noticeList.card-grid{grid-template-columns:1fr;gap:12px;}
+  #noticeList .card{padding:16px;border-radius:16px;}
+  #noticeList .card h3{font-size:17px;line-height:1.45;}
+  #noticeList .card .content{font-size:14px;line-height:1.7;}
+  #feed .card{font-size:14px;line-height:1.65;border-radius:14px;}
+  .card .date{font-size:12.5px;}
+
+  /* 动态筛选栏 */
+  .feed-bar{gap:8px;margin:0 0 12px;padding:8px 0;}
+  .feed-bar-tab{padding:6px 12px;font-size:13.5px;}
+
+  /* 赞助卡单列 */
+  #sponsor .card-grid{grid-template-columns:1fr;gap:12px;}
+  #sponsor .card{padding:16px;border-radius:16px;}
+
+  /* 页脚单列 */
+  .footer-grid{grid-template-columns:1fr;gap:18px;padding:6px 0;}
+  .footer-col h4{margin-bottom:8px;}
+  .footer-bottom{flex-wrap:wrap;gap:6px;font-size:12px;line-height:1.8;}
+
+  /* 全局：卡片圆角 + 好点的按钮 */
+  .card{border-radius:14px;}
+  .search-row{gap:8px;}
+  .search-row input{height:40px;border-radius:12px;}
+  .search-row .btn{height:40px;border-radius:12px;padding:0 16px;}
+  .btn{min-height:38px;}
+}
+
 
 
 
