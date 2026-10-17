@@ -3240,6 +3240,7 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 </head>
 
 <body>
+<div id="dataTimeoutTip" style="position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:99999;display:none;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.35);" onclick="location.reload()">加载超时（超过30秒），点击此处刷新重试</div>
 <div id="glbLoad" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;display:none;align-items:center;gap:10px;background:rgba(0,0,0,.6);border-radius:12px;padding:16px 22px;color:#fff;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);"><span style="width:26px;height:26px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:gspin .8s linear infinite;display:inline-block;"></span><span>处理中…</span></div>
 <style>@keyframes gspin{to{transform:rotate(360deg)}}button:active{transform:scale(.96);filter:brightness(.92)}</style>
 <script>
@@ -6813,7 +6814,12 @@ async function loadData(){
 
     try{
 
-      const r=await fetch('/api/data');
+      const ac=new AbortController();
+      const tm=setTimeout(()=>ac.abort(),30000);
+      let r;
+      try{ r=await fetch('/api/data',{signal:ac.signal}); }
+      catch(e){ clearTimeout(tm); lastErr=(e&&e.name==='AbortError')?'timeout':'network'; if(attempt<2){ await new Promise(res=>setTimeout(res,1000)); continue; } break; }
+      clearTimeout(tm);
 
       if(r.status===503||r.status===502||r.status===504){
 
@@ -6903,7 +6909,17 @@ async function loadData(){
 
     var nlEl = document.getElementById('noticeList');
 
-    if (nlEl) { nlEl.innerHTML='<div class="empty-hint">'+(lastErr==='service_unavailable'?'数据服务暂时不可用，请稍后刷新':'数据加载失败，请刷新重试')+'</div>'; }
+    if (nlEl) { nlEl.innerHTML='<div class="empty-hint">'+(lastErr==='timeout'?'加载超时（30秒），点击下方提示或刷新重试；刷新后公告会直接显示':'')+(lastErr==='service_unavailable'?'数据服务暂时不可用，请稍后刷新':'')+(!lastErr||lastErr==='bad_data'||lastErr==='network'?'数据加载失败，请刷新重试':'')+'</div>'; }
+
+    var tipEl=document.getElementById('dataTimeoutTip');
+
+    if(tipEl && lastErr==='timeout'){ tipEl.style.display='block'; }
+
+  } else {
+
+    var tipEl=document.getElementById('dataTimeoutTip');
+
+    if(tipEl) tipEl.style.display='none';
 
   }
 
