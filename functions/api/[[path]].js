@@ -193,6 +193,38 @@ export async function onRequest(context) {
   if (path === '/api/admin' || path.startsWith('/api/admin/')) {
     return proxyFetch(DATA_ORIGIN + '/api/admin' + url.search, request);
   }
+  // 数据站管理鉴权中介：官网 token 校验（经 TSTFK whoami）+ 服务器端带数据站口令转发，前端全程不接触数据站密码
+  if (path === '/api/dadmin' && request.method === 'POST') {
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { bd = {}; }
+    const spwd = (context && context.env && context.env.SITE_ADMIN_PWD) || '';
+    if (!spwd) return json({ ok: false, error: 'not_configured' }, 200, request);
+    const auth = request.headers.get('Authorization') || '';
+    const who = await fetch('https://theslowtidefk.pages.dev/api/admin/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': auth },
+      body: JSON.stringify({ action: 'whoami' }),
+    }).then(r => r.json()).catch(() => ({ ok: false }));
+    if (!(who && who.ok && (who.admin_level || 0) >= 1)) {
+      return json({ ok: false, error: 'no_permission' }, 200, request);
+    }
+    const lr = await fetch(DATA_ORIGIN + '/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'login', password: spwd }),
+    }).then(r => r.json()).catch(() => ({ ok: false }));
+    if (!(lr && lr.token)) return json({ ok: false, error: 'site_unavailable' }, 200, request);
+    const up = await fetch(DATA_ORIGIN + '/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + lr.token },
+      body: JSON.stringify(bd),
+    });
+    const upText = await up.text();
+    const rhead = { 'Content-Type': 'application/json', ...corsHeaders(request) };
+    let upBody = null;
+    try { upBody = JSON.parse(upText); } catch (e) { upBody = upText; }
+    return new Response(JSON.stringify(upBody === null ? { ok: false, error: 'site_error' } : upBody), { status: 200, headers: rhead });
+  }
 
   // 服务器工具（禁用物品/任务）转发到数据服务站点（反馈站 TSTFK 的 D1）
   if (path.startsWith('/api/tools')) {
