@@ -69,6 +69,7 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 .admin-pane.active{display:block;}
 .ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
 .ov-card{background:var(--hover);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.ov-ico{font-size:26px;line-height:1;margin-bottom:6px;}
 .ov-num{font-size:22px;font-weight:800;color:var(--accent);}
 .ov-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
 .admin-list-item{display:flex;align-items:flex-start;gap:10px;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
@@ -789,7 +790,7 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <script>
 function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);clearTimeout(el._t2);if(t>0)el._t2=setTimeout(hideLoad,t);}
 function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);clearTimeout(el._t2);}}
-document.addEventListener('click',function(e){var b=e.target.closest('button');if(b){var el=document.getElementById('glbLoad');if(el){clearTimeout(el._t);el._t=setTimeout(function(){el.style.display='flex';clearTimeout(el._t2);el._t2=setTimeout(hideLoad,2500);},350);}}});
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(b&&b.closest('.admin-tabs'))return;if(b){var el=document.getElementById('glbLoad');if(el){clearTimeout(el._t);el._t=setTimeout(function(){el.style.display='flex';clearTimeout(el._t2);el._t2=setTimeout(hideLoad,2500);},350);}}});
 </script>
 <header class="site-header">
 <div class="container header-inner">
@@ -814,20 +815,14 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 <h2 class="section-title">管理员面板</h2>
 <div id="loginBox" class="login-box">
 <div class="card">
-<div class="form-row"><label>管理员密码</label><input type="password" id="adminPwd" placeholder="请输入管理员密码"></div>
-<button class="btn btn-primary" id="adminLoginBtn" style="width:100%;">登录</button>
+<p style="font-size:14px;font-weight:600;margin-bottom:6px;">登录后使用管理面板</p>
+<p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">请先登录官网账号（需管理员权限）。登录后自动进入管理面板，无需再输入密码。</p>
+<button class="btn btn-primary" id="adminGoLogin" style="width:100%;">前往登录</button>
 </div>
 </div>
 <div id="adminPanel" style="display:none;">
 <div class="admin-tabs">
-<button class="admin-tab" data-tab="overview">概览</button>
-<button class="admin-tab active" data-tab="notice">公告管理</button>
-<button class="admin-tab" data-tab="history">历史管理</button>
-<button class="admin-tab" data-tab="feed">动态管理</button>
-<button class="admin-tab" data-tab="sponsor">赞助管理</button>
-<button class="admin-tab" data-tab="replay">赛事管理</button>
-<button class="admin-tab" data-tab="image">图片管理</button>
-<button class="admin-tab" data-tab="lottery">抽奖管理</button>
+<button class="admin-tab active" data-tab="overview">概览</button>
 <button class="admin-tab" data-tab="shop">商店管理</button>
 <button class="admin-tab" data-tab="users">玩家管理</button>
 <button class="admin-tab" data-tab="posts">帖子管理</button>
@@ -896,7 +891,6 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 </div>
 <div class="admin-pane" id="paneLottery">
 <div class="card">
-<div class="form-row"><label>管理员密码（后端校验）</label><input type="password" id="ltPwd" placeholder="请输入管理员密码"></div>
 <div class="form-row"><label>新增兑换码</label>
 <div style="display:flex;gap:8px;flex-wrap:wrap;">
 <input type="text" id="ltCode" placeholder="兑换码（8位字母）" style="flex:1;min-width:110px;">
@@ -918,10 +912,6 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 </div>
 </div>
 <div class="admin-pane" id="paneShop">
-<div class="card">
-<div class="form-row"><label>管理员密码（商店操作校验）</label><input type="password" id="shopPwd" placeholder="请输入管理员密码"></div>
-<button class="btn btn-primary" id="shopPwdBtn" style="width:100%;">解锁商店管理</button>
-</div>
 <div class="card" id="shopMgr" style="display:none;">
 <div class="form-row"><label>商品名称</label><input type="text" id="spiName" placeholder="如 钻石 32 个"></div>
 <div class="form-row"><label>分类</label><select id="spiCat"><option>金币</option><option>物资</option><option>增益</option><option>称号</option></select></div>
@@ -943,7 +933,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 </div>
 <div class="admin-pane" id="paneUsers">
 <div class="card">
-<div class="form-row"><label>搜索玩家（昵称/邮箱/UID，留空显示最近 100 个）</label><input type="text" id="usrQ" placeholder="输入关键词后回车"></div>
+<div class="form-row"><label>搜索玩家（昵称/邮箱/UID，留空显示全部）</label><input type="text" id="usrQ" placeholder="输入关键词后回车"></div>
 <button class="btn btn-primary" id="usrSearchBtn">搜索</button>
 </div>
 <div id="usrList"></div>
@@ -1016,25 +1006,17 @@ if(!d.ok&&r.status===401){ADMIN_TOKEN='';sessionStorage.removeItem('tst_admin_to
 if(!d.ok){showToast(d.error||d.msg||'操作失败，请重试');return null;}
 return d;
 }
-$('#adminLoginBtn').onclick=async()=>{
-const pwd=$('#adminPwd').value;if(!pwd){showToast('请输入密码');return;}
-const r=await fetch('https://tst-server-site.pages.dev/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password:pwd})});
-const d=await r.json();
-if(d.ok){ADMIN_TOKEN=d.token;sessionStorage.setItem('tst_admin_token',ADMIN_TOKEN);showToast('登录成功');showAdminPanel();}
-else{showToast(d.error||'登录失败');}
-};
-$('#adminPwd').addEventListener('keydown',e=>{if(e.key==='Enter')$('#adminLoginBtn').click();});
+$('#adminGoLogin').onclick=()=>{ location.href='login.html'; };
 function showAdminPanel(){$('#loginBox').style.display='none';$('#adminPanel').style.display='block';refreshLists();}
 document.querySelectorAll('.admin-tab').forEach(t=>{t.onclick=()=>{document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.admin-pane').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#pane'+t.dataset.tab.charAt(0).toUpperCase()+t.dataset.tab.slice(1)).classList.add('active');};});
 function resolveImg(src){if(typeof src==='string'&&src.startsWith('img:')&&Array.isArray(SITE_DATA.images)){const it=SITE_DATA.images.find(x=>x.id===src.slice(4));if(it)return it.data;}return src;}
 async function refreshLists(){await loadData();renderAdminHistory();renderNotices();renderFeeds();renderSponsors();renderReplays();renderImages();renderLottery();}
 function lotteryApi(action,payload){
-  const pwd=$('#ltPwd').value.trim();
-  if(!pwd){showToast('请输入管理员密码');return Promise.resolve(null);}
-  return fetch('/api/rest/rpc/admin_lottery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({p_pwd:pwd,p_action:action,p_payload:payload||{}})}).then(r=>r.json()).catch(()=>{showToast('请求失败');return null;});
+  showToast('该功能暂未开放');
+  return Promise.resolve(null);
 }
 const FK='https://theslowtidefk.pages.dev/api';
-function getPw(){ return ($('#shopPwd').value||'').trim(); }
+function getPw(){ return ''; }
 function getTok(){ return localStorage.getItem('tst_token')||''; }
 async function shopApi(action,data){
   const tok=getTok(); if(!tok){showToast('请先登录官网账号');return null;}
@@ -1089,23 +1071,25 @@ async function adminInit(){
   const tok=getTok(); if(!tok){ showToast('请先登录官网账号'); return; }
   const w=await usersApi('whoami',{});
   if(w&&w.ok&&w.admin_level>=1){
-    const pwdCard=$('#shopPwd') ? $('#shopPwd').closest('.card') : null;
-    if(pwdCard) pwdCard.style.display='none';
-    $('#shopMgr').style.display='block';
-    $('#shopPointsBox').style.display='block';
+    $('#loginBox').style.display='none';
+    $('#adminPanel').style.display='block';
+    document.querySelectorAll('.admin-tab').forEach(function(t){t.classList.remove('active');});
+    document.querySelectorAll('.admin-pane').forEach(function(p){p.classList.remove('active');});
+    const ov=document.querySelector('.admin-tab[data-tab="overview"]');
+    if(ov) ov.classList.add('active');
+    $('#paneOverview').classList.add('active');
     window.__ADMIN_LEVEL=w.admin_level||0;
     window.__IS_OWNER=!!w.owner;
     reloadShop(); loadUsers(); loadStats(); loadAdmins(); loadCodes(); loadPostsList();
     showToast('欢迎回来，'+(window.__IS_OWNER?'站长':'管理员'));
-  } else {
+  } else if(w&&w.ok){
     showToast('当前账号无管理权限');
+  } else {
+    showToast('登录已过期，请重新登录');
+    $('#loginBox').style.display='block';
+    $('#adminPanel').style.display='none';
   }
 }
-$('#shopPwdBtn').onclick=async()=>{
-  const pw=getPw(); if(!pw){showToast('请输入管理员密码');return;}
-  const d=await shopApi('item_list',{});
-  if(d){$('#shopMgr').style.display='block';$('#shopPointsBox').style.display='block';renderShopItems(d.items);showToast('商店管理已解锁');}
-};
 adminInit();
 async function renderShopItems(items){
   $('#spiList').innerHTML=(items||[]).map(it=>{
@@ -1197,11 +1181,11 @@ async function loadStats(){
   if(!d||!d.stats){ $('#ovStats').innerHTML='<div class="empty-hint">统计加载失败</div>'; return; }
   const s=d.stats;
   const rows=[
-    ['注册玩家',s.users||0],['帖子',s.posts||0],['评论',s.comments||0],['点赞',s.likes||0],
-    ['商店商品',s.shop_items||0],['兑换订单',s.orders||0],['已用兑换码',s.codes_used||0],
-    ['签到次数',s.checkins||0],['积分流水',s.points_log||0],['投币记录',s.coins||0]
+    ['👥','注册玩家',s.users||0],['📝','帖子',s.posts||0],['💬','评论',s.comments||0],['❤️','点赞',s.likes||0],
+    ['🛒','商店商品',s.shop_items||0],['🧾','兑换订单',s.orders||0],['🎟️','已用兑换码',s.codes_used||0],
+    ['✅','签到次数',s.checkins||0],['💰','积分流水',s.points_log||0],['🪙','投币记录',s.coins||0]
   ];
-  $('#ovStats').innerHTML=rows.map(r=>'<div class="ov-card"><div class="ov-num">'+r[1]+'</div><div class="ov-label">'+r[0]+'</div></div>').join('');
+  $('#ovStats').innerHTML=rows.map(r=>'<div class="ov-card"><div class="ov-ico">'+r[0]+'</div><div class="ov-num">'+r[1]+'</div><div class="ov-label">'+r[2]+'</div></div>').join('');
 }
 $('#ovRefreshBtn').onclick=()=>{ loadStats(); };
 async function loadAdmins(){
@@ -1253,8 +1237,8 @@ $('#poAddBtn').onclick=async()=>{ const content=$('#poContent').value.trim(); if
 $('#poRefreshBtn').onclick=()=>{ renderPosts(); };
 async function renderLottery(){
   const el=$('#ltList');if(!el)return;
-  const pwd=$('#ltPwd').value.trim();
-  if(!pwd){el.innerHTML='<div class="empty-hint">输入管理员密码后点「刷新列表」查看兑换码池</div>';return;}
+  const pwd=$('#ltPwd')?$('#ltPwd').value.trim():'';
+  if(!pwd){el.innerHTML='<div class="empty-hint">抽奖管理暂未开放</div>';return;}
   const d=await lotteryApi('list');
   if(!d)return;
   if(!d.ok){el.innerHTML='<div class="empty-hint">'+(d.error==='bad_password'?'密码错误':'加载失败')+'</div>';return;}
