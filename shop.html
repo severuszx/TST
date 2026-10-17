@@ -485,7 +485,7 @@ function loadAll(){
     myName=d.nickname||email.split('@')[0];
     document.getElementById('mainWrap').style.display='block';
     var nb=document.getElementById('navLoginBtn');
-    nb.textContent=myName; nb.href='profile.html'; nb.title=myName;
+    nb.textContent=myName+(d.uid?(' #'+d.uid):''); nb.href='profile.html'; nb.title=myName;
     var st=res[1];
     if(st&&st.ok){ myPoints=st.points; document.getElementById('ptsNum').textContent=fmt(st.points); }
     var it=res[2];
