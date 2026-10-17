@@ -4001,37 +4001,26 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 .status-line .dot{width:10px;height:10px;border-radius:50%;background:#888;flex:none;}
 .status-line .dot.on{background:#3ddc84;box-shadow:0 0 8px rgba(61,220,132,.7);}
 .status-line .dot.off{background:#e05a5a;box-shadow:0 0 8px rgba(224,90,90,.6);}
-
-/* ===== 手机版二改增强（保留 PC 全部功能与风格，仅重排布局） ===== */
+/* 手机端网站式适配 */
 @media (max-width:820px){
-  body{padding-bottom:calc(58px + env(safe-area-inset-bottom,0));}
-  .site-header{position:sticky;top:0;z-index:900;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
   .container{padding:0 12px;}
   .header-inner{padding:8px 0;}
   .logo{font-size:15px;}
   .logo-img{width:26px;height:26px;}
   .time-badge{display:none;}
+  .main-nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
+  .main-nav::-webkit-scrollbar{display:none;}
+  .main-nav .nav-link{flex-shrink:0;}
   .hero{padding:12px 0 4px;}
-  .hero-slider{scroll-snap-type:x mandatory;}
-  .hero-slider>*{scroll-snap-align:start;flex:0 0 86%;}
   .section{padding:14px 0;}
-  .section-title{font-size:16px;padding:0 2px;}
+  .section-title{font-size:16px;}
   .card-grid{grid-template-columns:1fr;gap:10px;}
   .card{padding:12px;border-radius:12px;}
   .feed-bar{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;}
   .feed-bar::-webkit-scrollbar{display:none;}
   .feed-bar-tab{flex-shrink:0;}
-  .main-nav{scrollbar-width:none;}
-  .main-nav::-webkit-scrollbar{display:none;}
   .header-right .feedback-btn{padding:6px 10px;font-size:12px;}
-  .footer{padding:20px 0 calc(70px + env(safe-area-inset-bottom,0));}
-  /* 底部固定导航 */
-  .m-tabbar{position:fixed;bottom:0;left:0;right:0;z-index:950;display:flex;background:var(--card);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -4px 16px rgba(0,0,0,.08);}
-  .m-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0 6px;font-size:11px;color:var(--text-secondary);transition:color .15s;}
-  .m-tab.active{color:var(--accent);font-weight:700;}
-  .m-tab .t-ico{font-size:17px;line-height:1;}
 }
-@media (min-width:821px){.m-tabbar{display:none;}}
 </style>
 
 <div class="card" style="margin-bottom:14px;">
@@ -9662,38 +9651,6 @@ try{ eval('const __t=()=>1;'); }catch(e){
     document.getElementById('sponsorModal').classList.add('open');
   }
   window.openPtsModal=openPtsModal; window.openSponsor=openSponsor;
-})();
-</script>
-<!-- 手机版二改：底部固定导航 -->
-<nav class="m-tabbar">
-  <button class="m-tab active" data-mnav="home"><span class="t-ico">⌂</span>首页</button>
-  <button class="m-tab" data-mnav="notice"><span class="t-ico">▤</span>公告</button>
-  <button class="m-tab" data-mnav="feed"><span class="t-ico">☰</span>动态</button>
-  <button class="m-tab" data-mnav="shop"><span class="t-ico">◈</span>商店</button>
-  <button class="m-tab" data-mnav="me"><span class="t-ico">☺</span>我的</button>
-</nav>
-<script>
-(function(){
-  var tabs=document.querySelectorAll('.m-tab');
-  function syncTab(){
-    var cur=document.querySelector('.main-nav .nav-link.active');
-    if(!cur||!cur.dataset.nav) return;
-    var nav=cur.dataset.nav;
-    tabs.forEach(function(x){ x.classList.toggle('active', x.dataset.mnav===nav); });
-  }
-  tabs.forEach(function(t){
-    t.onclick=function(){
-      var nav=t.dataset.mnav;
-      if(nav==='shop'){ location.href='shop.html'; return; }
-      if(nav==='me'){ location.href=localStorage.getItem('tst_token')?'profile.html':'login.html'; return; }
-      if(typeof switchPage==='function') switchPage(nav);
-      tabs.forEach(function(x){ x.classList.toggle('active',x===t); });
-      if(typeof window.scrollTo==='function') window.scrollTo({top:0});
-    };
-  });
-  document.addEventListener('click',function(){ setTimeout(syncTab,120); });
-  window.addEventListener('load',function(){ setTimeout(syncTab,300); });
-  window.__mTabSync=syncTab;
 })();
 </script>
 </body>
