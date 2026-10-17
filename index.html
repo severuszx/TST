@@ -3251,40 +3251,6 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 
 <script>
 
-// 手机/平板自动进入移动端专属 UI（?m=0 可跳过）
-
-(function(){
-
-  try{
-
-    if(/[?&]m=0/.test(location.search)) return;
-
-    var force=localStorage.getItem('tst_force_mode');
-
-    if(force==='mobile'){
-
-      if(location.pathname.indexOf('mobile.html')<0) location.replace('mobile.html'+(location.search||'')+(location.hash||''));
-
-      return;
-
-    }
-
-    if(force==='desktop') return;
-
-    var ua=navigator.userAgent;
-
-    var isMob=/Android|iPhone|iPad|iPod|Mobile/i.test(ua)||(navigator.maxTouchPoints>1&&window.innerWidth<1024);
-
-    if(isMob&&location.pathname.indexOf('mobile.html')<0){
-
-      location.replace('mobile.html'+(location.search||'')+(location.hash||''));
-
-    }
-
-  }catch(e){}
-
-})();
-
 </script>
 
 <header class="site-header">
@@ -5174,7 +5140,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
     function devData(){
 
-      return '<b>UA：</b>'+navigator.userAgent.slice(0,150)+'…<br><b>窗口：</b>'+innerWidth+'×'+innerHeight+' · DPR '+devicePixelRatio+'<br><b>语言：</b>'+navigator.language+'<br><b>当前主题：</b>'+themeState()+'<br><b>强制模式：</b>'+(localStorage.getItem('tst_force_mode')||'自动');
+      return '<b>UA：</b>'+navigator.userAgent.slice(0,150)+'…<br><b>窗口：</b>'+innerWidth+'×'+innerHeight+' · DPR '+devicePixelRatio+'<br><b>语言：</b>'+navigator.language+'<br><b>当前主题：</b>'+themeState()+'<br><b>显示模式：</b>响应式(手机直接用本页)';
 
     }
 
@@ -5218,7 +5184,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
           localStorage.setItem('tst_force_mode','mobile');
 
-          location.href='mobile.html';
+          showToast('手机已直接使用响应式页面，不再跳转');
 
         } else if(feat==='perf'){
 
