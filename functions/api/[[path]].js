@@ -202,6 +202,8 @@ export async function onRequest(context) {
       if (obj && Array.isArray(obj.feeds)) {
         obj.feeds = obj.feeds.map(function (f) {
           if (!f) return f;
+          var img = String(f.image || '');
+          if (/^data:image/i.test(img)) { f.image = ''; }
           var c = String(f.content || '');
           c = c.replace(/<img[^>]*src=["']data:image[^"']*["'][^>]*>/gi, '');
           c = c.replace(/data:image\\?\s*\/?[^"'\s,;]{10,}/gi, '');
