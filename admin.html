@@ -69,7 +69,10 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 .admin-pane.active{display:block;}
 .ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
 .ov-card{background:var(--hover);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
-.ov-ico{font-size:26px;line-height:1;margin-bottom:6px;}
+.ov-table{width:100%;border-collapse:collapse;font-size:14px;}
+.ov-table th,.ov-table td{padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;}
+.ov-table th{background:var(--hover);font-weight:600;}
+.ov-table td:last-child{text-align:right;font-weight:700;color:var(--accent);}
 .ov-num{font-size:22px;font-weight:800;color:var(--accent);}
 .ov-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
 .admin-list-item{display:flex;align-items:flex-start;gap:10px;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
@@ -823,6 +826,13 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 <div id="adminPanel" style="display:none;">
 <div class="admin-tabs">
 <button class="admin-tab active" data-tab="overview">概览</button>
+<button class="admin-tab" data-tab="notice">公告管理</button>
+<button class="admin-tab" data-tab="history">历史管理</button>
+<button class="admin-tab" data-tab="feed">动态管理</button>
+<button class="admin-tab" data-tab="sponsor">赞助管理</button>
+<button class="admin-tab" data-tab="replay">赛事管理</button>
+<button class="admin-tab" data-tab="image">图片管理</button>
+<button class="admin-tab" data-tab="lottery">抽奖管理</button>
 <button class="admin-tab" data-tab="shop">商店管理</button>
 <button class="admin-tab" data-tab="users">玩家管理</button>
 <button class="admin-tab" data-tab="posts">帖子管理</button>
@@ -1002,7 +1012,7 @@ body:JSON.stringify({action,data,...(extra||{})})});}catch(err){showToast('网�
 if(r.status===503||r.status===502||r.status===504){showToast('数据服务暂时不可用，请稍后重试');return null;}
 let d;
 try{d=await r.json();}catch(err){showToast('服务响应异常，请重试');return null;}
-if(!d.ok&&r.status===401){ADMIN_TOKEN='';sessionStorage.removeItem('tst_admin_token');showToast('登录已过期');document.getElementById('loginBox').style.display='block';document.getElementById('adminPanel').style.display='none';return null;}
+if(!d.ok&&r.status===401){ADMIN_TOKEN='';sessionStorage.removeItem('tst_admin_token');showToast('站点内容管理权限不足（该板块尚未接入官网登录，暂不可用）');return null;}
 if(!d.ok){showToast(d.error||d.msg||'操作失败，请重试');return null;}
 return d;
 }
@@ -1078,6 +1088,8 @@ async function adminInit(){
     const ov=document.querySelector('.admin-tab[data-tab="overview"]');
     if(ov) ov.classList.add('active');
     $('#paneOverview').classList.add('active');
+    const sm=$('#shopMgr'); if(sm) sm.style.display='block';
+    const sp=$('#shopPointsBox'); if(sp) sp.style.display='block';
     window.__ADMIN_LEVEL=w.admin_level||0;
     window.__IS_OWNER=!!w.owner;
     reloadShop(); loadUsers(); loadStats(); loadAdmins(); loadCodes(); loadPostsList();
@@ -1181,11 +1193,11 @@ async function loadStats(){
   if(!d||!d.stats){ $('#ovStats').innerHTML='<div class="empty-hint">统计加载失败</div>'; return; }
   const s=d.stats;
   const rows=[
-    ['👥','注册玩家',s.users||0],['📝','帖子',s.posts||0],['💬','评论',s.comments||0],['❤️','点赞',s.likes||0],
-    ['🛒','商店商品',s.shop_items||0],['🧾','兑换订单',s.orders||0],['🎟️','已用兑换码',s.codes_used||0],
-    ['✅','签到次数',s.checkins||0],['💰','积分流水',s.points_log||0],['🪙','投币记录',s.coins||0]
+    ['注册玩家',s.users||0],['帖子',s.posts||0],['评论',s.comments||0],['点赞',s.likes||0],
+    ['商店商品',s.shop_items||0],['兑换订单',s.orders||0],['已用兑换码',s.codes_used||0],
+    ['签到次数',s.checkins||0],['积分流水',s.points_log||0],['投币记录',s.coins||0]
   ];
-  $('#ovStats').innerHTML=rows.map(r=>'<div class="ov-card"><div class="ov-ico">'+r[0]+'</div><div class="ov-num">'+r[1]+'</div><div class="ov-label">'+r[2]+'</div></div>').join('');
+  $('#ovStats').innerHTML='<table class="ov-table"><tr><th>指标</th><th>数量</th></tr>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')+'</table>';
 }
 $('#ovRefreshBtn').onclick=()=>{ loadStats(); };
 async function loadAdmins(){
