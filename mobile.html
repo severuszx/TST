@@ -1827,6 +1827,11 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
   .search-row input{height:40px;border-radius:12px;}
   .search-row .btn{height:40px;border-radius:12px;padding:0 16px;}
   .btn{min-height:38px;}
+
+  /* 手机精简：去掉次要复杂功能 */
+  #glassBgBtn{display:none!important;}                    /* 液态玻璃实验室 */
+  .tst-debug-link{display:none!important;}                /* 调试入口 */
+  .footer-bottom a[href*="rss"]{display:none!important;}  /* RSS 订阅 */
 }
 
 
@@ -9718,6 +9723,19 @@ try{ eval('const __t=()=>1;'); }catch(e){
     document.getElementById('sponsorModal').classList.add('open');
   }
   window.openPtsModal=openPtsModal; window.openSponsor=openSponsor;
+})();
+</script>
+<script>
+/* 手机精简：隐藏服务器历史（PC 专属长区块） */
+(function(){
+  if(window.innerWidth>820) return;
+  document.querySelectorAll('.section-title').forEach(function(t){
+    if((t.textContent||'').trim()==='服务器历史'){
+      var card=t.nextElementSibling;
+      if(card&&card.classList&&card.classList.contains('card')) card.style.display='none';
+      t.style.display='none';
+    }
+  });
 })();
 </script>
 </body>
