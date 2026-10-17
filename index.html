@@ -3237,6 +3237,19 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <meta name="color-scheme" content="light">
 
+<script>
+// 手机访问进入手机专属版（mobile.html 为完整页面，不会跳回，无循环；?m=0 可留在电脑版）
+(function(){
+  try{
+    if(/[?&]m=0/.test(location.search)) return;
+    var ua=navigator.userAgent;
+    var isMob=/Android|iPhone|iPad|iPod|Mobile/i.test(ua)||(navigator.maxTouchPoints>1&&window.innerWidth<1024);
+    if(isMob&&location.pathname.indexOf('mobile.html')<0){
+      location.replace('mobile.html'+(location.search||'')+(location.hash||''));
+    }
+  }catch(e){}
+})();
+</script>
 </head>
 
 <body>

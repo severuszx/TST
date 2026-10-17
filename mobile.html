@@ -2,19 +2,497 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="refresh" content="0;url=/index.html">
-<title>The Slow Tide 官网</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>The Slow Tide · 手机版</title>
+<meta name="theme-color" content="#06121f">
 <style>
-  body{font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;background:#0b0e14;color:#c8ccd4;margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;}
-  .box{text-align:center;padding:24px;}
-  .sp{display:inline-block;width:28px;height:28px;border:3px solid rgba(255,255,255,.15);border-top-color:#4da3ff;border-radius:50%;animation:spin .8s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg);}}
-  p{margin:14px 0 0;font-size:14px;color:#7a828e;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#f3f5f8;--card:#fff;--card-brd:#e2e8f0;--txt:#1f2937;--txt2:#5b6675;
+  --acc:#0f766e;--acc-soft:rgba(15,118,110,.1);--danger:#dc2626;--ok:#059669;
+  --shadow:0 4px 14px rgba(15,23,42,.07);--radius:12px;
+  --sat:env(safe-area-inset-top,0);--sab:env(safe-area-inset-bottom,0);
+}
+html[data-theme="dark"]{
+  --bg:#0f1216;--card:#181c22;--card-brd:#262b33;--txt:#e5e7eb;--txt2:#9aa3af;
+  --acc:#2dd4bf;--acc-soft:rgba(45,212,191,.12);--danger:#f87171;--ok:#34d399;
+  --shadow:0 4px 14px rgba(0,0,0,.4);
+}
+html[data-theme="glass"]{
+  --bg:#e8eef2;--card:rgba(255,255,255,.7);--card-brd:rgba(255,255,255,.5);--txt:#16202b;--txt2:#5c6b7a;
+  --acc:#0e7490;--acc-soft:rgba(14,116,144,.12);--danger:#b91c1c;--ok:#047857;
+  --shadow:0 6px 24px rgba(13,38,56,.14);
+}
+html[data-theme="glass"] body{background:linear-gradient(160deg,#cfe4ef,#eef5f9 60%,#e2ecf2);}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:calc(64px + var(--sab));}
+a{color:var(--acc);text-decoration:none;}
+button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer;}
+input,textarea{font-family:inherit;color:var(--txt);}
+img{max-width:100%;}
+.load-spinner{width:20px;height:20px;border:2px solid var(--card-brd);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ===== 顶部 ===== */
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;padding:calc(8px + var(--sat)) 12px 8px;background:var(--bg);border-bottom:1px solid var(--card-brd);}
+.topbar .tb-logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:17px;}
+.topbar .tb-logo img{width:26px;height:26px;border-radius:6px;}
+.topbar .tb-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.pts-pill{display:flex;align-items:center;gap:5px;background:var(--acc-soft);color:var(--acc);font-weight:700;font-size:13px;padding:5px 10px;border-radius:999px;}
+.pts-pill .coin{font-size:11px;opacity:.85;}
+.tb-user{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--txt2);}
+.tb-user .av{width:26px;height:26px;border-radius:50%;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.icon-btn{width:34px;height:34px;border-radius:10px;background:var(--card);border:1px solid var(--card-brd);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--txt2);position:relative;}
+.icon-btn .badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;border-radius:8px;background:var(--danger);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+
+/* ===== 页面容器 ===== */
+.page{display:none;padding:12px;}
+.page.active{display:block;}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:14px 2px 8px;font-size:15px;font-weight:700;}
+.section-title .more{font-size:12px;color:var(--txt2);font-weight:400;}
+.card{background:var(--card);border:1px solid var(--card-brd);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;margin-bottom:10px;}
+.card h3{font-size:14px;margin-bottom:6px;}
+.muted{color:var(--txt2);font-size:12px;}
+.empty-hint{text-align:center;color:var(--txt2);font-size:13px;padding:30px 10px;}
+
+/* ===== 首页 ===== */
+.srv-card{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--acc),var(--acc-soft));color:var(--txt);border:1px solid var(--card-brd);}
+.srv-card .srv-status{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;margin-bottom:8px;}
+.dot{width:9px;height:9px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.8);}
+.dot.on{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.8);}
+.srv-card .srv-row{display:flex;justify-content:space-between;font-size:12px;color:var(--txt2);margin-top:5px;}
+.srv-card .srv-addr{font-size:11px;background:var(--acc-soft);border-radius:6px;padding:3px 6px;word-break:break-all;color:var(--acc);}
+.srv-actions{display:flex;gap:8px;margin-top:10px;}
+.srv-actions .btn{flex:1;text-align:center;padding:8px 0;background:var(--acc-soft);color:var(--acc);border-radius:8px;font-size:13px;font-weight:600;}
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;}
+.quick-item{background:var(--card);border:1px solid var(--card-brd);border-radius:var(--radius);padding:12px 6px;text-align:center;}
+.quick-item .qi-name{font-size:12px;font-weight:600;margin-top:6px;color:var(--txt);}
+.quick-item .qi-ico{font-size:20px;color:var(--acc);}
+.rule-box{font-size:12px;color:var(--txt2);line-height:1.9;white-space:pre-wrap;}
+.ann-item{padding:10px 0;border-bottom:1px solid var(--card-brd);}
+.ann-item:last-child{border-bottom:none;}
+.ann-item .a-date{font-size:11px;color:var(--txt2);margin-top:3px;}
+.hist-line{font-size:12px;color:var(--txt2);padding:7px 0;border-bottom:1px dashed var(--card-brd);}
+.hist-line:last-child{border-bottom:none;}
+.hist-line b{color:var(--txt);}
+
+/* ===== 商店 ===== */
+.shop-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.shop-toolbar .shop-cats{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.shop-toolbar .shop-cats::-webkit-scrollbar{display:none;}
+.cat-chip{flex-shrink:0;padding:6px 12px;background:var(--card);border:1px solid var(--card-brd);border-radius:999px;font-size:12px;color:var(--txt2);}
+.cat-chip.on{background:var(--acc);border-color:var(--acc);color:#fff;}
+.shop-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.shop-item{background:var(--card);border:1px solid var(--card-brd);border-radius:var(--radius);padding:10px;overflow:hidden;box-shadow:var(--shadow);}
+.shop-item .si-icon{width:100%;aspect-ratio:1/1;object-fit:contain;background:var(--acc-soft);border-radius:8px;}
+.shop-item .si-name{font-size:13px;font-weight:700;margin:7px 0 2px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+.shop-item .si-desc{font-size:11px;color:var(--txt2);line-height:1.4;min-height:30px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px;}
+.shop-item .si-foot{display:flex;align-items:center;justify-content:space-between;}
+.shop-item .si-price{color:var(--acc);font-weight:700;font-size:13px;}
+.shop-item .si-price small{font-size:10px;font-weight:400;color:var(--txt2);}
+.shop-item .si-buy{background:var(--acc);color:#fff;padding:5px 10px;border-radius:7px;font-size:12px;font-weight:600;}
+.gate-box{text-align:center;padding:40px 20px;}
+.gate-box .btn{display:inline-block;margin-top:14px;background:var(--acc);color:#fff;padding:10px 22px;border-radius:10px;font-size:14px;font-weight:600;}
+.cart-list .cl-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--card-brd);}
+.cart-list .cl-item img{width:40px;height:40px;border-radius:8px;background:var(--acc-soft);object-fit:contain;}
+.cart-list .cl-item .cl-info{flex:1;min-width:0;}
+.cart-list .cl-item .cl-name{font-size:13px;font-weight:600;}
+.cart-list .cl-item .cl-price{font-size:12px;color:var(--acc);font-weight:600;}
+
+/* ===== 动态 ===== */
+.feed-card .fc-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.feed-card .fc-name{font-size:13px;font-weight:700;}
+.feed-card .fc-time{font-size:11px;color:var(--txt2);}
+.feed-card .fc-tag{font-size:10px;background:var(--acc-soft);color:var(--acc);padding:2px 6px;border-radius:4px;}
+.feed-card .fc-body{font-size:13px;line-height:1.75;white-space:pre-wrap;word-break:break-word;}
+.feed-card .fc-img{width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid var(--card-brd);}
+.fab{position:fixed;right:16px;bottom:calc(78px + var(--sab));width:52px;height:52px;border-radius:50%;background:var(--acc);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:60;}
+
+/* ===== 我的 ===== */
+.me-hero{display:flex;align-items:center;gap:12px;padding:16px;}
+.me-hero .mh-av{width:52px;height:52px;border-radius:50%;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;}
+.me-hero .mh-name{font-size:16px;font-weight:700;}
+.me-hero .mh-mail{font-size:12px;color:var(--txt2);word-break:break-all;}
+.me-pts{display:flex;align-items:center;justify-content:space-around;padding:12px;background:var(--acc-soft);border-radius:var(--radius);margin-bottom:10px;}
+.me-pts .mp-num{font-size:24px;font-weight:800;color:var(--acc);}
+.me-pts .mp-lab{font-size:11px;color:var(--txt2);}
+.me-row{display:flex;align-items:center;gap:10px;padding:13px 4px;border-bottom:1px solid var(--card-brd);font-size:14px;}
+.me-row:last-child{border-bottom:none;}
+.me-row .mr-ico{width:32px;height:32px;border-radius:8px;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:15px;}
+.me-row .mr-arrow{margin-left:auto;color:var(--txt2);}
+.me-sign{margin-top:12px;}
+.me-sign .btn{flex:1;text-align:center;padding:11px 0;border-radius:10px;font-size:14px;font-weight:600;}
+.me-sign .btn.primary{background:var(--acc);color:#fff;}
+.me-sign .btn.ghost{background:var(--card);border:1px solid var(--card-brd);color:var(--txt);}
+
+/* ===== 更多 ===== */
+.more-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.more-card{background:var(--card);border:1px solid var(--card-brd);border-radius:var(--radius);padding:16px;text-align:center;box-shadow:var(--shadow);}
+.more-card .mc-ico{font-size:22px;color:var(--acc);}
+.more-card .mc-name{font-size:13px;font-weight:600;margin-top:8px;color:var(--txt);}
+.more-card .mc-desc{font-size:11px;color:var(--txt2);margin-top:3px;}
+
+/* ===== 弹窗/Toast/加载 ===== */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:100;align-items:flex-end;justify-content:center;}
+.mask.show{display:flex;}
+.sheet{width:100%;max-width:480px;background:var(--card);border-radius:16px 16px 0 0;max-height:86vh;overflow:auto;padding:16px 16px calc(16px + var(--sab));}
+.sheet .sh-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+.sheet .sh-x{width:28px;height:28px;border-radius:8px;background:var(--card-brd);color:var(--txt2);display:flex;align-items:center;justify-content:center;font-size:15px;}
+.sheet label{display:block;font-size:12px;color:var(--txt2);margin:10px 0 4px;}
+.sheet input,.sheet textarea{width:100%;background:var(--bg);border:1px solid var(--card-brd);border-radius:8px;padding:9px 10px;font-size:14px;outline:none;}
+.sheet textarea{min-height:80px;resize:vertical;}
+.sheet .btn{width:100%;background:var(--acc);color:#fff;border-radius:10px;padding:12px 0;font-size:15px;font-weight:700;margin-top:14px;}
+.sheet .btn.gray{background:var(--card-brd);color:var(--txt2);margin-top:8px;}
+.qty-row{display:flex;align-items:center;gap:12px;justify-content:center;padding:8px 0;}
+.qty-btn{width:34px;height:34px;border-radius:50%;background:var(--acc-soft);color:var(--acc);font-size:18px;font-weight:700;}
+.qty-num{font-size:18px;font-weight:700;min-width:40px;text-align:center;}
+.detail-icon{width:100%;aspect-ratio:1/1;object-fit:contain;background:var(--acc-soft);border-radius:12px;margin-bottom:10px;}
+.detail-name{font-size:16px;font-weight:700;margin-bottom:4px;}
+.detail-desc{font-size:13px;color:var(--txt2);line-height:1.7;margin:8px 0;white-space:pre-wrap;}
+.detail-price{color:var(--acc);font-weight:800;font-size:18px;}
+.detail-meta{font-size:11px;color:var(--txt2);margin-top:6px;line-height:1.8;}
+.toast{position:fixed;top:14%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;max-width:86vw;text-align:center;}
+.toast.show{opacity:1;}
+.gload{position:fixed;inset:0;background:rgba(0,0,0,.25);display:none;align-items:center;justify-content:center;z-index:150;backdrop-filter:blur(2px);}
+.gload.show{display:flex;}
+.gload .gl-box{background:var(--card);border-radius:14px;padding:22px 30px;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:var(--shadow);}
+.gload .gl-box .load-spinner{width:30px;height:30px;border-width:3px;}
+.gload .gl-box span{font-size:13px;color:var(--txt2);}
+
+/* ===== 底部导航 ===== */
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:80;display:flex;background:var(--card);border-top:1px solid var(--card-brd);padding-bottom:var(--sab);}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 7px;color:var(--txt2);font-size:11px;}
+.tab .t-ico{font-size:19px;line-height:1;}
+.tab.active{color:var(--acc);}
+.tab.active .t-ico{transform:translateY(-1px);}
+.post-img-prev{display:none;margin-top:8px;}
+.post-img-prev img{width:100%;max-height:160px;object-fit:cover;border-radius:8px;}
 </style>
 </head>
 <body>
-<div class="box"><div class="sp"></div><p>正在加载官网…</p></div>
-<script>location.replace('/index.html');</script>
+
+<div class="topbar">
+  <div class="tb-logo"><img src="logo.jpg" alt="">The Slow Tide</div>
+  <div class="tb-right">
+    <span class="pts-pill" id="ptsPill"><span class="coin">积分</span><span id="ptsNum">-</span></span>
+    <button class="icon-btn" id="cartBtn" style="display:none;"><span id="cartIco">🛒</span><span class="badge" id="cartBadge" style="display:none;">0</span></button>
+    <a class="tb-user" id="tbUser" href="login.html"><span class="av" id="tbAv">客</span><span id="tbName">登录</span></a>
+  </div>
+</div>
+
+<main>
+  <!-- 首页 -->
+  <section class="page active" id="page-home">
+    <div class="card srv-card">
+      <div class="srv-status"><span class="dot" id="srvDot"></span><span id="srvTitle">服务器状态检测中</span></div>
+      <div class="srv-row"><span id="srvAddr">mc.163.com/open/mc_realms/?realms=270239C36AD</span></div>
+      <div class="srv-row"><span id="srvQq">QQ交流群 833470853</span><span id="srvUp">运行中</span></div>
+      <div class="srv-actions">
+        <button class="btn" onclick="copyText('mc.163.com/open/mc_realms/?realms=270239C36AD')">复制地址</button>
+        <button class="btn" onclick="window.open('https://qm.qq.com/q/833470853','_blank')">加群</button>
+      </div>
+    </div>
+    <div class="section-title">快捷入口 <span class="more"></span></div>
+    <div class="quick-grid">
+      <div class="quick-item" onclick="go('shop')"><div class="qi-ico">积分商店</div><div class="qi-name">商店</div></div>
+      <div class="quick-item" onclick="go('posts')"><div class="qi-ico">动态</div><div class="qi-name">动态</div></div>
+      <div class="quick-item" onclick="openVote()"><div class="qi-ico">投票</div><div class="qi-name">投票</div></div>
+      <div class="quick-item" onclick="openUrl('tool.html')"><div class="qi-ico">工具</div><div class="qi-name">工具</div></div>
+      <div class="quick-item" onclick="openRule()"><div class="qi-ico">公约</div><div class="qi-name">公约</div></div>
+      <div class="quick-item" onclick="go('me')"><div class="qi-ico">签到</div><div class="qi-name">签到/投币</div></div>
+    </div>
+    <div class="section-title">最新公告 <span class="more"></span></div>
+    <div class="card" id="homeAnnBox"><div class="empty-hint">加载中…</div></div>
+    <div class="section-title">最新动态 <span class="more"></span></div>
+    <div class="card" id="homeFeedBox"><div class="empty-hint">加载中…</div></div>
+  </section>
+
+  <!-- 商店 -->
+  <section class="page" id="page-shop">
+    <div class="shop-toolbar">
+      <div class="shop-cats" id="shopCats"></div>
+    </div>
+    <div id="shopWrap">
+      <div class="shop-grid" id="shopGrid"><div class="empty-hint">加载中…</div></div>
+    </div>
+    <div class="gate-box" id="shopGate" style="display:none;">
+      <div style="font-size:14px;color:var(--txt2);">登录后才能查看和兑换商品</div>
+      <a class="btn" href="login.html">去登录</a>
+    </div>
+  </section>
+
+  <!-- 动态 -->
+  <section class="page" id="page-posts">
+    <div class="section-title">动态 <span class="more" id="poCount"></span></div>
+    <div id="postList"><div class="empty-hint">加载中…</div></div>
+    <button class="fab" id="fabPost" onclick="openPostSheet()">+</button>
+  </section>
+
+  <!-- 我的 -->
+  <section class="page" id="page-me">
+    <div id="meLogged" style="display:none;">
+      <div class="card me-hero">
+        <div class="mh-av" id="meAv">客</div>
+        <div><div class="mh-name" id="meName">-</div><div class="mh-mail" id="meMail">-</div></div>
+      </div>
+      <div class="me-pts">
+        <div><div class="mp-num" id="mePtsNum">-</div><div class="mp-lab">当前积分</div></div>
+        <div id="meSignBtn"><button class="btn primary" onclick="checkin()">每日签到</button></div>
+      </div>
+      <div class="card me-sign">
+        <div class="me-row" onclick="coinGive()"><span class="mr-ico">币</span>给喜欢的动态投币<span class="mr-arrow">›</span></div>
+      </div>
+      <div class="card" style="padding:0 12px;">
+        <a class="me-row" href="profile.html"><span class="mr-ico">个</span>个人资料<span class="mr-arrow">›</span></a>
+        <a class="me-row" href="shop.html"><span class="mr-ico">购</span>去完整商店<span class="mr-arrow">›</span></a>
+        <a class="me-row" href="admin.html"><span class="mr-ico">管</span>管理后台<span class="mr-arrow">›</span></a>
+      </div>
+    </div>
+    <div id="meGuest" style="display:none;">
+      <div class="gate-box">
+        <div style="font-size:15px;font-weight:700;margin-bottom:6px;">登录后可使用</div>
+        <div style="font-size:13px;color:var(--txt2);margin-bottom:16px;">签到领积分、发动态、兑换商品</div>
+        <a class="btn" href="login.html">登录 / 注册</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 更多 -->
+  <section class="page" id="page-more">
+    <div class="more-grid">
+      <div class="more-card" onclick="openVote()"><div class="mc-ico">投</div><div class="mc-name">投票</div><div class="mc-desc">参与官方投票</div></div>
+      <div class="more-card" onclick="openUrl('tool.html')"><div class="mc-ico">具</div><div class="mc-name">便捷工具</div><div class="mc-desc">地图画/查询工具</div></div>
+      <div class="more-card" onclick="openRule()"><div class="mc-ico">约</div><div class="mc-name">玩家公约</div><div class="mc-desc">服务器规则</div></div>
+      <div class="more-card" onclick="openUrl('fbk.html')"><div class="mc-ico">馈</div><div class="mc-name">意见反馈</div><div class="mc-desc">提交建议/Bug</div></div>
+      <div class="more-card" onclick="openUrl('admin.html')"><div class="mc-ico">管</div><div class="mc-name">管理后台</div><div class="mc-desc">管理功能</div></div>
+      <div class="more-card" onclick="openUrl('shop.html')"><div class="mc-ico">全</div><div class="mc-name">完整商店</div><div class="mc-desc">电脑版商店</div></div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <div class="me-row" onclick="copyText('mc.163.com/open/mc_realms/?realms=270239C36AD')"><span class="mr-ico">址</span>复制服务器地址<span class="mr-arrow">›</span></div>
+      <div class="me-row" onclick="copyText('833470853')"><span class="mr-ico">群</span>复制 QQ 群号<span class="mr-arrow">›</span></div>
+      <div class="me-row" onclick="switchTheme()"><span class="mr-ico">色</span>切换主题<span class="mr-arrow" id="themeLab"></span></div>
+    </div>
+    <div class="muted" style="text-align:center;padding:16px;">The Slow Tide 手机版</div>
+  </section>
+</main>
+
+<nav class="tabbar">
+  <button class="tab active" data-tab="home"><span class="t-ico">首</span>首页</button>
+  <button class="tab" data-tab="shop"><span class="t-ico">店</span>商店</button>
+  <button class="tab" data-tab="posts"><span class="t-ico">动</span>动态</button>
+  <button class="tab" data-tab="me"><span class="t-ico">我</span>我的</button>
+  <button class="tab" data-tab="more"><span class="t-ico">更</span>更多</button>
+</nav>
+
+<!-- 弹窗 -->
+<div class="mask" id="mask"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<div class="gload" id="gload"><div class="gl-box"><span class="load-spinner"></span><span id="gloadText">加载中…</span></div></div>
+
+<script>
+/* ===== 常量与工具 ===== */
+var API='https://theslowtidefk.pages.dev/api';
+var token=localStorage.getItem('tst_token')||'';
+var myPoints=0, ALL_ITEMS=[], cart=[], SITE_DATA=null;
+function $(s){ return document.querySelector(s); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function fmt(n){ return Number(n||0).toLocaleString(); }
+function go(tab){ document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');}); document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');}); document.getElementById('page-'+tab).classList.add('active'); document.querySelector('.tab[data-tab="'+tab+'"]').classList.add('active'); if(tab==='shop')loadShop(); if(tab==='posts')loadPosts(); if(tab==='me')loadMe(); }
+/* ===== Toast ===== */
+var toastTimer=null;
+function toast(msg){ var t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.classList.remove('show');},2200); }
+/* ===== 全局加载 ===== */
+var glTimer=null;
+function showLoad(txt){ $('#gloadText').textContent=txt||'加载中…'; $('#gload').classList.add('show'); clearTimeout(glTimer); glTimer=setTimeout(function(){ hideLoad(); toast('加载超时，请点上方刷新重试'); },30000); }
+function hideLoad(){ $('#gload').classList.remove('show'); clearTimeout(glTimer); }
+/* ===== 主题 ===== */
+function themeInit(){ var m=localStorage.getItem('tst-theme'); if(m==='dark')document.documentElement.setAttribute('data-theme','dark'); else if(m==='glass')document.documentElement.setAttribute('data-theme','glass'); else document.documentElement.setAttribute('data-theme','light'); }
+function switchTheme(){ var cur=document.documentElement.getAttribute('data-theme')||'light'; var next=cur==='dark'?'light':(cur==='light'?'glass':'dark'); localStorage.setItem('tst-theme',next); document.documentElement.setAttribute('data-theme',next); var lab=$('#themeLab'); if(lab)lab.textContent={dark:'暗色',light:'亮色',glass:'玻璃'}[next]; }
+/* ===== 复制 ===== */
+function copyText(t){ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast('已复制');},function(){toast('复制失败');});} else {toast(t);} }
+function openUrl(u){ location.href=u; }
+/* ===== 云端时间 ===== */
+var cloudBaseMs=Date.now(),perfBase=performance.now();
+function cloudNow(){ try{return cloudBaseMs+(performance.now()-perfBase);}catch(e){return Date.now();} }
+(function(){ try{ fetch(location.href,{cache:'no-store'}).then(function(r){ var dh=r.headers.get('date'); if(dh){ var t=Date.parse(dh); if(!isNaN(t)){cloudBaseMs=t;perfBase=performance.now();} } }).catch(function(){}); }catch(e){} })();
+function pTime(ts){ if(!ts)return ''; var d=new Date(String(ts).replace(' ','T')); if(isNaN(d.getTime()))return String(ts); function p(n){return n<10?'0'+n:''+n;} return (d.getMonth()+1)+'月'+d.getDate()+'日 '+p(d.getHours())+':'+p(d.getMinutes()); }
+/* ===== 弹窗 ===== */
+function openSheet(html){ $('#sheet').innerHTML=html; $('#mask').classList.add('show'); }
+function closeSheet(){ $('#mask').classList.remove('show'); }
+$('#mask').addEventListener('click',function(e){ if(e.target===this)closeSheet(); });
+function esc2(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function pLink(t){ return esc2(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--acc);text-decoration:underline;">$1</a>'); }
+/* ===== 首页 ===== */
+async function loadHome(){
+  $('#homeAnnBox').innerHTML='<div class="empty-hint">加载中…</div>';
+  $('#homeFeedBox').innerHTML='<div class="empty-hint">加载中…</div>';
+  try{
+    var r=await fetch('/api/data',{cache:'no-store'});
+    var d=await r.json();
+    SITE_DATA=d;
+    var anns=(d.announcements||[]).filter(function(a){return !String(a.title||'').startsWith('hist:');}).slice(0,3);
+    var hists=(d.announcements||[]).filter(function(a){return String(a.title||'').startsWith('hist:');}).slice(-4).reverse();
+    $('#homeAnnBox').innerHTML=anns.length?anns.map(function(a){return '<div class="ann-item"><div>'+pLink(a.content)+'</div><div class="a-date">'+esc2(a.title||a.date||'')+'</div></div>';}).join(''):(hists.length?hists.map(function(h){return '<div class="hist-line"><b>'+esc2(String(h.title).replace(/^hist:/,''))+'</b> '+pLink(h.content)+'</div>';}).join(''):'<div class="empty-hint">暂无公告</div>');
+    var feeds=(d.feeds||[]).slice(0,3);
+    $('#homeFeedBox').innerHTML=feeds.length?feeds.map(function(f){return feedCard(f);}).join(''):'<div class="empty-hint">暂无动态</div>';
+  }catch(e){ $('#homeAnnBox').innerHTML='<div class="empty-hint">加载失败，请刷新</div>'; }
+}
+function feedCard(f){
+  var pin=f.pinned?'<span class="fc-tag">置顶</span>':'';
+  return '<div class="feed-card"><div class="fc-head"><div style="flex:1;min-width:0;"><b class="fc-name">'+esc2(f.title||'')+'</b></div><span class="fc-time">'+pTime(f.date||f.created_at||'')+'</span>'+pin+'</div><div class="fc-body">'+pLink(f.content||'')+'</div>'+(f.image&&!String(f.image).startsWith('data:')?'<img class="fc-img" src="'+esc2(f.image)+'" alt="" loading="lazy">':'')+'</div>';
+}
+/* ===== 商店 ===== */
+async function loadShop(){
+  if(!token){ $('#shopWrap').style.display='none'; $('#shopGate').style.display='block'; return; }
+  $('#shopWrap').style.display='block'; $('#shopGate').style.display='none';
+  try{
+    var r=await fetch(API+'/shop/items',{headers:{'Authorization':'Bearer '+token},cache:'no-store'});
+    var d=await r.json();
+    if(!d||!d.ok){ toast('加载商店失败'); return; }
+    ALL_ITEMS=(d.items||[]).filter(function(x){return x.active!==0;});
+    renderCats(); renderShopItems(); renderPoints();
+  }catch(e){ toast('商店加载失败'); }
+}
+function renderCats(){
+  var cats=['全部'];
+  ALL_ITEMS.forEach(function(it){ var c=(it.category||'物资'); if(cats.indexOf(c)<0)cats.push(c); });
+  $('#shopCats').innerHTML=cats.map(function(c,i){ return '<button class="cat-chip'+(i===0?' on':'')+'" data-cat="'+esc2(c)+'">'+esc2(c)+'</button>'; }).join('');
+  document.querySelectorAll('.cat-chip').forEach(function(ch){ ch.onclick=function(){ document.querySelectorAll('.cat-chip').forEach(function(x){x.classList.remove('on');}); ch.classList.add('on'); renderShopItems(ch.dataset.cat); }; });
+}
+function renderShopItems(cat){
+  var list=cat&&cat!=='全部'?ALL_ITEMS.filter(function(x){return (x.category||'物资')===cat;}):ALL_ITEMS;
+  $('#shopGrid').innerHTML=list.length?list.map(function(it){ return '<div class="shop-item" onclick="openDetail('+it.id+')"><img class="si-icon" src="'+esc2(it.icon||'')+'" alt="" loading="lazy"><div class="si-name">'+esc2(it.name)+'</div><div class="si-desc">'+esc2(it.desc||'')+'</div><div class="si-foot"><span class="si-price">'+fmt(it.price)+'<small> 积分</small></span><button class="si-buy" onclick="event.stopPropagation();buyNow('+it.id+')">兑换</button></div></div>'; }).join(''):'<div class="empty-hint">该分类暂无商品</div>';
+}
+function openDetail(id){
+  var it=ALL_ITEMS.find(function(x){return x.id===id;}); if(!it)return;
+  var qty=1;
+  function meta(){ var m=''; if(it.period&&it.period_limit>0)m+='每人每'+({day:'天',week:'周',month:'月',total:'次'}[it.period]||it.period)+'限 '+it.period_limit+' 个\n'; if(it.lifetime_limit>0&&it.lifetime_limit<999999)m+='终身限 '+it.lifetime_limit+' 个\n'; if(it.stock>0)m+='库存 '+it.stock+' 个'; return m; }
+  function body(){ return '<div class="sh-title">商品详情<button class="sh-x" onclick="closeSheet()">✕</button></div><img class="detail-icon" src="'+esc2(it.icon||'')+'"><div class="detail-name">'+esc2(it.name)+'</div><div class="detail-desc">'+pLink(it.desc||'')+'</div><div class="detail-price">'+fmt(it.price*qty)+' 积分</div><div class="detail-meta">'+esc2(meta())+'</div><div class="qty-row"><button class="qty-btn" onclick="(function(){qty=Math.max(1,qty-1);renderQ();})()">−</button><span class="qty-num" id="dqNum">1</span><button class="qty-btn" onclick="(function(){qty+=1;renderQ();})()">+</button></div><div class="detail-meta" id="dqTip"></div><button class="btn" onclick="buyItem('+it.id+',qty)">立即兑换</button><button class="btn gray" onclick="closeSheet()">取消</button>'; }
+  function renderQ(){ $('#dqNum').textContent=qty; }
+  openSheet(body());
+}
+function buyNow(id){ openDetail(id); }
+async function buyItem(id,qty){
+  if(!token){ toast('请先登录'); location.href='login.html'; return; }
+  showLoad('正在兑换…');
+  try{
+    var r=await fetch(API+'/shop/buy',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({item_id:id})});
+    var d=await r.json();
+    hideLoad();
+    if(d&&d.ok){ toast('兑换成功'); closeSheet(); renderPoints(); }
+    else toast((d&&d.msg)||(d&&d.error)||'兑换失败');
+  }catch(e){ hideLoad(); toast('网络错误'); }
+}
+async function renderPoints(){
+  try{
+    var r=await fetch(API+'/shop/state',{headers:{'Authorization':'Bearer '+token},cache:'no-store'});
+    var d=await r.json();
+    if(d&&d.ok){ myPoints=d.points||0; $('#ptsNum').textContent=fmt(myPoints); }
+  }catch(e){}
+}
+/* ===== 动态 ===== */
+var POST_API='https://theslowtidefk.pages.dev/api/posts';
+function pDev(){ var d=localStorage.getItem('tst_dev_id'); if(!d){d='d'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('tst_dev_id',d);} return d; }
+async function loadPosts(){
+  $('#postList').innerHTML='<div class="empty-hint">加载中…</div>';
+  try{
+    var r=await fetch(POST_API+'/list?sort=new&filter=all&dev='+encodeURIComponent(pDev()),{cache:'no-store'});
+    var d=await r.json();
+    var apiPosts=(d&&d.posts)||[];
+    var feeds=(SITE_DATA&&SITE_DATA.feeds)||[];
+    var list=[];
+    feeds.forEach(function(f){ list.push({id:'feed-'+f.id,name:'官方',content:(f.title||'')+(f.content?('\n'+f.content):''),image:!String(f.image||'').startsWith('data:')?f.image:'',created_at:f.date||'',official:true,pinned:!!f.pinned,feed:true}); });
+    list.sort(function(a,b){return (b.created_at||'').localeCompare(a.created_at||'');});
+    apiPosts.forEach(function(p){ list.push(p); });
+    var cnt=$('#poCount'); if(cnt)cnt.textContent='共 '+list.length+' 条';
+    $('#postList').innerHTML=list.length?list.map(function(p){
+      var pin=p.pinned?'<span class="fc-tag">置顶</span>':'';
+      var off=p.official?'<span class="fc-tag">官方</span>':'';
+      var shown=(p.author_nickname&&p.author_nickname!==p.name)?p.author_nickname:((p.name&&!/@/.test(p.name))?p.name:'玩家');
+      return '<div class="card feed-card"><div class="fc-head"><b class="fc-name">'+esc2(shown)+'</b><span class="fc-time">'+pTime(p.created_at)+'</span>'+off+pin+'</div><div class="fc-body">'+pLink(p.content)+'</div>'+(p.image?'<img class="fc-img" src="'+esc2(p.image)+'" alt="" loading="lazy">':'')+'</div>';
+    }).join(''):'<div class="empty-hint">还没有动态</div>';
+  }catch(e){ $('#postList').innerHTML='<div class="empty-hint">加载失败</div>'; }
+}
+var poImgData='';
+function openPostSheet(){
+  if(!token){ toast('请先登录后再发动态'); location.href='login.html'; return; }
+  openSheet('<div class="sh-title">发布动态<button class="sh-x" onclick="closeSheet()">✕</button></div>'+
+    '<label>内容</label><textarea id="poContent" placeholder="分享你的游戏时刻…"></textarea>'+
+    '<label>图片（可选，自动压缩）</label><input type="file" id="poFile" accept="image/*">'+
+    '<div class="post-img-prev" id="poPrev"><img id="poPrevImg" alt=""></div>'+
+    '<button class="btn" onclick="submitPost()">发布</button><button class="btn gray" onclick="closeSheet()">取消</button>');
+  $('#poFile').onchange=function(){
+    var f=this.files[0]; if(!f)return;
+    var rd=new FileReader();
+    rd.onload=function(){
+      var im=new Image();
+      im.onload=function(){
+        var max=640,w=im.width,h=im.height,s=Math.max(w,h);
+        if(s>max){w=Math.round(w*max/s);h=Math.round(h*max/s);}
+        var cv=document.createElement('canvas');cv.width=w;cv.height=h;
+        cv.getContext('2d').drawImage(im,0,0,w,h);
+        poImgData=cv.toDataURL('image/jpeg',0.75);
+        $('#poPrevImg').src=poImgData; $('#poPrev').style.display='block';
+      };
+      im.src=rd.result;
+    };
+    rd.readAsDataURL(f);
+  };
+}
+async function submitPost(){
+  var content=$('#poContent').value.trim();
+  if(!content){ toast('内容不能为空'); return; }
+  showLoad('发布中…');
+  try{
+    var r=await fetch(POST_API+'/create',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({content:content,image:poImgData||undefined})});
+    var d=await r.json();
+    hideLoad();
+    if(d&&d.ok){ toast('已发布'); closeSheet(); poImgData=''; loadPosts(); if(SITE_DATA)loadHome(); }
+    else toast((d&&d.msg)||(d&&d.error)||'发布失败');
+  }catch(e){ hideLoad(); toast('网络错误'); }
+}
+/* ===== 我的 ===== */
+async function loadMe(){
+  if(!token){ $('#meGuest').style.display='block'; $('#meLogged').style.display='none'; return; }
+  $('#meGuest').style.display='none'; $('#meLogged').style.display='block';
+  try{
+    var r=await fetch(API+'/me',{headers:{'Authorization':'Bearer '+token},cache:'no-store'});
+    var d=await r.json();
+    if(d&&d.ok){
+      var nick=d.nickname||String(d.email||'').split('@')[0]||'玩家';
+      $('#meName').textContent=nick; $('#meMail').textContent=d.email||'';
+      $('#meAv').textContent=(nick||'客').slice(0,1).toUpperCase();
+      $('#tbUser').href='profile.html';
+      $('#tbName').textContent=nick; $('#tbAv').textContent=(nick||'客').slice(0,1).toUpperCase();
+      $('#ptsNum').textContent=fmt(d.points||0);
+      $('#mePtsNum').textContent=fmt(d.points||0);
+      $('#meSignBtn').innerHTML=d.checked_today?'<button class="btn ghost" disabled>今日已签到</button>':'<button class="btn primary" onclick="checkin()">每日签到 +'+fmt(d.checkin_reward||10)+'</button>';
+    }
+  }catch(e){}
+}
+async function checkin(){
+  if(!token){ toast('请先登录'); location.href='login.html'; return; }
+  showLoad('签到中…');
+  try{
+    var r=await fetch(API+'/shop/checkin',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}});
+    var d=await r.json();
+    hideLoad();
+    if(d&&d.ok){ toast('签到成功 +'+fmt(d.points||d.reward||0)+' 积分'); loadMe(); renderPoints(); }
+    else toast((d&&d.msg)||(d&&d.error)||'签到失败');
+  }catch(e){ hideLoad(); toast('网络错误'); }
+}
+function coinGive(){
+  if(!token){ toast('请先登录'); location.href='login.html'; return; }
+  openSheet('<div class="sh-title">投币说明<button class="sh-x" onclick="closeSheet()">✕</button></div><div class="detail-desc">在动态列表中，每给自己以外玩家的动态都可以投币支持（1 条动态限投 1 次）。本页动态列表暂未开放投币按钮，请到完整商店或电脑版查看支持。</div><a class="btn" href="shop.html">去完整版</a><button class="btn gray" onclick="closeSheet()">关闭</button>');
+}
+/* ===== 投票/公约/其他 ===== */
+function openVote(){ location.href='index.html?goto=vote'; }
+function openRule(){ openSheet('<div class="sh-title">玩家公约<button class="sh-x" onclick="closeSheet()">✕</button></div><div class="rule-box" id="ruleBox">加载中…</div>'); if(SITE_DATA&&SITE_DATA.rules){ $('#ruleBox').textContent=SITE_DATA.rules; } }
+/* ===== 初始化 ===== */
+themeInit();
+var themeLab=$('#themeLab'); if(themeLab)themeLab.textContent={dark:'暗色',light:'亮色',glass:'玻璃'}[document.documentElement.getAttribute('data-theme')||'light'];
+if(token){ var h=document.querySelector('.tb-user'); if(h){ h.href='profile.html'; } renderPoints(); }
+loadHome();
+$('#cartBtn').style.display='none';
+</script>
 </body>
 </html>
