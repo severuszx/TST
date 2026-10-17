@@ -67,6 +67,10 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 .admin-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
 .admin-pane{display:none;}
 .admin-pane.active{display:block;}
+.ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+.ov-card{background:var(--hover);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.ov-num{font-size:22px;font-weight:800;color:var(--accent);}
+.ov-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
 .admin-list-item{display:flex;align-items:flex-start;gap:10px;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
 .admin-list-item:last-child{border-bottom:none;}
 .admin-list-item .meta{font-size:13px;color:var(--text-secondary);}
@@ -816,6 +820,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 </div>
 <div id="adminPanel" style="display:none;">
 <div class="admin-tabs">
+<button class="admin-tab" data-tab="overview">概览</button>
 <button class="admin-tab active" data-tab="notice">公告管理</button>
 <button class="admin-tab" data-tab="history">历史管理</button>
 <button class="admin-tab" data-tab="feed">动态管理</button>
@@ -826,6 +831,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 <button class="admin-tab" data-tab="shop">商店管理</button>
 <button class="admin-tab" data-tab="users">玩家管理</button>
 <button class="admin-tab" data-tab="posts">帖子管理</button>
+<button class="admin-tab" data-tab="admins">管理员</button>
 </div>
 <div class="admin-pane active" id="paneNotice">
 <div class="card">
@@ -904,6 +910,13 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 </div>
 <div id="ltList"></div>
 </div>
+<div class="admin-pane" id="paneOverview">
+<div class="card">
+<h3>网站概览</h3>
+<div id="ovStats" class="ov-grid"><div class="load-box"><span class="load-spinner"></span><span class="load-text">统计加载中…</span></div></div>
+<div style="margin-top:14px;"><button class="btn btn-primary" id="ovRefreshBtn">刷新统计</button></div>
+</div>
+</div>
 <div class="admin-pane" id="paneShop">
 <div class="card">
 <div class="form-row"><label>管理员密码（商店操作校验）</label><input type="password" id="shopPwd" placeholder="请输入管理员密码"></div>
@@ -946,6 +959,15 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 </div>
 <div id="poList"></div>
 </div>
+</div>
+<div class="admin-pane" id="paneAdmins">
+<div class="card">
+<h3>管理员权限（仅站长可见）</h3>
+<div class="form-row"><label>设置管理员（按邮箱）</label><input type="text" id="admEmail" placeholder="玩家邮箱"></div>
+<div class="form-row"><label>权限</label><select id="admLevel"><option value="1">管理员</option><option value="0">取消管理员</option></select></div>
+<button class="btn btn-primary" id="admSetBtn">保存设置</button>
+</div>
+<div id="admList" style="margin-top:14px;"></div>
 </div>
 </div>
 </main>
@@ -1013,11 +1035,12 @@ function lotteryApi(action,payload){
 }
 const FK='https://theslowtidefk.pages.dev/api';
 function getPw(){ return ($('#shopPwd').value||'').trim(); }
+function getTok(){ return localStorage.getItem('tst_token')||''; }
 async function shopApi(action,data){
-  const pw=getPw(); if(!pw){showToast('请先输入管理员密码');return null;}
+  const tok=getTok(); if(!tok){showToast('请先登录官网账号');return null;}
   showLoad(15000);
   try{
-    const r=await fetch(FK+'/shop/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action,pw},data||{}))});
+    const r=await fetch(FK+'/shop/admin',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(Object.assign({action},data||{}))});
     const d=await r.json();
     hideLoad();
     if(d&&d.ok) return d;
@@ -1026,10 +1049,10 @@ async function shopApi(action,data){
   }catch(e){hideLoad();showToast('网络错误，请重试');return null;}
 }
 async function usersApi(action,data){
-  const pw=getPw(); if(!pw){showToast('请先输入管理员密码');return null;}
+  const tok=getTok(); if(!tok){showToast('请先登录官网账号');return null;}
   showLoad(15000);
   try{
-    const r=await fetch(FK+'/admin/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action,pw},data||{}))});
+    const r=await fetch(FK+'/admin/users',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(Object.assign({action},data||{}))});
     const d=await r.json();
     hideLoad();
     if(d&&d.ok) return d;
@@ -1038,10 +1061,10 @@ async function usersApi(action,data){
   }catch(e){hideLoad();showToast('网络错误，请重试');return null;}
 }
 async function postsApi(action,data){
-  const pw=getPw(); if(!pw){showToast('请先输入管理员密码');return null;}
+  const tok=getTok(); if(!tok){showToast('请先登录官网账号');return null;}
   showLoad(15000);
   try{
-    const r=await fetch(FK+'/posts/admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action,pw},data||{}))});
+    const r=await fetch(FK+'/posts/admin',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(Object.assign({action},data||{}))});
     const d=await r.json();
     hideLoad();
     if(d&&d.ok) return d;
@@ -1050,22 +1073,40 @@ async function postsApi(action,data){
   }catch(e){hideLoad();showToast('网络错误，请重试');return null;}
 }
 async function postsCreateApi(data){
+  const tok=getTok(); if(!tok){showToast('请先登录官网账号');return null;}
   showLoad(15000);
   try{
-    const r=await fetch(FK+'/posts/admin_create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})});
+    const r=await fetch(FK+'/posts/admin_create',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(Object.assign({},data||{}))});
     const d=await r.json();
     hideLoad();
     if(d&&d.ok) return d;
     showToast(d&&d.msg?d.msg:(d&&d.error?('操作失败：'+d.error):'操作失败'));
     return null;
-  }catch(e){showToast('网络错误，请重试');return null;}
+  }catch(e){hideLoad();showToast('网络错误，请重试');return null;}
 }
 // ===== 商店管理 =====
+async function adminInit(){
+  const tok=getTok(); if(!tok){ showToast('请先登录官网账号'); return; }
+  const w=await usersApi('whoami',{});
+  if(w&&w.ok&&w.admin_level>=1){
+    const pwdCard=$('#shopPwd') ? $('#shopPwd').closest('.card') : null;
+    if(pwdCard) pwdCard.style.display='none';
+    $('#shopMgr').style.display='block';
+    $('#shopPointsBox').style.display='block';
+    window.__ADMIN_LEVEL=w.admin_level||0;
+    window.__IS_OWNER=!!w.owner;
+    reloadShop(); loadUsers(); loadStats(); loadAdmins(); loadCodes(); loadPostsList();
+    showToast('欢迎回来，'+(window.__IS_OWNER?'站长':'管理员'));
+  } else {
+    showToast('当前账号无管理权限');
+  }
+}
 $('#shopPwdBtn').onclick=async()=>{
   const pw=getPw(); if(!pw){showToast('请输入管理员密码');return;}
   const d=await shopApi('item_list',{});
   if(d){$('#shopMgr').style.display='block';$('#shopPointsBox').style.display='block';renderShopItems(d.items);showToast('商店管理已解锁');}
 };
+adminInit();
 async function renderShopItems(items){
   $('#spiList').innerHTML=(items||[]).map(it=>{
     const lim=it.period==='none'?'不限购':(it.period==='day'?'每日 ':(it.period==='week'?'每周 ':'每月 '))+(it.period_limit||0)+' 次';
@@ -1130,13 +1171,17 @@ async function renderUsers(q){
   const d=await usersApi('list',{q:q||''});
   if(!d){ $('#usrList').innerHTML=''; return; }
   $('#usrList').innerHTML=(d.users||[]).map(u=>{
+    const al=u.admin_level||0;
+    const tag=al>=9?'<span style="color:#f59e0b;font-size:12px;font-weight:700;">站长</span>':(al>=1?'<span style="color:#2563eb;font-size:12px;font-weight:700;">管理员</span>':'');
+    const ownerBtn=(window.__IS_OWNER&&al<9)?'<button class="btn sm" onclick="userSetAdmin(\''+esc(u.email).replace(/'/g,"\\'")+'\','+(al>=1?0:1)+')">'+(al>=1?'取消管理员':'设为管理员')+'</button>':'';
     return '<div class="card" style="padding:10px 14px;margin-bottom:8px;">'+
       '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'+
         (u.avatar?'<img src="'+esc(u.avatar)+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" alt="">':'<div style="width:36px;height:36px;border-radius:50%;background:var(--hover);display:flex;align-items:center;justify-content:center;">👤</div>')+
-        '<div style="flex:1;min-width:130px;"><b>'+esc(u.nickname||'未设置昵称')+'</b> '+(u.banned?'<span style="color:#ef4444;font-size:12px;">已封禁</span>':'')+'<br>'+
+        '<div style="flex:1;min-width:130px;"><b>'+esc(u.nickname||'未设置昵称')+'</b> '+tag+(u.banned?'<span style="color:#ef4444;font-size:12px;">已封禁</span>':'')+'<br>'+
         '<span style="font-size:12px;color:var(--text-secondary);">'+esc(u.email)+' · UID:'+esc(u.uid||'-')+' · 注册 '+esc((u.created_at||'').slice(0,10))+'</span></div>'+
         '<div style="font-weight:700;color:var(--warn);">'+u.points+' 积分</div>'+
         '<div style="display:flex;gap:6px;flex-wrap:wrap;">'+
+          ownerBtn+
           '<button class="btn sm" onclick="userPoints(\''+esc(u.email).replace(/'/g,"\\'")+'\',100)">+100</button>'+
           '<button class="btn sm" onclick="userPoints(\''+esc(u.email).replace(/'/g,"\\'")+'\',-100)">-100</button>'+
           '<button class="btn sm" onclick="userBan(\''+esc(u.email).replace(/'/g,"\\'")+'\','+(u.banned?0:1)+')">'+(u.banned?'解封':'封禁')+'</button>'+
@@ -1144,6 +1189,41 @@ async function renderUsers(q){
         '</div>'+
       '</div></div>';
   }).join('')||'<div class="empty-hint">没有找到玩家</div>';
+}
+async function loadUsers(){ renderUsers($('#usrQ').value.trim()); }
+async function loadPostsList(){ renderPosts(); }
+async function loadStats(){
+  const d=await usersApi('stats',{});
+  if(!d||!d.stats){ $('#ovStats').innerHTML='<div class="empty-hint">统计加载失败</div>'; return; }
+  const s=d.stats;
+  const rows=[
+    ['注册玩家',s.users||0],['帖子',s.posts||0],['评论',s.comments||0],['点赞',s.likes||0],
+    ['商店商品',s.shop_items||0],['兑换订单',s.orders||0],['已用兑换码',s.codes_used||0],
+    ['签到次数',s.checkins||0],['积分流水',s.points_log||0],['投币记录',s.coins||0]
+  ];
+  $('#ovStats').innerHTML=rows.map(r=>'<div class="ov-card"><div class="ov-num">'+r[1]+'</div><div class="ov-label">'+r[0]+'</div></div>').join('');
+}
+$('#ovRefreshBtn').onclick=()=>{ loadStats(); };
+async function loadAdmins(){
+  const d=await usersApi('list',{q:''});
+  if(!d){ $('#admList').innerHTML=''; return; }
+  const ads=(d.users||[]).filter(u=>(u.admin_level||0)>=1);
+  $('#admList').innerHTML='<div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">当前管理员 '+ads.length+' 人</div>'+
+    (ads.map(u=>'<div class="card" style="padding:10px 14px;margin-bottom:8px;">'+
+      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'+
+        '<b>'+esc(u.nickname||'未设置昵称')+'</b>'+(u.admin_level>=9?'<span style="color:#f59e0b;font-size:12px;font-weight:700;">站长</span>':'<span style="color:#2563eb;font-size:12px;font-weight:700;">管理员</span>')+
+        '<span style="font-size:12px;color:var(--text-secondary);margin-left:auto;">'+esc(u.email)+'</span>'+
+      '</div></div>').join('')||'<div class="empty-hint">暂无管理员</div>');
+}
+$('#admSetBtn').onclick=async()=>{
+  const email=$('#admEmail').value.trim(); if(!email){showToast('请输入邮箱');return;}
+  const d=await usersApi('set_admin',{email,level:$('#admLevel').value});
+  if(d){ showToast('权限已更新'); $('#admEmail').value=''; loadAdmins(); loadUsers(); }
+};
+async function userSetAdmin(email,level){
+  if(!confirm('确定'+(level?'设为管理员':'取消管理员')+' '+email+'？')) return;
+  const d=await usersApi('set_admin',{email,level});
+  if(d){ showToast('权限已更新'); loadAdmins(); loadUsers(); }
 }
 async function userPoints(email,delta){ const d=await usersApi('points',{email,delta,reason:'admin'}); if(d){ showToast('已操作，当前积分 '+d.points); renderUsers($('#usrQ').value.trim()); } }
 async function userBan(email,ban){ if(!confirm((ban?'确定封禁 ':'确定解封 ')+email+'？')) return; const d=await usersApi('ban',{email,ban:ban?1:0}); if(d){ showToast('已'+(ban?'封禁':'解封')); renderUsers($('#usrQ').value.trim()); } }
