@@ -85,6 +85,8 @@ a{color:inherit;text-decoration:none;}
 .hero h1 .g{color:var(--gold);}
 .hero .sub{font-size:15px;color:#cbd5e1;margin-bottom:22px;}
 .hero .tagline{font-size:14px;color:#94a3b8;letter-spacing:3px;}
+.dev-badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);padding:4px 16px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:12px;background:rgba(176,141,62,.08);}
+.hero .note{font-size:13px;color:#8b95a5;margin-top:14px;letter-spacing:1px;}
 @media(max-width:960px){
 .hero-banner img{height:180px;}
 .hero{padding-bottom:40px;}
@@ -174,6 +176,9 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 .section{padding:34px 0;}
 .sec-head h2{font-size:20px;}
 }
+/* 入场动画 */
+.reveal{transition:opacity .55s ease,transform .55s ease;}
+.reveal.in{opacity:1;transform:none;}
 </style>
 </head>
 <body>
@@ -209,10 +214,12 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
   <section class="hero">
     <div class="hero-banner"><img src="hogwarts_castle.jpg" alt="霍格沃茨城堡夜景"></div>
     <div class="container hero-body">
+      <div class="dev-badge">正在开发中 · 企划预告</div>
       <div class="kicker">完全独立的开放世界 RPG · 哈利波特世界观</div>
       <h1>霍格沃茨异世秘录<br><span class="g">三代黑暗余烬</span></h1>
       <p class="sub">黑魔王战败落幕三十余年，魔法界终于褪去战火硝烟。但无人知晓——跨越三个时代的黑暗隐患，始终深埋在这片土地之中。</p>
       <div class="tagline">一场跨越百年的魔法史诗，静待你的开启</div>
+      <p class="note">本服务器仍在开发中，本页为世界观与玩法企划预告，正式上线时间敬请期待。</p>
       <div class="epochs">
         <div class="epoch"><div class="yr">1890</div><div class="tx">远古封印破裂<br>古代魔法失控</div></div>
         <div class="epoch"><div class="yr">1920</div><div class="tx">默然虚空席卷<br>格林德沃动荡</div></div>
@@ -527,6 +534,26 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
       bgm.play().then(setState).catch(function(){ setState(); });
       clearTimeout(t);
     },600);
+  }
+  // 入场动画:元素滚动进入视口时淡入上浮
+  var revealSel='.card,.tl-item,.ending,.sec-head,.hero-body';
+  var items=document.querySelectorAll(revealSel);
+  if('IntersectionObserver' in window){
+    items.forEach(function(el){
+      el.style.opacity='0';
+      el.style.transform='translateY(16px)';
+    });
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          en.target.classList.add('in');
+          io.unobserve(en.target);
+        }
+      });
+    },{threshold:0.1});
+    items.forEach(function(el){ io.observe(el); });
+  } else {
+    items.forEach(function(el){ el.classList.add('in'); });
   }
 })();
 </script>
