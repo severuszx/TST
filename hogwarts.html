@@ -177,6 +177,8 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 .sec-head h2{font-size:20px;}
 }
 /* 入场动画 */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+.hero-body{animation:fadeUp .6s ease .1s both;}
 .reveal{transition:opacity .55s ease,transform .55s ease;}
 .reveal.in{opacity:1;transform:none;}
 </style>
@@ -535,10 +537,11 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
       clearTimeout(t);
     },600);
   }
-  // 入场动画:元素滚动进入视口时淡入上浮
-  var revealSel='.card,.tl-item,.ending,.sec-head,.hero-body';
+  // 入场动画:元素滚动进入视口时淡入上浮(hero 用 CSS 动画,不依赖此逻辑)
+  var revealSel='.card,.tl-item,.ending,.sec-head';
   var items=document.querySelectorAll(revealSel);
   if('IntersectionObserver' in window){
+    var ioOk=false;
     items.forEach(function(el){
       el.style.opacity='0';
       el.style.transform='translateY(16px)';
@@ -548,10 +551,15 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
         if(en.isIntersecting){
           en.target.classList.add('in');
           io.unobserve(en.target);
+          ioOk=true;
         }
       });
     },{threshold:0.1});
     items.forEach(function(el){ io.observe(el); });
+    // 兜底:若 IO 从未触发(环境不支持/异常),1.5s 后强制全部显示,避免页面空白
+    setTimeout(function(){
+      if(!ioOk){ items.forEach(function(el){ el.classList.add('in'); }); }
+    },1500);
   } else {
     items.forEach(function(el){ el.classList.add('in'); });
   }
