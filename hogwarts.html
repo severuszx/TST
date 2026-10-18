@@ -227,6 +227,15 @@ html{scroll-behavior:smooth;}
 .pop-close{position:absolute;top:8px;right:10px;border:none;background:none;color:var(--text-secondary);font-size:18px;cursor:pointer;padding:2px 6px;}
 .pop-title{font-size:15px;font-weight:700;color:var(--gold);margin-bottom:6px;padding-right:24px;}
 .pop-desc{font-size:13px;color:var(--text);line-height:1.7;}
+.pop-tasks{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.pop-task{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;background:var(--hover);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);cursor:pointer;transition:border-color .15s;}
+.pop-task:hover{border-color:var(--gold);}
+.pop-tag{font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:8px;padding:1px 6px;white-space:nowrap;flex:none;}
+.pop-hint{font-size:12px;color:var(--text-secondary);margin-top:10px;}
+.pop-back{border:none;background:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0 0 10px;}
+.pop-sec{margin-top:10px;}
+.pop-sec b{display:block;font-size:12px;color:var(--gold);margin-bottom:3px;}
+.pop-sec p{font-size:13px;color:var(--text);line-height:1.65;margin:0;}
 
 @media(max-width:960px){
 .layout{display:block;padding:0 14px;}
@@ -523,22 +532,23 @@ html{scroll-behavior:smooth;}
       </div>
       <div class="map-wrap">
         <img src="hogwarts_map.jpg" alt="霍格沃茨及周边魔法地图">
-        <button class="map-pin" style="left:50%;top:8%" data-title="霍格莫德村" data-desc="神奇动物支线「迷途嗅嗅」——被黑雾惊吓的嗅嗅在村里乱窜偷东西；黑势力支线「密探抓捕」也发生在这里。"><span class="pin-dot"></span><span class="pin-tag">霍格莫德村</span></button>
-        <button class="map-pin" style="left:66%;top:27%" data-title="海格的小屋" data-desc="一年级「走廊异象调查」完成后解锁海格对话；二年级主线「禁林异动报告」从这里开始。"><span class="pin-dot"></span><span class="pin-tag">海格小屋</span></button>
-        <button class="map-pin" style="left:86%;top:35%" data-title="禁林" data-desc="主线「禁林异动报告」、神奇动物「马人预警」「护树罗锅栖息地」——越深入，越接近百年黑暗的真相。"><span class="pin-dot"></span><span class="pin-tag">禁林</span></button>
-        <button class="map-pin" style="left:17%;top:41%" data-title="魁地奇球场" data-desc="校园休闲「魁地奇赛事备战」——给学院队当替补，练完就上场。"><span class="pin-dot"></span><span class="pin-tag">魁地奇球场</span></button>
-        <button class="map-pin" style="left:39%;top:45%" data-title="霍格沃茨城堡" data-desc="一切开始的地方——新生入学登记、分院仪式、城堡向导、走廊异象调查，你的七学年由此展开。"><span class="pin-dot"></span><span class="pin-tag">城堡</span></button>
-        <button class="map-pin" style="left:67%;top:50%" data-title="温室与菜园" data-desc="教授的私人委托常来自这里——收集草药、整理书籍、捕获出逃实验小动物，循环刷新。"><span class="pin-dot"></span><span class="pin-tag">温室菜园</span></button>
-        <button class="map-pin" style="left:39%;top:60%" data-title="黑湖" data-desc="斯莱特林专属支线「纯血家族的秘密信件」——潜入湖底，取回记录家族分歧的尘封信件。"><span class="pin-dot"></span><span class="pin-tag">黑湖</span></button>
-        <button class="map-pin" style="left:69%;top:72%" data-title="霍格莫德车站" data-desc="穿过九又四分之三站台，登上霍格沃茨特快列车——这段旅程的起点。"><span class="pin-dot"></span><span class="pin-tag">车站</span></button>
+        <button class="map-pin" style="left:50%;top:8%" data-key="hogsmeade"><span class="pin-dot"></span><span class="pin-tag">霍格莫德村</span></button>
+        <button class="map-pin" style="left:66%;top:27%" data-key="hagrid"><span class="pin-dot"></span><span class="pin-tag">海格小屋</span></button>
+        <button class="map-pin" style="left:86%;top:35%" data-key="forest"><span class="pin-dot"></span><span class="pin-tag">禁林</span></button>
+        <button class="map-pin" style="left:17%;top:41%" data-key="quidditch"><span class="pin-dot"></span><span class="pin-tag">魁地奇球场</span></button>
+        <button class="map-pin" style="left:39%;top:45%" data-key="castle"><span class="pin-dot"></span><span class="pin-tag">城堡</span></button>
+        <button class="map-pin" style="left:67%;top:50%" data-key="greenhouse"><span class="pin-dot"></span><span class="pin-tag">温室菜园</span></button>
+        <button class="map-pin" style="left:66%;top:36%" data-key="willow"><span class="pin-dot"></span><span class="pin-tag">打人柳</span></button>
+        <button class="map-pin" style="left:46%;top:55%" data-key="cliffs"><span class="pin-dot"></span><span class="pin-tag">悬崖·地底</span></button>
+        <button class="map-pin" style="left:39%;top:60%" data-key="lake"><span class="pin-dot"></span><span class="pin-tag">黑湖</span></button>
+        <button class="map-pin" style="left:69%;top:72%" data-key="station"><span class="pin-dot"></span><span class="pin-tag">车站</span></button>
       </div>
     </div>
   </section>
 
   <div class="map-pop" id="mapPop" hidden>
     <button class="pop-close" id="popClose">&#10005;</button>
-    <div class="pop-title" id="popTitle"></div>
-    <div class="pop-desc" id="popDesc"></div>
+    <div class="pop-body" id="popBody"></div>
   </div>
 
   <!-- ===== 结局 ===== -->
@@ -684,21 +694,88 @@ html{scroll-behavior:smooth;}
     secs.forEach(function(o){ io.observe(o.s); });
   }
   // 魔法地图任务点弹窗
+  var mapTasks={
+    'hogsmeade':{title:'霍格莫德村',tasks:[
+      {name:'迷途嗅嗅',tag:'神奇动物',goal:'寻找嗅嗅,带回巢穴',story:'一只嗅嗅被黑雾惊吓逃出巢穴,在霍格莫德四处乱窜,偷走居民小件物品,需要找到并安抚嗅嗅。',reward:'货币,少量稀有材料'},
+      {name:'黑势力密探抓捕',tag:'魔法部支线',goal:'追踪并拦截密探,截获情报',story:'食死徒余党派遣密探潜入霍格莫德收集情报。追踪密探,截获情报。',reward:'魔法部声望'}
+    ]},
+    'hagrid':{title:'海格的小屋',tasks:[
+      {name:'禁林异动报告',tag:'二年级主线',goal:'进入禁林外围,观察异变生物',story:'海格发现禁林内生物性情狂暴,鹿、狐狸等生物被黑雾浸染后攻击闯入者,请求你协助查看情况。',reward:'经验,解锁禁林外围区域'},
+      {name:'解锁海格对话',tag:'一年级奖励',goal:'与海格对话,了解禁林情况',story:'完成一年级「走廊异象调查」后,可解锁与海格的对话,从他口中了解禁林异动。',reward:'解锁海格对话'}
+    ]},
+    'forest':{title:'禁林',tasks:[
+      {name:'受损结界修复',tag:'二年级主线',goal:'修补三处结界破损点',story:'禁林边缘的古老防护结界出现破损,虚空能量持续从裂缝溢出,你使用基础魔法暂时封堵裂隙。',reward:'货币,古代魔法感知小幅提升'},
+      {name:'马人预警',tag:'神奇动物',goal:'协助马人击退靠近营地的暗影怪物',story:'马人观测到黑雾流动方向变化,前来警告人类不要深入禁林核心,协助马人清理靠近营地的暗影怪物。',reward:'马人好感,解锁禁林核心短期通行权限'},
+      {name:'护树罗锅栖息地保护',tag:'神奇动物',goal:'清除树根处暗影,重建栖息地',story:'禁林树木被虚空侵蚀,护树罗锅失去家园,清理树根处暗影,安置护树罗锅。',reward:'生物材料'},
+      {name:'受伤的魔法生物',tag:'赫奇帕奇专属',goal:'收集治愈材料,治疗魔法生物',story:'禁林大量小动物被黑雾灼伤,你需要收集治愈材料,救助受伤魔法生物。',reward:'赫奇帕奇声望,生物好感度'}
+    ]},
+    'quidditch':{title:'魁地奇球场',tasks:[
+      {name:'魁地奇赛事备战',tag:'校园休闲',goal:'完成魁地奇训练项目',story:'学院魁地奇队缺少替补队员,邀请你参与训练,完成赛前练习。',reward:'学院声望,魁地奇相关饰品'}
+    ]},
+    'castle':{title:'霍格沃茨城堡',tasks:[
+      {name:'新生入学登记',tag:'一年级主线',goal:'完成注册,参与分院,归属四大学院之一',story:'你穿过九又四分之三站台,登上霍格沃茨特快列车,抵达城堡,完成身份注册,迎接分院仪式。',reward:'基础魔杖、南瓜汁、学院校服权限'},
+      {name:'城堡向导',tag:'一年级主线',goal:'依次走访指定城堡点位',story:'学院级长带你熟悉城堡,参观大礼堂、公共休息室、图书馆、教室。沿途画像出现短暂消失的怪事,级长只当是画像恶作剧。',reward:'少量货币,解锁城堡基础区域'},
+      {name:'走廊异象调查',tag:'一年级主线',goal:'夜间前往走廊探查,收集黑雾样本',story:'多名学生报告,夜晚走廊会短暂飘过淡黑色雾气,城堡内的猫躁动不安。海格怀疑禁林的生物溜进城堡。',reward:'经验,解锁海格对话'},
+      {name:'教授的私下问询',tag:'一年级主线',goal:'与邓布利多画像对话',story:'邓布利多画像单独找到你,告知你身上有特殊魔力波动,提醒你留意身边异常,暂时不要向其他人提起。',reward:'主线进度推进,解锁一年级收尾'}
+    ]},
+    'greenhouse':{title:'温室与菜园',tasks:[
+      {name:'教授的私人委托',tag:'校园休闲',goal:'完成教授随机委托',story:'各类教授会不定期委托简单任务:收集草药、整理书籍、捕获出逃实验小动物,循环刷新。',reward:'少量经验、货币、基础材料'}
+    ]},
+    'willow':{title:'打人柳',tasks:[
+      {name:'地下密室遗迹',tag:'三年级主线',goal:'探索地下古代遗迹',story:'古籍记载城堡地下存在古代魔法节点,跟随教授进入地下隐秘遗迹,亲眼看见维持百年的封印正在开裂。',reward:'解锁地下遗迹区域'},
+      {name:'暗影契约',tag:'斯莱特林专属',goal:'处理暗影契约残片(销毁/留存研究,永久分支)',story:'一段旧暗影契约残片在地底被发现,契约可以召唤暗影力量,但代价巨大。',reward:'斯莱特林声望变动'}
+    ]},
+    'cliffs':{title:'悬崖·地底入口',tasks:[
+      {name:'主封印实地勘察',tag:'五年级主线',goal:'勘察主封印裂隙',story:'全体教授与魔法部专员一同前往地底主封印,看见巨大裂隙,封印结构大面积碎裂,专家判定三重黑暗共振已经无法自然停止。',reward:'大量经验'},
+      {name:'紧急疏散预案',tag:'五年级主线',goal:'标记危险点位,完成疏散演练',story:'校方制定城堡应急疏散方案,你协助标记城堡内危险区域,引导低年级学生熟悉避难地点。',reward:'五年级主线完成'}
+    ]},
+    'lake':{title:'黑湖',tasks:[
+      {name:'纯血家族的秘密信件',tag:'斯莱特林专属',goal:'潜入黑湖获取信件',story:'古老纯血家族留存一批信件,记录当年伏地魔崛起时期家族内部的分歧,信件藏在湖底。',reward:'斯莱特林声望'}
+    ]},
+    'station':{title:'霍格莫德车站',tasks:[
+      {name:'新生入学登记·起点',tag:'一年级主线',goal:'穿过九又四分之三站台,登上霍格沃茨特快列车',story:'旅程的起点——从站台出发,前往霍格沃茨,开启你的七学年。',reward:'开启新生入学登记'}
+    ]}
+  };
   var pins=document.querySelectorAll('.map-pin');
   var pop=document.getElementById('mapPop');
-  var popT=document.getElementById('popTitle');
-  var popD=document.getElementById('popDesc');
+  var popBody=document.getElementById('popBody');
   var popC=document.getElementById('popClose');
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function renderList(key){
+    var d=mapTasks[key];
+    var html='<div class="pop-title">'+esc(d.title)+'</div>';
+    html+='<div class="pop-tasks">';
+    d.tasks.forEach(function(t,i){
+      html+='<button class="pop-task" data-k="'+key+'" data-i="'+i+'">'+esc(t.name)+'<span class="pop-tag">'+esc(t.tag)+'</span></button>';
+    });
+    html+='</div><p class="pop-hint">点击任务查看要求介绍</p>';
+    popBody.innerHTML=html;
+  }
+  function renderDetail(key,i){
+    var t=mapTasks[key].tasks[i];
+    var html='<button class="pop-back" data-k="'+key+'">← 返回任务列表</button>';
+    html+='<div class="pop-title">'+esc(t.name)+'</div><span class="pop-tag">'+esc(t.tag)+'</span>';
+    html+='<div class="pop-sec"><b>任务目标</b><p>'+esc(t.goal)+'</p></div>';
+    html+='<div class="pop-sec"><b>剧情简述</b><p>'+esc(t.story)+'</p></div>';
+    html+='<div class="pop-sec"><b>奖励方向</b><p>'+esc(t.reward)+'</p></div>';
+    popBody.innerHTML=html;
+  }
   if(pop){
     pins.forEach(function(p){
       p.addEventListener('click',function(){
-        popT.textContent=p.getAttribute('data-title');
-        popD.textContent=p.getAttribute('data-desc');
+        var k=p.getAttribute('data-key');
+        if(mapTasks[k]) renderList(k);
         pop.hidden=false;
       });
     });
+    popBody.addEventListener('click',function(e){
+      var el=e.target;
+      var taskBtn=el.closest?el.closest('.pop-task'):null;
+      var backBtn=el.closest?el.closest('.pop-back'):null;
+      if(taskBtn){ renderDetail(taskBtn.getAttribute('data-k'),parseInt(taskBtn.getAttribute('data-i'),10)); }
+      else if(backBtn){ renderList(backBtn.getAttribute('data-k')); }
+    });
     if(popC) popC.addEventListener('click',function(){ pop.hidden=true; });
-    pop.addEventListener('click',function(e){ if(e.target===pop) pop.hidden=true; });
   }
 })();
 </script>
