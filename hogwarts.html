@@ -216,8 +216,11 @@ html{scroll-behavior:smooth;}
 /* 魔法地图 */
 .map-wrap{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:14px;}
 .map-wrap img{width:100%;display:block;border-radius:10px;}
-.map-pin{position:absolute;width:24px;height:24px;border-radius:50%;border:2px solid var(--gold);background:var(--card);color:var(--gold);font-size:13px;line-height:1;font-weight:700;cursor:pointer;transform:translate(-50%,-50%);box-shadow:0 2px 8px rgba(0,0,0,.2);transition:transform .15s,box-shadow .15s;padding:0;display:flex;align-items:center;justify-content:center;}
-.map-pin:hover{transform:translate(-50%,-50%) scale(1.25);box-shadow:0 4px 14px rgba(176,141,62,.5);}
+.map-pin{position:absolute;transform:translate(-50%,-50%);background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;gap:4px;z-index:5;}
+.map-pin .pin-dot{width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid #fff;box-shadow:0 0 6px rgba(176,141,62,.7);flex:none;transition:transform .15s;}
+.map-pin .pin-tag{font-size:12px;font-weight:600;color:#fff;background:rgba(15,17,26,.88);border:1px solid rgba(176,141,62,.65);border-radius:10px;padding:2px 8px;white-space:nowrap;transition:background .15s,color .15s;box-shadow:0 1px 5px rgba(0,0,0,.25);}
+.map-pin:hover .pin-tag,.map-pin:focus .pin-tag{background:var(--gold);color:var(--card);}
+.map-pin:hover .pin-dot{transform:scale(1.2);}
 .map-pop{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);width:min(420px,calc(100vw - 40px));background:var(--card);border:1px solid var(--gold);border-radius:14px;box-shadow:0 10px 34px rgba(0,0,0,.25);padding:16px 18px;z-index:12000;}
 .map-pop[hidden]{display:none;}
 .pop-close{position:absolute;top:8px;right:10px;border:none;background:none;color:var(--text-secondary);font-size:18px;cursor:pointer;padding:2px 6px;}
@@ -515,18 +518,18 @@ html{scroll-behavior:smooth;}
     <div class="container">
       <div class="sec-head">
         <h2>魔法地图</h2>
-        <p>点击地图上的标记，查看对应区域相关的任务</p>
+        <p>点击金色标记，查看对应区域相关的任务</p>
       </div>
       <div class="map-wrap">
         <img src="hogwarts_map.jpg" alt="霍格沃茨及周边魔法地图">
-        <button class="map-pin" style="left:50%;top:8%" data-title="霍格莫德村" data-desc="神奇动物支线「迷途嗅嗅」——被黑雾惊吓的嗅嗅在村里乱窜偷东西；黑势力支线「密探抓捕」也发生在这里。">+</button>
-        <button class="map-pin" style="left:66%;top:27%" data-title="海格的小屋" data-desc="一年级「走廊异象调查」完成后解锁海格对话；二年级主线「禁林异动报告」从这里开始。">+</button>
-        <button class="map-pin" style="left:86%;top:35%" data-title="禁林" data-desc="主线「禁林异动报告」、神奇动物「马人预警」「护树罗锅栖息地」——越深入，越接近百年黑暗的真相。">+</button>
-        <button class="map-pin" style="left:17%;top:41%" data-title="魁地奇球场" data-desc="校园休闲「魁地奇赛事备战」——给学院队当替补，练完就上场。">+</button>
-        <button class="map-pin" style="left:39%;top:45%" data-title="霍格沃茨城堡" data-desc="一切开始的地方——新生入学登记、分院仪式、城堡向导、走廊异象调查，你的七学年由此展开。">+</button>
-        <button class="map-pin" style="left:67%;top:50%" data-title="温室与菜园" data-desc="教授的私人委托常来自这里——收集草药、整理书籍、捕获出逃实验小动物，循环刷新。">+</button>
-        <button class="map-pin" style="left:39%;top:60%" data-title="黑湖" data-desc="斯莱特林专属支线「纯血家族的秘密信件」——潜入湖底，取回记录家族分歧的尘封信件。">+</button>
-        <button class="map-pin" style="left:69%;top:72%" data-title="霍格莫德车站" data-desc="穿过九又四分之三站台，登上霍格沃茨特快列车——这段旅程的起点。">+</button>
+        <button class="map-pin" style="left:50%;top:8%" data-title="霍格莫德村" data-desc="神奇动物支线「迷途嗅嗅」——被黑雾惊吓的嗅嗅在村里乱窜偷东西；黑势力支线「密探抓捕」也发生在这里。"><span class="pin-dot"></span><span class="pin-tag">霍格莫德村</span></button>
+        <button class="map-pin" style="left:66%;top:27%" data-title="海格的小屋" data-desc="一年级「走廊异象调查」完成后解锁海格对话；二年级主线「禁林异动报告」从这里开始。"><span class="pin-dot"></span><span class="pin-tag">海格小屋</span></button>
+        <button class="map-pin" style="left:86%;top:35%" data-title="禁林" data-desc="主线「禁林异动报告」、神奇动物「马人预警」「护树罗锅栖息地」——越深入，越接近百年黑暗的真相。"><span class="pin-dot"></span><span class="pin-tag">禁林</span></button>
+        <button class="map-pin" style="left:17%;top:41%" data-title="魁地奇球场" data-desc="校园休闲「魁地奇赛事备战」——给学院队当替补，练完就上场。"><span class="pin-dot"></span><span class="pin-tag">魁地奇球场</span></button>
+        <button class="map-pin" style="left:39%;top:45%" data-title="霍格沃茨城堡" data-desc="一切开始的地方——新生入学登记、分院仪式、城堡向导、走廊异象调查，你的七学年由此展开。"><span class="pin-dot"></span><span class="pin-tag">城堡</span></button>
+        <button class="map-pin" style="left:67%;top:50%" data-title="温室与菜园" data-desc="教授的私人委托常来自这里——收集草药、整理书籍、捕获出逃实验小动物，循环刷新。"><span class="pin-dot"></span><span class="pin-tag">温室菜园</span></button>
+        <button class="map-pin" style="left:39%;top:60%" data-title="黑湖" data-desc="斯莱特林专属支线「纯血家族的秘密信件」——潜入湖底，取回记录家族分歧的尘封信件。"><span class="pin-dot"></span><span class="pin-tag">黑湖</span></button>
+        <button class="map-pin" style="left:69%;top:72%" data-title="霍格莫德车站" data-desc="穿过九又四分之三站台，登上霍格沃茨特快列车——这段旅程的起点。"><span class="pin-dot"></span><span class="pin-tag">车站</span></button>
       </div>
     </div>
   </section>
