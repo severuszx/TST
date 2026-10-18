@@ -810,7 +810,36 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 </head>
 <body>
 <div id="glbLoad" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;display:none;align-items:center;gap:10px;background:rgba(0,0,0,.6);border-radius:12px;padding:16px 22px;color:#fff;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25);"><span style="width:26px;height:26px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:gspin .8s linear infinite;display:inline-block;"></span><span>处理中…</span></div>
-<style>@keyframes gspin{to{transform:rotate(360deg)}}button:active{transform:scale(.96);filter:brightness(.92)}</style>
+<style>@keyframes gspin{to{transform:rotate(360deg)}}button:active{transform:scale(.96);filter:brightness(.92)}/* ===== 手机导航：抽屉 + 底部 Tab（子页面统一） ===== */
+.nav-burger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid var(--border,#ddd);border-radius:8px;background:var(--card,#fff);color:var(--text,#333);font-size:18px;cursor:pointer;line-height:1;padding:0;flex:none;}
+.nav-burger:hover{background:var(--hover,rgba(0,0,0,.05));}
+.mobile-drawer{position:fixed;inset:0;z-index:10050;display:none;pointer-events:none;}
+.mobile-drawer.open{display:block;pointer-events:auto;}
+.drawer-mask{position:absolute;inset:0;background:rgba(10,16,30,.45);opacity:0;transition:opacity .2s;}
+.mobile-drawer.open .drawer-mask{opacity:1;}
+.drawer-panel{position:absolute;top:0;right:0;bottom:0;width:78%;max-width:300px;background:var(--card,#fff);border-left:1px solid var(--border,#ddd);box-shadow:0 8px 30px rgba(0,0,0,.18);transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;overflow-y:auto;}
+.mobile-drawer.open .drawer-panel{transform:none;}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border,#ddd);}
+.drawer-title{font-weight:700;color:var(--text,#333);}
+.drawer-close{border:none;background:none;color:var(--text-secondary,#888);font-size:16px;cursor:pointer;padding:4px;}
+.drawer-list{display:flex;flex-direction:column;padding:10px 14px;gap:2px;}
+.drawer-list .nav-link{padding:12px 14px;border-radius:10px;font-size:15px;text-align:left;width:100%;}
+.mobile-tabbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:10040;background:var(--header-bg,#fff);backdrop-filter:blur(10px);border-top:1px solid var(--border,#ddd);padding:6px 8px calc(6px + env(safe-area-inset-bottom));justify-content:space-around;}
+.mtab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;color:var(--text-secondary,#888);font-size:11px;cursor:pointer;padding:4px 0;text-decoration:none;}
+.mtab .mtab-ic{font-size:19px;line-height:1;}
+.mtab.active{color:var(--accent,#d9b45b);font-weight:600;}
+@media(max-width:960px){
+.main-nav{display:none!important;}
+.nav-burger{display:flex!important;}
+.mobile-tabbar{display:flex!important;}
+body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
+}
+@media(min-width:961px){
+.nav-burger{display:none!important;}
+.mobile-drawer{display:none!important;}
+.mobile-tabbar{display:none!important;}
+}
+</style>
 <script>
 function showLoad(t){var el=document.getElementById('glbLoad');if(!el)return;el.style.display='flex';clearTimeout(el._t);clearTimeout(el._t2);if(t>0)el._t2=setTimeout(hideLoad,t);}
 function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.display='none';clearTimeout(el._t);clearTimeout(el._t2);}}
@@ -830,10 +859,38 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 <span class="tt-ic tt-sun">&#9728;</span>
 <span class="tt-ic tt-moon">&#9790;</span>
 <span class="tt-thumb" id="themeThumb"></span>
-</button>
+</button><button class="nav-burger" id="navBurger" aria-label="菜单">☰</button>
 </div>
 </div>
 </header>
+<!-- ===== 手机导航：抽屉菜单 ===== -->
+<div class="mobile-drawer" id="mobileDrawer">
+<div class="drawer-mask" id="drawerMask"></div>
+<div class="drawer-panel" id="drawerPanel">
+<div class="drawer-head"><span class="drawer-title">导航菜单</span><button class="drawer-close" id="drawerClose">&#10005;</button></div>
+<div class="drawer-list">
+<a class="nav-link" href="index.html">首页</a>
+<a class="nav-link" href="index.html#notice">公告</a>
+<a class="nav-link" href="index.html#feed">动态</a>
+<a class="nav-link" href="index.html#vote">投票</a>
+<a class="nav-link" href="tool.html">便捷工具</a>
+<a class="nav-link" href="index.html#tools">服务器工具</a>
+<a class="nav-link" href="index.html#rule">玩家公约</a>
+<a class="nav-link" href="index.html#event">赛事活动</a>
+<a class="nav-link" href="index.html#cdkey">兑换码</a>
+<a class="nav-link" href="index.html#sponsor">服务器赞助</a>
+<a class="nav-link" href="shop.html">积分商店</a>
+<a class="nav-link" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
+</div>
+</div>
+</div>
+<!-- ===== 手机导航：底部 Tab ===== -->
+<div class="mobile-tabbar" id="mobileTabbar">
+<a class="mtab" href="index.html"><span class="mtab-ic">&#8962;</span><span class="mtab-tx">首页</span></a>
+<a class="mtab" href="index.html#notice"><span class="mtab-ic">&#9635;</span><span class="mtab-tx">公告</span></a>
+<a class="mtab" href="index.html#feed"><span class="mtab-ic">&#9993;</span><span class="mtab-tx">动态</span></a>
+<a class="mtab" href="profile.html"><span class="mtab-ic">&#9681;</span><span class="mtab-tx">我的</span></a>
+</div>
 <main>
 <div class="container">
 <h2 class="section-title">管理员面板</h2>
@@ -2266,4 +2323,18 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
 /* ===== 液态玻璃主题 v8（iOS 27 液态玻璃·管理员内测）===== */html[data-theme="glass"]{color-scheme:light;--bg:#eef2fb;--text:#1f2937;--text-secondary:#5b6675;--border:rgba(255,255,255,.7);--card:rgba(255,255,255,.35);--hover:rgba(255,255,255,.55);--header-bg:rgba(255,255,255,.4);--primary:#111827;--accent:#4f63d8;--accent-soft:rgba(79,99,216,.12);--shadow:0 20px 60px rgba(70,90,160,.16);--hero-grad:linear-gradient(135deg,#dbe4ff,#e9e2ff);--go1:.24;--go2:.08;--go3:.13;    /* 卡片渐变三段透明度（通透液态玻璃） */--gn1:.24;                       /* 导航透明度 */--gb1:.42;--gb2:.12;             /* 按钮透明度 */--gsh1:30px;--gsh2:.12;--gsh3:10px;  /* 阴影扩展/强度/偏移 */}/* 背景：干净 iOS 壁纸渐变（无杂乱光斑） */html[data-theme="glass"] body{background:linear-gradient(160deg,#dee9ff 0%,#eaf2ff 26%,#e6efff 48%,#e5eeff 72%,#eef3ff 100%);background-attachment:fixed;background-size:220% 220%;animation:gbFlow 26s ease-in-out infinite;}@keyframes gbFlow{0%{background-position:0% 0%;}50%{background-position:100% 100%;}100%{background-position:0% 0%;}}html[data-theme="glass"][data-gb="plain"] body,html[data-theme="glass"][data-gb="transparent"] body{animation:none;background-size:auto;}    document.body.appendChild(t);    requestAnimationFrame(function(){t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';});    setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';setTimeout(function(){t.remove();},450);},1800);  }  seg.addEventListener('click',function(e){    var b=e.target.closest('.gb-seg-btn');    if(!b)return;    var m=b.getAttribute('data-drag');    localStorage.setItem('tst-drag-mode',m);    sync();    if(window.applyDragMode)applyDragMode();    tip(m==='free'?'已切换：自由摆放（拖到哪放哪）':'已切换：网格排序（自动对齐）');  });  sync();})();
 // ===== 液态玻璃特效：鼠标光晕 + 卡片反光 + 滚动渐入 =====(function(){  function gs(){return themeState()==='glass';}  var m=document.createElement('div');  m.style.cssText='position:fixed;left:0;top:0;width:340px;height:340px;border-radius:50%;pointer-events:none;z-index:2;background:radial-gradient(circle,rgba(255,255,255,.3),transparent 66%);mix-blend-mode:screen;transform:translate(-50%,-50%);opacity:0;transition:opacity .5s ease;';  document.body.appendChild(m);  var shown=false;  document.addEventListener('mousemove',function(e){    if(!gs()){m.style.opacity='0';return;}    if(!shown){shown=true;m.style.opacity='1';}    m.style.left=e.clientX+'px';m.style.top=e.clientY+'px';  });  function bindCard(card){    card.addEventListener('mousemove',function(e){      var r=card.getBoundingClientRect();      var x=((e.clientX-r.left)/r.width*100).toFixed(1),y=((e.clientY-r.top)/r.height*100).toFixed(1);      card.style.setProperty('--mx',x+'%');card.style.setProperty('--my',y+'%');    });  }  var cards=document.querySelectorAll('.card-grid .card');  for(var i=0;i<cards.length;i++)bindCard(cards[i]);  var els=[].slice.call(document.querySelectorAll('.section-title,.card-grid,.notice-ticker,.hero-slider-wrap,.server-card'));  els.forEach(function(el){el.classList.add('gb-wait');});  var io=null;  if('IntersectionObserver' in window){    io=new IntersectionObserver(function(es){      es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('gb-in');io.unobserve(en.target);}});    },{threshold:.05});    els.forEach(function(el){io.observe(el);});  }  // 兜底：1.2s 后仍未进入视口的元素强制显示，避免卡白  setTimeout(function(){    els.forEach(function(el){el.classList.add('gb-in');});    if(io)io.disconnect();  },1200);})();
-// 首次玻璃主题提示：小卡片可自由拖动(function(){  if(localStorage.getItem('tst-card-drag-hint'))return;  let shown=false;  const showHint=function(){    if(shown||themeState()!=='glass')return;    shown=true;    localStorage.setItem('tst-card-drag-hint','1');    const tip=document.createElement('div');    tip.id='glassDragTip';    tip.textContent='液态玻璃主题下，亮点小卡片可自由拖动排列';    tip.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:999;padding:11px 20px;border-radius:14px;background:rgba(255,255,255,.7);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.75);box-shadow:0 16px 50px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,.9);color:#1f2937;font-size:14px;opacity:0;transition:opacity .4s ease,transform .45s cubic-bezier(.34,1.56,.64,1);pointer-events:none;';    document.body.appendChild(tip);    requestAnimationFrame(function(){tip.style.opacity='1';tip.style.transform='translateX(-50%) translateY(0)';});    setTimeout(function(){tip.style.opacity='0';tip.style.transform='translateX(-50%) translateY(20px)';setTimeout(function(){tip.remove();},500);},3400);  };  showHint();})();</script></body></html>
+// 首次玻璃主题提示：小卡片可自由拖动(function(){  if(localStorage.getItem('tst-card-drag-hint'))return;  let shown=false;  const showHint=function(){    if(shown||themeState()!=='glass')return;    shown=true;    localStorage.setItem('tst-card-drag-hint','1');    const tip=document.createElement('div');    tip.id='glassDragTip';    tip.textContent='液态玻璃主题下，亮点小卡片可自由拖动排列';    tip.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:999;padding:11px 20px;border-radius:14px;background:rgba(255,255,255,.7);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.75);box-shadow:0 16px 50px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,.9);color:#1f2937;font-size:14px;opacity:0;transition:opacity .4s ease,transform .45s cubic-bezier(.34,1.56,.64,1);pointer-events:none;';    document.body.appendChild(tip);    requestAnimationFrame(function(){tip.style.opacity='1';tip.style.transform='translateX(-50%) translateY(0)';});    setTimeout(function(){tip.style.opacity='0';tip.style.transform='translateX(-50%) translateY(20px)';setTimeout(function(){tip.remove();},500);},3400);  };  showHint();})();
+// ===== 手机导航：抽屉 =====
+(function(){
+  var drawer=document.getElementById('mobileDrawer');
+  var burger=document.getElementById('navBurger');
+  var closeBtn=document.getElementById('drawerClose');
+  var mask=document.getElementById('drawerMask');
+  function openD(){ if(drawer) drawer.classList.add('open'); }
+  function closeD(){ if(drawer) drawer.classList.remove('open'); }
+  if(burger) burger.addEventListener('click',function(e){ e.stopPropagation(); openD(); });
+  if(mask) mask.addEventListener('click',closeD);
+  if(closeBtn) closeBtn.addEventListener('click',closeD);
+  if(drawer) drawer.addEventListener('click',function(e){ if(e.target.closest('a')) closeD(); });
+})();
+</script></body></html>
