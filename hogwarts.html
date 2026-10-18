@@ -126,6 +126,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 .motto{font-style:italic;letter-spacing:1px;color:#cbd5e1;font-size:12px;margin-top:4px;}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
 .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
 .grid-6{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .card h3{font-size:16px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
@@ -150,6 +151,10 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 .tl-item ul li:last-child{border-bottom:none;}
 .tl-item ul li b{color:var(--gold);}
 .tl-item .br{color:var(--gold);font-size:11px;border:1px solid var(--gold-soft,transparent);background:var(--gold-soft);border-radius:4px;padding:1px 6px;margin-left:6px;}
+.tl-item .vline{font-size:12.5px;color:var(--text-secondary);line-height:1.7;background:rgba(176,141,62,.07);border:1px dashed rgba(176,141,62,.45);border-radius:10px;padding:9px 12px;margin-top:10px;}
+.tl-item .vline b{color:var(--gold);}
+.tl-item .noise{color:var(--text-secondary);font-size:11px;border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin-left:6px;}
+.s-desc{font-size:13px;color:var(--text-secondary);margin-bottom:8px;}
 
 /* ===== Ending ===== */
 .endings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
@@ -172,7 +177,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 .bgm-btn.playing .pause-hide{display:inline;}
 
 @media(max-width:960px){
-.grid,.grid-2,.grid-4,.grid-6,.endings{grid-template-columns:1fr;}
+.grid,.grid-2,.grid-3,.grid-4,.grid-6,.endings{grid-template-columns:1fr;}
 .section{padding:34px 0;}
 .sec-head h2{font-size:20px;}
 }
@@ -227,7 +232,7 @@ html{scroll-behavior:smooth;}
 .pop-close{position:absolute;top:8px;right:10px;border:none;background:none;color:var(--text-secondary);font-size:18px;cursor:pointer;padding:2px 6px;}
 .pop-title{font-size:15px;font-weight:700;color:var(--gold);margin-bottom:6px;padding-right:24px;}
 .pop-desc{font-size:13px;color:var(--text);line-height:1.7;}
-.pop-tasks{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.pop-tasks{display:flex;flex-direction:column;gap:8px;margin-top:10px;max-height:46vh;overflow-y:auto;padding-right:2px;}
 .pop-task{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;background:var(--hover);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);cursor:pointer;transition:border-color .15s;}
 .pop-task:hover{border-color:var(--gold);}
 .pop-tag{font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:8px;padding:1px 6px;white-space:nowrap;flex:none;}
@@ -285,9 +290,9 @@ html{scroll-behavior:smooth;}
       <div class="tagline">一场跨越百年的魔法史诗，静待你的开启</div>
       <p class="note">本页是企划预告——饼先画给大家看，能不能烙熟、什么时候烙熟，作者心里也没底。内容以后大概率要改，最终以游戏内为准；上线时间先按几年后算，催更请轻拍，鸽子也是会害羞的。</p>
       <div class="epochs">
-        <div class="epoch"><div class="yr">1890</div><div class="tx">远古封印破裂<br>古代魔法失控</div></div>
-        <div class="epoch"><div class="yr">1920</div><div class="tx">默然虚空席卷<br>格林德沃动荡</div></div>
-        <div class="epoch"><div class="yr">1998</div><div class="tx">大战落幕<br>黑魔法余烬永存</div></div>
+        <div class="epoch"><div class="yr">1890</div><div class="tx">封印稳定百年<br>守护者平定危机</div></div>
+        <div class="epoch"><div class="yr">1920</div><div class="tx">默然创伤暗影<br>无法根除只能压制</div></div>
+        <div class="epoch"><div class="yr">1998</div><div class="tx">残片化作节点<br>持续侵蚀封印</div></div>
       </div>
     </div>
   </section>
@@ -309,28 +314,31 @@ html{scroll-behavior:smooth;}
     <div class="container">
       <div class="sec-head">
         <h2>官方世界观预告</h2>
-        <p>三代黑暗，层层叠加、彼此共振。百年平静只是假象，一场足以颠覆整个魔法界秩序的终极灾厄，正在悄然降临。</p>
+        <p>黑魔王战败三十余年，魔法界以为黑暗已灭。但无人知晓——封印完好，裂隙却在被无声侵蚀。</p>
       </div>
       <div class="grid-2">
         <div class="card">
-          <h3><span class="t">1890</span> 霍格沃茨之遗 · 远古封印破裂</h3>
-          <p>古老的古代魔法失控暴走，地底裂隙永久留存，本源魔力持续泄漏，为世间埋下失衡的最初祸根。</p>
+          <h3><span class="t">1890</span> 封印稳定 · 守护者落幕</h3>
+          <p>新任守护者平定古代魔法失控危机，稳固贮藏库远古封印。封印结构完好，不存在原生裂缝——它唯一的弱点，只能被外部持续的魔力扰动缓慢侵蚀，不会自行崩坏。</p>
         </div>
         <div class="card">
-          <h3><span class="t">1920</span> 默然虚空 · 席卷魔法世界</h3>
-          <p>格林德沃掀起的动荡未曾真正终结，无形的默默然黑雾潜伏大地，不断侵蚀生灵、扭曲魔法法则，污染从未消散。</p>
+          <h3><span class="t">1920</span> 默然创伤 · 暗影底色</h3>
+          <p>格林德沃的运动席卷欧洲，大量压抑魔力的年轻巫师诞生默然寄生体。默默然是创伤凝结的黑暗产物，无法净化、无法根除，只能依靠纯度极高的古代魔法短暂压制。这场动荡的暗影底色，长久浸染整片土地。</p>
         </div>
         <div class="card">
-          <h3><span class="t">1998</span> 大战落幕 · 余烬永存</h3>
-          <p>伏地魔覆灭后，破碎的黑魔法残响散落各地，化作无形放大器，持续激化裂隙与虚空灾厄，让所有隐患不断加剧。</p>
+          <h3><span class="t">1998</span> 残片共振 · 侵蚀封印</h3>
+          <p>伏地魔覆灭，破碎的灵魂残片散落英伦，被百年默然暗影吸附同化，化作无数黑暗共振节点，持续释放低频魔力扰动，从外部侵蚀 1890 年封印，打乱世界魔力稳态。</p>
         </div>
         <div class="card">
-          <h3><span class="t">你是</span> 唯一破局者</h3>
-          <p>百年难得一遇的双天赋特殊巫师：天生掌握古代魔法感知之力，身负默然虚空调和之能。唯有你，能够制衡三重黑暗、改写既定命运。</p>
+          <h3><span class="t">你是</span> 唯一本源抗性者</h3>
+          <p>百年之内唯一拥有古代魔法本源抗性的巫师。但你的力量有边界：<b>只能压制暗影暴走，不能治愈创伤，无法消灭默然，无法逆转世代流传的偏见。</b>故事的核心主题——只能压制，无法根除。</p>
         </div>
       </div>
       <div style="margin-top:16px;background:var(--accent-soft);border:1px solid var(--border);border-radius:14px;padding:22px;">
-        <p style="font-size:14px;color:var(--text);"><b style="color:var(--gold);">异变频发、生灵黑化、空间崩坏、暗影四起。</b>整个魔法世界，正一步步走向彻底失衡的终焉边缘。你将作为新生巫师踏入霍格沃茨，历经完整七学年沉浸式成长：从懵懂入学、探索校园异象，到深入禁林秘境、接触跨国魔法势力，再到直面百年黑暗根源、参与终极宿命抉择。四大学院专属秘闻待你解锁，海量原创支线、秘境探索、势力博弈、命运分支贯穿全程。<br><br>没有固定剧本，没有既定结局。<b style="color:var(--gold);">你的魔法，你的选择，你的意志——将彻底改写这片异世的未来。</b></p>
+        <p style="font-size:14px;color:var(--text);"><b style="color:var(--gold);">暗线叙事规则（游戏内全程遵守）</b><br><br>
+        本作不存在单独的暗线专属任务：所有伏笔对话、环境文本，全部嵌入普通主线任务流程，与普通对话共用同一套表现形式——<b>没有高亮、没有闪光特效、没有专属提示音效、没有弹窗提醒、不写入任务面板</b>。<br><br>
+        真假线索混杂：三年级天文课埋有一条噪音伏笔，全程不会回收，只为让玩家无法单纯靠氛围分辨哪些闲笔是伏笔、哪些只是普通台词。<br><br>
+        <b style="color:var(--gold);">顿悟依靠玩家记忆与意象共鸣，不强制触发。</b>错过伏笔,永久丢失,无法回看。</p>
       </div>
     </div>
   </section>
@@ -340,86 +348,80 @@ html{scroll-behavior:smooth;}
     <div class="container">
       <div class="sec-head">
         <h2>主线任务 · 完整七学年</h2>
-        <p>每一学年都是一段不可复刻的魔法旅程，关键抉择永久写入你的个人档案。</p>
+        <p>以下伏笔植入点位在游戏内全程无 UI 标记、无任务提示，错过即永久丢失。</p>
       </div>
       <div class="timeline">
         <div class="tl-item">
           <div class="yr">一年级</div>
-          <h3>异象初现 · 百年征兆复苏</h3>
-          <div class="tone">校园日常为主，埋下异常伏笔，玩家初步觉醒微弱体质，校方暗中观察。</div>
+          <h3>异象初现 · 浅埋无痕余烬</h3>
+          <div class="tone">完成入学流程，熟悉城堡环境，学习基础魔咒。植入 2 条真实伏笔，全程零提示。</div>
           <ul>
-            <li><b>新生入学登记</b>：穿过九又四分之三站台，登上特快列车，完成注册与分院仪式。<span class="m">奖励：基础魔杖、南瓜汁、学院校服权限</span></li>
-            <li><b>城堡向导</b>：走访大礼堂、公共休息室、图书馆、教室，沿途画像出现消失怪事。<span class="m">奖励：少量货币，解锁城堡基础区域</span></li>
-            <li><b>魔咒课练习</b>：跟随弗立维教授学习悬浮咒，无意间释放出金色古代魔法微光。<span class="m">奖励：基础魔咒解锁，经验</span></li>
-            <li><b>走廊异象调查</b>：夜晚走廊飘过淡黑色雾气，收集黑雾样本。<span class="m">奖励：经验，解锁海格对话</span></li>
-            <li><b>教授的私下问询</b>：邓布利多画像单独找到你，提醒留意身边异常。<span class="m">奖励：主线进度推进</span></li>
+            <li><b>1-01 城堡导览</b>：跟随级长参观城堡，大厅 → 大理石楼梯 → 校长办公室外侧长廊 → 变形课 → 魔咒课教室。<span class="m">奖励：魔杖抛光套件，解锁快速旅行点位</span></li>
+            <li><b>1-02 魔咒课第一课</b>：学习悬浮咒，成功施法 3 次。留在教室，教授会发现你魔杖尖的金色微光。<span class="m">奖励：悬浮咒基础熟练度</span></li>
           </ul>
+          <div class="vline"><b>伏笔植入</b>：① 长廊那幅面壁缄默的老画像——级长随口提起"老一辈学生说,他早年十分健谈,几十年前突然就缄默不语了"；② 课后教授闲聊——"有些人走着走着就停在了半路,停下的地方,往往比走过的路更烫"。</div>
         </div>
         <div class="tl-item">
           <div class="yr">二年级</div>
-          <h3>虚空泄露 · 默然灾厄现世</h3>
-          <div class="tone">禁林危机爆发，虚空能量外泄，异变魔法生物大量出现，确认默默然侵蚀的存在。</div>
+          <h3>虚空泄露 · 创伤暗影伏笔</h3>
+          <div class="tone">处理第一次默然异动事件，夜间进入禁林探查痕迹。植入 2 条真实伏笔。</div>
           <ul>
-            <li><b>禁林异动报告</b>：禁林生物被黑雾浸染后攻击闯入者，进入禁林外围观察异变。<span class="m">奖励：经验，解锁禁林外围</span></li>
-            <li><b>受损结界修复</b>：用基础魔法封堵三处虚空裂隙。<span class="m">奖励：货币，古代魔法感知提升</span></li>
-            <li><b>默然踪迹</b>：追踪失控学生身上的默然黑雾。<span class="br">分支：猎杀默然者 / 安抚救赎</span><span class="m">永久分支标记</span></li>
-            <li><b>黑雾扩散遏制</b>：联合海格与教授击退暗影怪物潮。<span class="m">奖励：大量经验</span></li>
+            <li><b>2-01 默然踪迹调查</b>：跟随魔法部外勤人员，探查村庄附近的魔法异象，寻找默然踪迹。<span class="m">奖励：暗影魔力侦测饰品</span></li>
+            <li><b>2-02 禁林夜间探查</b>：夜间沿预设路径追踪暗影残迹，抵达禁林边缘确认走向。<span class="m">奖励：夜行防护药剂配方</span></li>
           </ul>
+          <div class="vline"><b>伏笔植入</b>：① 外勤 NPC 闲谈——"有些东西,一百年了,从来没人真正学会"；② 禁林边缘随风飘来的无名低语（一次性,找不到音源）——"星火燃于夏,烬落终无答"。</div>
         </div>
         <div class="tl-item">
           <div class="yr">三年级</div>
-          <h3>古秘现世 · 1890 封印真相曝光</h3>
-          <div class="tone">城堡远古符文苏醒，揭开 1890 年古代魔法封印与妖精叛乱的历史，找到灾厄最底层的根源。</div>
+          <h3>古秘现世 · 本源裂痕 + 噪音假伏笔</h3>
+          <div class="tone">查阅古代封印历史，与妖精交谈，在禁书区翻阅旧文档。2 条真实伏笔 + 1 条噪音假伏笔。</div>
           <ul>
-            <li><b>图书馆古籍检索</b>：在禁书区查阅三份 1890 年古老手稿残页。<span class="m">奖励：经验，解锁古代魔法认知</span></li>
-            <li><b>地下密室遗迹</b>：进入地下古代遗迹，亲眼看见维持百年的封印正在开裂。<span class="m">奖励：解锁地下遗迹区域</span></li>
-            <li><b>妖精的口述历史</b>：与妖精首领谈判，听取妖精视角的百年秘史。<span class="br">分支：强硬施压 / 和平协商</span><span class="m">永久分支标记</span></li>
-            <li><b>封印评估</b>：提交封印现状报告，确认一切灾厄源于古代魔法封印持续松动。<span class="m">奖励：大量经验</span></li>
+            <li><b>3-01 贮藏库历史问询</b>：前往霍格莫德妖精工坊，询问 1890 年贮藏库封印历史。<span class="m">奖励：古代魔力简易解读笔记</span></li>
+            <li><b>3-02 禁书区古籍检索</b>：查找远古魔力扰动的古籍记载，注意书页夹缝的泛黄残句。<span class="m">奖励：禁书区临时访问权限</span></li>
+            <li><b>3-03 天文课·星象观测</b>：天文塔夜间观测星象。<span class="noise">噪音假伏笔——这句话之后全程不会回收</span><span class="m">奖励：望远镜小配件</span></li>
           </ul>
+          <div class="vline"><b>伏笔植入</b>：① 妖精闲笔——"封印安稳数年之后,曾有外来巫师掀起极大争议"（追问即止）；② 古籍夹缝手写残句——"挣脱桎梏,方见魔力本容"（唯一可反复回看的伏笔文本）；③ 天文课——"一颗的光太强,把另一颗的微光盖住了"（永不回收,混淆真假）。</div>
         </div>
         <div class="tl-item">
           <div class="yr">四年级</div>
-          <h3>全球动荡 · 三势力介入</h3>
-          <div class="tone">重启三强争霸试炼，场地被双重魔法污染；MACUSA 介入调查；食死徒残余势力趁乱行动。</div>
+          <h3>全球动荡 · 圣徒半截留白</h3>
+          <div class="tone">遭遇残存圣徒伏击；查阅魔法部旧档案。2 条真实伏笔。</div>
           <ul>
-            <li><b>三强争霸资格试炼</b>：完成基础参赛资格考核。<span class="m">奖励：解锁三强争霸赛场</span></li>
-            <li><b>MACUSA 会面</b>：配合美国魔法部专员调查默默然跨区域扩散。<span class="m">奖励：MACUSA 声望开启</span></li>
-            <li><b>赛场暗影清理</b>：进入赛场清除异变怪物。<span class="m">奖励：经验，试炼积分</span></li>
-            <li><b>食死徒余党伏击</b>：赛场外围击退企图捕获你的伏击敌人。<span class="m">奖励：大量经验</span></li>
+            <li><b>4-01 林间伏击</b>：前往林间裂隙点位压制暴走暗影，途中遭遇残存圣徒拦截。<span class="m">奖励：主线进度推进</span></li>
+            <li><b>4-02 魔法部档案查阅</b>：调取默然爆发案例记录，注意档案末尾的小字批注。<span class="m">奖励：默然暗影侦测药剂</span></li>
           </ul>
+          <div class="vline"><b>伏笔植入</b>：① 圣徒残血撤离前的半截问句——"你以为你对抗的只是暗影怪物?你根本不知道这些灾厄——从何而来"（秒杀则永久丢失）；② 档案末尾小字——"领袖早年曾有极致理想,后彻底作废,无人敢再提及"。</div>
         </div>
         <div class="tl-item">
           <div class="yr">五年级</div>
-          <h3>封印崩坏 · 世界失衡加剧</h3>
-          <div class="tone">OWL 考试途中遭遇暗影突袭；玩家第一次主动爆发古代魔法力量；百年主封印大面积破损。</div>
+          <h3>封印崩坏 · 旧像复现闲笔</h3>
+          <div class="tone">暗影裂隙数量增多，开展校园疏散演练。2 条伏笔。</div>
           <ul>
-            <li><b>OWL 考试途中突袭</b>：地底裂隙爆发，保护考生击退入侵暗影。<span class="m">奖励：经验</span></li>
-            <li><b>古代魔法觉醒</b>：金色魔力大范围净化黑雾，稳定自身不受控的古代魔法。<span class="m">奖励：解锁古代魔法主动技能</span></li>
-            <li><b>主封印实地勘察</b>：与教授、魔法部专员一同勘察地底主封印巨大裂隙。<span class="m">奖励：大量经验</span></li>
-            <li><b>紧急疏散预案</b>：标记危险区域，引导低年级学生熟悉避难地点。<span class="m">奖励：五年级主线完成</span></li>
+            <li><b>5-01 校园紧急疏散演练</b>：巡查走廊安全隐患，组织学生疏散演练。<span class="m">奖励：主线进度推进</span></li>
+            <li><b>5-02 黑魔法防御课闲谈</b>：完成课程练习，触发课后闲聊。<span class="m">奖励：高级暗影防护咒练习权限</span></li>
           </ul>
+          <div class="vline"><b>伏笔植入</b>：① 疏散巡查经过长廊,邻侧画像低声自语——"这么多年,还在等?终究是等不到的",老画像依旧面壁不语；② 防御课教授——"光明与黑暗从不是绝对界限,百年前最顶尖的巫师,也曾困在这份取舍之中"（追问即止）。</div>
         </div>
         <div class="tl-item">
           <div class="yr">六年级</div>
-          <h3>真相终焉 · 三代黑暗合一</h3>
-          <div class="tone">全部伏笔回收：伏地魔是表层灾难，格林德沃带来默默然污染，古代魔法失衡是一切灾难底层根源。</div>
+          <h3>三方博弈 · 理念闭环 + 画像分支</h3>
+          <div class="tone">三方势力辩论，你的立场决定画像深层对话是否永久锁死。</div>
           <ul>
-            <li><b>黑魔法残响溯源</b>：收集伏地魔破碎灵魂残片样本，证实其如放大器般激化灾厄。<span class="m">奖励：经验</span></li>
-            <li><b>格林德沃遗留档案</b>：阅读 MACUSA 提供的格林德沃时期档案。<span class="m">奖励：MACUSA 声望</span></li>
-            <li><b>三方势力的邀约</b>：魔法部、格林德沃信徒、黑魔法研究者分别向你抛出方案。<span class="br">分支：信任魔法部 / 接触格林德沃信徒</span><span class="m">永久分支标记</span></li>
-            <li><b>灾厄融合预警</b>：三大黑暗正在融合，一旦完全合一，魔法世界法则将被改写。<span class="m">奖励：六年级主线完成</span></li>
+            <li><b>6-01 三方理念辩论</b>：魔法部隔离管控、圣徒理念、中立立场三选一，一旦确定不可反悔。<span class="br">分支：支持魔法部 / 支持圣徒 / 中立（解锁画像深层对话）</span></li>
+            <li><b>6-02 校长长廊画像访问</b>：返回长廊与画像交互，只有中立立场才能解锁深层对话链。<span class="m">奖励：无道具,解锁深层对话</span></li>
           </ul>
+          <div class="vline"><b>伏笔植入</b>：① 圣徒长老承接四年级问句——"答案是,从我们不肯看见的地方来。偏见不灭,黑暗便永远不会消失"；② 画像——"这个夏天,曾有过一些太过天真的构想……有些选择一旦落地,余生皆余烬"。</div>
         </div>
         <div class="tl-item">
           <div class="yr">七年级</div>
-          <h3>终局之战 · 三结局宿命抉择</h3>
-          <div class="tone">最终决战，抵达地底主裂隙，做出最终抉择，永久锁定个人结局。</div>
+          <h3>终局阶段 · 记忆钩子与顿悟</h3>
+          <div class="tone">全域裂隙爆发，组织学生疏散；进入裂隙核心压制三重黑暗聚合体；战后回访画像完成顿悟收束。</div>
           <ul>
-            <li><b>集结盟友</b>：依据此前所有分支，召唤教授、妖精、MACUSA 或凤凰社等盟友参战。<span class="m">奖励：盟友参战支援</span></li>
-            <li><b>裂隙决战</b>：进入地底主裂隙核心，击败三重黑暗聚合体。</li>
-            <li><b>最终抉择</b>：三选一，永久锁定结局——光明守护 / 平衡救赎 / 远古执掌。</li>
-            <li><b>结局落幕</b>：触发专属结局动画，世界状态永久改变。<span class="m">奖励：结局专属称号、专属区域、专属彩蛋</span></li>
+            <li><b>7-01 全校学生疏散</b>：组织学生撤离城堡，检查走廊安全。<span class="m">奖励：完成疏散解锁终战</span></li>
+            <li><b>7-02 终局之战</b>：进入裂隙核心，多阶段压制三重黑暗聚合体。<span class="m">奖励：主线通关成就</span></li>
+            <li><b>7-03 战后回访画像</b>：主动回到长廊与画像交互（不会自动开启）。<span class="m">奖励：顿悟称号与留白短片</span></li>
           </ul>
+          <div class="vline"><b>伏笔植入</b>：① 疏散时再经长廊,老画像侧身向外,邻像说——"他今天开口了,就一句。他说'到时候了'"；② 聚合体末阶段台词——"世人固执划分明暗、固守百年偏见……它们从未消失,只是换了一种方式燃烧",意象呼应一年级那句"更烫"。</div>
         </div>
       </div>
     </div>
@@ -429,96 +431,32 @@ html{scroll-behavior:smooth;}
   <section class="section" id="side">
     <div class="container">
       <div class="sec-head">
-        <h2>支线任务体系</h2>
-        <p>学院秘闻、神奇动物、远古遗秘、势力博弈、休闲社交——你的魔法人生远不止主线。</p>
+        <h2>支线预埋闲笔</h2>
+        <p>三条支线均埋有残缺文本伏笔——文字被遮挡、无高亮，需要玩家仔细辨认。</p>
       </div>
 
-      <div class="grid-4">
-        <div class="card house house-g">
-          <h3><span class="dot"></span>格兰芬多<span class="t">专属</span></h3>
-          <ul>
-            <li><b>骑士画像的遗愿</b>：塔楼取回被暗影污染的骑士遗物。<span class="m">勇气称号碎片</span></li>
-            <li><b>失踪的决斗社成员</b>：禁林搜寻失联社员。<span class="m">决斗增益 buff</span></li>
-            <li><b>古堡幽灵的战场回忆</b>：寻找幽灵记载的藏宝密室。<span class="m">专属装饰</span></li>
-          </ul>
+      <div class="grid-3" style="margin-top:2px;">
+        <div class="card">
+          <h3>S01 · 拉文克劳谜语之门</h3>
+          <p class="s-desc">三年级解锁，进入拉文克劳公共休息室秘密阁楼，解开古老石门谜语。</p>
+          <div class="vline"><b>伏笔残句</b>：阁楼旧书被墨渍涂抹遮盖，页面边角残留残缺文字——"炽烈……终焚……过半皆空"，部分笔画被墨遮挡。</div>
         </div>
-        <div class="card house house-r">
-          <h3><span class="dot"></span>拉文克劳<span class="t">专属</span></h3>
-          <ul>
-            <li><b>星象异象记录</b>：多日记录与裂隙活动相关的异常星轨。<span class="m">古籍材料</span></li>
-            <li><b>遗失的魔杖手稿</b>：寻回奥利凡德家族魔杖学手稿。<span class="m">解锁魔杖知识</span></li>
-            <li><b>谜语之门</b>：解开层层谜题开启阁楼大门。<span class="m">专属古籍</span></li>
-          </ul>
+        <div class="card">
+          <h3>S02 · 斯莱特林暗影契约</h3>
+          <p class="s-desc">四年级解锁，调查斯莱特林地牢密室残留的暗影契约残片。</p>
+          <div class="vline"><b>伏笔残句</b>：残页边角手写小字——"力量边界之争,古来皆有,最盛于百年之前"。小字印在页面边缘,不属于契约正文。</div>
         </div>
-        <div class="card house house-h">
-          <h3><span class="dot"></span>赫奇帕奇<span class="t">专属</span></h3>
-          <ul>
-            <li><b>受伤的魔法生物</b>：收集治愈材料救助黑雾灼伤的小动物。<span class="m">生物好感度</span></li>
-            <li><b>妖精族群的粮食危机</b>：寻找抗虚空污染的种子。<span class="m">赫奇帕奇+妖精声望</span></li>
-            <li><b>家养小精灵的秘密储藏室</b>：获得信任，进入古老储藏室。<span class="m">专属食物配方</span></li>
-          </ul>
-        </div>
-        <div class="card house house-s">
-          <h3><span class="dot"></span>斯莱特林<span class="t">专属</span></h3>
-          <ul>
-            <li><b>诅咒溯源</b>：地牢追溯斯莱特林时代遗留的诅咒起源。<span class="m">诅咒知识</span></li>
-            <li><b>纯血家族的秘密信件</b>：潜入黑湖获取记录家族分歧的信件。<span class="m">斯莱特林声望</span></li>
-            <li><b>暗影契约</b>：处理可召唤暗影力量的旧契约残片。<span class="br">分支：销毁 / 留存研究</span></li>
-          </ul>
+        <div class="card">
+          <h3>S03 · 马人星象预言</h3>
+          <p class="s-desc">五年级解锁，禁林马人营地，交流魔力扰动与星象关联。</p>
+          <div class="vline"><b>伏笔台词</b>："天际常有纠缠星辰,一者吞噬一者微光。待到肉眼可辨时,星光早已寂灭多年。"马人一贯隐喻,不会主动解释。</div>
         </div>
       </div>
 
-      <div class="grid-6" style="margin-top:14px;">
-        <div class="card">
-          <h3>神奇动物<span class="t">全域 · 循环日常</span></h3>
-          <ul>
-            <li><b>迷途嗅嗅</b>：在霍格莫德寻找并安抚受惊逃窜的嗅嗅。</li>
-            <li><b>护树罗锅栖息地保护</b>：清除树根暗影，重建栖息地。</li>
-            <li><b>马人预警</b>：协助马人击退靠近营地的暗影怪物。</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>远古魔法 & 妖精<span class="t">长线 · 二至七年级</span></h3>
-          <ul>
-            <li><b>妖精工匠请求</b>：采集裂隙边缘的古代魔法矿石。</li>
-            <li><b>守护者雕像</b>：激活三座雕像，读取守护者记忆。</li>
-            <li><b>裂隙矿石净化</b>：用调和能力净化带污染的矿石。</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>魔法部 / 凤凰社 / 黑势力<span class="t">四至七年级</span></h3>
-          <ul>
-            <li><b>黑魔法残迹清剿</b>：摧毁三处滋生暗影的祭坛。</li>
-            <li><b>凤凰社情报传递</b>：秘密运送加密情报，避开黑势力巡逻者。</li>
-            <li><b>黑势力密探抓捕</b>：追踪并拦截潜入霍格莫德的密探。</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>校园休闲<span class="t">全学年 · 社交</span></h3>
-          <ul>
-            <li><b>魁地奇赛事备战</b>：完成替补队员赛前训练。</li>
-            <li><b>教授的私人委托</b>：收集草药、整理书籍、捕获出逃实验小动物（循环刷新）。</li>
-            <li><b>决斗俱乐部挑战赛</b>：与校内 NPC 巫师依次决斗争夺名次。</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>影响终局的隐藏命运支线<span class="t">关键不可逆</span></h3>
-          <ul>
-            <li><b>默然者救赎 / 猎杀</b>（二年级主线分支，影响结局）</li>
-            <li><b>妖精镇压 / 和解</b>（三年级主线分支，影响盟友阵容）</li>
-            <li><b>暗影契约销毁 / 留存</b>（斯莱特林支线，影响远古结局条件）</li>
-            <li><b>信任魔法部 / 私通格林德沃信徒</b>（六年级分支，影响决战盟友）</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>支线通用规则</h3>
-          <ul>
-            <li>学院支线分院后永久锁定，其他学院无法接取。</li>
-            <li>神奇动物与教授委托为循环日常，稳定产出材料货币。</li>
-            <li>带分支标记的任务，选择永久写入个人档案，影响最终结局。</li>
-            <li>休闲支线不影响主线结局，主要提升氛围与社交。</li>
-          </ul>
-        </div>
+      <div style="margin-top:16px;background:var(--accent-soft);border:1px solid var(--border);border-radius:14px;padding:22px;">
+        <p style="font-size:14px;color:var(--text);"><b style="color:var(--gold);">支线通用规则</b><br><br>
+        所有伏笔文字与普通任务文本共用同一套表现：没有高亮标记、没有特殊字号提示、不写入任务面板。<br><br>
+        真假线索混杂——散落书籍、信件、便条类闲笔伏笔会持续增加，混入大量无关噪音台词；玩家只能依靠记忆与意象共鸣去辨认，游戏不会告诉你哪些是伏笔。</p>
       </div>
     </div>
   </section>
@@ -533,15 +471,10 @@ html{scroll-behavior:smooth;}
       <div class="map-wrap">
         <img src="hogwarts_map.jpg" alt="霍格沃茨及周边魔法地图">
         <button class="map-pin" style="left:50%;top:8%" data-key="hogsmeade"><span class="pin-dot"></span><span class="pin-tag">霍格莫德村</span></button>
-        <button class="map-pin" style="left:66%;top:27%" data-key="hagrid"><span class="pin-dot"></span><span class="pin-tag">海格小屋</span></button>
         <button class="map-pin" style="left:86%;top:35%" data-key="forest"><span class="pin-dot"></span><span class="pin-tag">禁林</span></button>
-        <button class="map-pin" style="left:17%;top:41%" data-key="quidditch"><span class="pin-dot"></span><span class="pin-tag">魁地奇球场</span></button>
+        <button class="map-pin" style="left:66%;top:36%" data-key="verge"><span class="pin-dot"></span><span class="pin-tag">林间裂隙</span></button>
         <button class="map-pin" style="left:39%;top:45%" data-key="castle"><span class="pin-dot"></span><span class="pin-tag">城堡</span></button>
-        <button class="map-pin" style="left:67%;top:50%" data-key="greenhouse"><span class="pin-dot"></span><span class="pin-tag">温室菜园</span></button>
-        <button class="map-pin" style="left:66%;top:36%" data-key="willow"><span class="pin-dot"></span><span class="pin-tag">打人柳</span></button>
-        <button class="map-pin" style="left:46%;top:55%" data-key="cliffs"><span class="pin-dot"></span><span class="pin-tag">悬崖·地底</span></button>
-        <button class="map-pin" style="left:39%;top:60%" data-key="lake"><span class="pin-dot"></span><span class="pin-tag">黑湖</span></button>
-        <button class="map-pin" style="left:69%;top:72%" data-key="station"><span class="pin-dot"></span><span class="pin-tag">车站</span></button>
+        <button class="map-pin" style="left:46%;top:55%" data-key="abyss"><span class="pin-dot"></span><span class="pin-tag">地底裂隙</span></button>
       </div>
     </div>
   </section>
@@ -555,25 +488,30 @@ html{scroll-behavior:smooth;}
   <section class="section alt" id="ending">
     <div class="container">
       <div class="sec-head">
-        <h2>三种截然不同的史诗终局</h2>
-        <p>你的每一次选择、每一次决断，都将永久烙印属于自己的魔法人生。</p>
+        <h2>终局 · 静默顿悟</h2>
+        <p>没有弹窗、没有提示、没有任务日志——只有记得的人，才能走到最后一步。</p>
       </div>
       <div class="endings">
         <div class="ending">
-          <h3>光明守护</h3>
-          <p>彻底净化虚空、抹除黑魔法残响，永久封印古代魔法裂隙。魔法世界回归传统秩序，黑暗力量被根除。</p>
-          <div class="mark">以光明净化黑暗</div>
+          <h3>两个达成条件</h3>
+          <p>① 打完终局战斗，完整听完三重黑暗聚合体的全部台词；<br>② 决战前的全校疏散任务，走过校长办公室外侧长廊，亲眼看到画像状态发生变化。</p>
+          <div class="mark">全程不会告知条件是否达成</div>
         </div>
         <div class="ending">
-          <h3>平衡救赎</h3>
-          <p>调和古魔法与默默然能量，证明黑暗本身不是邪恶。建立共存的新平衡，裂隙不再向外泄露灾厄。</p>
-          <div class="mark">以平衡包容两极</div>
+          <h3>画像的收尾对话</h3>
+          <p>你去了裂隙。你回来了。<br>……我们当年没能看懂的，你看懂了。</p>
+          <div class="mark">唯一一次说出"我们"</div>
         </div>
         <div class="ending">
-          <h3>远古执掌</h3>
-          <p>接纳全部三重黑暗本源，继承远古守护者权柄，由你重新定义魔法世界的规则。</p>
-          <div class="mark">以本源执掌万法</div>
+          <h3>静默解锁 · 留白收束</h3>
+          <p>称号「星火观星者」静默加入称号列表（无弹窗通知）；自动播放 35 秒无旁白留白短片——禁林晚风、古籍残页、长廊画像的侧影。</p>
+          <div class="mark">结局无旁白、无字幕</div>
         </div>
+      </div>
+      <div style="margin-top:16px;background:var(--accent-soft);border:1px solid var(--border);border-radius:14px;padding:22px;">
+        <p style="font-size:14px;color:var(--text);"><b style="color:var(--gold);">错过的代价</b><br><br>
+        你必须主动回到长廊，手动与画像交互才会触发收尾。如果疏散任务绕开了长廊、或终局战斗跳过了聚合体台词——回访画像只能看到简短慰问，带"我们"的收尾对话、称号与短片全部永久锁死。<br><br>
+        顿悟不靠系统提示，靠的是你自己的记忆与意象共鸣。</p>
       </div>
     </div>
   </section>
@@ -696,44 +634,31 @@ html{scroll-behavior:smooth;}
   // 魔法地图任务点弹窗
   var mapTasks={
     'hogsmeade':{title:'霍格莫德村',tasks:[
-      {name:'迷途嗅嗅',tag:'神奇动物',goal:'寻找嗅嗅,带回巢穴',story:'一只嗅嗅被黑雾惊吓逃出巢穴,在霍格莫德四处乱窜,偷走居民小件物品,需要找到并安抚嗅嗅。',reward:'货币,少量稀有材料'},
-      {name:'黑势力密探抓捕',tag:'魔法部支线',goal:'追踪并拦截密探,截获情报',story:'食死徒余党派遣密探潜入霍格莫德收集情报。追踪密探,截获情报。',reward:'魔法部声望'}
-    ]},
-    'hagrid':{title:'海格的小屋',tasks:[
-      {name:'禁林异动报告',tag:'二年级主线',goal:'进入禁林外围,观察异变生物',story:'海格发现禁林内生物性情狂暴,鹿、狐狸等生物被黑雾浸染后攻击闯入者,请求你协助查看情况。',reward:'经验,解锁禁林外围区域'},
-      {name:'解锁海格对话',tag:'一年级奖励',goal:'与海格对话,了解禁林情况',story:'完成一年级「走廊异象调查」后,可解锁与海格的对话,从他口中了解禁林异动。',reward:'解锁海格对话'}
+      {name:'默然踪迹调查',tag:'二年级主线 2-01',goal:'跟随魔法部外勤人员,探查村庄附近的魔法异象,寻找默然踪迹',story:'两名魔法部外勤 NPC 已在村庄外围勘查,你跟随巡查地面异象痕迹、采集魔力样本。两人闲谈时会带出伏笔。',reward:'暗影魔力侦测基础饰品'},
+      {name:'贮藏库历史问询',tag:'三年级主线 3-01',goal:'前往霍格莫德妖精工坊,询问 1890 年贮藏库封印相关历史记录',story:'与妖精对话,了解当年封印稳定事件。对话末尾,妖精会带出一句关于外来巫师争议的闲笔,追问即止。',reward:'古代魔力简易解读笔记'}
     ]},
     'forest':{title:'禁林',tasks:[
-      {name:'受损结界修复',tag:'二年级主线',goal:'修补三处结界破损点',story:'禁林边缘的古老防护结界出现破损,虚空能量持续从裂缝溢出,你使用基础魔法暂时封堵裂隙。',reward:'货币,古代魔法感知小幅提升'},
-      {name:'马人预警',tag:'神奇动物',goal:'协助马人击退靠近营地的暗影怪物',story:'马人观测到黑雾流动方向变化,前来警告人类不要深入禁林核心,协助马人清理靠近营地的暗影怪物。',reward:'马人好感,解锁禁林核心短期通行权限'},
-      {name:'护树罗锅栖息地保护',tag:'神奇动物',goal:'清除树根处暗影,重建栖息地',story:'禁林树木被虚空侵蚀,护树罗锅失去家园,清理树根处暗影,安置护树罗锅。',reward:'生物材料'},
-      {name:'受伤的魔法生物',tag:'赫奇帕奇专属',goal:'收集治愈材料,治疗魔法生物',story:'禁林大量小动物被黑雾灼伤,你需要收集治愈材料,救助受伤魔法生物。',reward:'赫奇帕奇声望,生物好感度'}
+      {name:'禁林夜间探查',tag:'二年级主线 2-02',goal:'夜间进入禁林,追踪逃逸的微弱暗影残迹,确认它没有继续向村庄移动',story:'沿预设路径追踪暗影痕迹,抵达禁林边缘。踏入指定区域时,远处会随风飘来一句无名低语,一次性播放,找不到音源。',reward:'夜行防护药剂配方'},
+      {name:'马人星象预言',tag:'支线 S03',goal:'与马人交流,了解魔力扰动与星象关联',story:'禁林马人营地。马人一贯使用星象隐喻说话:"天际常有纠缠星辰,一者吞噬一者微光",不会主动解释含义。',reward:'马人好感'}
     ]},
-    'quidditch':{title:'魁地奇球场',tasks:[
-      {name:'魁地奇赛事备战',tag:'校园休闲',goal:'完成魁地奇训练项目',story:'学院魁地奇队缺少替补队员,邀请你参与训练,完成赛前练习。',reward:'学院声望,魁地奇相关饰品'}
+    'verge':{title:'禁林边缘 · 林间裂隙',tasks:[
+      {name:'林间伏击',tag:'四年级主线 4-01',goal:'前往林间裂隙点位,压制暴走暗影,途中遭遇残存圣徒拦截',story:'圣徒现身开启战斗。血量降至残血时,他会抛出半截问句后撤离——若被一击秒杀,这句话永久丢失。',reward:'主线进度推进'}
     ]},
     'castle':{title:'霍格沃茨城堡',tasks:[
-      {name:'新生入学登记',tag:'一年级主线',goal:'完成注册,参与分院,归属四大学院之一',story:'你穿过九又四分之三站台,登上霍格沃茨特快列车,抵达城堡,完成身份注册,迎接分院仪式。',reward:'基础魔杖、南瓜汁、学院校服权限'},
-      {name:'城堡向导',tag:'一年级主线',goal:'依次走访指定城堡点位',story:'学院级长带你熟悉城堡,参观大礼堂、公共休息室、图书馆、教室。沿途画像出现短暂消失的怪事,级长只当是画像恶作剧。',reward:'少量货币,解锁城堡基础区域'},
-      {name:'走廊异象调查',tag:'一年级主线',goal:'夜间前往走廊探查,收集黑雾样本',story:'多名学生报告,夜晚走廊会短暂飘过淡黑色雾气,城堡内的猫躁动不安。海格怀疑禁林的生物溜进城堡。',reward:'经验,解锁海格对话'},
-      {name:'教授的私下问询',tag:'一年级主线',goal:'与邓布利多画像对话',story:'邓布利多画像单独找到你,告知你身上有特殊魔力波动,提醒你留意身边异常,暂时不要向其他人提起。',reward:'主线进度推进,解锁一年级收尾'}
+      {name:'城堡导览',tag:'一年级主线 1-01',goal:'跟随级长参观城堡,熟悉公共区域与教室位置',story:'大厅 → 大理石楼梯 → 校长办公室外侧长廊 → 变形课教室 → 魔咒课教室。长廊里那幅老画像紧贴墙面、面壁缄默,级长随口提起他的往事。',reward:'基础魔杖抛光套件,解锁快速旅行点位'},
+      {name:'魔咒课第一课',tag:'一年级主线 1-02',goal:'学习悬浮咒,成功施法 3 次,完成课堂练习',story:'练习结束后留在教室,教授会发现你魔杖尖淡淡的金色微光,说出关于"停下的地方更烫"的感慨——离开教室即永久错过。',reward:'解锁悬浮咒基础熟练度'},
+      {name:'天文课·星象观测',tag:'三年级主线 3-03',goal:'天文塔夜间观测星象,学习恒星与伴星常识',story:'教授指着望远镜里的星体:"有些星看起来是两颗,其实是一颗的光太强,把另一颗的微光盖住了。"——这句话之后全程不会回收,是混淆真假线索的噪音伏笔。',reward:'天文观测望远镜小配件'},
+      {name:'校园紧急疏散演练',tag:'五年级主线 5-01',goal:'巡查走廊安全,组织学生疏散演练',story:'巡查经过校长办公室外侧长廊,邻侧画像低声自语"这么多年,还在等?终究是等不到的",老画像依旧面壁,不给出回应。',reward:'主线进度推进'},
+      {name:'黑魔法防御课闲谈',tag:'五年级主线 5-02',goal:'完成课程练习,靠近教授触发课后闲聊',story:'教授说起"光明与黑暗从不是绝对界限,百年前最顶尖的巫师,也曾困在这份取舍之中",追问细节会被拉回防御咒练习。',reward:'高级暗影防护咒基础练习权限'},
+      {name:'三方理念辩论',tag:'六年级主线 6-01',goal:'魔法部、残存圣徒、霍格沃茨三方会谈,选择应对默然灾厄的立场',story:'支持魔法部隔离管控、支持圣徒理念、或保持中立,三选一永久固定。圣徒长老会承接四年级的问句:"偏见不灭,黑暗便永远不会消失"。',reward:'三方会谈纪要'},
+      {name:'校长长廊画像访问',tag:'六年级主线 6-02',goal:'返回长廊与画像交互,解锁深层对话链',story:'只有六年级辩论选择中立立场,才能解锁画像的深层对话——"有些选择一旦落地,余生皆余烬"。立场一旦确定不可反悔。',reward:'无道具,解锁画像深层对话'},
+      {name:'全校学生疏散',tag:'七年级主线 7-01',goal:'全域魔力扰动爆发,组织霍格沃茨学生撤离城堡,检查走廊安全',story:'再次走过一年级入学导览走过的那条长廊——老画像不再紧贴墙壁,改为侧身向外。邻像说:"他今天开口了,就一句。他说「到时候了」。"',reward:'完成疏散解锁终战'},
+      {name:'战后回访画像',tag:'七年级主线 7-03',goal:'击败三重黑暗聚合体后,主动回到长廊与画像交互',story:'必须自行回到长廊,手动点击交互才会触发。"你去了裂隙。你回来了。我们当年没能看懂的,你看懂了。"随后静默解锁称号与留白短片。',reward:'称号「星火观星者」,留白结局短片'},
+      {name:'谜语之门',tag:'支线 S01',goal:'解开拉文克劳阁楼古老石门谜语',story:'阁楼内旧书被墨渍涂抹遮盖,页面边角残留残缺文字:"炽烈……终焚……过半皆空",部分笔画被墨遮挡,需要仔细辨认。',reward:'拉文克劳专属古籍'},
+      {name:'暗影契约',tag:'支线 S02',goal:'调查斯莱特林地牢密室残留的暗影契约残片',story:'残页边角手写小字:"力量边界之争,古来皆有,最盛于百年之前"。小字印在页面边缘,不属于契约正文。',reward:'斯莱特林声望'}
     ]},
-    'greenhouse':{title:'温室与菜园',tasks:[
-      {name:'教授的私人委托',tag:'校园休闲',goal:'完成教授随机委托',story:'各类教授会不定期委托简单任务:收集草药、整理书籍、捕获出逃实验小动物,循环刷新。',reward:'少量经验、货币、基础材料'}
-    ]},
-    'willow':{title:'打人柳',tasks:[
-      {name:'地下密室遗迹',tag:'三年级主线',goal:'探索地下古代遗迹',story:'古籍记载城堡地下存在古代魔法节点,跟随教授进入地下隐秘遗迹,亲眼看见维持百年的封印正在开裂。',reward:'解锁地下遗迹区域'},
-      {name:'暗影契约',tag:'斯莱特林专属',goal:'处理暗影契约残片(销毁/留存研究,永久分支)',story:'一段旧暗影契约残片在地底被发现,契约可以召唤暗影力量,但代价巨大。',reward:'斯莱特林声望变动'}
-    ]},
-    'cliffs':{title:'悬崖·地底入口',tasks:[
-      {name:'主封印实地勘察',tag:'五年级主线',goal:'勘察主封印裂隙',story:'全体教授与魔法部专员一同前往地底主封印,看见巨大裂隙,封印结构大面积碎裂,专家判定三重黑暗共振已经无法自然停止。',reward:'大量经验'},
-      {name:'紧急疏散预案',tag:'五年级主线',goal:'标记危险点位,完成疏散演练',story:'校方制定城堡应急疏散方案,你协助标记城堡内危险区域,引导低年级学生熟悉避难地点。',reward:'五年级主线完成'}
-    ]},
-    'lake':{title:'黑湖',tasks:[
-      {name:'纯血家族的秘密信件',tag:'斯莱特林专属',goal:'潜入黑湖获取信件',story:'古老纯血家族留存一批信件,记录当年伏地魔崛起时期家族内部的分歧,信件藏在湖底。',reward:'斯莱特林声望'}
-    ]},
-    'station':{title:'霍格莫德车站',tasks:[
-      {name:'新生入学登记·起点',tag:'一年级主线',goal:'穿过九又四分之三站台,登上霍格沃茨特快列车',story:'旅程的起点——从站台出发,前往霍格沃茨,开启你的七学年。',reward:'开启新生入学登记'}
+    'abyss':{title:'地底裂隙核心',tasks:[
+      {name:'终局之战',tag:'七年级主线 7-02',goal:'进入裂隙核心区域,多阶段压制三重黑暗聚合体',story:'BOSS 血量降至末阶段时,战斗暂停,聚合体说出核心台词:"我是世间所有被压抑、被排斥、被否定的魔法汇聚而成……它们从未消失,只是换了一种方式燃烧。"',reward:'主线通关基础成就'}
     ]}
   };
   var pins=document.querySelectorAll('.map-pin');
