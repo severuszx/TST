@@ -201,8 +201,9 @@ html{scroll-behavior:smooth;}
 /* 开发进度 */
 .p-card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:22px;}
 .p-bar{height:10px;border-radius:10px;background:var(--accent-soft);overflow:hidden;margin-bottom:20px;}
-.p-fill{height:100%;width:12%;border-radius:10px;background:linear-gradient(90deg,var(--gold),#d4b45e);transition:width .8s ease;}
-.p-stages{display:flex;flex-direction:column;gap:10px;}
+.p-fill{height:100%;width:3%;border-radius:10px;background:linear-gradient(90deg,var(--gold),#d4b45e);transition:width .8s ease;}
+.p-stages{display:flex;flex-direction:column;gap:7px;}
+.p-group{font-size:12px;color:var(--gold);letter-spacing:1px;margin-top:8px;font-weight:700;}
 .p-stage{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary);}
 .p-stage .st-ic{width:20px;text-align:center;color:var(--text-secondary);font-size:13px;}
 .p-stage.done .st-ic{color:var(--gold);}
@@ -578,12 +579,24 @@ html{scroll-behavior:smooth;}
         <div class="p-bar"><div class="p-fill"></div></div>
         <div class="p-stages">
           <div class="p-stage done"><span class="st-ic">✓</span> 立项<span class="st-date">2026.06.25</span></div>
-          <div class="p-stage cur"><span class="st-ic">●</span> 世界观与玩法企划<span class="st-tag">当前阶段</span></div>
-          <div class="p-stage"><span class="st-ic">○</span> 核心玩法开发</div>
+          <div class="p-group">企划阶段</div>
+          <div class="p-stage cur"><span class="st-ic">●</span> 世界观框架<span class="st-tag">当前</span></div>
+          <div class="p-stage"><span class="st-ic">○</span> 七学年主线设计</div>
+          <div class="p-stage"><span class="st-ic">○</span> 支线与结局设计</div>
+          <div class="p-stage"><span class="st-ic">○</span> 玩法系统企划</div>
+          <div class="p-group">开发阶段</div>
+          <div class="p-stage"><span class="st-ic">○</span> 核心系统开发</div>
+          <div class="p-stage"><span class="st-ic">○</span> 场景与地图搭建</div>
+          <div class="p-stage"><span class="st-ic">○</span> 任务与 NPC 实现</div>
+          <div class="p-stage"><span class="st-ic">○</span> 美术与音效</div>
+          <div class="p-group">测试阶段</div>
+          <div class="p-stage"><span class="st-ic">○</span> Alpha 内部测试</div>
           <div class="p-stage"><span class="st-ic">○</span> 测试与打磨</div>
+          <div class="p-group">上线</div>
+          <div class="p-stage"><span class="st-ic">○</span> Beta 公测</div>
           <div class="p-stage"><span class="st-ic">○</span> 正式上线</div>
         </div>
-        <p class="p-note">进度 12% —— 四舍五入约等于刚开头，毕竟立项才几个月，饼要慢慢烙。</p>
+        <p class="p-note">进度 3% —— 刚把饼画出来，面团都还没和。</p>
       </div>
     </div>
   </section>
