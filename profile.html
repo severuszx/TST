@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Slow Tide 官网</title>
 <script>
+var AUTH='https://theslowtidefk.pages.dev/api';
 (function(){
 // 主题：浅色 / 深色，localStorage 优先，默认浅色
 var mode=localStorage.getItem('tst-theme');
@@ -1128,10 +1129,15 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 <button class="nav-link active" data-nav="home">首页</button>
 <button class="nav-link" data-nav="notice">公告</button>
 <button class="nav-link" data-nav="feed">动态</button>
+<div class="nav-more" id="navMore">
+<button class="nav-link" id="navMoreBtn">更多<span class="more-caret">&#9662;</span></button>
+<div class="more-menu" id="moreMenu">
 <button class="nav-link" data-nav="event">赛事活动</button>
 <button class="nav-link" data-nav="cdkey">兑换码</button>
 <button class="nav-link" data-nav="sponsor">服务器赞助</button>
 <button class="nav-link" data-nav="rule">玩家公约</button>
+</div>
+</div>
 </nav>
 <div class="header-right">
 <div class="time-badge" title="北京时间与服务器运行时间">
@@ -1509,7 +1515,7 @@ applyTheme();
 // ============================================================
 // 导航切换
 // ============================================================
-const navBtns=document.querySelectorAll('.nav-link');
+const navBtns=document.querySelectorAll('.main-nav .nav-link');
 const pages=document.querySelectorAll('.page');
 function switchPage(pid){
   pages.forEach(p=>p.classList.remove('active'));
@@ -1521,6 +1527,14 @@ function switchPage(pid){
 navBtns.forEach(b=>{ b.onclick=()=>{
   location.href = b.dataset.nav==='home' ? 'index.html' : ('index.html#'+b.dataset.nav);
 }; });
+(function(){
+  var nm=document.getElementById('navMore');
+  var nmb=document.getElementById('navMoreBtn');
+  if(!nm||!nmb) return;
+  nmb.onclick=function(e){ e.stopPropagation(); nm.classList.toggle('open'); };
+  document.addEventListener('click',function(e){ if(!nm.contains(e.target)) nm.classList.remove('open'); });
+  nm.addEventListener('click',function(e){ if(e.target.closest('.nav-link')) nm.classList.remove('open'); });
+})();
 document.querySelectorAll('[data-fnav]').forEach(b=>{
   b.onclick=()=>{
   location.href = b.dataset.fnav==='home' ? 'index.html' : ('index.html#'+b.dataset.fnav);
