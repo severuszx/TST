@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>霍格沃茨异世秘录：三代黑暗余烬 - The Slow Tide</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+color-scheme:light;
+--bg:#f3f5f8;
+--text:#1f2937;
+--text-secondary:#5b6675;
+--border:#e2e8f0;
+--card:#ffffff;
+--hover:#eef2f7;
+--header-bg:rgba(255,255,255,.92);
+--primary:#0f172a;
+--accent:#52525b;
+--accent-soft:rgba(82,82,91,.1);
+--gold:#b08d3e;
+--gold-soft:rgba(176,141,62,.12);
+--shadow:0 4px 14px rgba(15,23,42,.07);
+--hero-grad:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
+}
+html[data-theme="dark"]{
+color-scheme:dark;
+--bg:#111113;
+--text:#e5e5e7;
+--text-secondary:#9a9aa0;
+--border:#26262b;
+--card:#18181b;
+--hover:#222226;
+--header-bg:rgba(17,17,19,.92);
+--primary:#f4f4f5;
+--accent:#a1a1aa;
+--accent-soft:rgba(161,161,170,.14);
+--gold:#d4b45e;
+--gold-soft:rgba(212,180,94,.14);
+--shadow:0 4px 14px rgba(0,0,0,.5);
+--hero-grad:linear-gradient(135deg,#0a0a0b 0%,#1a1507 100%);
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;min-height:100vh;display:flex;flex-direction:column;}
+a{color:inherit;text-decoration:none;}
+.container{max-width:1080px;margin:0 auto;padding:0 20px;width:100%;}
+
+/* ===== Header ===== */
+.site-header{position:sticky;top:0;z-index:1000;background:var(--header-bg);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px;}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;letter-spacing:.5px;white-space:nowrap;}
+.logo .logo-gold{color:var(--gold);}
+.header-right{display:flex;align-items:center;gap:8px;}
+.back-btn{padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);font-size:13px;cursor:pointer;color:var(--text);}
+.back-btn:hover{background:var(--hover);}
+.theme-toggle{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;color:var(--text);font-size:15px;display:flex;align-items:center;justify-content:center;}
+.theme-toggle:hover{background:var(--hover);}
+.nav-burger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:18px;cursor:pointer;line-height:1;padding:0;flex:none;}
+.mobile-drawer{position:fixed;inset:0;z-index:10050;display:none;pointer-events:none;}
+.mobile-drawer.open{display:block;pointer-events:auto;}
+.drawer-mask{position:absolute;inset:0;background:rgba(10,16,30,.45);opacity:0;transition:opacity .2s;}
+.mobile-drawer.open .drawer-mask{opacity:1;}
+.drawer-panel{position:absolute;top:0;right:0;bottom:0;width:78%;max-width:300px;background:var(--card);border-left:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,.18);transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;overflow-y:auto;}
+.mobile-drawer.open .drawer-panel{transform:none;}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);}
+.drawer-title{font-weight:700;color:var(--text);}
+.drawer-close{border:none;background:none;color:var(--text-secondary);font-size:16px;cursor:pointer;padding:4px;}
+.drawer-list{display:flex;flex-direction:column;padding:10px 14px;gap:2px;}
+.drawer-list .nav-link{padding:12px 14px;border-radius:10px;font-size:15px;text-align:left;width:100%;color:var(--text);}
+.drawer-list .nav-link:hover{background:var(--hover);}
+@media(max-width:960px){
+.nav-burger{display:flex;}
+}
+@media(min-width:961px){
+.nav-burger{display:none!important;}
+.mobile-drawer{display:none!important;}
+}
+
+/* ===== Hero ===== */
+.hero{background:var(--hero-grad);color:#f8fafc;padding:64px 0 56px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 10%,rgba(176,141,62,.18),transparent 45%),radial-gradient(ellipse at 85% 90%,rgba(88,28,135,.25),transparent 50%);pointer-events:none;}
+.hero .kicker{display:inline-block;border:1px solid rgba(176,141,62,.55);color:var(--gold);padding:5px 14px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:18px;background:rgba(176,141,62,.1);}
+.hero h1{font-size:34px;font-weight:800;letter-spacing:1px;line-height:1.3;margin-bottom:12px;}
+.hero h1 .g{color:var(--gold);}
+.hero .sub{font-size:15px;color:#cbd5e1;margin-bottom:22px;}
+.hero .tagline{font-size:14px;color:#94a3b8;letter-spacing:3px;}
+.hero .epochs{display:flex;justify-content:center;gap:12px;margin-top:34px;flex-wrap:wrap;}
+.epoch{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 18px;min-width:150px;text-align:center;}
+.epoch .yr{font-size:20px;font-weight:800;color:var(--gold);}
+.epoch .tx{font-size:12px;color:#cbd5e1;margin-top:4px;}
+
+/* ===== Section ===== */
+.section{padding:44px 0;}
+.section.alt{background:var(--hover);}
+.sec-head{text-align:center;margin-bottom:30px;}
+.sec-head .en{font-size:12px;letter-spacing:3px;color:var(--gold);margin-bottom:6px;}
+.sec-head h2{font-size:24px;font-weight:800;letter-spacing:.5px;}
+.sec-head p{color:var(--text-secondary);font-size:13px;margin-top:6px;}
+
+/* ===== Cards ===== */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:20px;transition:transform .15s ease,box-shadow .15s ease;}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(15,23,42,.12);}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.grid-6{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.card h3{font-size:16px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.card h3 .t{color:var(--gold);font-size:13px;letter-spacing:1px;}
+.card p{font-size:13px;color:var(--text-secondary);}
+.card ul{list-style:none;margin-top:8px;}
+.card ul li{font-size:13px;color:var(--text);padding:6px 0;border-bottom:1px dashed var(--border);}
+.card ul li:last-child{border-bottom:none;}
+.card ul li .m{color:var(--text-secondary);font-size:12px;}
+.card ul li b{color:var(--gold);font-weight:600;}
+
+/* ===== Timeline ===== */
+.timeline{position:relative;margin-top:10px;}
+.timeline::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--gold),var(--accent));opacity:.35;}
+.tl-item{position:relative;padding:0 0 22px 44px;}
+.tl-item::before{content:"";position:absolute;left:9px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:3px solid var(--card);box-shadow:0 0 0 2px var(--gold);}
+.tl-item .yr{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;}
+.tl-item h3{font-size:17px;font-weight:800;margin:2px 0 4px;}
+.tl-item .tone{font-size:13px;color:var(--text-secondary);margin-bottom:10px;font-style:italic;}
+.tl-item ul{list-style:none;}
+.tl-item ul li{font-size:13px;padding:5px 0;border-bottom:1px dashed var(--border);}
+.tl-item ul li:last-child{border-bottom:none;}
+.tl-item ul li b{color:var(--gold);}
+.tl-item .br{color:var(--gold);font-size:11px;border:1px solid var(--gold-soft,transparent);background:var(--gold-soft);border-radius:4px;padding:1px 6px;margin-left:6px;}
+
+/* ===== Ending ===== */
+.endings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.ending{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;box-shadow:var(--shadow);}
+.ending .ic{font-size:30px;margin-bottom:10px;}
+.ending h3{font-size:17px;font-weight:800;margin-bottom:8px;}
+.ending p{font-size:13px;color:var(--text-secondary);}
+.ending .mark{display:inline-block;margin-top:12px;font-size:12px;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:4px 14px;}
+
+/* ===== Footer ===== */
+.site-footer{background:var(--hero-grad);color:#94a3b8;text-align:center;padding:36px 20px;font-size:13px;margin-top:auto;}
+.site-footer .big{font-size:17px;color:#f8fafc;font-weight:700;margin-bottom:8px;letter-spacing:1px;}
+.site-footer a{color:var(--gold);}
+
+@media(max-width:960px){
+.hero h1{font-size:26px;}
+.hero{padding:48px 0 40px;}
+.grid,.grid-2,.grid-4,.grid-6,.endings{grid-template-columns:1fr;}
+.section{padding:34px 0;}
+.sec-head h2{font-size:20px;}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="logo"><span class="logo-gold">⚡</span> 霍格沃茨异世秘录<span class="logo-gold"> · 三代黑暗余烬</span></div>
+    <div class="header-right">
+      <a class="back-btn" href="index.html">返回官网</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="切换主题">☾</button>
+      <button class="nav-burger" id="navBurger" aria-label="菜单">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- 手机抽屉 -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <div class="drawer-mask" id="drawerMask"></div>
+  <div class="drawer-panel">
+    <div class="drawer-head"><span class="drawer-title">页面导航</span><button class="drawer-close" id="drawerClose">&#10005;</button></div>
+    <div class="drawer-list">
+      <a class="nav-link" href="#world">世界观预告</a>
+      <a class="nav-link" href="#main">主线 · 七学年</a>
+      <a class="nav-link" href="#side">支线任务体系</a>
+      <a class="nav-link" href="#ending">终局抉择</a>
+      <a class="nav-link" href="index.html">返回官网</a>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- ===== Hero ===== -->
+  <section class="hero">
+    <div class="container">
+      <div class="kicker">完全独立的开放世界 RPG · 哈利波特世界观</div>
+      <h1>霍格沃茨异世秘录<br><span class="g">三代黑暗余烬</span></h1>
+      <p class="sub">黑魔王战败落幕三十余年，魔法界终于褪去战火硝烟。但无人知晓——跨越三个时代的黑暗隐患，始终深埋在这片土地之中。</p>
+      <div class="tagline">一场跨越百年的魔法史诗，静待你的开启</div>
+      <div class="epochs">
+        <div class="epoch"><div class="yr">1890</div><div class="tx">远古封印破裂<br>古代魔法失控</div></div>
+        <div class="epoch"><div class="yr">1920</div><div class="tx">默然虚空席卷<br>格林德沃动荡</div></div>
+        <div class="epoch"><div class="yr">1998</div><div class="tx">大战落幕<br>黑魔法余烬永存</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 世界观 ===== -->
+  <section class="section" id="world">
+    <div class="container">
+      <div class="sec-head">
+        <div class="en">WORLDVIEW</div>
+        <h2>官方世界观预告</h2>
+        <p>三代黑暗，层层叠加、彼此共振。百年平静只是假象，一场足以颠覆整个魔法界秩序的终极灾厄，正在悄然降临。</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3><span class="t">1890</span> 霍格沃茨之遗 · 远古封印破裂</h3>
+          <p>古老的古代魔法失控暴走，地底裂隙永久留存，本源魔力持续泄漏，为世间埋下失衡的最初祸根。</p>
+        </div>
+        <div class="card">
+          <h3><span class="t">1920</span> 默然虚空 · 席卷魔法世界</h3>
+          <p>格林德沃掀起的动荡未曾真正终结，无形的默默然黑雾潜伏大地，不断侵蚀生灵、扭曲魔法法则，污染从未消散。</p>
+        </div>
+        <div class="card">
+          <h3><span class="t">1998</span> 大战落幕 · 余烬永存</h3>
+          <p>伏地魔覆灭后，破碎的黑魔法残响散落各地，化作无形放大器，持续激化裂隙与虚空灾厄，让所有隐患不断加剧。</p>
+        </div>
+        <div class="card">
+          <h3><span class="t">你是</span> 唯一破局者</h3>
+          <p>百年难得一遇的双天赋特殊巫师：天生掌握古代魔法感知之力，身负默然虚空调和之能。唯有你，能够制衡三重黑暗、改写既定命运。</p>
+        </div>
+      </div>
+      <div style="margin-top:16px;background:var(--accent-soft);border:1px solid var(--border);border-radius:14px;padding:22px;">
+        <p style="font-size:14px;color:var(--text);"><b style="color:var(--gold);">异变频发、生灵黑化、空间崩坏、暗影四起。</b>整个魔法世界，正一步步走向彻底失衡的终焉边缘。你将作为新生巫师踏入霍格沃茨，历经完整七学年沉浸式成长：从懵懂入学、探索校园异象，到深入禁林秘境、接触跨国魔法势力，再到直面百年黑暗根源、参与终极宿命抉择。四大学院专属秘闻待你解锁，海量原创支线、秘境探索、势力博弈、命运分支贯穿全程。<br><br>没有固定剧本，没有既定结局。<b style="color:var(--gold);">你的魔法，你的选择，你的意志——将彻底改写这片异世的未来。</b></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 主线 ===== -->
+  <section class="section alt" id="main">
+    <div class="container">
+      <div class="sec-head">
+        <div class="en">MAIN QUEST</div>
+        <h2>主线任务 · 完整七学年</h2>
+        <p>每一学年都是一段不可复刻的魔法旅程，关键抉择永久写入你的个人档案。</p>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="yr">一年级</div>
+          <h3>异象初现 · 百年征兆复苏</h3>
+          <div class="tone">校园日常为主，埋下异常伏笔，玩家初步觉醒微弱体质，校方暗中观察。</div>
+          <ul>
+            <li><b>新生入学登记</b>：穿过九又四分之三站台，登上特快列车，完成注册与分院仪式。<span class="m">奖励：基础魔杖、南瓜汁、学院校服权限</span></li>
+            <li><b>城堡向导</b>：走访大礼堂、公共休息室、图书馆、教室，沿途画像出现消失怪事。<span class="m">奖励：少量货币，解锁城堡基础区域</span></li>
+            <li><b>魔咒课练习</b>：跟随弗立维教授学习悬浮咒，无意间释放出金色古代魔法微光。<span class="m">奖励：基础魔咒解锁，经验</span></li>
+            <li><b>走廊异象调查</b>：夜晚走廊飘过淡黑色雾气，收集黑雾样本。<span class="m">奖励：经验，解锁海格对话</span></li>
+            <li><b>教授的私下问询</b>：邓布利多画像单独找到你，提醒留意身边异常。<span class="m">奖励：主线进度推进</span></li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="yr">二年级</div>
+          <h3>虚空泄露 · 默然灾厄现世</h3>
+          <div class="tone">禁林危机爆发，虚空能量外泄，异变魔法生物大量出现，确认默默然侵蚀的存在。</div>
+          <ul>
+            <li><b>禁林异动报告</b>：禁林生物被黑雾浸染后攻击闯入者，进入禁林外围观察异变。<span class="m">奖励：经验，解锁禁林外围</span></li>
+            <li><b>受损结界修复</b>：用基础魔法封堵三处虚空裂隙。<span class="m">奖励：货币，古代魔法感知提升</span></li>
+            <li><b>默然踪迹</b>：追踪失控学生身上的默然黑雾。<span class="br">分支：猎杀默然者 / 安抚救赎</span><span class="m">永久分支标记</span></li>
+            <li><b>黑雾扩散遏制</b>：联合海格与教授击退暗影怪物潮。<span class="m">奖励：大量经验</span></li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="yr">三年级</div>
+          <h3>古秘现世 · 1890 封印真相曝光</h3>
+          <div class="tone">城堡远古符文苏醒，揭开 1890 年古代魔法封印与妖精叛乱的历史，找到灾厄最底层的根源。</div>
+          <ul>
+            <li><b>图书馆古籍检索</b>：在禁书区查阅三份 1890 年古老手稿残页。<span class="m">奖励：经验，解锁古代魔法认知</span></li>
+            <li><b>地下密室遗迹</b>：进入地下古代遗迹，亲眼看见维持百年的封印正在开裂。<span class="m">奖励：解锁地下遗迹区域</span></li>
+            <li><b>妖精的口述历史</b>：与妖精首领谈判，听取妖精视角的百年秘史。<span class="br">分支：强硬施压 / 和平协商</span><span class="m">永久分支标记</span></li>
+            <li><b>封印评估</b>：提交封印现状报告，确认一切灾厄源于古代魔法封印持续松动。<span class="m">奖励：大量经验</span></li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="yr">四年级</div>
+          <h3>全球动荡 · 三势力介入</h3>
+          <div class="tone">重启三强争霸试炼，场地被双重魔法污染；MACUSA 介入调查；食死徒残余势力趁乱行动。</div>
+          <ul>
+            <li><b>三强争霸资格试炼</b>：完成基础参赛资格考核。<span class="m">奖励：解锁三强争霸赛场</span></li>
+            <li><b>MACUSA 会面</b>：配合美国魔法部专员调查默默然跨区域扩散。<span class="m">奖励：MACUSA 声望开启</span></li>
+            <li><b>赛场暗影清理</b>：进入赛场清除异变怪物。<span class="m">奖励：经验，试炼积分</span></li>
+            <li><b>食死徒余党伏击</b>：赛场外围击退企图捕获你的伏击敌人。<span class="m">奖励：大量经验</span></li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="yr">五年级</div>
+          <h3>封印崩坏 · 世界失衡加剧</h3>
+          <div class="tone">OWL 考试途中遭遇暗影突袭；玩家第一次主动爆发古代魔法力量；百年主封印大面积破损。</div>
+          <ul>
+            <li><b>OWL 考试途中突袭</b>：地底裂隙爆发，保护考生击退入侵暗影。<span class="m">奖励：经验</span></li>
+            <li><b>古代魔法觉醒</b>：金色魔力大范围净化黑雾，稳定自身不受控的古代魔法。<span class="m">奖励：解锁古代魔法主动技能</span></li>
+            <li><b>主封印实地勘察</b>：与教授、魔法部专员一同勘察地底主封印巨大裂隙。<span class="m">奖励：大量经验</span></li>
+            <li><b>紧急疏散预案</b>：标记危险区域，引导低年级学生熟悉避难地点。<span class="m">奖励：五年级主线完成</span></li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="yr">六年级</div>
+          <h3>真相终焉 · 三代黑暗合一</h3>
+          <div class="tone">全部伏笔回收：伏地魔是表层灾难，格林德沃带来默默然污染，古代魔法失衡是一切灾难底层根源。</div>
+          <ul>
+            <li><b>黑魔法残响溯源</b>：收集伏地魔破碎灵魂残片样本，证实其如放大器般激化灾厄。<span class="m">奖励：经验</span></li>
+            <li><b>格林德沃遗留档案</b>：阅读 MACUSA 提供的格林德沃时期档案。<span class="m">奖励：MACUSA 声望</span></li>
+            <li><b>三方势力的邀约</b>：魔法部、格林德沃信徒、黑魔法研究者分别向你抛出方案。<span class="br">分支：信任魔法部 / 接触格林德沃信徒</span><span class="m">永久分支标记</span></li>
+            <li><b>灾厄融合预警</b>：三大黑暗正在融合，一旦完全合一，魔法世界法则将被改写。<span class="m">奖励：六年级主线完成</span></li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="yr">七年级</div>
+          <h3>终局之战 · 三结局宿命抉择</h3>
+          <div class="tone">最终决战，抵达地底主裂隙，做出最终抉择，永久锁定个人结局。</div>
+          <ul>
+            <li><b>集结盟友</b>：依据此前所有分支，召唤教授、妖精、MACUSA 或凤凰社等盟友参战。<span class="m">奖励：盟友参战支援</span></li>
+            <li><b>裂隙决战</b>：进入地底主裂隙核心，击败三重黑暗聚合体。</li>
+            <li><b>最终抉择</b>：三选一，永久锁定结局——光明守护 / 平衡救赎 / 远古执掌。</li>
+            <li><b>结局落幕</b>：触发专属结局动画，世界状态永久改变。<span class="m">奖励：结局专属称号、专属区域、专属彩蛋</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 支线 ===== -->
+  <section class="section" id="side">
+    <div class="container">
+      <div class="sec-head">
+        <div class="en">SIDE QUESTS</div>
+        <h2>支线任务体系</h2>
+        <p>学院秘闻、神奇动物、远古遗秘、势力博弈、休闲社交——你的魔法人生远不止主线。</p>
+      </div>
+
+      <div class="grid-4">
+        <div class="card">
+          <h3>🦁 格兰芬多<span class="t">专属</span></h3>
+          <ul>
+            <li><b>骑士画像的遗愿</b>：塔楼取回被暗影污染的骑士遗物。<span class="m">勇气称号碎片</span></li>
+            <li><b>失踪的决斗社成员</b>：禁林搜寻失联社员。<span class="m">决斗增益 buff</span></li>
+            <li><b>古堡幽灵的战场回忆</b>：寻找幽灵记载的藏宝密室。<span class="m">专属装饰</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🦅 拉文克劳<span class="t">专属</span></h3>
+          <ul>
+            <li><b>星象异象记录</b>：多日记录与裂隙活动相关的异常星轨。<span class="m">古籍材料</span></li>
+            <li><b>遗失的魔杖手稿</b>：寻回奥利凡德家族魔杖学手稿。<span class="m">解锁魔杖知识</span></li>
+            <li><b>谜语之门</b>：解开层层谜题开启阁楼大门。<span class="m">专属古籍</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🦡 赫奇帕奇<span class="t">专属</span></h3>
+          <ul>
+            <li><b>受伤的魔法生物</b>：收集治愈材料救助黑雾灼伤的小动物。<span class="m">生物好感度</span></li>
+            <li><b>妖精族群的粮食危机</b>：寻找抗虚空污染的种子。<span class="m">赫奇帕奇+妖精声望</span></li>
+            <li><b>家养小精灵的秘密储藏室</b>：获得信任，进入古老储藏室。<span class="m">专属食物配方</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🐍 斯莱特林<span class="t">专属</span></h3>
+          <ul>
+            <li><b>诅咒溯源</b>：地牢追溯斯莱特林时代遗留的诅咒起源。<span class="m">诅咒知识</span></li>
+            <li><b>纯血家族的秘密信件</b>：潜入黑湖获取记录家族分歧的信件。<span class="m">斯莱特林声望</span></li>
+            <li><b>暗影契约</b>：处理可召唤暗影力量的旧契约残片。<span class="br">分支：销毁 / 留存研究</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid-6" style="margin-top:14px;">
+        <div class="card">
+          <h3>🐾 神奇动物<span class="t">全域 · 循环日常</span></h3>
+          <ul>
+            <li><b>迷途嗅嗅</b>：在霍格莫德寻找并安抚受惊逃窜的嗅嗅。</li>
+            <li><b>护树罗锅栖息地保护</b>：清除树根暗影，重建栖息地。</li>
+            <li><b>马人预警</b>：协助马人击退靠近营地的暗影怪物。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>⚱️ 远古魔法 & 妖精<span class="t">长线 · 二至七年级</span></h3>
+          <ul>
+            <li><b>妖精工匠请求</b>：采集裂隙边缘的古代魔法矿石。</li>
+            <li><b>守护者雕像</b>：激活三座雕像，读取守护者记忆。</li>
+            <li><b>裂隙矿石净化</b>：用调和能力净化带污染的矿石。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🛡️ 魔法部 / 凤凰社 / 黑势力<span class="t">四至七年级</span></h3>
+          <ul>
+            <li><b>黑魔法残迹清剿</b>：摧毁三处滋生暗影的祭坛。</li>
+            <li><b>凤凰社情报传递</b>：秘密运送加密情报，避开黑势力巡逻者。</li>
+            <li><b>黑势力密探抓捕</b>：追踪并拦截潜入霍格莫德的密探。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🧹 校园休闲<span class="t">全学年 · 社交</span></h3>
+          <ul>
+            <li><b>魁地奇赛事备战</b>：完成替补队员赛前训练。</li>
+            <li><b>教授的私人委托</b>：收集草药、整理书籍、捕获出逃实验小动物（循环刷新）。</li>
+            <li><b>决斗俱乐部挑战赛</b>：与校内 NPC 巫师依次决斗争夺名次。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🔮 影响终局的隐藏命运支线<span class="t">关键不可逆</span></h3>
+          <ul>
+            <li><b>默然者救赎 / 猎杀</b>（二年级主线分支，影响结局）</li>
+            <li><b>妖精镇压 / 和解</b>（三年级主线分支，影响盟友阵容）</li>
+            <li><b>暗影契约销毁 / 留存</b>（斯莱特林支线，影响远古结局条件）</li>
+            <li><b>信任魔法部 / 私通格林德沃信徒</b>（六年级分支，影响决战盟友）</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>📜 支线通用规则</h3>
+          <ul>
+            <li>学院支线分院后永久锁定，其他学院无法接取。</li>
+            <li>神奇动物与教授委托为循环日常，稳定产出材料货币。</li>
+            <li>带分支标记的任务，选择永久写入个人档案，影响最终结局。</li>
+            <li>休闲支线不影响主线结局，主要提升氛围与社交。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 结局 ===== -->
+  <section class="section alt" id="ending">
+    <div class="container">
+      <div class="sec-head">
+        <div class="en">THREE FATES</div>
+        <h2>三种截然不同的史诗终局</h2>
+        <p>你的每一次选择、每一次决断，都将永久烙印属于自己的魔法人生。</p>
+      </div>
+      <div class="endings">
+        <div class="ending">
+          <div class="ic">☀️</div>
+          <h3>光明守护</h3>
+          <p>彻底净化虚空、抹除黑魔法残响，永久封印古代魔法裂隙。魔法世界回归传统秩序，黑暗力量被根除。</p>
+          <div class="mark">以光明净化黑暗</div>
+        </div>
+        <div class="ending">
+          <div class="ic">⚖️</div>
+          <h3>平衡救赎</h3>
+          <p>调和古魔法与默默然能量，证明黑暗本身不是邪恶。建立共存的新平衡，裂隙不再向外泄露灾厄。</p>
+          <div class="mark">以平衡包容两极</div>
+        </div>
+        <div class="ending">
+          <div class="ic">👑</div>
+          <h3>远古执掌</h3>
+          <p>接纳全部三重黑暗本源，继承远古守护者权柄，由你重新定义魔法世界的规则。</p>
+          <div class="mark">以本源执掌万法</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="big">欢迎来到 霍格沃茨异世秘录：三代黑暗余烬</div>
+    <p>一场跨越百年的魔法史诗，静待你的开启。</p>
+    <p style="margin-top:12px;"><a href="index.html">← 返回 The Slow Tide 官网</a></p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var mode=localStorage.getItem('tst-theme');
+  if(mode!=='dark' && mode!=='light'){ mode='light'; }
+  document.documentElement.setAttribute('data-theme',mode);
+  var tb=document.getElementById('themeToggle');
+  function sync(){ var m=document.documentElement.getAttribute('data-theme'); tb.textContent = m==='dark' ? '☀' : '☾'; }
+  if(tb) tb.onclick=function(){
+    var m=document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme',m);
+    localStorage.setItem('tst-theme',m);
+    sync();
+  };
+  sync();
+  // 手机抽屉
+  var drawer=document.getElementById('mobileDrawer');
+  var burger=document.getElementById('navBurger');
+  var closeBtn=document.getElementById('drawerClose');
+  var mask=document.getElementById('drawerMask');
+  function openD(){ if(drawer) drawer.classList.add('open'); }
+  function closeD(){ if(drawer) drawer.classList.remove('open'); }
+  if(burger) burger.addEventListener('click',function(e){ e.stopPropagation(); openD(); });
+  if(mask) mask.addEventListener('click',closeD);
+  if(closeBtn) closeBtn.addEventListener('click',closeD);
+  if(drawer) drawer.addEventListener('click',function(e){ if(e.target.closest('a')) closeD(); });
+})();
+</script>
+</body>
+</html>
