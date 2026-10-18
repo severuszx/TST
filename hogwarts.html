@@ -179,14 +179,46 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 /* 入场动画:横幅图缓慢淡入放大,标题区元素依次上浮 */
 @keyframes imgIn{from{opacity:.25;transform:scale(1.07);}to{opacity:.95;transform:scale(1);}}
 @keyframes rise{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:none;}}
-.hero-banner{animation:imgIn .95s ease both;}
-.hero-body .dev-badge{animation:rise .5s ease .15s both;}
-.hero-body .kicker{animation:rise .5s ease .28s both;}
-.hero-body h1{animation:rise .55s ease .4s both;}
-.hero-body .sub{animation:rise .5s ease .55s both;}
-.hero-body .tagline{animation:rise .5s ease .68s both;}
-.hero-body .note{animation:rise .5s ease .8s both;}
-.hero-body .epochs{animation:rise .55s ease .95s both;}
+html{scroll-behavior:smooth;}
+.hero-banner{animation:imgIn 1.3s ease both;}
+.hero-body .dev-badge{animation:rise .55s ease .2s both;}
+.hero-body .kicker{animation:rise .55s ease .4s both;}
+.hero-body h1{animation:rise .6s ease .6s both;}
+.hero-body .sub{animation:rise .55s ease .85s both;}
+.hero-body .tagline{animation:rise .55s ease 1.05s both;}
+.hero-body .note{animation:rise .55s ease 1.25s both;}
+.hero-body .epochs{animation:rise .6s ease 1.5s both;}
+
+/* 左侧目录 + 内容布局 */
+.layout{max-width:1200px;margin:0 auto;display:flex;gap:26px;padding:0 20px;align-items:flex-start;}
+.toc{width:200px;flex:none;position:sticky;top:76px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;}
+.toc-title{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;margin-bottom:6px;}
+.toc a{display:block;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--text-secondary);transition:background .15s,color .15s;}
+.toc a:hover{background:var(--hover);color:var(--text);}
+.toc a.active{background:var(--gold-soft);color:var(--gold);font-weight:600;}
+.content{flex:1;min-width:0;}
+
+/* 开发进度 */
+.p-card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:22px;}
+.p-bar{height:10px;border-radius:10px;background:var(--accent-soft);overflow:hidden;margin-bottom:20px;}
+.p-fill{height:100%;width:12%;border-radius:10px;background:linear-gradient(90deg,var(--gold),#d4b45e);transition:width .8s ease;}
+.p-stages{display:flex;flex-direction:column;gap:10px;}
+.p-stage{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary);}
+.p-stage .st-ic{width:20px;text-align:center;color:var(--text-secondary);font-size:13px;}
+.p-stage.done .st-ic{color:var(--gold);}
+.p-stage.done{color:var(--text);}
+.p-stage.cur{color:var(--text);font-weight:600;}
+.p-stage.cur .st-ic{color:var(--gold);}
+.p-stage .st-date{font-size:12px;color:var(--text-secondary);margin-left:auto;}
+.p-stage .st-tag{font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:10px;padding:1px 8px;margin-left:auto;}
+.p-note{margin-top:16px;font-size:13px;color:var(--text-secondary);}
+
+@media(max-width:960px){
+.layout{display:block;padding:0 14px;}
+.toc{position:static;width:100%;flex-direction:row;overflow-x:auto;white-space:nowrap;padding:10px 12px;gap:2px;scrollbar-width:none;}
+.toc a{display:inline-block;padding:6px 12px;}
+.toc-title{display:none;}
+}
 </style>
 </head>
 <body>
@@ -235,6 +267,17 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
       </div>
     </div>
   </section>
+
+  <div class="layout">
+    <aside class="toc">
+      <div class="toc-title">目录</div>
+      <a href="#world">世界观预告</a>
+      <a href="#main">主线 · 七学年</a>
+      <a href="#side">支线体系</a>
+      <a href="#ending">终局抉择</a>
+      <a href="#progress">开发进度</a>
+    </aside>
+    <div class="content">
 
   <!-- ===== 世界观 ===== -->
   <section class="section" id="world">
@@ -481,6 +524,30 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
       </div>
     </div>
   </section>
+
+  <!-- ===== 开发进度 ===== -->
+  <section class="section alt" id="progress">
+    <div class="container">
+      <div class="sec-head">
+        <h2>开发进度</h2>
+        <p>立项于 2026 年 6 月 25 日，至今约 4 个月。进度仅供参考，实际速度取决于作者睡眠质量。</p>
+      </div>
+      <div class="p-card">
+        <div class="p-bar"><div class="p-fill"></div></div>
+        <div class="p-stages">
+          <div class="p-stage done"><span class="st-ic">✓</span> 立项<span class="st-date">2026.06.25</span></div>
+          <div class="p-stage cur"><span class="st-ic">●</span> 世界观与玩法企划<span class="st-tag">当前阶段</span></div>
+          <div class="p-stage"><span class="st-ic">○</span> 核心玩法开发</div>
+          <div class="p-stage"><span class="st-ic">○</span> 测试与打磨</div>
+          <div class="p-stage"><span class="st-ic">○</span> 正式上线</div>
+        </div>
+        <p class="p-note">进度 12% —— 四舍五入约等于刚开头，毕竟立项才几个月，饼要慢慢烙。</p>
+      </div>
+    </div>
+  </section>
+
+    </div>
+  </div>
 </main>
 
 <button class="bgm-btn" id="bgmBtn" title="背景音乐：播放/暂停" aria-label="背景音乐"><span class="play-hide">♪</span><span class="pause-hide">♫</span></button>
@@ -542,6 +609,24 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
       bgm.play().then(setState).catch(function(){ setState(); });
       clearTimeout(t);
     },600);
+  }
+  // 目录滚动高亮
+  var tocLinks=document.querySelectorAll('.toc a');
+  var secs=[];
+  tocLinks.forEach(function(a){
+    var id=a.getAttribute('href').slice(1);
+    var s=document.getElementById(id);
+    if(s) secs.push({a:a,s:s});
+  });
+  if('IntersectionObserver' in window && secs.length){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          secs.forEach(function(o){ o.a.classList.toggle('active', o.s===en.target); });
+        }
+      });
+    },{rootMargin:'-15% 0px -75% 0px'});
+    secs.forEach(function(o){ io.observe(o.s); });
   }
 })();
 </script>
