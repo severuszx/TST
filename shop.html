@@ -522,7 +522,7 @@ function checkout(){
 
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function pTime(t){ if(!t) return ''; return String(t).replace('T',' ').slice(0,16); }
-function fmt(n){ return Number(n||0).toLocaleString('zh-CN'); }
+function fmt(n){ n=Number(n||0); if(n>=1e16) return n.toExponential(2).replace('e+','e'); if(n>=1e12) return (n/1e12).toFixed(1).replace(/\.0$/,'')+'万亿'; if(n>=1e8) return (n/1e8).toFixed(1).replace(/\.0$/,'')+'亿'; if(n>=1e4) return (n/1e4).toFixed(1).replace(/\.0$/,'')+'万'; return n.toLocaleString('zh-CN'); }
 function toast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._tm); t._tm=setTimeout(function(){ t.classList.remove('show'); },2200); }
 function hideBoot(){ var b=document.getElementById('bootLoad'); if(b) b.classList.add('hide'); }
 function api(path,opt){ return fetch(API+path,opt).then(function(r){ return r.json().catch(function(){ return {}; }); }); }
