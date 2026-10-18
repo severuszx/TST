@@ -76,14 +76,20 @@ a{color:inherit;text-decoration:none;}
 }
 
 /* ===== Hero ===== */
-.hero{background:linear-gradient(rgba(9,11,18,.82),rgba(9,11,18,.88)),url('hogwarts_castle.jpg') center 32%/cover no-repeat,#0f172a;color:#f8fafc;padding:76px 0 62px;text-align:center;position:relative;overflow:hidden;}
-html[data-theme="dark"] .hero{background:linear-gradient(rgba(8,8,10,.85),rgba(8,8,10,.9)),url('hogwarts_castle.jpg') center 32%/cover no-repeat,#0a0a0b;}
-.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 10%,rgba(176,141,62,.16),transparent 45%),radial-gradient(ellipse at 85% 90%,rgba(88,28,135,.22),transparent 50%);pointer-events:none;}
+.hero{background:var(--hero-grad);color:#f8fafc;padding:0 0 52px;text-align:center;position:relative;overflow:hidden;}
+.hero-banner{width:100%;overflow:hidden;}
+.hero-banner img{width:100%;height:300px;object-fit:cover;display:block;opacity:.95;}
+.hero-body{max-width:1080px;margin:0 auto;padding:46px 20px 0;}
 .hero .kicker{display:inline-block;border:1px solid rgba(176,141,62,.55);color:var(--gold);padding:5px 14px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:18px;background:rgba(176,141,62,.1);}
-.hero h1{font-size:36px;font-weight:800;letter-spacing:1px;line-height:1.3;margin-bottom:12px;text-shadow:0 0 22px rgba(176,141,62,.35),0 2px 10px rgba(0,0,0,.5);}
-.hero h1 .g{color:var(--gold);text-shadow:0 0 26px rgba(176,141,62,.5),0 2px 12px rgba(0,0,0,.55);}
+.hero h1{font-size:36px;font-weight:800;letter-spacing:1px;line-height:1.3;margin-bottom:12px;}
+.hero h1 .g{color:var(--gold);}
 .hero .sub{font-size:15px;color:#cbd5e1;margin-bottom:22px;}
 .hero .tagline{font-size:14px;color:#94a3b8;letter-spacing:3px;}
+@media(max-width:960px){
+.hero-banner img{height:180px;}
+.hero{padding-bottom:40px;}
+.hero-body{padding-top:34px;}
+}
 .hero .epochs{display:flex;justify-content:center;gap:12px;margin-top:34px;flex-wrap:wrap;}
 .epoch{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 18px;min-width:150px;text-align:center;}
 .epoch .yr{font-size:20px;font-weight:800;color:var(--gold);}
@@ -98,12 +104,12 @@ html[data-theme="dark"] .hero{background:linear-gradient(rgba(8,8,10,.85),rgba(8
 .sec-head p{color:var(--text-secondary);font-size:13px;margin-top:6px;}
 
 /* ===== Cards ===== */
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:20px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;}
-.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(15,23,42,.12);border-color:rgba(176,141,62,.45);}
-.ending{border:1px solid var(--border);transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;}
-.ending:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(15,23,42,.14);border-color:rgba(176,141,62,.55);}
-.epoch{transition:transform .15s ease,border-color .15s ease;}
-.epoch:hover{transform:translateY(-2px);border-color:rgba(176,141,62,.6);}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:20px;transition:transform .15s ease,box-shadow .15s ease;}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(15,23,42,.12);}
+.ending{transition:transform .15s ease,box-shadow .15s ease;}
+.ending:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(15,23,42,.14);}
+.epoch{transition:transform .15s ease;}
+.epoch:hover{transform:translateY(-2px);}
 /* 四学院配色 */
 .house{border-left:3px solid var(--hc,#999);}
 .house .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--hc,#999);margin-right:2px;}
@@ -114,7 +120,7 @@ html[data-theme="dark"] .hero{background:linear-gradient(rgba(8,8,10,.85),rgba(8
 html[data-theme="dark"] .house-r{--hc:#4b6ab8;}
 html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 /* 死亡圣器 */
-.hallows{display:block;margin:0 auto 14px;opacity:.9;filter:drop-shadow(0 0 8px rgba(176,141,62,.4));}
+.hallows{display:block;margin:0 auto 14px;opacity:.9;}
 .motto{font-style:italic;letter-spacing:1px;color:#cbd5e1;font-size:12px;margin-top:4px;}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
 .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
@@ -133,8 +139,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 .timeline{position:relative;margin-top:10px;}
 .timeline::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--gold),var(--accent));opacity:.35;}
 .tl-item{position:relative;padding:0 0 22px 44px;}
-.tl-item::before{content:"";position:absolute;left:9px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:3px solid var(--card);box-shadow:0 0 0 2px var(--gold);animation:tlPulse 3s ease-in-out infinite;}
-@keyframes tlPulse{0%,100%{box-shadow:0 0 0 2px var(--gold),0 0 6px rgba(176,141,62,.25);}50%{box-shadow:0 0 0 2px var(--gold),0 0 14px rgba(176,141,62,.7);}}
+.tl-item::before{content:"";position:absolute;left:9px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:3px solid var(--card);box-shadow:0 0 0 2px var(--gold);}
 .tl-item .yr{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;}
 .tl-item h3{font-size:17px;font-weight:800;margin:2px 0 4px;}
 .tl-item .tone{font-size:13px;color:var(--text-secondary);margin-bottom:10px;font-style:italic;}
@@ -147,7 +152,6 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 /* ===== Ending ===== */
 .endings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
 .ending{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;box-shadow:var(--shadow);}
-.ending .ic{font-size:30px;margin-bottom:10px;}
 .ending h3{font-size:17px;font-weight:800;margin-bottom:8px;}
 .ending p{font-size:13px;color:var(--text-secondary);}
 .ending .mark{display:inline-block;margin-top:12px;font-size:12px;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:4px 14px;}
@@ -176,7 +180,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 
 <header class="site-header">
   <div class="container header-inner">
-    <div class="logo"><span class="logo-gold">⚡</span> 霍格沃茨异世秘录<span class="logo-gold"> · 三代黑暗余烬</span></div>
+    <div class="logo">霍格沃茨异世秘录<span class="logo-gold"> · 三代黑暗余烬</span></div>
     <div class="header-right">
       <a class="back-btn" href="index.html">返回官网</a>
       <button class="theme-toggle" id="themeToggle" aria-label="切换主题">☾</button>
@@ -203,7 +207,8 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 <main>
   <!-- ===== Hero ===== -->
   <section class="hero">
-    <div class="container">
+    <div class="hero-banner"><img src="hogwarts_castle.jpg" alt="霍格沃茨城堡夜景"></div>
+    <div class="container hero-body">
       <div class="kicker">完全独立的开放世界 RPG · 哈利波特世界观</div>
       <h1>霍格沃茨异世秘录<br><span class="g">三代黑暗余烬</span></h1>
       <p class="sub">黑魔王战败落幕三十余年，魔法界终于褪去战火硝烟。但无人知晓——跨越三个时代的黑暗隐患，始终深埋在这片土地之中。</p>
@@ -220,7 +225,6 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
   <section class="section" id="world">
     <div class="container">
       <div class="sec-head">
-        <div class="en">WORLDVIEW</div>
         <h2>官方世界观预告</h2>
         <p>三代黑暗，层层叠加、彼此共振。百年平静只是假象，一场足以颠覆整个魔法界秩序的终极灾厄，正在悄然降临。</p>
       </div>
@@ -252,7 +256,6 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
   <section class="section alt" id="main">
     <div class="container">
       <div class="sec-head">
-        <div class="en">MAIN QUEST</div>
         <h2>主线任务 · 完整七学年</h2>
         <p>每一学年都是一段不可复刻的魔法旅程，关键抉择永久写入你的个人档案。</p>
       </div>
@@ -343,14 +346,13 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
   <section class="section" id="side">
     <div class="container">
       <div class="sec-head">
-        <div class="en">SIDE QUESTS</div>
         <h2>支线任务体系</h2>
         <p>学院秘闻、神奇动物、远古遗秘、势力博弈、休闲社交——你的魔法人生远不止主线。</p>
       </div>
 
       <div class="grid-4">
         <div class="card house house-g">
-          <h3><span class="dot"></span>🦁 格兰芬多<span class="t">专属</span></h3>
+          <h3><span class="dot"></span>格兰芬多<span class="t">专属</span></h3>
           <ul>
             <li><b>骑士画像的遗愿</b>：塔楼取回被暗影污染的骑士遗物。<span class="m">勇气称号碎片</span></li>
             <li><b>失踪的决斗社成员</b>：禁林搜寻失联社员。<span class="m">决斗增益 buff</span></li>
@@ -358,7 +360,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
           </ul>
         </div>
         <div class="card house house-r">
-          <h3><span class="dot"></span>🦅 拉文克劳<span class="t">专属</span></h3>
+          <h3><span class="dot"></span>拉文克劳<span class="t">专属</span></h3>
           <ul>
             <li><b>星象异象记录</b>：多日记录与裂隙活动相关的异常星轨。<span class="m">古籍材料</span></li>
             <li><b>遗失的魔杖手稿</b>：寻回奥利凡德家族魔杖学手稿。<span class="m">解锁魔杖知识</span></li>
@@ -366,7 +368,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
           </ul>
         </div>
         <div class="card house house-h">
-          <h3><span class="dot"></span>🦡 赫奇帕奇<span class="t">专属</span></h3>
+          <h3><span class="dot"></span>赫奇帕奇<span class="t">专属</span></h3>
           <ul>
             <li><b>受伤的魔法生物</b>：收集治愈材料救助黑雾灼伤的小动物。<span class="m">生物好感度</span></li>
             <li><b>妖精族群的粮食危机</b>：寻找抗虚空污染的种子。<span class="m">赫奇帕奇+妖精声望</span></li>
@@ -374,7 +376,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
           </ul>
         </div>
         <div class="card house house-s">
-          <h3><span class="dot"></span>🐍 斯莱特林<span class="t">专属</span></h3>
+          <h3><span class="dot"></span>斯莱特林<span class="t">专属</span></h3>
           <ul>
             <li><b>诅咒溯源</b>：地牢追溯斯莱特林时代遗留的诅咒起源。<span class="m">诅咒知识</span></li>
             <li><b>纯血家族的秘密信件</b>：潜入黑湖获取记录家族分歧的信件。<span class="m">斯莱特林声望</span></li>
@@ -385,7 +387,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 
       <div class="grid-6" style="margin-top:14px;">
         <div class="card">
-          <h3>🐾 神奇动物<span class="t">全域 · 循环日常</span></h3>
+          <h3>神奇动物<span class="t">全域 · 循环日常</span></h3>
           <ul>
             <li><b>迷途嗅嗅</b>：在霍格莫德寻找并安抚受惊逃窜的嗅嗅。</li>
             <li><b>护树罗锅栖息地保护</b>：清除树根暗影，重建栖息地。</li>
@@ -393,7 +395,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
           </ul>
         </div>
         <div class="card">
-          <h3>⚱️ 远古魔法 & 妖精<span class="t">长线 · 二至七年级</span></h3>
+          <h3>远古魔法 & 妖精<span class="t">长线 · 二至七年级</span></h3>
           <ul>
             <li><b>妖精工匠请求</b>：采集裂隙边缘的古代魔法矿石。</li>
             <li><b>守护者雕像</b>：激活三座雕像，读取守护者记忆。</li>
@@ -401,7 +403,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
           </ul>
         </div>
         <div class="card">
-          <h3>🛡️ 魔法部 / 凤凰社 / 黑势力<span class="t">四至七年级</span></h3>
+          <h3>魔法部 / 凤凰社 / 黑势力<span class="t">四至七年级</span></h3>
           <ul>
             <li><b>黑魔法残迹清剿</b>：摧毁三处滋生暗影的祭坛。</li>
             <li><b>凤凰社情报传递</b>：秘密运送加密情报，避开黑势力巡逻者。</li>
@@ -409,7 +411,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
           </ul>
         </div>
         <div class="card">
-          <h3>🧹 校园休闲<span class="t">全学年 · 社交</span></h3>
+          <h3>校园休闲<span class="t">全学年 · 社交</span></h3>
           <ul>
             <li><b>魁地奇赛事备战</b>：完成替补队员赛前训练。</li>
             <li><b>教授的私人委托</b>：收集草药、整理书籍、捕获出逃实验小动物（循环刷新）。</li>
@@ -417,7 +419,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
           </ul>
         </div>
         <div class="card">
-          <h3>🔮 影响终局的隐藏命运支线<span class="t">关键不可逆</span></h3>
+          <h3>影响终局的隐藏命运支线<span class="t">关键不可逆</span></h3>
           <ul>
             <li><b>默然者救赎 / 猎杀</b>（二年级主线分支，影响结局）</li>
             <li><b>妖精镇压 / 和解</b>（三年级主线分支，影响盟友阵容）</li>
@@ -426,7 +428,7 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
           </ul>
         </div>
         <div class="card">
-          <h3>📜 支线通用规则</h3>
+          <h3>支线通用规则</h3>
           <ul>
             <li>学院支线分院后永久锁定，其他学院无法接取。</li>
             <li>神奇动物与教授委托为循环日常，稳定产出材料货币。</li>
@@ -442,25 +444,21 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
   <section class="section alt" id="ending">
     <div class="container">
       <div class="sec-head">
-        <div class="en">THREE FATES</div>
         <h2>三种截然不同的史诗终局</h2>
         <p>你的每一次选择、每一次决断，都将永久烙印属于自己的魔法人生。</p>
       </div>
       <div class="endings">
         <div class="ending">
-          <div class="ic">☀️</div>
           <h3>光明守护</h3>
           <p>彻底净化虚空、抹除黑魔法残响，永久封印古代魔法裂隙。魔法世界回归传统秩序，黑暗力量被根除。</p>
           <div class="mark">以光明净化黑暗</div>
         </div>
         <div class="ending">
-          <div class="ic">⚖️</div>
           <h3>平衡救赎</h3>
           <p>调和古魔法与默默然能量，证明黑暗本身不是邪恶。建立共存的新平衡，裂隙不再向外泄露灾厄。</p>
           <div class="mark">以平衡包容两极</div>
         </div>
         <div class="ending">
-          <div class="ic">👑</div>
           <h3>远古执掌</h3>
           <p>接纳全部三重黑暗本源，继承远古守护者权柄，由你重新定义魔法世界的规则。</p>
           <div class="mark">以本源执掌万法</div>
