@@ -176,9 +176,17 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 .section{padding:34px 0;}
 .sec-head h2{font-size:20px;}
 }
-/* 入场动画(与官网一致:整页淡入上浮) */
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-main{animation:fadeIn .35s ease;}
+/* 入场动画:横幅图缓慢淡入放大,标题区元素依次上浮 */
+@keyframes imgIn{from{opacity:.25;transform:scale(1.07);}to{opacity:.95;transform:scale(1);}}
+@keyframes rise{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:none;}}
+.hero-banner{animation:imgIn .95s ease both;}
+.hero-body .dev-badge{animation:rise .5s ease .15s both;}
+.hero-body .kicker{animation:rise .5s ease .28s both;}
+.hero-body h1{animation:rise .55s ease .4s both;}
+.hero-body .sub{animation:rise .5s ease .55s both;}
+.hero-body .tagline{animation:rise .5s ease .68s both;}
+.hero-body .note{animation:rise .5s ease .8s both;}
+.hero-body .epochs{animation:rise .55s ease .95s both;}
 </style>
 </head>
 <body>
@@ -219,7 +227,7 @@ main{animation:fadeIn .35s ease;}
       <h1>霍格沃茨异世秘录<br><span class="g">三代黑暗余烬</span></h1>
       <p class="sub">黑魔王战败落幕三十余年，魔法界终于褪去战火硝烟。但无人知晓——跨越三个时代的黑暗隐患，始终深埋在这片土地之中。</p>
       <div class="tagline">一场跨越百年的魔法史诗，静待你的开启</div>
-      <p class="note">本页是企划预告——饼先画给大家看，能不能烙熟、什么时候烙熟，作者心里也没底。内容以后大概率要改，最终以游戏内为准；更新随缘，催更请轻拍，鸽子也是会害羞的。</p>
+      <p class="note">本页是企划预告——饼先画给大家看，能不能烙熟、什么时候烙熟，作者心里也没底。内容以后大概率要改，最终以游戏内为准；上线时间先按几年后算，催更请轻拍，鸽子也是会害羞的。</p>
       <div class="epochs">
         <div class="epoch"><div class="yr">1890</div><div class="tx">远古封印破裂<br>古代魔法失控</div></div>
         <div class="epoch"><div class="yr">1920</div><div class="tx">默然虚空席卷<br>格林德沃动荡</div></div>
