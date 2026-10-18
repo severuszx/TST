@@ -1002,8 +1002,21 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 <nav class="main-nav" id="mainNav">
 <button class="nav-link" onclick="location.href='index.html'">首页</button>
 <button class="nav-link" onclick="location.href='index.html#notice'">公告</button>
+<button class="nav-link" onclick="location.href='index.html#feed'">动态</button>
+<div class="nav-more" id="navMore">
+<button class="nav-link" id="navMoreBtn">更多<span class="more-caret">&#9662;</span></button>
+<div class="more-menu" id="moreMenu">
 <button class="nav-link active" onclick="location.href='tool.html'">便捷工具</button>
+<button class="nav-link" onclick="location.href='index.html#vote'">投票</button>
+<button class="nav-link" onclick="location.href='index.html#tools'">服务器工具</button>
+<button class="nav-link" onclick="location.href='index.html#rule'">玩家公约</button>
+<button class="nav-link" onclick="location.href='index.html#event'">赛事活动</button>
+<button class="nav-link" onclick="location.href='index.html#cdkey'">兑换码</button>
+<button class="nav-link" onclick="location.href='index.html#sponsor'">服务器赞助</button>
+<button class="nav-link" onclick="location.href='shop.html'">积分商店</button>
 <button class="nav-link" onclick="location.href='profile.html'">我的</button>
+</div>
+</div>
 </nav>
 <div class="header-right">
 <button class="nav-link" style="font-size:14px;" onclick="location.href='index.html'">返回官网</button>
@@ -2238,6 +2251,15 @@ resetAll();
   if(mask) mask.addEventListener('click',closeD);
   if(closeBtn) closeBtn.addEventListener('click',closeD);
   if(drawer) drawer.addEventListener('click',function(e){ if(e.target.closest('a')) closeD(); });
+})();
+// ===== 更多下拉 =====
+(function(){
+  var nm=document.getElementById('navMore');
+  var nmb=document.getElementById('navMoreBtn');
+  if(!nm||!nmb) return;
+  nmb.onclick=function(e){ e.stopPropagation(); nm.classList.toggle('open'); };
+  document.addEventListener('click',function(e){ if(!nm.contains(e.target)) nm.classList.remove('open'); });
+  nm.addEventListener('click',function(e){ if(e.target.closest('.nav-link')) nm.classList.remove('open'); });
 })();
 </script>
 </body>
