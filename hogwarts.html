@@ -7,45 +7,61 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-color-scheme:light;
---bg:#f3f5f8;
---text:#1f2937;
---text-secondary:#5b6675;
---border:#e2e8f0;
---card:#ffffff;
---hover:#eef2f7;
---header-bg:rgba(255,255,255,.92);
---primary:#0f172a;
---accent:#52525b;
---accent-soft:rgba(82,82,91,.1);
---gold:#b08d3e;
---gold-soft:rgba(176,141,62,.12);
---shadow:0 4px 14px rgba(15,23,42,.07);
---hero-grad:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
-}
-html[data-theme="dark"]{
 color-scheme:dark;
---bg:#111113;
---text:#e5e5e7;
---text-secondary:#9a9aa0;
---border:#26262b;
---card:#18181b;
---hover:#222226;
---header-bg:rgba(17,17,19,.92);
+--bg:#0a1026;
+--text:#e8e6f0;
+--text-secondary:#a7adc9;
+--border:rgba(148,166,222,.16);
+--card:rgba(16,22,48,.66);
+--hover:rgba(212,180,94,.08);
+--header-bg:rgba(10,16,38,.85);
 --primary:#f4f4f5;
---accent:#a1a1aa;
---accent-soft:rgba(161,161,170,.14);
+--accent:#8b93bd;
+--accent-soft:rgba(139,147,189,.14);
 --gold:#d4b45e;
 --gold-soft:rgba(212,180,94,.14);
---shadow:0 4px 14px rgba(0,0,0,.5);
---hero-grad:linear-gradient(135deg,#0a0a0b 0%,#1a1507 100%);
+--shadow:0 6px 24px rgba(0,0,0,.35);
+--hero-grad:linear-gradient(180deg,#080d20 0%,#101a3d 100%);
+}
+html[data-theme="dark"]{
+--bg:#05070f;
+--text:#ecebf2;
+--text-secondary:#9aa0b8;
+--border:rgba(150,166,222,.14);
+--card:rgba(10,14,30,.72);
+--hover:rgba(227,197,110,.08);
+--header-bg:rgba(5,7,15,.88);
+--accent:#7e86ad;
+--accent-soft:rgba(126,134,173,.14);
+--gold:#e3c56e;
+--gold-soft:rgba(227,197,110,.14);
+--shadow:0 6px 26px rgba(0,0,0,.55);
+--hero-grad:linear-gradient(180deg,#04060c 0%,#0b1128 100%);
 }
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;min-height:100vh;display:flex;flex-direction:column;}
+/* 魔法星空背景:底色渐变 + 漂浮星点 */
+body::before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(900px 560px at 85% 8%,rgba(72,58,168,.20),transparent 70%),radial-gradient(820px 540px at 8% 88%,rgba(96,48,140,.18),transparent 70%),radial-gradient(600px 400px at 50% 50%,rgba(38,52,120,.10),transparent 70%);}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+background:
+radial-gradient(1px 1px at 12% 18%,rgba(255,255,255,.75) 0,transparent 100%),
+radial-gradient(1.5px 1.5px at 28% 64%,rgba(212,180,94,.65) 0,transparent 100%),
+radial-gradient(1px 1px at 45% 10%,rgba(255,255,255,.6) 0,transparent 100%),
+radial-gradient(1.2px 1.2px at 62% 38%,rgba(180,190,255,.65) 0,transparent 100%),
+radial-gradient(1px 1px at 76% 20%,rgba(255,255,255,.55) 0,transparent 100%),
+radial-gradient(1.6px 1.6px at 88% 56%,rgba(212,180,94,.5) 0,transparent 100%),
+radial-gradient(1px 1px at 8% 76%,rgba(255,255,255,.45) 0,transparent 100%),
+radial-gradient(1.3px 1.3px at 52% 86%,rgba(180,190,255,.55) 0,transparent 100%),
+radial-gradient(1px 1px at 92% 82%,rgba(255,255,255,.45) 0,transparent 100%),
+radial-gradient(2px 2px at 34% 42%,rgba(255,255,255,.3) 0,transparent 100%),
+radial-gradient(1.2px 1.2px at 68% 70%,rgba(212,180,94,.4) 0,transparent 100%),
+radial-gradient(1px 1px at 20% 38%,rgba(255,255,255,.4) 0,transparent 100%);
+animation:twinkle 5s ease-in-out infinite alternate;}
+@keyframes twinkle{from{opacity:.7}to{opacity:1}}
 a{color:inherit;text-decoration:none;}
 .container{max-width:1080px;margin:0 auto;padding:0 20px;width:100%;}
 
 /* ===== Header ===== */
-.site-header{position:sticky;top:0;z-index:1000;background:var(--header-bg);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+.site-header{position:sticky;top:0;z-index:1000;background:var(--header-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
 .header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px;}
 .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;letter-spacing:.5px;white-space:nowrap;}
 .logo .logo-gold{color:var(--gold);}
@@ -57,9 +73,9 @@ a{color:inherit;text-decoration:none;}
 .nav-burger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:18px;cursor:pointer;line-height:1;padding:0;flex:none;}
 .mobile-drawer{position:fixed;inset:0;z-index:10050;display:none;pointer-events:none;}
 .mobile-drawer.open{display:block;pointer-events:auto;}
-.drawer-mask{position:absolute;inset:0;background:rgba(10,16,30,.45);opacity:0;transition:opacity .2s;}
+.drawer-mask{position:absolute;inset:0;background:rgba(6,10,26,.6);opacity:0;transition:opacity .2s;}
 .mobile-drawer.open .drawer-mask{opacity:1;}
-.drawer-panel{position:absolute;top:0;right:0;bottom:0;width:78%;max-width:300px;background:var(--card);border-left:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,.18);transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;overflow-y:auto;}
+.drawer-panel{position:absolute;top:0;right:0;bottom:0;width:78%;max-width:300px;background:var(--card);border-left:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,.4);transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;overflow-y:auto;backdrop-filter:blur(14px);}
 .mobile-drawer.open .drawer-panel{transform:none;}
 .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);}
 .drawer-title{font-weight:700;color:var(--text);}
@@ -80,41 +96,52 @@ a{color:inherit;text-decoration:none;}
 .hero-banner{width:100%;overflow:hidden;}
 .hero-banner img{width:100%;height:300px;object-fit:cover;display:block;opacity:.95;}
 .hero-body{max-width:1080px;margin:0 auto;padding:46px 20px 0;}
-.hero .kicker{display:inline-block;border:1px solid rgba(176,141,62,.55);color:var(--gold);padding:5px 14px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:18px;background:rgba(176,141,62,.1);}
+.hero .kicker{display:inline-block;border:1px solid rgba(212,180,94,.55);color:var(--gold);padding:5px 14px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:18px;background:rgba(212,180,94,.1);}
 .hero h1{font-size:36px;font-weight:800;letter-spacing:1px;line-height:1.3;margin-bottom:12px;}
-.hero h1 .g{color:var(--gold);}
-.hero .sub{font-size:15px;color:#cbd5e1;margin-bottom:22px;}
-.hero .tagline{font-size:14px;color:#94a3b8;letter-spacing:3px;}
-.dev-badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);padding:4px 16px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:12px;background:rgba(176,141,62,.08);}
-.hero .note{font-size:13px;color:#8b95a5;margin-top:14px;letter-spacing:1px;}
+.hero h1 .g{color:var(--gold);text-shadow:0 0 24px rgba(212,180,94,.35);}
+.hero .sub{font-size:15px;color:#c7cce0;margin-bottom:22px;}
+.hero .tagline{font-size:14px;color:#9aa0bc;letter-spacing:3px;}
+.dev-badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);padding:4px 16px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:12px;background:rgba(212,180,94,.08);}
+.hero .note{font-size:13px;color:#8b93b5;margin-top:14px;letter-spacing:1px;}
 @media(max-width:960px){
 .hero-banner img{height:180px;}
 .hero{padding-bottom:40px;}
 .hero-body{padding-top:34px;}
 }
 .hero .epochs{display:flex;justify-content:center;gap:12px;margin-top:34px;flex-wrap:wrap;}
-.epoch{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 18px;min-width:150px;text-align:center;}
-.epoch .yr{font-size:20px;font-weight:800;color:var(--gold);}
-.epoch .tx{font-size:12px;color:#cbd5e1;margin-top:4px;}
+.epoch{background:rgba(212,180,94,.06);border:1px solid rgba(212,180,94,.22);border-radius:12px;padding:14px 18px;min-width:150px;text-align:center;}
+.epoch .yr{font-size:20px;font-weight:800;color:var(--gold);text-shadow:0 0 14px rgba(212,180,94,.4);}
+.epoch .tx{font-size:12px;color:#c7cce0;margin-top:4px;}
 
 /* ===== Section ===== */
 .section{padding:44px 0;}
-.section.alt{background:var(--hover);}
+.section.alt{background:rgba(13,18,42,.55);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
 .sec-head{text-align:center;margin-bottom:30px;}
-.sec-head .en{font-size:12px;letter-spacing:3px;color:var(--gold);margin-bottom:6px;}
 .sec-head h2{font-size:24px;font-weight:800;letter-spacing:.5px;}
+.sec-head h2 .g{color:var(--gold);}
 .sec-head p{color:var(--text-secondary);font-size:13px;margin-top:6px;}
+/* 章节横幅图 */
+.chap{position:relative;border-radius:16px;overflow:hidden;margin-bottom:28px;border:1px solid rgba(212,180,94,.3);box-shadow:0 0 34px rgba(212,180,94,.12);}
+.chap img{width:100%;height:190px;object-fit:cover;display:block;}
+.chap-duo{display:grid;grid-template-columns:2fr 1fr;}
+.chap-duo img{width:100%;height:190px;object-fit:cover;display:block;}
+.chap-cap{position:absolute;left:0;right:0;bottom:0;padding:30px 22px 14px;background:linear-gradient(180deg,transparent,rgba(6,10,26,.94));color:#e8e6f0;font-size:14px;letter-spacing:.5px;text-align:left;}
+.chap-cap b{color:var(--gold);}
+@media(max-width:960px){
+.chap img,.chap-duo img{height:130px;}
+.chap-cap{font-size:12.5px;padding:20px 14px 10px;}
+}
 
 /* ===== Cards ===== */
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:20px;transition:transform .15s ease,box-shadow .15s ease;}
-.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(15,23,42,.12);}
-.ending{transition:transform .15s ease,box-shadow .15s ease;}
-.ending:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(15,23,42,.14);}
-.epoch{transition:transform .15s ease;}
-.epoch:hover{transform:translateY(-2px);}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:20px;backdrop-filter:blur(8px);transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;}
+.card:hover{transform:translateY(-2px);border-color:rgba(212,180,94,.45);box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 0 1px rgba(212,180,94,.12);}
+.ending{transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;}
+.ending:hover{transform:translateY(-3px);border-color:rgba(212,180,94,.45);box-shadow:0 12px 34px rgba(0,0,0,.55);}
+.epoch{transition:transform .15s ease,border-color .15s ease;}
+.epoch:hover{transform:translateY(-2px);border-color:rgba(212,180,94,.6);}
 /* 四学院配色 */
 .house{border-left:3px solid var(--hc,#999);}
-.house .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--hc,#999);margin-right:2px;}
+.house .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--hc,#999);margin-right:2px;box-shadow:0 0 8px var(--hc,#999);}
 .house-g{--hc:#ae0001;}
 .house-r{--hc:#222f5b;}
 .house-h{--hc:#b8860b;}
@@ -122,8 +149,8 @@ a{color:inherit;text-decoration:none;}
 html[data-theme="dark"] .house-r{--hc:#4b6ab8;}
 html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 /* 死亡圣器 */
-.hallows{display:block;margin:0 auto 14px;opacity:.9;}
-.motto{font-style:italic;letter-spacing:1px;color:#cbd5e1;font-size:12px;margin-top:4px;}
+.hallows{display:block;margin:0 auto 14px;opacity:.9;filter:drop-shadow(0 0 10px rgba(212,180,94,.4));}
+.motto{font-style:italic;letter-spacing:1px;color:#c7cce0;font-size:12px;margin-top:4px;}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
 .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
@@ -140,9 +167,9 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 
 /* ===== Timeline ===== */
 .timeline{position:relative;margin-top:10px;}
-.timeline::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--gold),var(--accent));opacity:.35;}
+.timeline::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--gold),rgba(139,147,189,.5));opacity:.5;}
 .tl-item{position:relative;padding:0 0 22px 44px;}
-.tl-item::before{content:"";position:absolute;left:9px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:3px solid var(--card);box-shadow:0 0 0 2px var(--gold);}
+.tl-item::before{content:"";position:absolute;left:9px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:3px solid var(--card);box-shadow:0 0 12px rgba(212,180,94,.85);}
 .tl-item .yr{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;}
 .tl-item h3{font-size:17px;font-weight:800;margin:2px 0 4px;}
 .tl-item .tone{font-size:13px;color:var(--text-secondary);margin-bottom:10px;font-style:italic;}
@@ -151,25 +178,30 @@ html[data-theme="dark"] .house-h{--hc:#e0b13a;}
 .tl-item ul li:last-child{border-bottom:none;}
 .tl-item ul li b{color:var(--gold);}
 .tl-item .br{color:var(--gold);font-size:11px;border:1px solid var(--gold-soft,transparent);background:var(--gold-soft);border-radius:4px;padding:1px 6px;margin-left:6px;}
-.tl-item .vline{font-size:12.5px;color:var(--text-secondary);line-height:1.7;background:rgba(176,141,62,.07);border:1px dashed rgba(176,141,62,.45);border-radius:10px;padding:9px 12px;margin-top:10px;}
+.tl-item .vline{font-size:12.5px;color:var(--text-secondary);line-height:1.7;background:rgba(212,180,94,.07);border:1px dashed rgba(212,180,94,.45);border-radius:10px;padding:9px 12px;margin-top:10px;}
 .tl-item .vline b{color:var(--gold);}
 .tl-item .noise{color:var(--text-secondary);font-size:11px;border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin-left:6px;}
 .s-desc{font-size:13px;color:var(--text-secondary);margin-bottom:8px;}
 
 /* ===== Ending ===== */
 .endings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.ending{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;box-shadow:var(--shadow);}
+.ending{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;box-shadow:var(--shadow);backdrop-filter:blur(8px);}
 .ending h3{font-size:17px;font-weight:800;margin-bottom:8px;}
 .ending p{font-size:13px;color:var(--text-secondary);}
 .ending .mark{display:inline-block;margin-top:12px;font-size:12px;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:4px 14px;}
+/* 金色飞贼收尾 */
+.snitch{text-align:center;margin-top:30px;}
+.snitch img{width:210px;border-radius:14px;border:1px solid rgba(212,180,94,.4);box-shadow:0 0 36px rgba(212,180,94,.22);}
+.snitch p{font-size:13px;color:var(--text-secondary);margin-top:14px;letter-spacing:.5px;}
+.snitch p b{color:var(--gold);}
 
 /* ===== Footer ===== */
-.site-footer{background:var(--hero-grad);color:#94a3b8;text-align:center;padding:36px 20px;font-size:13px;margin-top:auto;}
+.site-footer{background:var(--hero-grad);color:#9aa0bc;text-align:center;padding:36px 20px;font-size:13px;margin-top:auto;border-top:1px solid var(--border);}
 .site-footer .big{font-size:17px;color:#f8fafc;font-weight:700;margin-bottom:8px;letter-spacing:1px;}
 .site-footer a{color:var(--gold);}
 
 /* ===== 背景音乐按钮 ===== */
-.bgm-btn{position:fixed;right:16px;bottom:16px;z-index:11000;width:46px;height:46px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--gold);box-shadow:var(--shadow);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s ease,box-shadow .15s ease;opacity:.92;}
+.bgm-btn{position:fixed;right:16px;bottom:16px;z-index:11000;width:46px;height:46px;border-radius:50%;border:1px solid rgba(212,180,94,.5);background:var(--card);color:var(--gold);box-shadow:0 0 18px rgba(212,180,94,.25);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s ease,box-shadow .15s ease;opacity:.95;backdrop-filter:blur(8px);}
 .bgm-btn:hover{transform:scale(1.06);opacity:1;}
 .bgm-btn.playing{background:var(--gold);color:#fff;border-color:var(--gold);}
 .bgm-btn .pause-hide{display:none;}
@@ -196,7 +228,7 @@ html{scroll-behavior:smooth;}
 
 /* 左侧目录 + 内容布局 */
 .layout{max-width:1200px;margin:0 auto;display:flex;gap:26px;padding:0 20px;align-items:flex-start;}
-.toc{width:200px;flex:none;position:sticky;top:76px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;}
+.toc{width:200px;flex:none;position:sticky;top:76px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;backdrop-filter:blur(8px);}
 .toc-title{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;margin-bottom:6px;}
 .toc a{display:block;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--text-secondary);transition:background .15s,color .15s;}
 .toc a:hover{background:var(--hover);color:var(--text);}
@@ -204,9 +236,9 @@ html{scroll-behavior:smooth;}
 .content{flex:1;min-width:0;}
 
 /* 开发进度 */
-.p-card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:22px;}
+.p-card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:22px;backdrop-filter:blur(8px);}
 .p-bar{height:10px;border-radius:10px;background:var(--accent-soft);overflow:hidden;margin-bottom:20px;}
-.p-fill{height:100%;width:3%;border-radius:10px;background:linear-gradient(90deg,var(--gold),#d4b45e);transition:width .8s ease;}
+.p-fill{height:100%;width:3%;border-radius:10px;background:linear-gradient(90deg,var(--gold),#e3c56e);box-shadow:0 0 14px rgba(212,180,94,.7);transition:width .8s ease;}
 .p-stages{display:flex;flex-direction:column;gap:7px;}
 .p-group{font-size:12px;color:var(--gold);letter-spacing:1px;margin-top:8px;font-weight:700;}
 .p-stage{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary);}
@@ -214,20 +246,20 @@ html{scroll-behavior:smooth;}
 .p-stage.done .st-ic{color:var(--gold);}
 .p-stage.done{color:var(--text);}
 .p-stage.cur{color:var(--text);font-weight:600;}
-.p-stage.cur .st-ic{color:var(--gold);}
+.p-stage.cur .st-ic{color:var(--gold);text-shadow:0 0 10px rgba(212,180,94,.9);}
 .p-stage .st-date{font-size:12px;color:var(--text-secondary);margin-left:auto;}
 .p-stage .st-tag{font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:10px;padding:1px 8px;margin-left:auto;}
 .p-note{margin-top:16px;font-size:13px;color:var(--text-secondary);}
 
 /* 魔法地图 */
-.map-wrap{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:14px;}
+.map-wrap{position:relative;background:var(--card);border:1px solid rgba(212,180,94,.35);border-radius:14px;box-shadow:0 0 30px rgba(212,180,94,.14);padding:14px;}
 .map-wrap img{width:100%;display:block;border-radius:10px;}
 .map-pin{position:absolute;transform:translate(-50%,-50%);background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;gap:4px;z-index:5;}
-.map-pin .pin-dot{width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid #fff;box-shadow:0 0 6px rgba(176,141,62,.7);flex:none;transition:transform .15s;}
-.map-pin .pin-tag{font-size:12px;font-weight:600;color:#fff;background:rgba(15,17,26,.88);border:1px solid rgba(176,141,62,.65);border-radius:10px;padding:2px 8px;white-space:nowrap;transition:background .15s,color .15s;box-shadow:0 1px 5px rgba(0,0,0,.25);}
+.map-pin .pin-dot{width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid #fff;box-shadow:0 0 10px rgba(212,180,94,.9);flex:none;transition:transform .15s;}
+.map-pin .pin-tag{font-size:12px;font-weight:600;color:#fff;background:rgba(10,14,30,.9);border:1px solid rgba(212,180,94,.65);border-radius:10px;padding:2px 8px;white-space:nowrap;transition:background .15s,color .15s;box-shadow:0 1px 5px rgba(0,0,0,.3);}
 .map-pin:hover .pin-tag,.map-pin:focus .pin-tag{background:var(--gold);color:var(--card);}
-.map-pin:hover .pin-dot{transform:scale(1.2);}
-.map-pop{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);width:min(420px,calc(100vw - 40px));background:var(--card);border:1px solid var(--gold);border-radius:14px;box-shadow:0 10px 34px rgba(0,0,0,.25);padding:16px 18px;z-index:12000;}
+.map-pin:hover .pin-dot{transform:scale(1.25);}
+.map-pop{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);width:min(420px,calc(100vw - 40px));background:var(--card);border:1px solid var(--gold);border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.5),0 0 24px rgba(212,180,94,.15);padding:16px 18px;z-index:12000;backdrop-filter:blur(14px);}
 .map-pop[hidden]{display:none;}
 .pop-close{position:absolute;top:8px;right:10px;border:none;background:none;color:var(--text-secondary);font-size:18px;cursor:pointer;padding:2px 6px;}
 .pop-title{font-size:15px;font-weight:700;color:var(--gold);margin-bottom:6px;padding-right:24px;}
@@ -281,7 +313,7 @@ html{scroll-behavior:smooth;}
 <main>
   <!-- ===== Hero ===== -->
   <section class="hero">
-    <div class="hero-banner"><img src="hogwarts_castle.jpg" alt="霍格沃茨城堡夜景"></div>
+    <div class="hero-banner"><img src="hogwarts_hero.jpg" alt="星夜下的霍格沃茨城堡"></div>
     <div class="container hero-body">
       <div class="dev-badge">开发中 · 先画个饼</div>
       <div class="kicker">完全独立的开放世界 RPG · 哈利波特世界观</div>
@@ -347,8 +379,12 @@ html{scroll-behavior:smooth;}
   <section class="section alt" id="main">
     <div class="container">
       <div class="sec-head">
-        <h2>主线任务 · 完整七学年</h2>
+        <h2>主线任务 · <span class="g">完整七学年</span></h2>
         <p>以下伏笔植入点位在游戏内全程无 UI 标记、无任务提示，错过即永久丢失。</p>
+      </div>
+      <div class="chap">
+        <img src="hogwarts_forest.jpg" alt="禁林守护神">
+        <div class="chap-cap">七学年的主线，从城堡一路走到禁林与裂隙深处——每一步路过的风景里，都埋着无人察觉的暗线。</div>
       </div>
       <div class="timeline">
         <div class="tl-item">
@@ -434,7 +470,10 @@ html{scroll-behavior:smooth;}
         <h2>支线预埋闲笔</h2>
         <p>三条支线均埋有残缺文本伏笔——文字被遮挡、无高亮，需要玩家仔细辨认。</p>
       </div>
-
+      <div style="text-align:center;margin-bottom:24px;">
+        <img src="hogwarts_houses.jpg" alt="四学院徽章" style="width:min(340px,100%);border-radius:14px;border:1px solid rgba(212,180,94,.4);box-shadow:0 0 30px rgba(212,180,94,.16);">
+        <p style="font-size:13px;color:var(--text-secondary);margin-top:12px;letter-spacing:.5px;">四学院，三种身份，一条暗线。支线散落在不同的学院与营地——你不属于任何一边，却要把所有痕迹串起来。</p>
+      </div>
       <div class="grid-3" style="margin-top:2px;">
         <div class="card">
           <h3>S01 · 拉文克劳谜语之门</h3>
@@ -468,6 +507,11 @@ html{scroll-behavior:smooth;}
         <h2>魔法地图</h2>
         <p>点击金色标记，查看对应区域相关的任务</p>
       </div>
+      <div class="chap chap-duo">
+        <img src="hogwarts_train.jpg" alt="九又四分之三站台与霍格沃茨特快">
+        <img src="hogwarts_owl.jpg" alt="海德薇送信">
+        <div class="chap-cap">列车抵达，猫头鹰送信——欢迎来到霍格沃茨。<b>地图依据罗琳手绘草图整理，标注了任务所在的位置。</b></div>
+      </div>
       <div class="map-wrap">
         <img src="hogwarts_map.jpg" alt="霍格沃茨及周边魔法地图">
         <button class="map-pin" style="left:50%;top:8%" data-key="hogsmeade"><span class="pin-dot"></span><span class="pin-tag">霍格莫德村</span></button>
@@ -488,8 +532,12 @@ html{scroll-behavior:smooth;}
   <section class="section alt" id="ending">
     <div class="container">
       <div class="sec-head">
-        <h2>终局 · 静默顿悟</h2>
+        <h2>终局 · <span class="g">静默顿悟</span></h2>
         <p>没有弹窗、没有提示、没有任务日志——只有记得的人，才能走到最后一步。</p>
+      </div>
+      <div class="chap">
+        <img src="hogwarts_potions.jpg" alt="黑暗炼金魔药桌">
+        <div class="chap-cap">裂隙深处的黑暗，从来不是凭空而来——它来自被压抑、被排斥、被否定的魔法，只是换了一种方式燃烧。</div>
       </div>
       <div class="endings">
         <div class="ending">
@@ -513,11 +561,15 @@ html{scroll-behavior:smooth;}
         你必须主动回到长廊，手动与画像交互才会触发收尾。如果疏散任务绕开了长廊、或终局战斗跳过了聚合体台词——回访画像只能看到简短慰问，带"我们"的收尾对话、称号与短片全部永久锁死。<br><br>
         顿悟不靠系统提示，靠的是你自己的记忆与意象共鸣。</p>
       </div>
+      <div class="snitch">
+        <img src="hogwarts_snitch.jpg" alt="金色飞贼">
+        <p>金色飞贼记住了第一个触碰它的人。<br>这个世界的秘密，也只向<b>记得</b>的人打开。</p>
+      </div>
     </div>
   </section>
 
   <!-- ===== 开发进度 ===== -->
-  <section class="section alt" id="progress">
+  <section class="section" id="progress">
     <div class="container">
       <div class="sec-head">
         <h2>开发进度</h2>
