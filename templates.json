@@ -1,0 +1,20 @@
+{
+  "templates": [
+    {"name": "给玩家钻石", "desc": "给自己 64 颗钻石（@s 可换成玩家名）", "cmd": "/give @s diamond 64"},
+    {"name": "设置时间", "desc": "白天 1000 / 夜晚 13000 / 午夜 18000", "cmd": "/time set 1000"},
+    {"name": "切换天气", "desc": "晴朗 clear / 下雨 rain / 雷暴 thunder", "cmd": "/weather clear"},
+    {"name": "传送到坐标", "desc": "传送到指定坐标（基岩版 X Y Z）", "cmd": "/tp @s 0 100 0"},
+    {"name": "防爆", "desc": "关闭生物破坏（防爆常用）", "cmd": "/gamerule mobGriefing false"},
+    {"name": "防火焰蔓延", "desc": "关闭火焰蔓延", "cmd": "/gamerule doFireTick false"},
+    {"name": "全员传送", "desc": "把所有人传送到身边", "cmd": "/tp @a @s"},
+    {"name": "清空物品栏", "desc": "清空指定玩家物品栏", "cmd": "/clear @s"},
+    {"name": "给予所有玩家钻石", "desc": "给服务器内所有玩家钻石", "cmd": "/give @a diamond 32"},
+    {"name": "召唤凋灵", "desc": "在坐标处召唤凋灵（Boss）", "cmd": "/summon wither 0 100 0"},
+    {"name": "召唤末影龙", "desc": "在坐标处召唤末影龙（Boss）", "cmd": "/summon ender_dragon 0 100 0"},
+    {"name": "设置重生点", "desc": "把当前所在位置设为重生点", "cmd": "/spawnpoint @s"},
+    {"name": "玩家头顶祝福", "desc": "给自己速度 2 效果 60 秒", "cmd": "/effect @s speed 60 1"},
+    {"name": "全服广播", "desc": "向全服广播一条消息", "cmd": "/tellraw @a {\"rawtext\":[{\"text\":\"欢迎来到 The Slow Tide！\"}]}"},
+    {"name": "服务器规则", "desc": "显示当前游戏规则列表", "cmd": "/gamerule"},
+    {"name": "封锁区域", "desc": "填充玻璃方块封住区域（X1 Y1 Z1 到 X2 Y2 Z2）", "cmd": "/fill 0 0 0 10 10 10 glass"}
+  ]
+}

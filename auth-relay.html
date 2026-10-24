@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<title>auth-relay</title>
+</head>
+<body>
+<!-- 仅用于跨站登录态中继:读取本站 localStorage 中的 tst_token,响应来自新站的 postMessage 请求 -->
+<script>
+(function(){
+  var tk=localStorage.getItem('tst_token')||'';
+  var em=localStorage.getItem('tst_email')||'';
+  var uid=localStorage.getItem('tst_uid')||'';
+  window.addEventListener('message',function(e){
+    var d=e.data;
+    if(d && d.type==='tst-auth-request'){
+      try{
+        e.source.postMessage({type:'tst-auth-response',token:tk,email:em,uid:uid},'*');
+      }catch(err){}
+    }
+  });
+  // 兼容:页面加载后若请求方先发消息,这里保持监听即可
+})();
+</script>
+</body>
+</html>
