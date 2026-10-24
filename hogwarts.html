@@ -3,943 +3,606 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tide of Remnant · 三代黑暗余烬 - The Slow Tide</title>
+<title>Tide of Remnant · 三代黑暗余烬</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
 :root{
-color-scheme:light;
---bg:#f1e8d4;
---text:#3a3126;
---text-secondary:#77695a;
---border:#d9cba6;
---card:#faf6ea;
---hover:rgba(138,109,35,.08);
---header-bg:rgba(241,232,213,.96);
---accent:#8a2f2f;
---accent-soft:rgba(138,47,47,.07);
---gold:#8a6d23;
---gold-soft:rgba(138,109,35,.12);
---shadow:0 2px 10px rgba(96,78,42,.13);
---hero-grad:linear-gradient(180deg,#e8dcc0 0%,#f1e8d4 100%);
+  --paper:#f2e9d5; --paper2:#e9ddc2; --ink:#3a2e1d; --ink2:#6b5a3e;
+  --gold:#b8922a; --gold2:#d6b556; --wine:#7d2f22; --green:#2f5d43; --blue:#2e4a6e;
+  --line:rgba(120,95,50,.28); --shadow:0 14px 34px rgba(60,40,10,.22);
 }
-html[data-theme="dark"]{
-color-scheme:dark;
---bg:#191611;
---text:#ece4d3;
---text-secondary:#a29580;
---border:rgba(220,200,160,.16);
---card:#221e17;
---hover:rgba(217,180,92,.07);
---header-bg:rgba(25,22,17,.96);
---accent:#b55858;
---accent-soft:rgba(181,88,88,.10);
---gold:#d9b45c;
---gold-soft:rgba(217,180,92,.12);
---shadow:0 2px 10px rgba(0,0,0,.45);
---hero-grad:linear-gradient(180deg,#12100b 0%,#1c1812 100%);
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Songti SC","SimSun","Noto Serif SC",serif;color:var(--ink);
+  background:
+    radial-gradient(1200px 700px at 12% -8%, rgba(182,146,42,.16), transparent 60%),
+    radial-gradient(1000px 600px at 90% 18%, rgba(47,93,67,.14), transparent 55%),
+    radial-gradient(900px 800px at 70% 80%, rgba(125,47,34,.10), transparent 55%),
+    var(--paper);
+  overflow-x:hidden;position:relative;
 }
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",serif;line-height:1.75;min-height:100vh;display:flex;flex-direction:column;}
-a{color:inherit;text-decoration:none;}
-.container{max-width:1080px;margin:0 auto;padding:0 20px;width:100%;}
-
-/* ===== Header ===== */
-.site-header{position:sticky;top:0;z-index:1000;background:var(--header-bg);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
-.header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px;}
-.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;letter-spacing:.5px;white-space:nowrap;}
-.logo .logo-gold{color:var(--gold);}
-.header-right{display:flex;align-items:center;gap:8px;}
-.back-btn{padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);font-size:13px;cursor:pointer;color:var(--text);}
-.back-btn:hover{background:var(--hover);}
-.theme-toggle{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;color:var(--text);font-size:15px;display:flex;align-items:center;justify-content:center;}
-.theme-toggle:hover{background:var(--hover);}
-.nav-burger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:18px;cursor:pointer;line-height:1;padding:0;flex:none;}
-.mobile-drawer{position:fixed;inset:0;z-index:10050;display:none;pointer-events:none;}
-.mobile-drawer.open{display:block;pointer-events:auto;}
-.drawer-mask{position:absolute;inset:0;background:rgba(40,32,20,.55);opacity:0;transition:opacity .2s;}
-.mobile-drawer.open .drawer-mask{opacity:1;}
-.drawer-panel{position:absolute;top:0;right:0;bottom:0;width:78%;max-width:300px;background:var(--card);border-left:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,.35);transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;overflow-y:auto;}
-.mobile-drawer.open .drawer-panel{transform:none;}
-.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);}
-.drawer-title{font-weight:700;color:var(--text);}
-.drawer-close{border:none;background:none;color:var(--text-secondary);font-size:16px;cursor:pointer;padding:4px;}
-.drawer-list{display:flex;flex-direction:column;padding:10px 14px;gap:2px;}
-.drawer-list .nav-link{padding:12px 14px;border-radius:10px;font-size:15px;text-align:left;width:100%;color:var(--text);}
-.drawer-list .nav-link:hover{background:var(--hover);}
-@media(max-width:960px){
-.nav-burger{display:flex;}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.45 0 0 0 0 0.3 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-@media(min-width:961px){
-.nav-burger{display:none!important;}
-.mobile-drawer{display:none!important;}
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(140% 120% at 50% 40%, transparent 55%, rgba(70,45,10,.20) 100%);
 }
+.wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:28px 20px 90px}
 
-/* ===== Hero ===== */
-.hero{background:var(--hero-grad);color:var(--text);padding:0 0 52px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border);}
-.hero-banner{width:100%;overflow:hidden;}
-.hero-banner img{width:100%;height:300px;object-fit:cover;display:block;}
-.hero-body{max-width:1080px;margin:0 auto;padding:46px 20px 0;}
-.hero .kicker{display:inline-block;border:1px solid var(--gold);color:var(--gold);padding:5px 14px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:18px;background:var(--gold-soft);}
-.hero h1{font-size:36px;font-weight:800;letter-spacing:1px;line-height:1.3;margin-bottom:12px;}
-.hero h1 .g{color:var(--gold);}
-.hero .sub{font-size:15px;color:var(--text-secondary);margin-bottom:22px;}
-.hero .tagline{font-size:14px;color:var(--text-secondary);letter-spacing:3px;}
-.dev-badge{display:inline-block;border:1px solid var(--gold);color:var(--gold);padding:4px 16px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:12px;background:var(--gold-soft);}
-.hero .note{font-size:13px;color:var(--text-secondary);margin-top:14px;letter-spacing:1px;}
-@media(max-width:960px){
-.hero-banner img{height:180px;}
-.hero{padding-bottom:40px;}
-.hero-body{padding-top:34px;}
+/* ---------- 顶栏 ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:14px 18px;border:1px solid var(--line);border-radius:14px;
+  background:linear-gradient(180deg, rgba(255,252,240,.85), rgba(240,228,202,.75));
+  box-shadow:var(--shadow);position:sticky;top:14px;z-index:40}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{width:42px;height:42px;filter:drop-shadow(0 2px 3px rgba(120,80,10,.4))}
+.brand b{font-size:19px;letter-spacing:1px;font-family:"KaiTi","STKaiti",serif}
+.brand small{display:block;font-size:11px;color:var(--ink2);letter-spacing:2px}
+.topbtns{display:flex;align-items:center;gap:10px}
+.btn{font-family:inherit;cursor:pointer;border:1px solid var(--line);border-radius:999px;
+  padding:8px 16px;font-size:13px;background:linear-gradient(180deg,#fff8e8,#efdfbd);
+  color:var(--ink);box-shadow:0 2px 6px rgba(90,60,15,.18);text-decoration:none;display:inline-block}
+.btn:hover{box-shadow:0 6px 14px rgba(120,80,15,.28);border-color:var(--gold)}
+.chip{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;
+  padding:6px 14px;font-size:12px;background:rgba(255,250,235,.8)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(47,93,67,.15)}
+.banner{margin:18px 0 0;padding:12px 18px;border:1px dashed var(--gold);border-radius:12px;
+  background:rgba(214,181,86,.16);font-size:13.5px;color:#5c470f;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.banner b{color:var(--wine)}
+
+/* ---------- 登录弹窗 ---------- */
+.mask{display:none;position:fixed;inset:0;z-index:100;background:rgba(40,25,5,.5);align-items:center;justify-content:center;padding:20px}
+.mask.show{display:flex}
+.dialog{width:100%;max-width:380px;border:1px solid var(--gold2);border-radius:18px;
+  background:linear-gradient(180deg,#fffaf0,#f0e4c6);box-shadow:0 24px 60px rgba(40,20,0,.45);padding:26px 26px 22px;position:relative}
+.dialog h3{font-family:"KaiTi",serif;font-size:22px;color:var(--wine);letter-spacing:2px;margin-bottom:4px;text-align:center}
+.dialog .sub{font-size:12px;color:var(--ink2);text-align:center;margin-bottom:18px}
+.dlg-row{margin-bottom:12px}
+.dlg-row label{display:block;font-size:12px;color:var(--ink2);margin-bottom:5px}
+.dlg-row input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+  font-size:14px;font-family:inherit;background:rgba(255,255,255,.7);color:var(--ink);outline:none}
+.dlg-row input:focus{border-color:var(--gold)}
+.code-row{display:flex;gap:8px}
+.code-row input{flex:1}
+.dlg-msg{font-size:12px;color:var(--wine);min-height:16px;margin-bottom:8px}
+.dlg-btns{display:flex;gap:10px}
+.dlg-btns .btn{flex:1;text-align:center}
+.dlg-close{position:absolute;top:12px;right:16px;border:none;background:none;font-size:18px;color:var(--ink2);cursor:pointer}
+
+/* 目录 */
+.toc{position:fixed;left:16px;top:50%;transform:translateY(-50%);z-index:45;width:172px;
+  border:1px solid var(--line);border-radius:14px;background:rgba(255,250,238,.92);
+  box-shadow:var(--shadow);padding:14px 12px}
+.toc h4{font-family:"KaiTi",serif;letter-spacing:2px;font-size:14px;color:var(--wine);
+  border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:8px}
+.toc a{display:block;padding:6px 8px 6px 16px;color:var(--ink2);text-decoration:none;font-size:13px;
+  border-left:2px solid transparent;position:relative}
+.toc a::before{content:"";position:absolute;left:4px;top:50%;width:5px;height:5px;border-radius:50%;
+  background:var(--gold);transform:translateY(-50%);opacity:.5}
+.toc a:hover{color:var(--ink);border-left-color:var(--gold)}
+.toc a.on{color:var(--wine);border-left-color:var(--wine);font-weight:bold}
+.toc a.on::before{background:var(--wine);opacity:1}
+
+/* Hero */
+.hero{position:relative;margin:34px 0 26px;border:1px solid var(--line);border-radius:20px;overflow:hidden;
+  background:linear-gradient(150deg,#f6eedb,#e5d7b6 55%,#d8c69a);box-shadow:var(--shadow);
+  padding:56px 48px 46px;min-height:340px;display:flex;flex-direction:column;justify-content:center}
+.hero::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(500px 300px at 78% 18%, rgba(182,146,42,.22), transparent 60%),
+             radial-gradient(400px 300px at 12% 90%, rgba(47,93,67,.14), transparent 55%)}
+.hero .stamp{position:absolute;right:34px;top:28px;width:86px;height:86px;opacity:.85}
+.hero .stamp text{font-family:"KaiTi",serif;fill:#7d2f22}
+.hero .badge{font-size:12px;letter-spacing:3px;color:var(--gold2);background:#3a2e1d;
+  display:inline-block;padding:6px 16px;border-radius:999px;margin-bottom:18px;width:fit-content}
+.hero h1{font-family:"KaiTi","STKaiti",serif;font-size:52px;line-height:1.1;letter-spacing:2px;
+  color:#2f2210;text-shadow:0 2px 0 rgba(255,255,255,.5)}
+.hero .sub{font-family:"Georgia",serif;font-style:italic;color:var(--wine);font-size:21px;margin-top:6px;letter-spacing:1px}
+.hero p.lead{margin-top:20px;max-width:640px;font-size:16px;line-height:1.9;color:var(--ink)}
+.hero .note{margin-top:16px;font-size:13.5px;color:var(--ink2);line-height:1.8;border-left:3px solid var(--gold);padding-left:14px}
+.hero .note b{color:var(--wine)}
+
+.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:26px 0 8px}
+.timeline .tl{position:relative;border:1px solid var(--line);border-radius:16px;padding:20px 20px 18px;
+  background:rgba(255,251,240,.85);box-shadow:0 8px 20px rgba(70,45,15,.14)}
+.timeline .tl .yr{font-family:"Georgia",serif;font-weight:bold;font-size:26px;color:var(--wine);letter-spacing:1px}
+.timeline .tl h3{font-size:15.5px;margin:8px 0 6px;color:var(--ink)}
+.timeline .tl p{font-size:12.5px;color:var(--ink2);line-height:1.7}
+.tl::after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(var(--wine),var(--gold),var(--green));opacity:.55}
+
+.sec{margin:34px 0;scroll-margin-top:90px}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.sec-head .ico{font-family:"Georgia",serif;color:var(--gold);font-size:22px}
+.sec-head h2{font-family:"KaiTi","STKaiti",serif;font-size:27px;color:var(--wine);letter-spacing:1px}
+.sec-head span.desc{font-size:12.5px;color:var(--ink2);margin-left:auto;font-family:"KaiTi",serif}
+.card{border:1px solid var(--line);border-radius:16px;background:rgba(255,251,240,.9);
+  box-shadow:0 10px 24px rgba(70,45,15,.16);padding:20px 22px;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--wine),var(--gold),var(--green));opacity:.5}
+
+.mainline{position:relative;padding-left:26px}
+.mainline::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;
+  background:repeating-linear-gradient(var(--gold),var(--gold) 6px,transparent 6px,transparent 12px)}
+.ml{position:relative;margin-bottom:20px}
+.ml::before{content:"";position:absolute;left:-26px;top:8px;width:12px;height:12px;border-radius:50%;
+  background:var(--paper);border:3px solid var(--gold)}
+.ml h3{font-size:16.5px;color:var(--ink);display:flex;align-items:center;gap:8px}
+.ml h3 .yr{font-family:"Georgia",serif;color:var(--wine);font-size:13px;border:1px solid var(--line);
+  padding:1px 8px;border-radius:999px;background:#f3ead4}
+.ml p{font-size:13px;color:var(--ink2);line-height:1.8;margin-top:5px;max-width:820px}
+
+.houses{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.house{border:1px solid var(--line);border-radius:16px;padding:20px 16px;text-align:center;
+  background:linear-gradient(160deg,#fff8e8,#efdfbd);box-shadow:0 10px 22px rgba(70,45,15,.2)}
+.house svg{width:74px;height:74px}
+.house h4{font-family:"Georgia",serif;letter-spacing:2px;font-size:14px;margin:8px 0 4px}
+.house small{font-size:11px;color:var(--ink2)}
+.house .desc{font-size:12px;color:var(--ink);line-height:1.65;margin-top:8px;border-top:1px dashed var(--line);padding-top:8px;text-align:left}
+.house.gryf{border-top:4px solid #7d2f22}.house.gryf h4{color:#7d2f22}
+.house.sly{border-top:4px solid #2f5d43}.house.sly h4{color:#2f5d43}
+.house.huff{border-top:4px solid #a8871f}.house.huff h4{color:#a8871f}
+.house.rav{border-top:4px solid #2e4a6e}.house.rav h4{color:#2e4a6e}
+
+table{width:100%;border-collapse:collapse;font-size:12.8px}
+th{font-family:"KaiTi",serif;letter-spacing:1px;text-align:left;color:var(--wine);
+  background:linear-gradient(180deg,#f3ead4,#e7d8b4);padding:10px 12px;border:1px solid var(--line)}
+td{padding:9px 12px;border:1px solid var(--line);color:var(--ink);line-height:1.6;vertical-align:top}
+tbody tr:nth-child(even){background:rgba(240,228,202,.4)}
+td small{color:var(--ink2)}
+
+.map-wrap{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  box-shadow:var(--shadow);background:#d8cba6}
+.map-wrap img{display:block;width:100%;height:auto}
+.map-pin{position:absolute;transform:translate(-50%,-50%);cursor:pointer;width:34px;height:34px;
+  filter:drop-shadow(0 3px 5px rgba(60,30,0,.4))}
+.map-pin svg{width:100%;height:100%}
+.map-pin .lab{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:4px;
+  font-size:11px;background:#3a2e1d;color:#f6e7bd;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.taskpop{display:none;position:absolute;z-index:20;max-width:320px;border:1px solid var(--gold2);
+  border-radius:14px;background:rgba(255,250,238,.97);box-shadow:0 16px 40px rgba(50,30,5,.4);
+  padding:18px 18px 14px}
+.taskpop.show{display:block}
+.taskpop h4{font-family:"KaiTi",serif;color:var(--wine);font-size:16px;margin-bottom:8px;display:flex;gap:8px;align-items:center}
+.taskpop .tag{font-size:11px;background:var(--green);color:#eef7ee;padding:1px 8px;border-radius:999px;font-family:inherit}
+.taskpop p{font-size:13px;color:var(--ink);line-height:1.8}
+.taskpop .how{margin-top:10px;border-top:1px dashed var(--gold);padding-top:8px;font-size:12.5px;color:var(--ink2)}
+.taskpop .how b{color:var(--wine)}
+.taskpop .close{position:absolute;top:8px;right:10px;border:none;background:none;font-size:16px;cursor:pointer;color:var(--ink2)}
+.map-legend{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px}
+.map-legend span{font-size:12px;display:flex;align-items:center;gap:6px;border:1px solid var(--line);
+  padding:4px 10px;border-radius:999px;background:rgba(255,251,240,.8)}
+
+.eggs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.egg{border:1px dashed var(--gold);border-radius:14px;padding:18px;text-align:center;background:rgba(255,251,240,.7)}
+.egg .e{font-size:30px;margin-bottom:6px}
+.egg h4{font-size:14px;color:var(--wine);margin-bottom:4px}
+.egg p{font-size:12px;color:var(--ink2);line-height:1.6}
+
+.progress{border:1px solid var(--line);border-radius:16px;padding:22px;background:rgba(255,251,240,.9);box-shadow:var(--shadow)}
+.pbar{height:14px;border-radius:999px;background:#e6d7b0;border:1px solid var(--line);overflow:hidden;margin:10px 0 6px}
+.pbar i{display:block;height:100%;width:3%;border-radius:999px;
+  background:repeating-linear-gradient(45deg,#b8922a,#b8922a 10px,#d6b556 10px,#d6b556 20px)}
+.pline{font-size:12.5px;color:var(--ink2);display:flex;justify-content:space-between;margin-top:14px;border-top:1px dashed var(--gold);padding-top:12px}
+
+footer{margin-top:46px;text-align:center;color:var(--ink2);font-size:12.5px;line-height:2;border-top:1px solid var(--line);padding-top:20px}
+footer b{color:var(--wine)}
+
+.mus{position:fixed;right:18px;bottom:20px;z-index:60;width:52px;height:52px;border-radius:50%;
+  border:1px solid var(--gold);background:rgba(255,250,235,.92);box-shadow:0 6px 16px rgba(60,40,10,.3);
+  cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mus.off svg .vib{opacity:.15}
+.mus svg{width:24px;height:24px;fill:var(--wine)}
+.mus svg .vib{transform-origin:center}
+
+.burger{display:none}
+@media(max-width:980px){
+  .toc{display:none}
+  .burger{display:flex;position:fixed;left:16px;bottom:20px;z-index:60;width:52px;height:52px;border-radius:50%;
+    border:1px solid var(--line);background:rgba(255,250,238,.95);box-shadow:0 6px 16px rgba(60,40,10,.3);
+    cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px}
+  .burger i{width:20px;height:2px;background:var(--ink);border-radius:2px}
+  .burger.open i:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .burger.open i:nth-child(2){opacity:0}
+  .burger.open i:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .toc.mob{display:block;position:fixed;left:16px;top:auto;bottom:80px;transform:none;width:190px;
+    max-height:60vh;overflow:auto;opacity:0;pointer-events:none}
+  .toc.mob.open{opacity:1;pointer-events:auto}
+  .hero{padding:40px 22px}
+  .hero h1{font-size:36px}
+  .hero .sub{font-size:17px}
+  .timeline{grid-template-columns:1fr}
+  .houses{grid-template-columns:1fr 1fr}
+  .eggs{grid-template-columns:1fr 1fr}
+  .topbar{padding:10px 12px}
+  .brand b{font-size:15px}
+  .chip{display:none}
 }
-.hero .epochs{display:flex;justify-content:center;gap:12px;margin-top:34px;flex-wrap:wrap;}
-.epoch{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;min-width:150px;text-align:center;}
-.epoch .yr{font-size:20px;font-weight:800;color:var(--gold);}
-.epoch .tx{font-size:12px;color:var(--text-secondary);margin-top:4px;}
-
-/* ===== Section ===== */
-.section{padding:44px 0;}
-.section.alt{background:var(--accent-soft);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
-.sec-head{text-align:center;margin-bottom:30px;}
-.sec-head h2{font-size:24px;font-weight:800;letter-spacing:.5px;}
-.sec-head h2 .g{color:var(--gold);}
-.sec-head p{color:var(--text-secondary);font-size:13px;margin-top:6px;}
-.pic{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:26px;background:var(--card);}
-.pic img{width:100%;height:190px;object-fit:cover;display:block;}
-.pic-duo{display:grid;grid-template-columns:2fr 1fr;}
-.pic-duo img{width:100%;height:190px;object-fit:cover;display:block;}
-.pic-cap{font-size:13px;color:var(--text-secondary);padding:11px 14px;border-top:1px solid var(--border);}
-.pic-cap b{color:var(--gold);font-weight:600;}
-@media(max-width:960px){
-.pic img,.pic-duo img{height:130px;}
-.pic-cap{font-size:12.5px;}
-}
-
-/* ===== Cards ===== */
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:20px;transition:transform .15s ease,border-color .15s ease;}
-.card:hover{transform:translateY(-2px);border-color:var(--gold);}
-.epoch{transition:transform .15s ease;}
-.epoch:hover{transform:translateY(-2px);}
-.house{border-left:3px solid var(--hc,#999);}
-.house .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--hc,#999);margin-right:2px;}
-.house-g{--hc:#ae0001;}
-.house-r{--hc:#0e3a8a;}
-.house-h{--hc:#a8842a;}
-.house-s{--hc:#1a472a;}
-html[data-theme="dark"] .house-r{--hc:#5b7fd4;}
-html[data-theme="dark"] .house-h{--hc:#e0b13a;}
-.motto{font-style:italic;letter-spacing:1px;color:var(--text-secondary);font-size:12px;margin-top:4px;}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-.card h3{font-size:16px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
-.card h3 .t{color:var(--gold);font-size:13px;letter-spacing:1px;}
-.card p{font-size:13px;color:var(--text-secondary);}
-.card ul{list-style:none;margin-top:8px;}
-.card ul li{font-size:13px;color:var(--text);padding:6px 0;border-bottom:1px dashed var(--border);}
-.card ul li:last-child{border-bottom:none;}
-.card ul li .m{color:var(--text-secondary);font-size:12px;}
-.card ul li b{color:var(--gold);font-weight:600;}
-
-/* ===== Tables ===== */
-.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--card);box-shadow:var(--shadow);}
-table.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:640px;}
-table.tbl th{background:var(--gold-soft);color:var(--gold);font-weight:700;text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:.5px;}
-table.tbl td{padding:9px 12px;border-bottom:1px dashed var(--border);color:var(--text);vertical-align:top;}
-table.tbl tr:last-child td{border-bottom:none;}
-table.tbl td b{color:var(--gold);}
-table.tbl .dim{color:var(--text-secondary);font-size:12px;}
-table.tbl .tag{font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:8px;padding:1px 6px;white-space:nowrap;}
-table.tbl tr:hover td{background:var(--hover);}
-
-/* ===== Timeline ===== */
-.timeline{position:relative;margin-top:10px;}
-.timeline::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:2px;background:var(--gold);opacity:.5;}
-.tl-item{position:relative;padding:0 0 26px 44px;}
-.tl-item::before{content:"";position:absolute;left:9px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:3px solid var(--bg);}
-.tl-item .yr{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;}
-.tl-item h3{font-size:18px;font-weight:800;margin:2px 0 4px;}
-.tl-item .tone{font-size:13px;color:var(--text-secondary);margin-bottom:10px;font-style:italic;}
-.tl-item .mtask{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
-.tl-item .mtask h4{font-size:14.5px;font-weight:700;margin-bottom:6px;}
-.tl-item .mtask h4 .code{color:var(--gold);font-size:12px;letter-spacing:1px;margin-right:8px;}
-.tl-item .mtask p{font-size:13px;color:var(--text);margin:3px 0;}
-.tl-item .mtask .k{color:var(--text-secondary);font-size:12px;display:inline-block;min-width:52px;}
-.tl-item .mtask .rwd{color:var(--gold);font-size:12.5px;margin-top:6px;border-top:1px dashed var(--border);padding-top:6px;}
-.tl-item .mtask .br{color:var(--text-secondary);font-size:12px;margin-top:4px;}
-.tl-item .mtask .br b{color:var(--gold);}
-.tl-item .vline{font-size:12.5px;color:var(--text-secondary);line-height:1.7;background:var(--gold-soft);border:1px dashed var(--gold);border-radius:10px;padding:9px 12px;margin-top:10px;}
-.tl-item .vline b{color:var(--gold);}
-.s-desc{font-size:13px;color:var(--text-secondary);margin-bottom:8px;}
-
-/* ===== Ending ===== */
-.endings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.ending{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:center;box-shadow:var(--shadow);transition:transform .15s ease,border-color .15s ease;}
-.ending:hover{transform:translateY(-2px);border-color:var(--gold);}
-.ending h3{font-size:17px;font-weight:800;margin-bottom:8px;}
-.ending p{font-size:13px;color:var(--text-secondary);}
-.ending .mark{display:inline-block;margin-top:12px;font-size:12px;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:4px 14px;}
-.snitch{text-align:center;margin-top:30px;}
-.snitch img{width:190px;border-radius:12px;border:1px solid var(--border);}
-.snitch p{font-size:13px;color:var(--text-secondary);margin-top:12px;}
-
-/* ===== Footer ===== */
-.site-footer{background:#211c13;color:#a29580;text-align:center;padding:36px 20px;font-size:13px;margin-top:auto;border-top:1px solid var(--border);}
-html[data-theme="dark"] .site-footer{background:#12100b;}
-.site-footer .big{font-size:17px;color:#ece4d3;font-weight:700;margin-bottom:8px;letter-spacing:1px;}
-.site-footer a{color:#d9b45c;}
-
-/* ===== 背景音乐按钮 ===== */
-.bgm-btn{position:fixed;right:16px;bottom:16px;z-index:11000;width:46px;height:46px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--gold);box-shadow:var(--shadow);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s ease;opacity:.95;}
-.bgm-btn:hover{transform:scale(1.06);opacity:1;}
-.bgm-btn.playing{background:var(--gold);color:#fff;border-color:var(--gold);}
-.bgm-btn .pause-hide{display:none;}
-.bgm-btn.playing .play-hide{display:none;}
-.bgm-btn.playing .pause-hide{display:inline;}
-
-@media(max-width:960px){
-.grid,.grid-2,.grid-3,.grid-4,.endings{grid-template-columns:1fr;}
-.section{padding:34px 0;}
-.sec-head h2{font-size:20px;}
-}
-/* 入场动画 */
-@keyframes imgIn{from{opacity:0;}to{opacity:1;}}
-@keyframes rise{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
-html{scroll-behavior:smooth;}
-.hero-banner{animation:imgIn .8s ease both;}
-.hero-body .dev-badge{animation:rise .5s ease .2s both;}
-.hero-body .kicker{animation:rise .5s ease .35s both;}
-.hero-body h1{animation:rise .55s ease .5s both;}
-.hero-body .sub{animation:rise .5s ease .7s both;}
-.hero-body .tagline{animation:rise .5s ease .85s both;}
-.hero-body .note{animation:rise .5s ease 1s both;}
-.hero-body .epochs{animation:rise .55s ease 1.2s both;}
-
-/* 左侧目录 + 内容布局 */
-.layout{max-width:1200px;margin:0 auto;display:flex;gap:26px;padding:0 20px;align-items:flex-start;}
-.toc{width:200px;flex:none;position:sticky;top:76px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;}
-.toc-title{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;margin-bottom:6px;}
-.toc a{display:block;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--text-secondary);transition:background .15s,color .15s;}
-.toc a:hover{background:var(--hover);color:var(--text);}
-.toc a.active{background:var(--gold-soft);color:var(--gold);font-weight:600;}
-.content{flex:1;min-width:0;}
-
-/* 开发进度 */
-.p-card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:22px;}
-.p-bar{height:10px;border-radius:10px;background:var(--gold-soft);overflow:hidden;margin-bottom:20px;}
-.p-fill{height:100%;width:3%;border-radius:10px;background:var(--gold);transition:width .8s ease;}
-.p-stages{display:flex;flex-direction:column;gap:7px;}
-.p-group{font-size:12px;color:var(--gold);letter-spacing:1px;margin-top:8px;font-weight:700;}
-.p-stage{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary);}
-.p-stage .st-ic{width:20px;text-align:center;color:var(--text-secondary);font-size:13px;}
-.p-stage.done .st-ic{color:var(--gold);}
-.p-stage.done{color:var(--text);}
-.p-stage.cur{color:var(--text);font-weight:600;}
-.p-stage.cur .st-ic{color:var(--gold);}
-.p-stage .st-date{font-size:12px;color:var(--text-secondary);margin-left:auto;}
-.p-stage .st-tag{font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:10px;padding:1px 8px;margin-left:auto;}
-.p-note{margin-top:16px;font-size:13px;color:var(--text-secondary);}
-
-/* 魔法地图 */
-.map-wrap{position:relative;background:var(--card);border:1px solid var(--gold);border-radius:12px;box-shadow:var(--shadow);padding:14px;}
-.map-wrap img{width:100%;display:block;border-radius:8px;}
-.map-pin{position:absolute;transform:translate(-50%,-50%);background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;gap:4px;z-index:5;}
-.map-pin .pin-dot{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--card);flex:none;transition:transform .15s;}
-.map-pin .pin-tag{font-size:12px;font-weight:600;color:var(--text);background:var(--card);border:1px solid var(--gold);border-radius:10px;padding:2px 8px;white-space:nowrap;transition:background .15s,color .15s;box-shadow:0 1px 5px rgba(0,0,0,.2);}
-.map-pin:hover .pin-tag,.map-pin:focus .pin-tag{background:var(--gold);color:#fff;}
-.map-pin:hover .pin-dot{transform:scale(1.2);}
-.map-pop{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);width:min(430px,calc(100vw - 40px));background:var(--card);border:1px solid var(--gold);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4);padding:16px 18px;z-index:12000;}
-.map-pop[hidden]{display:none;}
-.pop-close{position:absolute;top:8px;right:10px;border:none;background:none;color:var(--text-secondary);font-size:18px;cursor:pointer;padding:2px 6px;}
-.pop-title{font-size:15px;font-weight:700;color:var(--gold);margin-bottom:6px;padding-right:24px;}
-.pop-desc{font-size:13px;color:var(--text);line-height:1.7;}
-.pop-groups{display:flex;flex-direction:column;gap:10px;margin-top:10px;max-height:48vh;overflow-y:auto;padding-right:2px;}
-.pop-group-t{font-size:12px;letter-spacing:1px;color:var(--text-secondary);font-weight:700;margin:2px 0 4px;}
-.pop-task{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;background:var(--hover);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);cursor:pointer;transition:border-color .15s;width:100%;}
-.pop-task:hover{border-color:var(--gold);}
-.pop-tag{font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:8px;padding:1px 6px;white-space:nowrap;flex:none;}
-.pop-hint{font-size:12px;color:var(--text-secondary);margin-top:10px;}
-.pop-back{border:none;background:none;color:var(--gold);font-size:13px;cursor:pointer;padding:0 0 10px;}
-.pop-sec{margin-top:10px;}
-.pop-sec b{display:block;font-size:12px;color:var(--gold);margin-bottom:3px;}
-.pop-sec p{font-size:13px;color:var(--text);line-height:1.65;margin:0;}
-
-@media(max-width:960px){
-.layout{display:block;padding:0 14px;}
-.toc{position:static;width:100%;flex-direction:row;overflow-x:auto;white-space:nowrap;padding:10px 12px;gap:2px;scrollbar-width:none;}
-.toc a{display:inline-block;padding:6px 12px;}
-.toc-title{display:none;}
+@media(max-width:520px){
+  .houses{grid-template-columns:1fr}
+  .eggs{grid-template-columns:1fr}
+  .wrap{padding:16px 12px 80px}
 }
 </style>
 </head>
 <body>
 
-<header class="site-header">
-  <div class="container header-inner">
-    <div class="logo">Tide of Remnant<span class="logo-gold"> · 三代黑暗余烬</span></div>
-    <div class="header-right">
-      <a class="back-btn" href="index.html">返回官网</a>
-      <button class="theme-toggle" id="themeToggle" aria-label="切换主题">☾</button>
-      <button class="nav-burger" id="navBurger" aria-label="菜单">☰</button>
-    </div>
+<!-- 顶栏 -->
+<div class="wrap">
+<header class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 48 48" fill="none" stroke="#b8922a" stroke-width="1.6">
+      <path d="M24 4l4 5-4 5-4-5z" fill="rgba(184,146,42,.25)"/>
+      <path d="M14 18h20M16 18v14c0 4 4 6 8 6s8-2 8-6V18" stroke="#7d2f22"/>
+      <path d="M24 10v28M12 12l-5 8M36 12l5 8" stroke="#2f5d43"/>
+      <circle cx="24" cy="8" r="1.4" fill="#b8922a"/>
+    </svg>
+    <div><b>Tide of Remnant</b><small>三代黑暗余烬 · 同人企划</small></div>
+  </div>
+  <div class="topbtns">
+    <span class="chip" id="loginChip"><span class="dot"></span>未登录</span>
+    <button class="btn" id="btnLogin">登录 / 注册</button>
   </div>
 </header>
 
-<!-- 手机抽屉 -->
-<div class="mobile-drawer" id="mobileDrawer">
-  <div class="drawer-mask" id="drawerMask"></div>
-  <div class="drawer-panel">
-    <div class="drawer-head"><span class="drawer-title">页面导航</span><button class="drawer-close" id="drawerClose">&#10005;</button></div>
-    <div class="drawer-list">
-      <a class="nav-link" href="#world">世界观预告</a>
-      <a class="nav-link" href="#faction">势力速览</a>
-      <a class="nav-link" href="#main">主线 · 七学年</a>
-      <a class="nav-link" href="#side">支线体系</a>
-      <a class="nav-link" href="#map">魔法地图</a>
-      <a class="nav-link" href="#ending">彩蛋与终局</a>
-      <a class="nav-link" href="#progress">开发进度</a>
-      <a class="nav-link" href="index.html">返回官网</a>
+<div class="banner" id="loginBanner">
+  🪄 还没登录。登录后主页会亮出你的 <b>巫师身份</b>，管理员还能进 <b>策划台</b>。<button class="btn" id="btnBannerLogin" style="margin-left:6px">点这里登录</button>
+</div>
+
+<!-- 目录 -->
+<nav class="toc" id="toc">
+  <h4>📜 目录</h4>
+  <a href="#hero">序 · 卷首</a>
+  <a href="#timeline">世 · 时间线</a>
+  <a href="#mainline">历 · 主线</a>
+  <a href="#houses">院 · 四学院</a>
+  <a href="#branch">支 · 支线</a>
+  <a href="#map">图 · 魔法地图</a>
+  <a href="#egg">秘 · 彩蛋</a>
+  <a href="#progress">程 · 开发进度</a>
+</nav>
+<button class="burger" id="burger" aria-label="目录"><i></i><i></i><i></i></button>
+<nav class="toc mob" id="tocMob">
+  <h4>📜 目录</h4>
+  <a href="#hero">序 · 卷首</a>
+  <a href="#timeline">世 · 时间线</a>
+  <a href="#mainline">历 · 主线</a>
+  <a href="#houses">院 · 四学院</a>
+  <a href="#branch">支 · 支线</a>
+  <a href="#map">图 · 魔法地图</a>
+  <a href="#egg">秘 · 彩蛋</a>
+  <a href="#progress">程 · 开发进度</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <svg class="stamp" viewBox="0 0 90 90">
+    <circle cx="45" cy="45" r="40" fill="none" stroke="#7d2f22" stroke-width="2.5"/>
+    <circle cx="45" cy="45" r="34" fill="none" stroke="#7d2f22" stroke-width="1" stroke-dasharray="4 4"/>
+    <text x="45" y="42" text-anchor="middle" font-size="11">非官方</text>
+    <text x="45" y="56" text-anchor="middle" font-size="11">同人企划</text>
+  </svg>
+  <span class="badge">· 开放世界 · 魔法 RPG · 网易基岩 ·</span>
+  <h1>Tide of Remnant</h1>
+  <div class="sub">三代黑暗余烬 · The Slow Tide</div>
+  <p class="lead">大战结束三十余年，魔法界以为黑暗已灭。但封印正在被无声侵蚀——跨越三个时代的创伤，始终深埋在这片土地之下。你，是百年内唯一拥有古代魔法本源抗性的巫师。</p>
+  <div class="note">本页是<b>企划预告</b>——饼先画给大家看，能不能烙熟、什么时候烙熟，作者心里也没底。内容以游戏内最终版本为准，上线时间先按<b>几年后</b>算，催更请轻拍，鸽子也是会害羞的。<br>立项于 <b>2026年6月25日</b> · 目前开发进度 3%</div>
+</section>
+
+<!-- 时间线 -->
+<section class="sec" id="timeline">
+  <div class="sec-head"><span class="ico">✦</span><h2>这个世界发生过什么</h2><span class="desc">三个时代，一场未灭的余烬</span></div>
+  <div class="timeline">
+    <div class="tl"><div class="yr">1890</div><h3>封印稳固百年</h3><p>新任守护者平定古代魔法失控，稳固贮藏库远古封印。封印唯一弱点：只能被外部持续魔力扰动缓慢侵蚀。</p></div>
+    <div class="tl"><div class="yr">1920</div><h3>默然创伤暗影</h3><p>格林德沃之乱席卷欧洲。无数受创巫师凝结默然。默默然无法净化、无法根除，只能靠古代魔法短暂压制。</p></div>
+    <div class="tl"><div class="yr">1998</div><h3>残片化作节点</h3><p>伏地魔覆灭，破碎灵魂残片被百年默然暗影吸附，化作黑暗共振节点，持续侵蚀 1890 年的封印。</p></div>
+  </div>
+</section>
+
+<!-- 主线 -->
+<section class="sec" id="mainline">
+  <div class="sec-head"><span class="ico">⚔</span><h2>主线 · 七个学年的暗流</h2><span class="desc">真伏笔零提示，真假线索混杂</span></div>
+  <div class="card">
+    <div class="mainline">
+      <div class="ml"><h3><span class="yr">一</span>异象初现 · 浅埋无痕余烬</h3><p>入学、城堡导览、魔咒课第一课。长廊里那幅缄默的老画像，教授一句"停下的地方比走过的路更烫"——都只是闲笔。</p></div>
+      <div class="ml"><h3><span class="yr">二</span>虚空泄露 · 创伤暗影</h3><p>第一次默然异动，魔法部外勤联手调查；夜间禁林，风声里飘来一句没人能回放的低语："星火燃于夏，烬落终无答。"</p></div>
+      <div class="ml"><h3><span class="yr">三</span>古秘现世 · 本源裂痕</h3><p>与妖精问询、禁书区古籍检索、天文课观星。古籍夹缝一行残句，天文课一句永远不回收的"噪音伏笔"。</p></div>
+      <div class="ml"><h3><span class="yr">四</span>全球动荡 · 圣徒半截留白</h3><p>林间遭遇残存圣徒伏击。残血时他抛下半句："你以为你对抗的只是暗影怪物？你根本不知道这些灾厄——从何而来。"</p></div>
+      <div class="ml"><h3><span class="yr">五</span>封印崩坏 · 旧像复现</h3><p>暗影裂隙增多，校园疏散演练。邻侧画像忽然低语："这么多年，还在等？终究是等不到的。"</p></div>
+      <div class="ml"><h3><span class="yr">六</span>三方博弈 · 理念闭环</h3><p>魔法部、残存圣徒、霍格沃茨三方会谈。你的立场一旦选择便不可回头——只有中立，才推开老画像更深一层的心事。</p></div>
+      <div class="ml"><h3><span class="yr">七</span>终局 · 记忆钩子与顿悟</h3><p>全校疏散，老画像第一次侧身。裂隙核心，三重黑暗聚合体低语："它们从未消失，只是换了一种方式燃烧。"<br>打完后，主动走回长廊，点一下那幅画像——或许会听见，此生唯一一次"我们"。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 四学院 -->
+<section class="sec" id="houses">
+  <div class="sec-head"><span class="ico">🛡</span><h2>四学院</h2><span class="desc">你的归宿在哪里</span></div>
+  <div class="houses">
+    <div class="house gryf">
+      <svg viewBox="0 0 80 80"><path d="M40 8 66 22v26c0 12-11 20-26 20S14 60 14 48V22z" fill="#7d2f22"/><path d="M40 24l7 14-7 8-7-8z" fill="#e9c25b"/><circle cx="40" cy="50" r="4" fill="#e9c25b"/></svg>
+      <h4>GRYFFINDOR</h4><small>勇敢 · 胆识 · 骑士精神</small>
+      <div class="desc">以狮为徽。心里有火的人，总要先踏出那一步。分院帽说：勇敢的人，其实也会害怕，只是他们选择去做。</div>
+    </div>
+    <div class="house sly">
+      <svg viewBox="0 0 80 80"><path d="M40 8 66 22v26c0 12-11 20-26 20S14 60 14 48V22z" fill="#2f5d43"/><path d="M26 34c18-6 22 14 34 10-4 12-22 10-26 4-2-6 0-10-8-14z" fill="#c9d8c9"/></svg>
+      <h4>SLYTHERIN</h4><small>野心 · 精明 · 渴望力量</small>
+      <div class="desc">以蛇为徽。野心本身没错，错的是用它来伤谁。这条蛇从不说谎，只选择值得它的人。</div>
+    </div>
+    <div class="house huff">
+      <svg viewBox="0 0 80 80"><path d="M40 8 66 22v26c0 12-11 20-26 20S14 60 14 48V22z" fill="#a8871f"/><path d="M30 34c8 6 12 12 8 18 6-2 12-8 12-18-8 6-14 6-20 0z" fill="#efe2b0"/><circle cx="40" cy="42" r="4" fill="#efe2b0"/></svg>
+      <h4>HUFFLEPUFF</h4><small>忠诚 · 勤奋 · 公正</small>
+      <div class="desc">以獾为徽。不走捷径，肯吃苦，把该做的事做到底。獾看着笨，却没人能轻易把它从窝里赶出来。</div>
+    </div>
+    <div class="house rav">
+      <svg viewBox="0 0 80 80"><path d="M40 8 66 22v26c0 12-11 20-26 20S14 60 14 48V22z" fill="#2e4a6e"/><path d="M28 40c10-8 18-10 26-10-2 12-10 22-20 26-2-8 0-16-6-16z" fill="#b9c9dd"/></svg>
+      <h4>RAVENCLAW</h4><small>智慧 · 求知 · 创造力</small>
+      <div class="desc">以鹰为徽。问题比答案更珍贵。鹰飞得高，不为炫耀，只为看清——被云遮住的那一部分真相。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 支线 -->
+<section class="sec" id="branch">
+  <div class="sec-head"><span class="ico">✦</span><h2>支线 · 预埋闲笔</h2><span class="desc">三条支线，同样零提示</span></div>
+  <div class="card">
+    <table>
+      <thead><tr><th style="width:120px">支线</th><th>解锁条件</th><th>伏笔文本</th><th style="width:150px">风格</th></tr></thead>
+      <tbody>
+        <tr><td><b>拉文克劳<br>谜语之门</b></td><td>三年级 · 进入拉文克劳公共休息室秘密阁楼</td><td>旧书被墨渍涂抹，边角残留残缺文字：「炽烈……终焚……过半皆空」<small>（部分笔画被墨遮挡，需仔细辨认）</small></td><td>文字半遮挡，无高亮</td></tr>
+        <tr><td><b>斯莱特林<br>暗影契约</b></td><td>四年级 · 进入斯莱特林地牢密室</td><td>契约残片边角手写小字：「力量边界之争，古来皆有，最盛于百年之前」<small>（印在页面边缘，非正文）</small></td><td>边缘小字，易忽略</td></tr>
+        <tr><td><b>马人<br>星象预言</b></td><td>五年级 · 禁林马人营地</td><td>「天际常有纠缠星辰，一者吞噬一者微光。待到肉眼可辨时，星光早已寂灭多年」</td><td>马人隐喻，不解释</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 魔法地图 -->
+<section class="sec" id="map">
+  <div class="sec-head"><span class="ico">🗺</span><h2>魔法地图 · 点击任务点</h2><span class="desc">地图为示意，点位会随版本更新</span></div>
+  <div class="map-wrap" id="mapWrap">
+    <img src="https://theslowtide.pages.dev/hogwarts_map.jpg" alt="霍格沃茨魔法地图">
+    <div class="map-pin" data-key="hogsmeade" style="left:26%;top:34%">
+      <svg viewBox="0 0 34 34"><path d="M17 2c6 0 11 5 11 11 0 8-11 19-11 19S6 21 6 13c0-6 5-11 11-11z" fill="#b8922a" stroke="#3a2e1d" stroke-width="2"/><circle cx="17" cy="13" r="4" fill="#fdf6e6"/></svg>
+      <span class="lab">霍格莫德</span>
+    </div>
+    <div class="map-pin" data-key="forest" style="left:56%;top:22%">
+      <svg viewBox="0 0 34 34"><path d="M17 2c6 0 11 5 11 11 0 8-11 19-11 19S6 21 6 13c0-6 5-11 11-11z" fill="#2f5d43" stroke="#3a2e1d" stroke-width="2"/><circle cx="17" cy="13" r="4" fill="#fdf6e6"/></svg>
+      <span class="lab">禁林</span>
+    </div>
+    <div class="map-pin" data-key="verge" style="left:18%;top:62%">
+      <svg viewBox="0 0 34 34"><path d="M17 2c6 0 11 5 11 11 0 8-11 19-11 19S6 21 6 13c0-6 5-11 11-11z" fill="#2e4a6e" stroke="#3a2e1d" stroke-width="2"/><circle cx="17" cy="13" r="4" fill="#fdf6e6"/></svg>
+      <span class="lab">林间裂隙</span>
+    </div>
+    <div class="map-pin" data-key="castle" style="left:44%;top:46%">
+      <svg viewBox="0 0 34 34"><path d="M17 2c6 0 11 5 11 11 0 8-11 19-11 19S6 21 6 13c0-6 5-11 11-11z" fill="#7d2f22" stroke="#3a2e1d" stroke-width="2"/><circle cx="17" cy="13" r="4" fill="#fdf6e6"/></svg>
+      <span class="lab">城堡 · 校长长廊</span>
+    </div>
+    <div class="map-pin" data-key="abyss" style="left:74%;top:70%">
+      <svg viewBox="0 0 34 34"><path d="M17 2c6 0 11 5 11 11 0 8-11 19-11 19S6 21 6 13c0-6 5-11 11-11z" fill="#3a2e1d" stroke="#3a2e1d" stroke-width="2"/><circle cx="17" cy="13" r="4" fill="#fdf6e6"/></svg>
+      <span class="lab">裂隙核心</span>
+    </div>
+    <div class="taskpop" id="taskpop"><button class="close" id="tpClose">✕</button><h4><span id="tpTag" class="tag"></span><span id="tpTitle"></span></h4><p id="tpDesc"></p><div class="how" id="tpHow"></div></div>
+  </div>
+  <div class="map-legend">
+    <span>🟠 金色 · 主线任务点</span>
+    <span>🟢 绿色 · 禁林 / 野外</span>
+    <span>🔵 蓝色 · 裂隙相关</span>
+    <span>🔴 酒红 · 城堡内</span>
+    <span>⚫ 深棕 · 终局核心</span>
+  </div>
+</section>
+
+<!-- 彩蛋 -->
+<section class="sec" id="egg">
+  <div class="sec-head"><span class="ico">🔮</span><h2>彩蛋 · 一点私心</h2><span class="desc">都是脏活累活，但值得</span></div>
+  <div class="eggs">
+    <div class="egg"><div class="e">🏰</div><h4>致敬霍格沃茨之遗</h4><p>1890 封印由历代守护者接力，本作接过这根魔杖。</p></div>
+    <div class="egg"><div class="e">🕯</div><h4>默然的世界</h4><p>创伤无法治愈，只能压制——这是故事的铁律，也是它的温柔。</p></div>
+    <div class="egg"><div class="e">🦉</div><h4>画像与"我们"</h4><p>全流程唯一一次"我们"，藏在终局后一段无人提示的回访里。</p></div>
+    <div class="egg"><div class="e">🌟</div><h4>星火观星者</h4><p>一条静默解锁的称号，没有弹窗。打开称号列表，才知道它在。</p></div>
+    <div class="egg"><div class="e">🎶</div><h4>音乐</h4><p>页面有段淡淡的背景乐，右下角可开关。魔杖一挥，自己听。</p></div>
+    <div class="egg"><div class="e">🕊</div><h4>鸽子与饼</h4><p>进度会慢，但不会停。哪天上线，至少先让我们把饼烙熟一半。</p></div>
+  </div>
+</section>
+
+<!-- 进度 -->
+<section class="sec" id="progress">
+  <div class="sec-head"><span class="ico">⚒</span><h2>开发进度</h2><span class="desc">诚实地告诉你，还很早</span></div>
+  <div class="progress">
+    <p style="font-size:14px;color:var(--ink)"><b>2026年6月25日</b> 立项 · 世界观 · 主线框架</p>
+    <div class="pbar"><i></i></div>
+    <div class="pline">
+      <span>剧情企划 · 世界观 ✓</span>
+      <span>主线任务矩阵 · 架构中</span>
+      <span>支线 42 条 · 预埋中</span>
+    </div>
+    <div class="pline">
+      <span>地图 · 示意版</span>
+      <span>音效 / 氛围 · 待做</span>
+      <span>玩法 / 经济 · 设计中</span>
+    </div>
+    <div class="pline" style="border-top:none;padding-top:6px">
+      <span>目前进度</span><span><b style="color:var(--wine)">3%</b> —— 饼先画着，别急</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>Tide of Remnant · 三代黑暗余烬</b> — The Slow Tide 同人企划预告页<br>
+  内容为同人创作，与原著版权方无关 · 所有设定以游戏内最终版本为准<br>
+  催更请轻拍，鸽子也是会害羞的 ✦ 立项 2026-06-25
+</footer>
+</div>
+
+<!-- 登录弹窗 -->
+<div class="mask" id="loginMask">
+  <div class="dialog">
+    <button class="dlg-close" id="dlgClose">✕</button>
+    <h3>巫师登记</h3>
+    <div class="sub">使用 TST 官网账号（邮箱 + 验证码）登录，与主站同账号</div>
+    <div class="dlg-row">
+      <label>邮箱</label>
+      <input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="dlg-row">
+      <label>验证码</label>
+      <div class="code-row">
+        <input id="loginCode" type="text" maxlength="6" placeholder="6 位验证码" autocomplete="one-time-code">
+        <button class="btn" id="btnSend">发送验证码</button>
+      </div>
+    </div>
+    <div class="dlg-msg" id="dlgMsg"></div>
+    <div class="dlg-btns">
+      <button class="btn" id="btnConfirm">登录</button>
+      <button class="btn" id="btnCancel">取消</button>
     </div>
   </div>
 </div>
 
-<main>
-  <!-- ===== Hero ===== -->
-  <section class="hero">
-    <div class="hero-banner"><img src="hogwarts_hero.jpg" alt="星夜下的霍格沃茨城堡"></div>
-    <div class="container hero-body">
-      <div class="dev-badge">开发中 · 先画个饼</div>
-      <div class="kicker">非官方同人 · 开放世界 RPG</div>
-      <h1>Tide of Remnant<br><span class="g">三代黑暗余烬</span></h1>
-      <p class="sub">大战结束三十余年，魔法界以为黑暗已灭。但封印正在被无声侵蚀——跨越三个时代的创伤，始终深埋在这片土地之下。</p>
-      <div class="tagline">一段只能压制、无法根除的魔法史诗</div>
-      <p class="note">本页是企划预告——饼先画给大家看，能不能烙熟、什么时候烙熟，作者心里也没底。内容以游戏内最终版本为准，上线时间先按几年后算，催更请轻拍，鸽子也是会害羞的。</p>
-      <div class="epochs">
-        <div class="epoch"><div class="yr">1890</div><div class="tx">封印稳固百年<br>守护者平定危机</div></div>
-        <div class="epoch"><div class="yr">1920</div><div class="tx">默然创伤暗影<br>无法根除只能压制</div></div>
-        <div class="epoch"><div class="yr">1998</div><div class="tx">残片化作节点<br>持续侵蚀封印</div></div>
-      </div>
-    </div>
-  </section>
+<!-- 音乐 -->
+<audio id="bgm" loop preload="auto"><source src="https://theslowtide.pages.dev/hogwarts_music.mp3" type="audio/mpeg"></audio>
+<button class="mus on" id="mus" aria-label="音乐">
+  <svg viewBox="0 0 24 24"><path d="M9 6v9a3 3 0 1 1-2-2.8V8z"/><path d="M12 4l6-1.5v11.5" fill="none" stroke="#7d2f22" stroke-width="1.6"/><path class="vib" d="M15 6v8a3 3 0 1 1-2-2.8V6z" fill="none" stroke="#7d2f22" stroke-width="1.6"/></svg>
+</button>
 
-  <div class="layout">
-    <aside class="toc">
-      <div class="toc-title">目录</div>
-      <a href="#world">世界观预告</a>
-      <a href="#faction">势力速览</a>
-      <a href="#main">主线 · 七学年</a>
-      <a href="#side">支线体系</a>
-      <a href="#map">魔法地图</a>
-      <a href="#ending">彩蛋与终局</a>
-      <a href="#progress">开发进度</a>
-    </aside>
-    <div class="content">
-
-  <!-- ===== 世界观 ===== -->
-  <section class="section" id="world">
-    <div class="container">
-      <div class="sec-head">
-        <h2>世界观预告</h2>
-        <p>一个魔法与偏见共存的世界。光明与黑暗不是两个阵营，而是同一条道路上的不同选择。</p>
-      </div>
-      <div class="grid-2">
-        <div class="card">
-          <h3><span class="t">世界基调</span></h3>
-          <p>巫师世界拥有咒语、魔药、魔法生物、画像、幽灵、古老建筑，也拥有根深蒂固的等级观念、对差异的恐惧、对创伤的回避。善意可能带来毁灭，恶意可能源于被排斥的痛苦。这个世界不提供简单的答案。</p>
-        </div>
-        <div class="card">
-          <h3><span class="t">故事时间</span></h3>
-          <p>大战结束三十余年之后。公开的主流认知是黑暗势力彻底终结，战火归于历史。但百年前积累的创伤魔力，仍在土地、建筑、魔法生物身上低强度残留。</p>
-        </div>
-        <div class="card">
-          <h3><span class="t">黑暗的来源</span></h3>
-          <p>世界底层存在名为<b>默默然</b>的力量——年轻巫师长期压抑自身魔法，创伤催生的寄生型黑暗力量。它无法净化、无法彻底根除，只能依靠纯度极高的古代魔法短暂压制暴走。痛苦是它的温床。</p>
-        </div>
-        <div class="card">
-          <h3><span class="t">古代魔法封印</span></h3>
-          <p>1890年，新任守护者平定古代魔法失控危机，稳固贮藏库远古封印。封印结构完好，唯一弱点是被外部持续的魔力扰动缓慢侵蚀。如今，伏地魔的灵魂残片与百年默然暗影同化，化作无数<b>黑暗共振节点</b>，正从外部侵蚀封印——这是主线危机的根源。</p>
-        </div>
-        <div class="card">
-          <h3><span class="t">公开认知 vs 真实历史</span></h3>
-          <p>公开认知：黑暗势力已经彻底覆灭。真实历史：默默然从未消失，格林德沃的理念仍有残存信奉者，伏地魔的灵魂残片正在与百年默然暗影同化，古代魔法封印正在被侵蚀。魔法部知道一部分，霍格沃茨教职工知道一部分，残存圣徒知道一部分，没有人掌握全貌。</p>
-        </div>
-        <div class="card">
-          <h3><span class="t">玩家的位置</span></h3>
-          <p>你是百年之内唯一拥有<b>古代魔法本源抗性</b>的巫师。你的能力有边界：只能压制暗影暴走，不能治愈创伤，无法消灭默默然，无法逆转世代流传的偏见。你不是救世主，只能阻断仪式、保护身边的人、压制暴走。</p>
-        </div>
-      </div>
-      <div style="margin-top:16px;background:var(--gold-soft);border:1px dashed var(--gold);border-radius:12px;padding:22px;">
-        <p style="font-size:14px;color:var(--text);"><b style="color:var(--gold);">核心主题：只能压制，无法根除</b><br><br>
-        古代魔法压不住创伤，魔法部管不住偏见，圣徒说不清答案。玩家能做的只有保护、压制、阻断仪式——不能治愈、不能消灭、不能逆转偏见。这就是本世界的主题边界。<br><br>
-        暗线叙事规则（游戏内全程遵守）：不存在单独的暗线专属任务，所有伏笔对话、环境文本全部嵌入普通任务流程，与普通对话共用同一套表现形式——<b>没有高亮、没有闪光特效、没有专属提示音效、没有弹窗提醒、不写入任务面板</b>。真假线索混杂，顿悟依靠玩家记忆与意象共鸣，不强制触发。错过伏笔，永久丢失。</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== 势力速览 ===== -->
-  <section class="section alt" id="faction">
-    <div class="container">
-      <div class="sec-head">
-        <h2>势力与种族速览</h2>
-        <p>八股力量，各自只知道一部分真相。没有人掌握全貌。</p>
-      </div>
-      <div class="tbl-wrap">
-      <table class="tbl">
-        <thead><tr><th style="width:110px">势力</th><th style="width:220px">定位</th><th>行为准则</th><th>台词风格</th></tr></thead>
-        <tbody>
-          <tr><td><b>魔法部</b></td><td>官僚体系</td><td>优先执行沿用百年的隔离管控规章，先隔离再调查，很少深究创伤根源；档案管理严格，部分卷宗需权限</td><td>官方、克制、程序化；一线外勤可私下抱怨</td></tr>
-          <tr><td><b>残存圣徒</b></td><td>分散留存的理念信奉者，并非大规模武装组织</td><td>认为魔法界强行划分光明与黑暗、排斥创伤巫师，才是灾厄根源；不主动长篇宣讲，战斗落败抛半截问句</td><td>简短、急促、带质疑；不点名，不提私人往事</td></tr>
-          <tr><td><b>霍格沃茨</b></td><td>教职工大多只有碎片化模糊认知</td><td>主线内给出默默然基础解释；课堂闲谈浅尝辄止；邓布利多画像克制回避过往</td><td>教学口吻、克制、留白</td></tr>
-          <tr><td><b>妖精</b></td><td>重视契约与族群历史</td><td>问到封印历史会答，问到外来巫师直接说旧事不值一提</td><td>务实、简短、带契约意识</td></tr>
-          <tr><td><b>马人</b></td><td>禁林原住民</td><td>一贯隐喻风格，不主动解释预言含义</td><td>星象、星辰、微光、寂灭意象</td></tr>
-          <tr><td><b>家养小精灵</b></td><td>厨房、储藏室、休息室日常服务者</td><td>忠诚、务实、带善意，不参与主线冲突</td><td>服务口吻，赫奇帕奇支线涉及食材纠纷与告别宴会</td></tr>
-          <tr><td><b>幽灵</b></td><td>城堡历史的见证者</td><td>会聊城堡往事，不直接解释暗线；记住很多活着时候的小事</td><td>怀念式叙述</td></tr>
-          <tr><td><b>画像</b></td><td>环境叙事与暗线伏笔载体</td><td>长廊老画像分三阶段：一年级缄默面壁 → 五年级邻像闲聊 → 七年级决战前侧身；状态随主线自动切换</td><td>年长沉稳男声，语速偏慢，句子间留长停顿</td></tr>
-        </tbody>
-      </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== 主线 ===== -->
-  <section class="section" id="main">
-    <div class="container">
-      <div class="sec-head">
-        <h2>主线任务 · <span class="g">完整七学年（13 条）</span></h2>
-        <p>主线必做，解锁学年进度。以下伏笔植入点位全程无 UI 标记、无任务提示，错过即永久丢失。</p>
-      </div>
-      <div class="pic">
-        <img src="hogwarts_forest.jpg" alt="禁林守护神">
-        <div class="pic-cap">从长廊里的叮嘱，到裂隙深处的聚合体——七学年主线按《策划全局任务方案》V6.3 定稿整理。</div>
-      </div>
-      <div class="timeline">
-        <div class="tl-item">
-          <div class="yr">一年级</div>
-          <h3>入学 · 长廊里的叮嘱</h3>
-          <div class="tone">主线 2 条。初入城堡，埋下终局台词的第一枚锚点。</div>
-          <div class="mtask">
-            <h4><span class="code">1-01</span>长廊里的叮嘱</h4>
-            <p><span class="k">触发</span>新生入学仪式结束、完成分院后，进入城堡西侧长廊指定区域，区域强制触发，无需点击 NPC</p>
-            <p><span class="k">怎么做</span>黄昏路过长廊，麦格教授独自站在盔甲塑像旁。她会说：天赋耀眼的人很多，但有些人走着走着，就停在了半路；力量本身不是过错，懂得控制力量，才是巫师一生的课题。听完即可</p>
-            <p><span class="k">伏笔</span>这句话写入玩家记忆碎片，作为七学年终局台词的对应锚点</p>
-            <p class="rwd">奖励：霍格沃茨新生长袍、基础魔杖、城堡简易地图</p>
-          </div>
-          <div class="mtask">
-            <h4><span class="code">1-02</span>禁林边缘的异动</h4>
-            <p><span class="k">触发</span>完成 1-01 后，海格小屋门口点击海格</p>
-            <p><span class="k">怎么做</span>海格委托你在禁林外围巡查一圈，标记几处异常扰动的位置。切记不要跨过古老的橡树界碑；触碰界碑会触发警告，两次触碰后任务仍可完成，但海格会加重提醒。巡查完返回海格小屋</p>
-            <p><span class="k">分支</span>对话选项仅改变台词；巡查触碰界碑触发额外警告</p>
-            <p class="rwd">奖励：基础回复药剂、南瓜汁</p>
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="yr">二年级</div>
-          <h3>旧课本的低语与密室的流言</h3>
-          <div class="tone">主线 2 条。创伤附着在书页与石墙之上，开始显露痕迹。</div>
-          <div class="mtask">
-            <h4><span class="code">2-01</span>会低语的旧课本</h4>
-            <p><span class="k">触发</span>完成 1-02、开启二年级课程后，魔咒课教室课后，弗立维教授主动叫住你</p>
-            <p><span class="k">怎么做</span>读那本二手课本上的批注，耳边会传来模糊断续的低语：力量……不必压抑……裂痕终将扩大。向弗立维复述你听见的内容，他会告诉你这是残留的情绪——无法掌控的魔力会吞噬持有者</p>
-            <p><span class="k">伏笔</span>魔咒教室永久保留这本低语课本，后续学年路过可再次听见微弱低语</p>
-            <p class="rwd">奖励：咒语·无声咒入门</p>
-          </div>
-          <div class="mtask">
-            <h4><span class="code">2-02</span>密室流言</h4>
-            <p><span class="k">触发</span>完成 2-01 后，城堡走廊听见学生们议论，自动触发</p>
-            <p><span class="k">怎么做</span>走廊墙上出现暗淡的银色字迹，幽灵差点没头的尼克会飘过来提醒你：别被流言裹挟，仇恨长久徘徊在石墙之间。前往图书馆查阅旧校报，返回走廊与尼克对话</p>
-            <p><span class="k">伏笔</span>查阅档案时仔细阅读，会额外获得一段碎片化文字，无奖励，仅伏笔</p>
-            <p class="rwd">奖励：图书馆特殊阅览许可</p>
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="yr">三年级</div>
-          <h3>摄魂怪的阴影与古老魔法残痕</h3>
-          <div class="tone">主线 2 条。光明无法消灭绝望，只能短暂阻挡。</div>
-          <div class="mtask">
-            <h4><span class="code">3-01</span>摄魂怪的阴影</h4>
-            <p><span class="k">触发</span>完成 2-02、开启三年级后，霍格莫德村口遇到卢平教授</p>
-            <p><span class="k">怎么做</span>远望荒原上缓慢移动的灰雾——摄魂怪。跟随卢平练习守护神咒：不必强求召唤实体，先学会集中内心快乐的记忆抵御寒意。练习成功与否仅改变对话，主线流程不变</p>
-            <p class="rwd">奖励：咒语·呼神护卫</p>
-          </div>
-          <div class="mtask">
-            <h4><span class="code">3-02</span>古老魔法残痕</h4>
-            <p><span class="k">触发</span>完成 3-01 后，禁林深处古老石阵，靠近自动触发</p>
-            <p><span class="k">怎么做</span>触碰发光的淡蓝色古代魔法纹路，脑海中涌入碎片画面：一名巫师释放强大魔法，魔法失控撕裂周遭大地。邓布利多会走到石阵旁，告诉你力量本身中立，但即便是善意也可能带来毁灭性后果</p>
-            <p><span class="k">伏笔</span>石阵纹路会在特定天气下重新发光</p>
-            <p class="rwd">奖励：古代魔法基础感知</p>
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="yr">四年级</div>
-          <h3>圣徒伏击与密信</h3>
-          <div class="tone">主线 2 条。格林德沃的圣徒还在四处寻找默然者。</div>
-          <div class="mtask">
-            <h4><span class="code">4-01</span>圣徒伏击</h4>
-            <p><span class="k">触发</span>完成 3-02、开启四年级后，霍格莫德外郊山谷，跟随教授前往调查魔法异动</p>
-            <p><span class="k">怎么做</span>圣徒埋伏在山谷，战斗触发。他们的目标并非击杀，是搜寻关于默然者的情报。战斗结束敌人撤离，山谷战场留下灼烧痕迹</p>
-            <p class="rwd">奖励：防护药剂</p>
-          </div>
-          <div class="mtask">
-            <h4><span class="code">4-02</span>圣徒密信</h4>
-            <p><span class="k">触发</span>4-01 战斗结算完毕，密信自动存入背包（无需手动拾取）</p>
-            <p><span class="k">怎么做</span>打开背包取出泛黄密信——字迹潦草，墨水部分被灼烧：目标依旧潜伏。默然者的力量值得被解放……我们继续搜寻，等待时机。邓布利多抵达战场，告诉你圣徒误解了这份力量，并叮嘱此事暂时不要大范围散播</p>
-            <p><span class="k">伏笔</span>城堡内增加教授之间私下讨论圣徒活动的隐藏对话</p>
-            <p class="rwd">奖励：黑魔法防御术高级笔记</p>
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="yr">五年级</div>
-          <h3>疏散演练与暗流涌动</h3>
-          <div class="tone">主线 2 条。圣徒活动越发猖獗，城堡开始备战。</div>
-          <div class="mtask">
-            <h4><span class="code">5-01</span>城堡疏散演练</h4>
-            <p><span class="k">触发</span>完成 4-02、开启五年级后，城堡大礼堂，集会自动触发</p>
-            <p><span class="k">怎么做</span>跟随指引，带领一小队新生走完撤离路线。新生途中会受惊乱跑，你可以选择安抚或直接赶路——选择安抚解锁一句额外对话。演练结束返回礼堂，城堡密道全部解锁</p>
-            <p class="rwd">奖励：应急烟雾药剂</p>
-          </div>
-          <div class="mtask">
-            <h4><span class="code">5-02</span>暗流涌动</h4>
-            <p><span class="k">触发</span>完成 5-01 后，图书馆密室档案区，邓布利多等候玩家</p>
-            <p><span class="k">怎么做</span>档案室堆满格林德沃鼎盛时期的卷宗。邓布利多告诉你：圣徒持续搜寻默然者，证明他们在谋划更大的行动；格林德沃曾经是极为出色的巫师，只是选择了一条毁灭的道路</p>
-            <p><span class="k">伏笔</span>图书馆档案室新增一批格林德沃时代档案可供阅览</p>
-            <p class="rwd">奖励：古代魔法抗性护符</p>
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="yr">六年级</div>
-          <h3>抉择的岔路口</h3>
-          <div class="tone">主线 1 条。你最重要的选择，影响七年级对话与隐藏剧情开放权限，不锁死主线通关。</div>
-          <div class="mtask">
-            <h4><span class="code">6-01</span>抉择的岔路口</h4>
-            <p><span class="k">触发</span>完成 5-02、开启六年级后，天文台顶楼，黄昏</p>
-            <p><span class="k">怎么做</span>晚霞铺满天空，邓布利多站在石栏边：光明与黑暗的界限，远比课本描述模糊。三个选项标记你的立场——① 我会站在光明一方；② 我愿意保持中立；③ 力量才是一切。中立不是冷漠，是看清两边的代价之后依旧守住内心的底线</p>
-            <p><span class="k">分支</span>立场影响七年级部分对话、隐藏剧情开放权限；选择中立不影响主线通关，但解锁额外内容</p>
-            <p class="rwd">奖励：高级护盾药剂</p>
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="yr">七年级</div>
-          <h3>两条长廊 · 聚合体 · 星火余影</h3>
-          <div class="tone">主线 3 条（含彩蛋主线）。你的路线选择，决定能否走到最后一步。</div>
-          <div class="mtask">
-            <h4><span class="code">7-01</span>两条长廊</h4>
-            <p><span class="k">触发</span>完成 6-01、开启七年级终章后，城堡主厅，NPC 提示前方有两条路</p>
-            <p><span class="k">怎么做</span>自主选择：走<b>画像长廊</b>，会看到一幅双人画像侧身而立、只露半边轮廓，不主动对话（7-03 前置）；走<b>东侧楼梯</b>则直接前往决战场地，错过画像长廊伏笔。抵达后邓布利多说明：这场战斗不是为了单纯消灭敌人，而是阻止一场巨大的悲剧</p>
-            <p class="rwd">奖励：终极战斗药剂包</p>
-          </div>
-          <div class="mtask">
-            <h4><span class="code">7-02</span>三重黑暗聚合体</h4>
-            <p><span class="k">触发</span>完成 7-01 后，进入决战场地</p>
-            <p><span class="k">怎么做</span>空间扭曲、黑雾翻涌，聚合体显现：世人执着划分明暗，滋养一代又一代灾厄。战斗不以击杀为唯一目标，目标是<b>阻断仪式</b>。战斗结束，聚合体最后的声音回荡：有些人走着走着，就停在了半路——与一年级 1-01 麦格教授的台词形成完整意象对仗。六年级立场不同，决战收尾台词不同；中立玩家获得额外独白</p>
-            <p class="rwd">奖励：终局称号「守秘之人」（静默解锁，无弹窗）</p>
-          </div>
-          <div class="mtask">
-            <h4><span class="code">7-03</span>星火余影【彩蛋主线】</h4>
-            <p><span class="k">触发</span>完成 7-02，且 7-01 阶段选择长廊见过侧身双人画像后，主动回到长廊点击双人画像</p>
-            <p><span class="k">怎么做</span>长廊安静，其余画像全部沉睡，只有这幅画像缓缓转向你：我们当年没能看懂的，你看懂了。画面浮现一段无声短片——戈德里克山谷夏日景象。短片结束，画像恢复安静</p>
-            <p><span class="k">失败条件</span>7-01 走东侧楼梯的玩家，点击画像仅触发基础慰问台词，彩蛋永久无法解锁</p>
-            <p class="rwd">奖励：专属隐藏称号「双子星火」、解锁纪念短片</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== 支线 ===== -->
-  <section class="section alt" id="side">
-    <div class="container">
-      <div class="sec-head">
-        <h2>支线体系 · <span class="g">42 条</span></h2>
-        <p>纯日常 16 ｜ 轻伏笔 8 ｜ 学院专属 12 ｜ 人物羁绊 6。支线不强制，不锁主线升学。</p>
-      </div>
-      <div class="grid-3" style="margin-bottom:26px;">
-        <div class="card house house-g"><h3><span class="dot"></span>格兰芬多</h3><p class="s-desc">勇气不是毫无畏惧，是心怀恐惧依旧向前。</p><ul><li><b>G1-S01</b> <span class="m">遗失的狮子徽章 · 一年级</span></li><li><b>G3-S02</b> <span class="m">营救受伤马人 · 三年级</span></li><li><b>G5-S03</b> <span class="m">决斗训练 · 五年级</span></li></ul></div>
-        <div class="card house house-r"><h3><span class="dot"></span>拉文克劳</h3><p class="s-desc">智慧不止书本知识，是懂得质疑，不断思考。</p><ul><li><b>R1-S01</b> <span class="m">遗失星象手稿 · 一年级</span></li><li><b>R4-S01</b> <span class="m">手稿排序 · 四年级</span></li><li><b>R5-S02</b> <span class="m">预言碎片解读 · 五年级</span></li><li><b>R6-S03</b> <span class="m">星轨预言 · 六年级</span></li></ul></div>
-        <div class="card house house-s"><h3><span class="dot"></span>斯莱特林</h3><p class="s-desc">野心本身无罪，卑劣手段才会玷污目标。</p><ul><li><b>S2-S01</b> <span class="m">密室铭文抄录 · 二年级</span></li><li><b>S4-S02</b> <span class="m">毒草药剂调配 · 四年级</span></li><li><b>S6-S03</b> <span class="m">密室誓约 · 六年级</span></li></ul></div>
-        <div class="card house house-h"><h3><span class="dot"></span>赫奇帕奇</h3><p class="s-desc">忠诚与坚持，常常是最容易被低估的力量。</p><ul><li><b>H2-S01</b> <span class="m">储藏室种子保护 · 二年级</span></li><li><b>H4-S02</b> <span class="m">追踪走失獾类 · 四年级</span></li><li><b>H7-S03</b> <span class="m">守护储藏密室 · 七年级</span></li></ul></div>
-      </div>
-
-      <h3 style="margin:8px 0 12px;font-size:16px;">纯日常支线（16 条 · 可重复接取）</h3>
-      <div class="tbl-wrap" style="margin-bottom:26px;">
-      <table class="tbl">
-        <thead><tr><th style="width:90px">编号</th><th style="width:200px">名称</th><th style="width:90px">学年</th><th>怎么做</th><th style="width:130px">奖励</th></tr></thead>
-        <tbody>
-          <tr><td><b>1-S02</b></td><td>照料独角兽</td><td>一年级</td><td>海格小屋旁兽栏：清理荆棘、投喂特制甜苜蓿。动作要轻</td><td>魔法生物饲料</td></tr>
-          <tr><td><b>1-S03</b></td><td>猫头鹰分拣</td><td>一年级</td><td>猫头鹰棚屋：分拣信件，区分本地与外地邮件，弄混猫头鹰会迷路</td><td>猫头鹰零食</td></tr>
-          <tr><td><b>1-S04</b></td><td>清理温室杂草</td><td>一年级</td><td>草药课温室：拔除带刺杂草，小心别伤到曼德拉幼苗</td><td>肥料</td></tr>
-          <tr><td><b>2-S01</b></td><td>鹰头马身有翼兽梳洗</td><td>二年级</td><td>海格小屋：先鞠躬再靠近，帮它梳理羽毛</td><td>兽类安抚药剂</td></tr>
-          <tr><td><b>2-S03</b></td><td>修复破碎玻璃器皿</td><td>二年级</td><td>魔药课教室：用修复咒修补打碎的药瓶</td><td>空魔药瓶</td></tr>
-          <tr><td><b>3-S03</b></td><td>护树罗锅守护</td><td>三年级</td><td>禁林边缘橡树：驱赶啃食树皮的小虫</td><td>小树枝护身符</td></tr>
-          <tr><td><b>3-S04</b></td><td>图书馆整理古籍</td><td>三年级</td><td>图书馆：把散落古籍放回书架、除尘</td><td>书签</td></tr>
-          <tr><td><b>3-S05</b></td><td>清理魔法溢散</td><td>三年级</td><td>城堡各处：使用消寂咒平息随机溢散的魔法光点</td><td>微量魔法粉末</td></tr>
-          <tr><td><b>4-S02</b></td><td>夜骐照料</td><td>四年级</td><td>海格小屋后方兽栏：投喂肉食、检查蹄子。能看见夜骐的人，都见证过死亡</td><td>黑色马鬃饰品</td></tr>
-          <tr><td><b>4-S03</b></td><td>修补城堡挂毯</td><td>四年级</td><td>城堡长廊：修复被皮皮鬼扯破的古老挂毯</td><td>丝线</td></tr>
-          <tr><td><b>5-S01</b></td><td>蒲绒绒饲养</td><td>五年级</td><td>神奇动物教室：收集蒲绒绒产出的绒毛</td><td>蒲绒绒绒毛</td></tr>
-          <tr><td><b>5-S03</b></td><td>送信前往霍格莫德</td><td>五年级</td><td>猫头鹰棚屋：把密封包裹送到霍格莫德商店老板手中</td><td>蜂蜜公爵糖果</td></tr>
-          <tr><td><b>6-S02</b></td><td>校准天文望远镜</td><td>六年级</td><td>天文台：调整镜片，观测星象记录</td><td>星图手稿</td></tr>
-          <tr><td><b>6-S03</b></td><td>精灵下午茶</td><td>六年级</td><td>厨房入口：帮家养小精灵准备下午茶点心</td><td>手工蜂蜜蛋糕</td></tr>
-          <tr><td><b>7-S02</b></td><td>城堡盔甲维护</td><td>七年级</td><td>长廊盔甲塑像：清理灰尘、修复松动部件</td><td>抛光布</td></tr>
-          <tr><td><b>7-S03</b></td><td>最后的温室收获</td><td>七年级</td><td>草药课温室：收获成熟魔法草药，存放进储藏柜</td><td>成品草药</td></tr>
-        </tbody>
-      </table>
-      </div>
-
-      <h3 style="margin:8px 0 12px;font-size:16px;">轻伏笔支线（8 条 · 暗线藏于任务末尾闲笔，全程无提示）</h3>
-      <div class="tbl-wrap" style="margin-bottom:26px;">
-      <table class="tbl">
-        <thead><tr><th style="width:90px">编号</th><th style="width:200px">名称</th><th style="width:90px">学年</th><th>伏笔内容</th><th style="width:140px">奖励</th></tr></thead>
-        <tbody>
-          <tr><td><b>1-S01</b> <span class="tag">7-S01 前置</span></td><td>阁楼里的旧相片</td><td>一年级</td><td>阁楼角落木盒的褪色相片，两个少年并肩站在阳光下。旁白：山谷的夏日，曾经有两个灵魂同频</td><td>老旧相片碎片</td></tr>
-          <tr><td><b>2-S02</b></td><td>废弃信件</td><td>二年级</td><td>二楼废弃储物间，未寄出的信，残留片段：理念一致的时光太过短暂</td><td>泛黄信纸</td></tr>
-          <tr><td><b>3-S01</b> <span class="tag">7-S01 前置</span></td><td>墓碑铭文</td><td>三年级</td><td>霍格莫德郊外小墓园，铭文磨损：不必为理想殉葬，但人总会为挚爱奔赴毁灭</td><td>墓园野花</td></tr>
-          <tr><td><b>3-S02</b></td><td>歌谣残页</td><td>三年级</td><td>图书馆冷门诗歌手稿区，无名歌谣讲述戈德里克山谷的夏日风暴</td><td>诗歌残页</td></tr>
-          <tr><td><b>4-S01</b> <span class="tag">7-S01 前置</span></td><td>破损决斗记录</td><td>四年级</td><td>决斗俱乐部储藏室，旧羊皮纸记录两个天才巫师的一场对决</td><td>决斗记录残卷</td></tr>
-          <tr><td><b>5-S02</b></td><td>破碎镜子</td><td>五年级</td><td>禁林边缘小屋，碎裂镜子中倒影重叠两个人影</td><td>镜子碎片</td></tr>
-          <tr><td><b>6-S01</b></td><td>哲学家的辩论</td><td>六年级</td><td>天文台黄昏，老教授问：为了更大的善，可以牺牲少数人吗？中立玩家额外解锁隐藏对话：曾经有两位巫师，也长久辩论这个问题</td><td>思辨笔记</td></tr>
-          <tr><td><b>7-S01</b> <span class="tag">终极彩蛋</span></td><td>冥想盆里的残响</td><td>七年级</td><td>邓布利多办公室冥想盆。前置：完成 1-S01、3-S01、4-S01 三条支线。普通玩家只见两道模糊人影；哈迷可辨认戈德里克山谷场景</td><td>冥想盆记忆碎片</td></tr>
-        </tbody>
-      </table>
-      </div>
-
-      <h3 style="margin:8px 0 12px;font-size:16px;">人物羁绊支线（6 条 · 完成前置轻伏笔并重复接取一次后解锁）</h3>
-      <div class="tbl-wrap">
-      <table class="tbl">
-        <thead><tr><th style="width:90px">编号</th><th style="width:200px">名称</th><th style="width:90px">学年</th><th>羁绊内容</th><th style="width:140px">奖励</th></tr></thead>
-        <tbody>
-          <tr><td><b>1-J01</b></td><td>看守人的心事</td><td>一年级</td><td>前置 1-S01。阁楼管理员望着旧相片：有些爱，会被时代评判为错误</td><td>管理员金属书签</td></tr>
-          <tr><td><b>2-J01</b></td><td>信的遗憾</td><td>二年级</td><td>前置 2-S02。储物间管理员：这封信始终没能寄出，两个人走向不同道路</td><td>旧丝带</td></tr>
-          <tr><td><b>3-J02</b></td><td>墓园的怀念</td><td>三年级</td><td>前置 3-S01。墓园看守：很多埋葬在这里的人曾满怀理想，理想燃烧殆尽后只剩墓碑</td><td>干花束</td></tr>
-          <tr><td><b>4-J03</b></td><td>决斗者的遗憾</td><td>四年级</td><td>前置 4-S01。决斗俱乐部管理员：那场决斗不是仇恨开启，而是理念决裂，昔日知己兵刃相向</td><td>旧决斗手套</td></tr>
-          <tr><td><b>5-J04</b></td><td>镜中残影</td><td>五年级</td><td>前置 5-S02。禁林小屋看守：镜子可以映照外形，照不碎人心之间的裂痕</td><td>打磨镜布</td></tr>
-          <tr><td><b>7-J05</b> <span class="tag">羁绊链终章</span></td><td>星火回响</td><td>七年级</td><td>前置：完成全部五条人物羁绊。阁楼黄昏，碎片拼合，浮现完整戈德里克山谷记忆：夏日阳光，两个少年畅谈他们新世界的构想——我们将一起重塑这个世界</td><td>称号「星火见证者」</td></tr>
-        </tbody>
-      </table>
-      </div>
-      <p style="font-size:12.5px;color:var(--text-secondary);margin-top:12px;">学院专属支线仅本院可接，非本院玩家靠近触发 NPC 时无任何交互响应；多周目换学院可体验不同视角。</p>
-    </div>
-  </section>
-
-  <!-- ===== 魔法地图 ===== -->
-  <section class="section" id="map">
-    <div class="container">
-      <div class="sec-head">
-        <h2>魔法地图</h2>
-        <p>点击金色标记，查看该区域相关的任务与玩法（按《策划全局任务方案》V6.3 整理）</p>
-      </div>
-      <div class="pic pic-duo">
-        <img src="hogwarts_train.jpg" alt="九又四分之三站台与霍格沃茨特快">
-        <img src="hogwarts_owl.jpg" alt="海德薇送信">
-        <div class="pic-cap">列车抵达，猫头鹰送信——欢迎来到霍格沃茨。地图依据罗琳手绘草图整理，隐藏探索点位不在此标注。</div>
-      </div>
-      <div class="map-wrap">
-        <img src="hogwarts_map.jpg" alt="霍格沃茨及周边魔法地图">
-        <button class="map-pin" style="left:50%;top:8%" data-key="hogsmeade"><span class="pin-dot"></span><span class="pin-tag">霍格莫德村</span></button>
-        <button class="map-pin" style="left:86%;top:35%" data-key="forest"><span class="pin-dot"></span><span class="pin-tag">禁林</span></button>
-        <button class="map-pin" style="left:66%;top:36%" data-key="verge"><span class="pin-dot"></span><span class="pin-tag">林间裂隙</span></button>
-        <button class="map-pin" style="left:39%;top:45%" data-key="castle"><span class="pin-dot"></span><span class="pin-tag">城堡</span></button>
-        <button class="map-pin" style="left:46%;top:55%" data-key="abyss"><span class="pin-dot"></span><span class="pin-tag">地底裂隙</span></button>
-      </div>
-    </div>
-  </section>
-
-  <div class="map-pop" id="mapPop" hidden>
-    <button class="pop-close" id="popClose">&#10005;</button>
-    <div class="pop-body" id="popBody"></div>
-  </div>
-
-  <!-- ===== 彩蛋与终局 ===== -->
-  <section class="section alt" id="ending">
-    <div class="container">
-      <div class="sec-head">
-        <h2>彩蛋与终局 · <span class="g">静默顿悟</span></h2>
-        <p>没有弹窗、没有提示、没有任务日志——只有记得的人，才能走到最后一步。</p>
-      </div>
-      <div class="pic">
-        <img src="hogwarts_potions.jpg" alt="黑暗炼金魔药桌">
-        <div class="pic-cap">三重黑暗聚合体不是单纯的敌人，而是世界创伤的具象化。击败它是阻断仪式，不是消灭痛苦。</div>
-      </div>
-      <div class="endings">
-        <div class="ending">
-          <h3>三重黑暗聚合体</h3>
-          <p>被压抑、被排斥、被否定的魔法汇聚而成。痛苦不需要过错，只需要一个容器。世人划分明暗滋养灾厄——有些人走着走着，就停在了半路。</p>
-          <div class="mark">意象呼应一年级台词</div>
-        </div>
-        <div class="ending">
-          <h3>星火余影 · 双子星火</h3>
-          <p>决战前走过画像长廊、见过那幅侧身的双人画像，战后主动回访——画像会说：我们当年没能看懂的，你看懂了。浮现戈德里克山谷夏日无声短片。</p>
-          <div class="mark">走东侧楼梯则永久错过</div>
-        </div>
-        <div class="ending">
-          <h3>星火回响 · 星火见证者</h3>
-          <p>完成全部五条人物羁绊，阁楼碎片拼合——夏日阳光，两个少年畅谈他们的新世界。那是他们最明亮的一刻，后来的毁灭掩盖了这份曾经的星火。</p>
-          <div class="mark">羁绊链终章</div>
-        </div>
-      </div>
-      <div style="margin-top:16px;background:var(--gold-soft);border:1px dashed var(--gold);border-radius:12px;padding:22px;">
-        <p style="font-size:14px;color:var(--text);"><b style="color:var(--gold);">静默解锁规则</b><br><br>
-        称号「守秘之人」「双子星火」「星火见证者」全部静默解锁——没有弹窗通知，只有主动打开个人称号列表才能看见。<br><br>
-        终极彩蛋 7-S01 冥想盆：完成 1-S01、3-S01、4-S01 三条轻伏笔支线即可解锁戈德里克山谷完整回忆；未完成前置，只能看见山间村落远景和两个模糊人影轮廓。一段轰轰烈烈、最终走向毁灭的羁绊——很多故事，史书只会写下胜负，不会记录故事里人的真心。<br><br>
-        结局留白短片自动播放，没有旁白、没有解说字幕，只用纯意象镜头叙事。</p>
-      </div>
-      <div class="snitch">
-        <img src="hogwarts_snitch.jpg" alt="金色飞贼">
-        <p>金色飞贼——它记住了第一个触碰它的人。</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== 开发进度 ===== -->
-  <section class="section" id="progress">
-    <div class="container">
-      <div class="sec-head">
-        <h2>开发进度</h2>
-        <p>立项于 2026 年 6 月 25 日。世界基准与任务方案已定稿（2026.10.19），实际速度取决于作者睡眠质量。</p>
-      </div>
-      <div class="p-card">
-        <div class="p-bar"><div class="p-fill"></div></div>
-        <div class="p-stages">
-          <div class="p-stage done"><span class="st-ic">✓</span> 立项<span class="st-date">2026.06.25</span></div>
-          <div class="p-group">企划阶段</div>
-          <div class="p-stage done"><span class="st-ic">✓</span> 世界观总纲<span class="st-date">V1.0 定稿</span></div>
-          <div class="p-stage done"><span class="st-ic">✓</span> 全局任务方案（13 主线 + 42 支线）<span class="st-date">V6.3 定稿</span></div>
-          <div class="p-stage done"><span class="st-ic">✓</span> 区域 / 角色 / 道具 / 魔法系统设定<span class="st-date">定稿</span></div>
-          <div class="p-stage cur"><span class="st-ic">●</span> 策划经济系统与商业体系<span class="st-tag">当前</span></div>
-          <div class="p-group">开发阶段</div>
-          <div class="p-stage"><span class="st-ic">○</span> 核心系统开发</div>
-          <div class="p-stage"><span class="st-ic">○</span> 场景与地图搭建</div>
-          <div class="p-stage"><span class="st-ic">○</span> 任务与 NPC 实现</div>
-          <div class="p-stage"><span class="st-ic">○</span> 美术与音效</div>
-          <div class="p-group">测试阶段</div>
-          <div class="p-stage"><span class="st-ic">○</span> Alpha 内部测试</div>
-          <div class="p-stage"><span class="st-ic">○</span> 测试与打磨</div>
-          <div class="p-group">上线</div>
-          <div class="p-stage"><span class="st-ic">○</span> Beta 公测</div>
-          <div class="p-stage"><span class="st-ic">○</span> 正式上线</div>
-        </div>
-        <p class="p-note">进度 3% —— 刚把饼画出来，面团都还没和。</p>
-      </div>
-    </div>
-  </section>
-
-    </div>
-  </div>
-</main>
-
-<button class="bgm-btn" id="bgmBtn" title="背景音乐：播放/暂停" aria-label="背景音乐"><span class="play-hide">♪</span><span class="pause-hide">♫</span></button>
-<audio id="bgm" loop preload="none" src="hogwarts_music.mp3"></audio>
-
-<footer class="site-footer">
-  <div class="container">
-    <div class="big">Tide of Remnant · 三代黑暗余烬</div>
-    <p>一段只能压制、无法根除的魔法史诗。</p>
-    <p class="motto">Draco Dormiens Nunquam Titillandus —— 眠龙勿扰</p>
-    <p style="margin-top:12px;">非官方同人作品，与华纳兄弟、J.K.罗琳及任何官方机构无关联。</p>
-    <p style="margin-top:8px;"><a href="index.html">← 返回 The Slow Tide 官网</a></p>
-  </div>
-</footer>
+<!-- 登录中继：读主站已有登录态 -->
+<iframe id="authRelay" src="https://theslowtide.pages.dev/auth-relay.html" style="display:none"></iframe>
 
 <script>
-(function(){
-  var mode=localStorage.getItem('tst-theme');
-  if(mode!=='dark' && mode!=='light'){ mode='light'; }
-  document.documentElement.setAttribute('data-theme',mode);
-  var tb=document.getElementById('themeToggle');
-  function sync(){ var m=document.documentElement.getAttribute('data-theme'); tb.textContent = m==='dark' ? '☀' : '☾'; }
-  if(tb) tb.onclick=function(){
-    var m=document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme',m);
-    localStorage.setItem('tst-theme',m);
-    sync();
-  };
-  sync();
-  // 手机抽屉
-  var drawer=document.getElementById('mobileDrawer');
-  var burger=document.getElementById('navBurger');
-  var closeBtn=document.getElementById('drawerClose');
-  var mask=document.getElementById('drawerMask');
-  function openD(){ if(drawer) drawer.classList.add('open'); }
-  function closeD(){ if(drawer) drawer.classList.remove('open'); }
-  if(burger) burger.addEventListener('click',function(e){ e.stopPropagation(); openD(); });
-  if(mask) mask.addEventListener('click',closeD);
-  if(closeBtn) closeBtn.addEventListener('click',closeD);
-  if(drawer) drawer.addEventListener('click',function(e){ if(e.target.closest('a')) closeD(); });
-  // 背景音乐
-  var bgm=document.getElementById('bgm');
-  var bgmBtn=document.getElementById('bgmBtn');
-  function setState(){
-    if(!bgmBtn) return;
-    if(bgm && !bgm.paused){ bgmBtn.classList.add('playing'); }
-    else { bgmBtn.classList.remove('playing'); }
+/* ===== 登录（本页邮箱+验证码，与主站同账号）===== */
+var AUTH='https://theslowtidefk.pages.dev/api';
+var mask=document.getElementById('loginMask'),dlgMsg=document.getElementById('dlgMsg'),
+    emailEl=document.getElementById('loginEmail'),codeEl=document.getElementById('loginCode'),
+    btnSend=document.getElementById('btnSend'),btnConfirm=document.getElementById('btnConfirm'),
+    loginChip=document.getElementById('loginChip'),loginBanner=document.getElementById('loginBanner'),
+    btnLogin=document.getElementById('btnLogin');
+function api(path,body,token){
+  return fetch(AUTH+path,{method:'POST',headers:{'Content-Type':'application/json',
+    'Authorization':token?('Bearer '+token):''},body:JSON.stringify(body||{})}).then(function(r){return r.json();});
+}
+function openLogin(){dlgMsg.textContent='';mask.classList.add('show');}
+function closeLogin(){mask.classList.remove('show');}
+btnLogin.addEventListener('click',openLogin);
+document.getElementById('btnBannerLogin').addEventListener('click',openLogin);
+document.getElementById('btnCancel').addEventListener('click',closeLogin);
+document.getElementById('dlgClose').addEventListener('click',closeLogin);
+mask.addEventListener('click',function(e){if(e.target===mask)closeLogin();});
+btnSend.addEventListener('click',function(){
+  var email=emailEl.value.trim();
+  if(!email||email.indexOf('@')<0){dlgMsg.textContent='邮箱格式不对';return;}
+  btnSend.disabled=true;btnSend.textContent='发送中…';
+  api('/send-code',{email:email}).then(function(d){
+    btnSend.disabled=false;btnSend.textContent='发送验证码';
+    dlgMsg.textContent=(d&&d.msg)||(d&&d.ok?'验证码已发送':'发送失败');
+  }).catch(function(e){btnSend.disabled=false;btnSend.textContent='发送验证码';dlgMsg.textContent='网络异常';});
+});
+btnConfirm.addEventListener('click',function(){
+  var email=emailEl.value.trim(),code=codeEl.value.trim();
+  if(!email||email.indexOf('@')<0){dlgMsg.textContent='邮箱格式不对';return;}
+  if(code.length!==6){dlgMsg.textContent='验证码是 6 位';return;}
+  btnConfirm.disabled=true;btnConfirm.textContent='登录中…';
+  api('/verify',{email:email,code:code}).then(function(d){
+    btnConfirm.disabled=false;btnConfirm.textContent='登录';
+    if(d&&d.ok&&d.token){
+      try{localStorage.setItem('tst_token',d.token);localStorage.setItem('tst_email',d.email||email);
+        localStorage.setItem('tst_uid',d.uid||'');}catch(e){}
+      dlgMsg.textContent='登录成功 🎉';
+      closeLogin();refreshUser();
+    }else{dlgMsg.textContent=(d&&d.msg)||'验证失败';}
+  }).catch(function(){btnConfirm.disabled=false;btnConfirm.textContent='登录';dlgMsg.textContent='网络异常';});
+});
+function refreshUser(){
+  var token=null,email=null;
+  try{token=localStorage.getItem('tst_token');email=localStorage.getItem('tst_email');}catch(e){}
+  if(!token){loginChip.innerHTML='<span class="dot"></span>未登录';loginBanner.style.display='flex';return;}
+  loginBanner.style.display='none';
+  loginChip.innerHTML='<span class="dot"></span>'+(email||'已登录');
+  api('/admin/users',{action:'whoami'},token).then(function(d){
+    if(d&&d.ok&&Number(d.admin_level)>=1){
+      loginChip.innerHTML='<span class="dot"></span>管理员 · '+(email||'');
+      var b=document.createElement('a');
+      b.className='btn';b.href='https://theslowtide.pages.dev/planning.html';b.target='_blank';b.rel='noopener';
+      b.textContent='策划台';
+      var bt=document.querySelector('.topbtns');
+      if(!document.querySelector('.topbtns a.btn'))bt.appendChild(b);
+    }
+  }).catch(function(){});
+}
+/* 读主站已有登录态 */
+var relay=document.getElementById('authRelay');
+relay.addEventListener('load',function(){try{relay.contentWindow.postMessage({type:'tst-auth-request'},'https://theslowtide.pages.dev');}catch(e){}});
+window.addEventListener('message',function(e){
+  if(e.origin==='https://theslowtide.pages.dev'&&e.data&&e.data.type==='tst-auth-response'){
+    if(e.data.token){try{localStorage.setItem('tst_token',e.data.token);localStorage.setItem('tst_email',e.data.email||'');localStorage.setItem('tst_uid',e.data.uid||'');}catch(x){}}
+    refreshUser();
   }
-  if(bgm && bgmBtn){
-    bgmBtn.addEventListener('click',function(){
-      if(bgm.paused){ bgm.play().then(setState).catch(function(){ setState(); }); }
-      else { bgm.pause(); setState(); }
-    });
-    bgm.addEventListener('play',setState);
-    bgm.addEventListener('pause',setState);
-    bgm.addEventListener('ended',setState);
-    var t=setTimeout(function(){
-      bgm.play().then(setState).catch(function(){ setState(); });
-      clearTimeout(t);
-    },600);
-  }
-  // 目录滚动高亮
-  var tocLinks=document.querySelectorAll('.toc a');
-  var secs=[];
-  tocLinks.forEach(function(a){
-    var id=a.getAttribute('href').slice(1);
-    var s=document.getElementById(id);
-    if(s) secs.push({a:a,s:s});
+});
+refreshUser();
+
+/* ===== 目录高亮（静态跟随，无动画）===== */
+var links=Array.prototype.slice.call(document.querySelectorAll('#toc a,#tocMob a'));
+var secs=Array.prototype.slice.call(document.querySelectorAll('.sec,#hero'));
+var so=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(e.isIntersecting){
+      var id=e.target.id;
+      links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+id);});
+    }
   });
-  if('IntersectionObserver' in window && secs.length){
-    var io=new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if(en.isIntersecting){
-          secs.forEach(function(o){ o.a.classList.toggle('active', o.s===en.target); });
-        }
-      });
-    },{rootMargin:'-15% 0px -75% 0px'});
-    secs.forEach(function(o){ io.observe(o.s); });
-  }
-  // 魔法地图任务点弹窗（按定稿任务方案整理）
-  var mapTasks={
-    'hogsmeade':{title:'霍格莫德村',desc:'三年级后解锁的周末活动区域；低中年级接触外部商业场景。',groups:[
-      {g:'主线',tasks:[
-        {name:'摄魂怪的阴影',tag:'3-01 · 三年级主线',trigger:'完成 2-02、开启三年级后，霍格莫德村口遇到卢平教授',how:'远望荒原上缓慢移动的灰雾——摄魂怪。跟随卢平练习守护神咒：集中内心快乐的记忆抵御寒意，不必强求召唤实体。练习成功与否仅改变对话',reward:'咒语·呼神护卫'}
-      ]},
-      {g:'支线',tasks:[
-        {name:'墓碑铭文',tag:'3-S01 · 轻伏笔',trigger:'霍格莫德郊外小墓园（三年级解锁）',how:'找到磨损的老旧墓碑，阅读铭文：不必为理想殉葬，但人总会为挚爱奔赴毁灭。完成即计入 7-S01 冥想盆前置',reward:'墓园野花'},
-        {name:'送信前往霍格莫德',tag:'5-S03 · 日常',trigger:'猫头鹰棚屋接取（五年级解锁）',how:'把密封包裹送到霍格莫德商店老板手中',reward:'蜂蜜公爵糖果'},
-        {name:'墓园的怀念',tag:'3-J02 · 人物羁绊',trigger:'完成 3-S01 并重复接取一次后，找墓园看守',how:'看守谈起长眠于此的人：很多埋葬在这里的人曾满怀理想，理想燃烧殆尽后只剩墓碑',reward:'干花束'}
-      ]}
-    ]},
-    'forest':{title:'禁林',desc:'树木扭曲，深处有古老石阵、马人营地与无数被痛苦催生的力量。',groups:[
-      {g:'主线',tasks:[
-        {name:'禁林边缘的异动',tag:'1-02 · 一年级主线',trigger:'海格小屋门口点击海格',how:'帮海格在禁林外围巡查一圈，标记异常扰动位置。不要跨过古老橡树界碑——触碰会触发警告，两次触碰后任务仍可完成但海格会加重提醒。巡查完返回海格小屋',reward:'基础回复药剂、南瓜汁'},
-        {name:'古老魔法残痕',tag:'3-02 · 三年级主线',trigger:'禁林深处古老石阵，靠近自动触发',how:'触碰发光的古代魔法纹路，脑海涌入失控魔法的碎片画面。与邓布利多对话，了解力量本身中立',reward:'古代魔法基础感知'}
-      ]},
-      {g:'支线',tasks:[
-        {name:'鹰头马身有翼兽梳洗',tag:'2-S01 · 日常',trigger:'海格小屋',how:'先鞠躬再靠近，帮它梳理羽毛（自尊心很强）',reward:'兽类安抚药剂'},
-        {name:'护树罗锅守护',tag:'3-S03 · 日常',trigger:'禁林边缘橡树',how:'驱赶啃食树皮的小虫，护树罗锅藏在树皮缝隙',reward:'小树枝护身符'},
-        {name:'夜骐照料',tag:'4-S02 · 日常',trigger:'海格小屋后方兽栏',how:'投喂肉食、检查蹄子。能看见它的人，都见证过死亡，不必害怕它',reward:'黑色马鬃饰品'},
-        {name:'破碎镜子',tag:'5-S02 · 轻伏笔',trigger:'禁林边缘小屋（五年级解锁）',how:'查看碎裂镜子——镜中倒影重叠两个人影。看守说：很久以前有人留下的',reward:'镜子碎片'},
-        {name:'营救受伤马人',tag:'G3-S02 · 学院·格兰芬多',trigger:'禁林马人营地（格兰芬多专属）',how:'马人被陷阱所伤，帮忙包扎、安抚情绪',reward:'马人赠予的箭羽'},
-        {name:'追踪走失獾类',tag:'H4-S02 · 学院·赫奇帕奇',trigger:'禁林边缘（赫奇帕奇专属）',how:'寻找走失的魔法獾，引导回到巢穴。獾看似温顺，危急时刻会奋力守护家园',reward:'獾爪吊坠'},
-        {name:'镜中残影',tag:'5-J04 · 人物羁绊',trigger:'完成 5-S02 并重复接取一次后，找禁林小屋看守',how:'看守：镜子可以映照外形，照不碎人心之间的裂痕',reward:'打磨镜布'}
-      ]}
-    ]},
-    'verge':{title:'禁林边缘 · 林间裂隙',desc:'霍格莫德外郊山谷与裂隙点位，暗影异动与圣徒活动的交汇处。',groups:[
-      {g:'主线',tasks:[
-        {name:'圣徒伏击',tag:'4-01 · 四年级主线',trigger:'完成 3-02、开启四年级后，霍格莫德外郊山谷，跟随教授前往调查魔法异动',how:'圣徒埋伏在山谷，战斗触发。他们的目标并非击杀，是搜寻关于默然者的情报。战斗结束敌人撤离',reward:'防护药剂'},
-        {name:'圣徒密信',tag:'4-02 · 四年级主线',trigger:'4-01 战斗结算完毕，密信自动存入背包',how:'打开背包取出泛黄密信（字迹潦草、墨水被灼烧）。交给邓布利多解读，了解圣徒仍在搜寻默然者，此事暂不大范围散播',reward:'黑魔法防御术高级笔记'}
-      ]}
-    ]},
-    'castle':{title:'霍格沃茨城堡',desc:'主线与大部分支线的核心场景。长廊画像承担环境叙事与暗线伏笔。',groups:[
-      {g:'主线',tasks:[
-        {name:'长廊里的叮嘱',tag:'1-01 · 一年级主线',trigger:'完成分院后，进入城堡西侧长廊指定区域，区域强制触发',how:'黄昏路过长廊，麦格教授站在盔甲塑像旁说出叮嘱：懂得控制力量，才是巫师一生的课题。听完即可。这句话写入记忆碎片，与终局台词对仗',reward:'霍格沃茨新生长袍、基础魔杖、城堡简易地图'},
-        {name:'会低语的旧课本',tag:'2-01 · 二年级主线',trigger:'魔咒课教室课后，弗立维教授主动叫住你',how:'读二手课本上的批注，听清模糊低语：力量……不必压抑……裂痕终将扩大。向弗立维复述，了解这是残留的情绪',reward:'咒语·无声咒入门'},
-        {name:'密室流言',tag:'2-02 · 二年级主线',trigger:'城堡走廊听见学生议论，自动触发',how:'与差点没头的尼克对话，前往图书馆查阅旧校报，返回走廊与他交谈。仔细阅读可额外获得碎片化伏笔文字',reward:'图书馆特殊阅览许可'},
-        {name:'城堡疏散演练',tag:'5-01 · 五年级主线',trigger:'城堡大礼堂，集会自动触发',how:'带领一小队新生走完撤离路线。新生受惊乱跑时可选择安抚或直接赶路（安抚解锁额外对话）。演练结束城堡密道全部解锁',reward:'应急烟雾药剂'},
-        {name:'暗流涌动',tag:'5-02 · 五年级主线',trigger:'图书馆密室档案区，邓布利多等候',how:'在格林德沃鼎盛时期的档案卷宗间与邓布利多对话，了解圣徒的谋划与格林德沃的过往',reward:'古代魔法抗性护符'},
-        {name:'抉择的岔路口',tag:'6-01 · 六年级主线',trigger:'天文台顶楼，黄昏',how:'与邓布利多对话，三选一标记立场：站在光明一方 / 保持中立 / 力量才是一切。立场影响七年级对话与隐藏剧情开放权限，不锁死主线通关',reward:'高级护盾药剂'},
-        {name:'两条长廊',tag:'7-01 · 七年级主线',trigger:'城堡主厅，NPC 提示前方有两条路',how:'自主选择：走画像长廊可看到侧身双人画像（7-03 前置）；走东侧楼梯直接前往决战场地（永久错过彩蛋）。抵达后听邓布利多说明战斗目标',reward:'终极战斗药剂包'},
-        {name:'三重黑暗聚合体',tag:'7-02 · 七年级主线',trigger:'进入决战场地',how:'多阶段战斗，目标不是击杀而是阻断仪式。战斗结束聚合体的声音与一年级台词意象对仗；六年级立场不同收尾台词不同，中立玩家获得额外独白',reward:'终局称号「守秘之人」'},
-        {name:'星火余影',tag:'7-03 · 彩蛋主线',trigger:'完成 7-02 且 7-01 走过画像长廊后，主动回到长廊点击双人画像',how:'其余画像全部沉睡，只有这幅画像缓缓转向你，说出收尾台词，浮现戈德里克山谷夏日无声短片。走东侧楼梯的玩家点击画像只能看到基础慰问',reward:'称号「双子星火」、纪念短片'}
-      ]},
-      {g:'支线 · 轻伏笔',tasks:[
-        {name:'阁楼里的旧相片',tag:'1-S01 · 一年级',trigger:'城堡阁楼入口，点击阁楼管理员',how:'查看角落木盒里的褪色相片——两个少年并肩站在阳光下。完成即计入 7-S01 冥想盆前置',reward:'老旧相片碎片'},
-        {name:'废弃信件',tag:'2-S02 · 二年级',trigger:'城堡二楼废弃储物间',how:'查看储物箱里未寄出的信，残留片段：理念一致的时光太过短暂',reward:'泛黄信纸'},
-        {name:'歌谣残页',tag:'3-S02 · 三年级',trigger:'图书馆冷门诗歌手稿区',how:'阅读残破手稿上的无名歌谣——讲述戈德里克山谷的夏日风暴',reward:'诗歌残页'},
-        {name:'破损决斗记录',tag:'4-S01 · 四年级',trigger:'决斗俱乐部储藏室',how:'阅读旧羊皮纸记录的早年决斗——两个天才巫师的一场对决。完成即计入 7-S01 前置',reward:'决斗记录残卷'},
-        {name:'哲学家的辩论',tag:'6-S01 · 六年级',trigger:'天文台，黄昏',how:'老教授提问：为了更大的善，可以牺牲少数人吗？完成基础对话即完成任务；中立玩家额外解锁隐藏对话',reward:'思辨笔记'},
-        {name:'冥想盆里的残响',tag:'7-S01 · 终极彩蛋',trigger:'邓布利多办公室冥想盆（前置：完成 1-S01、3-S01、4-S01）',how:'观看冥想盆里的记忆碎片。普通玩家只见两道模糊人影；哈迷可辨认戈德里克山谷场景',reward:'冥想盆记忆碎片'}
-      ]},
-      {g:'支线 · 日常',tasks:[
-        {name:'猫头鹰分拣',tag:'1-S03 · 一年级',trigger:'猫头鹰棚屋',how:'分拣信件，区分本地与外地邮件',reward:'猫头鹰零食'},
-        {name:'清理温室杂草',tag:'1-S04 · 一年级',trigger:'草药课温室',how:'拔除带刺杂草，小心别伤到曼德拉幼苗',reward:'肥料'},
-        {name:'修复破碎玻璃器皿',tag:'2-S03 · 二年级',trigger:'魔药课教室',how:'用修复咒修补打碎的药瓶',reward:'空魔药瓶'},
-        {name:'图书馆整理古籍',tag:'3-S04 · 三年级',trigger:'图书馆',how:'把散落古籍放回书架、除尘',reward:'书签'},
-        {name:'清理魔法溢散',tag:'3-S05 · 三年级',trigger:'城堡各处随机光点',how:'使用消寂咒平息溢散魔法',reward:'微量魔法粉末'},
-        {name:'修补城堡挂毯',tag:'4-S03 · 四年级',trigger:'城堡长廊',how:'修复被皮皮鬼扯破的古老挂毯',reward:'丝线'},
-        {name:'蒲绒绒饲养',tag:'5-S01 · 五年级',trigger:'神奇动物教室',how:'收集蒲绒绒产出的绒毛',reward:'蒲绒绒绒毛'},
-        {name:'校准天文望远镜',tag:'6-S02 · 六年级',trigger:'天文台',how:'调整镜片，观测星象记录',reward:'星图手稿'},
-        {name:'精灵下午茶',tag:'6-S03 · 六年级',trigger:'厨房入口',how:'帮家养小精灵准备下午茶点心',reward:'手工蜂蜜蛋糕'},
-        {name:'城堡盔甲维护',tag:'7-S02 · 七年级',trigger:'长廊盔甲塑像',how:'清理灰尘、修复松动部件',reward:'抛光布'},
-        {name:'最后的温室收获',tag:'7-S03 · 七年级',trigger:'草药课温室',how:'收获成熟魔法草药，存放进储藏柜',reward:'成品草药'}
-      ]},
-      {g:'支线 · 学院专属',tasks:[
-        {name:'遗失的狮子徽章',tag:'G1-S01 · 格兰芬多',trigger:'格兰芬多公共休息室，学院级长',how:'取回遗失在城堡塔楼的旧狮子徽章',reward:'复刻狮子徽章'},
-        {name:'遗失星象手稿',tag:'R1-S01 · 拉文克劳',trigger:'拉文克劳塔楼级长',how:'找回被风吹走的星象手稿',reward:'星象草稿'},
-        {name:'密室铭文抄录',tag:'S2-S01 · 斯莱特林',trigger:'斯莱特林地牢级长',how:'在地牢墙壁抄录古老铭文',reward:'铭文抄本'},
-        {name:'储藏室种子保护',tag:'H2-S01 · 赫奇帕奇',trigger:'赫奇帕奇公共休息室',how:'保护珍贵魔法种子，阻止害虫啃食',reward:'魔法种子'},
-        {name:'决斗训练',tag:'G5-S03 · 格兰芬多',trigger:'决斗室',how:'练习防御决斗，重点学习克制，不追求击伤对手',reward:'决斗手套'},
-        {name:'手稿排序',tag:'R4-S01 · 拉文克劳',trigger:'拉文克劳塔楼图书馆分馆',how:'阅读关于「力量与人性」辩论的手稿片段，按文字逻辑排定正确顺序',reward:'古哲学手稿抄录本'},
-        {name:'毒草药剂调配',tag:'S4-S02 · 斯莱特林',trigger:'地牢魔药小室',how:'精准调配低毒性防御药剂，不用于伤人',reward:'防御型毒剂'},
-        {name:'预言碎片解读',tag:'R5-S02 · 拉文克劳',trigger:'拉文克劳塔楼',how:'解读残缺预言手稿，分辨隐喻与字面描述',reward:'预言笔记'},
-        {name:'星轨预言',tag:'R6-S03 · 拉文克劳',trigger:'天文台拉文克劳观测台',how:'观测特殊星象，记录星轨变化，对照古老预言',reward:'星轨手绘图'},
-        {name:'密室誓约',tag:'S6-S03 · 斯莱特林',trigger:'地牢隐秘石室',how:'阅读萨拉查·斯莱特林留下的原话——最初的理念是保护巫师，而不是奴役其他人',reward:'斯莱特林原始手记'},
-        {name:'守护储藏密室',tag:'H7-S03 · 赫奇帕奇',trigger:'赫奇帕奇地下储藏室',how:'加固储藏室防护魔法，保护珍贵魔法物资',reward:'守护护身符'}
-      ]},
-      {g:'支线 · 人物羁绊',tasks:[
-        {name:'看守人的心事',tag:'1-J01 · 一年级',trigger:'完成 1-S01 后找阁楼管理员',how:'管理员望着旧相片：有些爱，会被时代评判为错误',reward:'管理员金属书签'},
-        {name:'信的遗憾',tag:'2-J01 · 二年级',trigger:'完成 2-S02 并重复接取一次后，找储物间管理员',how:'这封信始终没能寄出，两个人走向不同道路',reward:'旧丝带'},
-        {name:'决斗者的遗憾',tag:'4-J03 · 四年级',trigger:'完成 4-S01 并重复接取一次后，找决斗俱乐部管理员',how:'那场决斗不是仇恨开启，而是理念决裂——昔日知己，兵刃相向',reward:'旧决斗手套'},
-        {name:'星火回响',tag:'7-J05 · 羁绊链终章',trigger:'完成全部五条人物羁绊后，自动收到提示前往阁楼',how:'阁楼黄昏，碎片拼合，浮现完整戈德里克山谷记忆——他们最明亮的一刻',reward:'称号「星火见证者」'}
-      ]}
-    ]},
-    'abyss':{title:'地底裂隙核心',desc:'1890 年封印所在，如今被黑暗共振节点从外部持续侵蚀。冥想盆房间承载终极彩蛋。',groups:[
-      {g:'主线',tasks:[
-        {name:'三重黑暗聚合体',tag:'7-02 · 七年级主线',trigger:'完成 7-01 后，进入决战场地',how:'空间扭曲、黑雾翻涌，聚合体显现。战斗不以击杀为唯一目标，目标是阻断仪式。战斗结束聚合体的最后声音与一年级台词对仗',reward:'终局称号「守秘之人」'}
-      ]}
-    ]}
-  };
-  var pins=document.querySelectorAll('.map-pin');
-  var pop=document.getElementById('mapPop');
-  var popBody=document.getElementById('popBody');
-  var popC=document.getElementById('popClose');
-  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
-  function renderList(key){
-    var d=mapTasks[key];
-    var html='<div class="pop-title">'+esc(d.title)+'</div>';
-    html+='<p class="pop-desc">'+esc(d.desc)+'</p>';
-    html+='<div class="pop-groups">';
-    d.groups.forEach(function(gp){
-      html+='<div class="pop-group-t">'+esc(gp.g)+'</div>';
-      gp.tasks.forEach(function(t,i){
-        html+='<button class="pop-task" data-k="'+key+'" data-g="'+gp.g+'" data-i="'+i+'">'+esc(t.name)+'<span class="pop-tag">'+esc(t.tag)+'</span></button>';
-      });
-    });
-    html+='</div><p class="pop-hint">点击任务查看触发方式、玩法与奖励</p>';
-    popBody.innerHTML=html;
-  }
-  function renderDetail(key,g,i){
-    var d=mapTasks[key];
-    var t=d.groups.filter(function(x){return x.g===g;})[0].tasks[i];
-    var html='<button class="pop-back" data-k="'+key+'">← 返回任务列表</button>';
-    html+='<div class="pop-title">'+esc(t.name)+'</div><span class="pop-tag">'+esc(t.tag)+'</span>';
-    html+='<div class="pop-sec"><b>触发方式</b><p>'+esc(t.trigger)+'</p></div>';
-    html+='<div class="pop-sec"><b>怎么做</b><p>'+esc(t.how)+'</p></div>';
-    html+='<div class="pop-sec"><b>奖励</b><p>'+esc(t.reward)+'</p></div>';
-    popBody.innerHTML=html;
-  }
-  if(pop){
-    pins.forEach(function(p){
-      p.addEventListener('click',function(){
-        var k=p.getAttribute('data-key');
-        if(mapTasks[k]) renderList(k);
-        pop.hidden=false;
-      });
-    });
-    popBody.addEventListener('click',function(e){
-      var el=e.target;
-      var taskBtn=el.closest?el.closest('.pop-task'):null;
-      var backBtn=el.closest?el.closest('.pop-back'):null;
-      if(taskBtn){ renderDetail(taskBtn.getAttribute('data-k'),taskBtn.getAttribute('data-g'),parseInt(taskBtn.getAttribute('data-i'),10)); }
-      else if(backBtn){ renderList(backBtn.getAttribute('data-k')); }
-    });
-    if(popC) popC.addEventListener('click',function(){ pop.hidden=true; });
-  }
-})();
+},{rootMargin:'-45% 0px -50%'});
+secs.forEach(function(s){so.observe(s);});
+
+/* 移动端抽屉 */
+var burger=document.getElementById('burger'),tocMob=document.getElementById('tocMob');
+burger.addEventListener('click',function(){burger.classList.toggle('open');tocMob.classList.toggle('open');});
+tocMob.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){burger.classList.remove('open');tocMob.classList.remove('open');});});
+
+/* ===== 地图任务点 ===== */
+var TASKS={
+hogsmeade:{title:'霍格莫德 · 妖精工坊问询',tag:'主线·三年级',
+ desc:'前往霍格莫德妖精工坊，询问 1890 年贮藏库封印的历史记录。',
+ how:'抵达工坊后与妖精对话，对话末尾会自动带出一句闲笔——追问"那个外来巫师是谁"，妖精只会回一句"旧事不值一提"。奖励：古代魔力简易解读笔记。'},
+forest:{title:'禁林 · 夜间探查',tag:'主线·二年级',
+ desc:'夜间进入禁林，追踪逃逸的微弱暗影残迹，确认它没有继续向村庄移动。',
+ how:'沿预设路径追踪暗影痕迹，抵达禁林边缘时，风里会飘来一句低语（仅一次，跑太快就听不到了）。确认残迹走向后返回城堡。奖励：夜行防护药剂配方。'},
+verge:{title:'林间裂隙 · 圣徒伏击',tag:'主线·四年级',
+ desc:'前往林间裂隙点位，压制暴走暗影，途中遭遇残存圣徒拦截。',
+ how:'战斗到圣徒残血（约 20%）他会抛下半句台词后撤离。注意：一击秒杀的话，这句话就永远听不到了。悬置到六年级才有人接。'},
+castle:{title:'城堡 · 校长办公室长廊',tag:'主线·多学年',
+ desc:'那条入学时走过的长廊，藏着一幅缄默了数十年的老画像。',
+ how:'一年级路过触发级长闲聊；五年级邻像低语；六年级选择中立后可与画像深谈；七年级疏散后主动回访，或许听见唯一一次"我们"。全程无提示，错过无法补看。'},
+abyss:{title:'裂隙核心 · 终局之战',tag:'主线·七年级',
+ desc:'全域魔力扰动爆发，组织全校疏散后，进入裂隙核心，压制三重黑暗聚合体。',
+ how:'先完成全校疏散任务（必经长廊，画像会侧身）。进入核心开启多阶段 BOSS 战，末阶段聚合体会说出核心台词。击败后主动回访画像，静默解锁称号「星火观星者」与结局短片。'}};
+var pins=document.querySelectorAll('.map-pin'),pop=document.getElementById('taskpop'),
+    tpT=document.getElementById('tpTitle'),tpTag=document.getElementById('tpTag'),
+    tpD=document.getElementById('tpDesc'),tpH=document.getElementById('tpHow'),wrap=document.getElementById('mapWrap');
+pins.forEach(function(p){
+  p.addEventListener('click',function(e){
+    e.stopPropagation();
+    var t=TASKS[p.getAttribute('data-key')];
+    tpT.textContent=t.title;tpTag.textContent=t.tag;tpD.textContent=t.desc;
+    tpH.innerHTML='<b>怎么做：</b>'+t.how;
+    var r=wrap.getBoundingClientRect(),pr=p.getBoundingClientRect();
+    pop.style.left=Math.min(pr.left-r.left+pr.width/2+8,wrap.clientWidth-340)+'px';
+    pop.style.top=(pr.top-r.top+pr.height/2)+'px';
+    pop.classList.add('show');
+  });
+});
+document.getElementById('tpClose').addEventListener('click',function(){pop.classList.remove('show');});
+wrap.addEventListener('click',function(e){if(!e.target.closest('.map-pin'))pop.classList.remove('show');});
+
+/* ===== 音乐：默认开 ===== */
+var mus=document.getElementById('mus'),bgm=document.getElementById('bgm');
+mus.addEventListener('click',function(){
+  if(bgm.paused){bgm.volume=.5;bgm.play().catch(function(){});mus.classList.remove('off');}
+  else{bgm.pause();mus.classList.add('off');}
+});
+function playBgm(){bgm.volume=.5;bgm.play().catch(function(){});}
+window.addEventListener('pointerdown',function once(){playBgm();window.removeEventListener('pointerdown',once);},true);
+playBgm();
 </script>
 </body>
 </html>

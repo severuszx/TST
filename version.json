@@ -1,6 +1,6 @@
 {
-  "versionCode": 2,
-  "versionName": "1.1.0",
+  "versionCode": 3,
+  "versionName": "1.2.0",
   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
-  "note": "新增：统一账号登录、云端指令模板、自动部署修复、新版本检测"
+  "note": "修复自动部署：兼容网易版自绘命令方块界面；新增坐标兜底与手动粘贴辅助；界面风格对齐主站液态玻璃"
 }

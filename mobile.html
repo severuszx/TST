@@ -6070,15 +6070,13 @@ function openBench3D(){
 
     var t=document.createElement('div');
 
-    t.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:999;padding:11px 20px;border-radius:14px;background:rgba(255,255,255,.85);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.75);box-shadow:0 16px 50px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,.9);color:#1f2937;font-size:14px;opacity:0;transition:opacity .4s ease,transform .45s cubic-bezier(.34,1.56,.64,1);pointer-events:none;';
+    t.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:999;padding:11px 20px;border-radius:14px;background:rgba(255,255,255,.85);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.75);box-shadow:0 16px 50px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,.9);color:#1f2937;font-size:14px;opacity:1;pointer-events:none;';
 
     t.textContent=text;
 
     document.body.appendChild(t);
 
-    requestAnimationFrame(function(){t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';});
-
-    setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';setTimeout(function(){t.remove();},450);},1800);
+    setTimeout(function(){t.remove();},1800);
 
   }
 
@@ -6198,13 +6196,11 @@ function openBench3D(){
 
     tip.textContent='液态玻璃主题下，亮点小卡片可自由拖动排列';
 
-    tip.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:999;padding:11px 20px;border-radius:14px;background:rgba(255,255,255,.7);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.75);box-shadow:0 16px 50px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,.9);color:#1f2937;font-size:14px;opacity:0;transition:opacity .4s ease,transform .45s cubic-bezier(.34,1.56,.64,1);pointer-events:none;';
+    tip.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:999;padding:11px 20px;border-radius:14px;background:rgba(255,255,255,.7);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.75);box-shadow:0 16px 50px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,.9);color:#1f2937;font-size:14px;opacity:1;pointer-events:none;';
 
     document.body.appendChild(tip);
 
-    requestAnimationFrame(function(){tip.style.opacity='1';tip.style.transform='translateX(-50%) translateY(0)';});
-
-    setTimeout(function(){tip.style.opacity='0';tip.style.transform='translateX(-50%) translateY(20px)';setTimeout(function(){tip.remove();},500);},3400);
+    setTimeout(function(){tip.remove();},3400);
 
   };
 
