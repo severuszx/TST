@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>策划资料台 · Tide of Remnant - The Slow Tide</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+color-scheme:light;
+--bg:#f1e8d4;
+--text:#3a3126;
+--text-secondary:#77695a;
+--border:#d9cba6;
+--card:#faf6ea;
+--hover:rgba(138,109,35,.08);
+--accent:#8a2f2f;
+--accent-soft:rgba(138,47,47,.07);
+--gold:#8a6d23;
+--gold-soft:rgba(138,109,35,.12);
+--shadow:0 2px 10px rgba(96,78,42,.13);
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",serif;line-height:1.75;min-height:100vh;display:flex;flex-direction:column;}
+a{color:inherit;text-decoration:none;}
+.container{max-width:1120px;margin:0 auto;padding:0 20px;width:100%;}
+.site-header{position:sticky;top:0;z-index:1000;background:rgba(241,232,213,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px;}
+.logo{font-weight:700;font-size:16px;letter-spacing:.5px;}
+.logo .g{color:var(--gold);}
+.header-right{display:flex;align-items:center;gap:8px;}
+.back-btn{padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);font-size:13px;cursor:pointer;color:var(--text);}
+.back-btn:hover{background:var(--hover);}
+.user-tag{font-size:12px;color:var(--gold);border:1px solid var(--gold);background:var(--gold-soft);border-radius:10px;padding:2px 10px;white-space:nowrap;}
+
+/* 权限门 */
+.gate{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;}
+.gate-card{max-width:440px;width:100%;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:30px 26px;box-shadow:var(--shadow);text-align:center;}
+.gate-card h2{font-size:20px;font-weight:800;margin-bottom:10px;}
+.gate-card p{font-size:14px;color:var(--text-secondary);margin-bottom:18px;line-height:1.8;}
+.gate-card .btn{display:inline-block;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--gold);background:var(--gold-soft);color:var(--gold);}
+.gate-card .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.gate-card .btn:hover{opacity:.9;}
+.gate-lock{font-size:40px;margin-bottom:12px;}
+.gate-sub{font-size:12px;color:var(--text-secondary);margin-top:14px;}
+
+/* 布局 */
+.layout{max-width:1200px;margin:0 auto;display:flex;gap:26px;padding:24px 20px;align-items:flex-start;}
+.toc{width:210px;flex:none;position:sticky;top:76px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;max-height:calc(100vh - 100px);overflow-y:auto;}
+.toc-title{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;margin-bottom:6px;}
+.toc a{display:block;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--text-secondary);transition:background .15s,color .15s;}
+.toc a:hover{background:var(--hover);color:var(--text);}
+.toc a.active{background:var(--gold-soft);color:var(--gold);font-weight:600;}
+.content{flex:1;min-width:0;}
+
+/* 区块 */
+.section{padding:10px 0 30px;}
+.sec-head{margin-bottom:16px;}
+.sec-head h2{font-size:22px;font-weight:800;letter-spacing:.5px;}
+.sec-head h2 .g{color:var(--gold);}
+.sec-head p{color:var(--text-secondary);font-size:13px;margin-top:4px;}
+
+/* 搜索 */
+.searchbar{position:sticky;top:64px;z-index:900;background:var(--bg);padding:10px 0;display:flex;gap:8px;flex-wrap:wrap;}
+.searchbar input{flex:1;min-width:200px;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);font-size:14px;}
+.searchbar input:focus{outline:none;border-color:var(--gold);}
+.searchbar .fbtn{padding:9px 14px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text-secondary);font-size:13px;cursor:pointer;white-space:nowrap;}
+.searchbar .fbtn.on{background:var(--gold-soft);border-color:var(--gold);color:var(--gold);font-weight:600;}
+
+/* 卡片 */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:20px;margin-bottom:14px;}
+.card h3{font-size:16px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.card h3 .t{color:var(--gold);font-size:12px;letter-spacing:1px;}
+.card p{font-size:14px;color:var(--text);}
+.card ul{list-style:none;margin-top:6px;}
+.card ul li{font-size:14px;padding:6px 0;border-bottom:1px dashed var(--border);}
+.card ul li:last-child{border-bottom:none;}
+.card ul li b{color:var(--gold);font-weight:600;}
+.card ul li .m{color:var(--text-secondary);font-size:12.5px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+
+/* 表格 */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--card);box-shadow:var(--shadow);margin-bottom:16px;}
+table.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:680px;}
+table.tbl th{background:var(--gold-soft);color:var(--gold);font-weight:700;text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:.5px;}
+table.tbl td{padding:9px 12px;border-bottom:1px dashed var(--border);color:var(--text);vertical-align:top;}
+table.tbl tr:last-child td{border-bottom:none;}
+table.tbl td b{color:var(--gold);}
+table.tbl tr:hover td{background:var(--hover);}
+table.tbl .dim{color:var(--text-secondary);font-size:12px;}
+.tag{font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:8px;padding:1px 6px;white-space:nowrap;}
+.tag.red{color:var(--accent);border-color:var(--accent);}
+.tag.gray{color:var(--text-secondary);border-color:var(--border);}
+
+/* 提示框 */
+.note{background:var(--gold-soft);border:1px dashed var(--gold);border-radius:12px;padding:16px 18px;margin-bottom:16px;font-size:13.5px;color:var(--text);line-height:1.8;}
+.note b{color:var(--gold);}
+
+.site-footer{background:#211c13;color:#a29580;text-align:center;padding:30px 20px;font-size:13px;margin-top:auto;}
+.site-footer .big{font-size:16px;color:#ece4d3;font-weight:700;margin-bottom:6px;}
+
+@media(max-width:960px){
+.layout{display:block;padding:16px 12px;}
+.toc{position:static;width:100%;flex-direction:row;overflow-x:auto;white-space:nowrap;padding:10px 12px;gap:2px;max-height:none;}
+.toc a{display:inline-block;padding:6px 12px;}
+.toc-title{display:none;}
+.grid-2,.grid-3{grid-template-columns:1fr;}
+.sec-head h2{font-size:19px;}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="logo">Tide of Remnant <span class="g">· 策划资料台</span></div>
+    <div class="header-right">
+      <span class="user-tag" id="hdAdminTag" style="display:none;">管理</span>
+      <a class="back-btn" href="index.html">返回官网</a>
+    </div>
+  </div>
+</header>
+
+<!-- 权限门 -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-lock" id="gateIcon">🔒</div>
+    <h2 id="gateTitle">正在验证权限…</h2>
+    <p id="gateMsg">本页面为策划专用资料台，仅对通过管理员认证的账号开放。</p>
+    <div id="gateBtns">
+      <a class="btn primary" href="login.html" id="gateLoginBtn" style="display:none;">去登录</a>
+      <button class="btn" id="gateBackBtn" style="display:none;" onclick="location.href='index.html'">返回官网</button>
+    </div>
+    <div class="gate-sub" id="gateSub">需要登录且具有管理认证（admin_level ≥ 1）</div>
+  </div>
+</div>
+
+<div class="layout" id="mainBody" style="display:none;">
+  <aside class="toc">
+    <div class="toc-title">目录</div>
+    <a href="#docs">文档索引</a>
+    <a href="#world">世界观总纲</a>
+    <a href="#faction">势力与阵营</a>
+    <a href="#main">主线任务</a>
+    <a href="#side">支线体系</a>
+    <a href="#map">地图任务</a>
+    <a href="#items">道具关联</a>
+    <a href="#rules">伏笔与规则</a>
+    <a href="#progress">开发进度</a>
+  </aside>
+  <div class="content">
+
+  <!-- ===== 文档索引 ===== -->
+  <section class="section" id="docs">
+    <div class="sec-head">
+      <h2>文档索引</h2>
+      <p>14 份定稿策划文档，编号 / 版本 / 状态一览。点击可直接跳转到本页对应章节。</p>
+    </div>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th style="width:90px">文档编号</th><th>名称</th><th style="width:90px">版本</th><th style="width:100px">状态</th><th style="width:110px">本页章节</th></tr></thead>
+      <tbody>
+        <tr><td><b>TST-WORLD-001</b></td><td>世界观总纲</td><td>V1.0</td><td><span class="tag">定稿</span></td><td><a href="#world" style="color:var(--gold);">世界观总纲</a></td></tr>
+        <tr><td><b>TST-IDEA-006</b></td><td>策划全局任务方案（13 主线 + 42 支线）</td><td>V6.3</td><td><span class="tag">定稿</span></td><td><a href="#main" style="color:var(--gold);">主线 / 支线</a></td></tr>
+        <tr><td><b>TST-XREF-001</b></td><td>附表：道具-剧情关联对照表</td><td>V1.0</td><td><span class="tag">定稿</span></td><td><a href="#items" style="color:var(--gold);">道具关联</a></td></tr>
+        <tr><td><b>TST-SET-001</b></td><td>区域总设定</td><td>定稿</td><td><span class="tag">定稿</span></td><td><a href="#map" style="color:var(--gold);">地图任务</a></td></tr>
+        <tr><td><b>TST-CAST-001</b></td><td>核心角色档案</td><td>定稿</td><td><span class="tag">定稿</span></td><td><a href="#faction" style="color:var(--gold);">势力与阵营</a></td></tr>
+        <tr><td><b>TST-NPC-001</b></td><td>NPC 配置与动线表</td><td>定稿</td><td><span class="tag">定稿</span></td><td><a href="#map" style="color:var(--gold);">地图任务</a></td></tr>
+        <tr><td><b>TST-MAGIC-001</b></td><td>魔法系统文档</td><td>定稿</td><td><span class="tag">定稿</span></td><td><a href="#world" style="color:var(--gold);">世界观总纲</a></td></tr>
+        <tr><td><b>TST-ECO-001</b></td><td>策划经济系统方案</td><td>定稿</td><td><span class="tag">定稿</span></td><td><a href="#rules" style="color:var(--gold);">伏笔与规则</a></td></tr>
+        <tr><td><b>TST-ITEM-001</b></td><td>策划物品道具咒语清单</td><td>定稿</td><td><span class="tag">定稿</span></td><td><a href="#items" style="color:var(--gold);">道具关联</a></td></tr>
+        <tr><td><b>TST-PLAY-001</b></td><td>游戏核心玩法与规则</td><td>定稿</td><td><span class="tag">定稿</span></td><td><a href="#rules" style="color:var(--gold);">伏笔与规则</a></td></tr>
+        <tr><td><b>TST-FAC-001</b></td><td>势力与阵营设定</td><td>定稿</td><td><span class="tag">定稿</span></td><td><a href="#faction" style="color:var(--gold);">势力与阵营</a></td></tr>
+        <tr><td><b>TST-RISK-001</b></td><td>全局项目约束与风险校验</td><td>定稿</td><td><span class="tag">定稿</span></td><td><a href="#rules" style="color:var(--gold);">伏笔与规则</a></td></tr>
+        <tr><td><b>TST-SPELL-001</b></td><td>附表：咒语效果对照表</td><td>定稿</td><td><span class="tag">定稿</span></td><td><a href="#items" style="color:var(--gold);">道具关联</a></td></tr>
+        <tr><td><b>TST-CONF-001</b></td><td>附表：设定冲突校验表</td><td>定稿</td><td><span class="tag">定稿</span></td><td><a href="#rules" style="color:var(--gold);">伏笔与规则</a></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="note">本资料台数据源：14 份策划定稿文档（截至 2026.10.19 定稿版）。页面为方便策划快速查询而做的表格化整理，具体数值以文档原文为准。</div>
+  </section>
+
+  <!-- ===== 世界观 ===== -->
+  <section class="section" id="world">
+    <div class="sec-head">
+      <h2>世界观总纲 <span class="g">· TST-WORLD-001</span></h2>
+      <p>魔法与偏见共存的世界。光明与黑暗不是两个阵营，而是同一条道路上的不同选择。</p>
+    </div>
+    <div class="grid-2">
+      <div class="card"><h3><span class="t">世界基调</span></h3><p>巫师世界拥有咒语、魔药、魔法生物、画像、幽灵、古老建筑，也拥有根深蒂固的等级观念、对差异的恐惧、对创伤的回避。善意可能带来毁灭，恶意可能源于被排斥的痛苦。</p></div>
+      <div class="card"><h3><span class="t">故事时间</span></h3><p>大战结束三十余年之后。公开的主流认知是黑暗势力彻底终结，但百年前积累的创伤魔力，仍在土地、建筑、魔法生物身上低强度残留。</p></div>
+      <div class="card"><h3><span class="t">黑暗的来源</span></h3><p>世界底层存在名为<b>默默然</b>的力量——年轻巫师长期压抑自身魔法、创伤催生的寄生型黑暗力量。无法净化、无法彻底根除，只能依靠古代魔法短暂压制暴走。</p></div>
+      <div class="card"><h3><span class="t">古代魔法封印</span></h3><p>1890 年新任守护者平定失控危机、稳固贮藏库远古封印。如今伏地魔的灵魂残片与百年默然暗影同化，化作无数<b>黑暗共振节点</b>，正从外部侵蚀封印——这是主线危机的根源。</p></div>
+      <div class="card"><h3><span class="t">认知差</span></h3><p>公开认知：黑暗彻底覆灭。真实历史：默默然从未消失、格林德沃理念仍有残存信奉者、封印正被侵蚀。魔法部知道一部分，霍格沃茨教职工知道一部分，残存圣徒知道一部分，没有人掌握全貌。</p></div>
+      <div class="card"><h3><span class="t">玩家的位置</span></h3><p>你是百年内唯一拥有<b>古代魔法本源抗性</b>的巫师。能力有边界：只能压制暗影暴走、阻断仪式、保护身边的人——不是救世主，无法治愈创伤、消灭默默然、逆转偏见。</p></div>
+    </div>
+    <div class="note" style="margin-top:14px;">
+      <b>核心主题：只能压制，无法根除。</b><br>
+      古代魔法压不住创伤，魔法部管不住偏见，圣徒说不清答案。玩家能做的只有保护、压制、阻断仪式。<br><br>
+      <b>暗线叙事规则（游戏内全程遵守）：</b>不存在单独的暗线专属任务，所有伏笔对话、环境文本全部嵌入普通任务流程——没有高亮、没有闪光特效、没有专属提示音效、没有弹窗提醒、不写入任务面板。真假线索混杂，顿悟依靠玩家记忆与意象共鸣。错过伏笔，永久丢失。
+    </div>
+  </section>
+
+  <!-- ===== 势力 ===== -->
+  <section class="section" id="faction">
+    <div class="sec-head">
+      <h2>势力与阵营速览 <span class="g">· TST-FAC-001</span></h2>
+      <p>八股力量，各自只知道一部分真相。</p>
+    </div>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th style="width:110px">势力</th><th style="width:200px">定位</th><th>行为准则</th><th>台词风格</th></tr></thead>
+      <tbody>
+        <tr><td><b>魔法部</b></td><td>官僚体系</td><td>优先执行沿用百年的隔离管控规章，先隔离再调查；档案管理严格，部分卷宗需权限</td><td>官方、克制、程序化；一线外勤可私下抱怨</td></tr>
+        <tr><td><b>残存圣徒</b></td><td>分散留存的理念信奉者</td><td>认为魔法界强行划分明暗、排斥创伤巫师才是灾厄根源；不主动长篇宣讲，战斗落败抛半截问句</td><td>简短、急促、带质疑；不点名，不提私人往事</td></tr>
+        <tr><td><b>霍格沃茨</b></td><td>教职工大多只有碎片化模糊认知</td><td>主线内给出默默然基础解释；课堂闲谈浅尝辄止；邓布利多画像克制回避过往</td><td>教学口吻、克制、留白</td></tr>
+        <tr><td><b>妖精</b></td><td>重视契约与族群历史</td><td>问到封印历史会答，问到外来巫师直接说旧事不值一提</td><td>务实、简短、带契约意识</td></tr>
+        <tr><td><b>马人</b></td><td>禁林原住民</td><td>一贯隐喻风格，不主动解释预言含义</td><td>星象、星辰、微光、寂灭意象</td></tr>
+        <tr><td><b>家养小精灵</b></td><td>日常服务者</td><td>忠诚、务实、带善意，不参与主线冲突</td><td>服务口吻；赫奇帕奇支线涉及食材纠纷与告别宴会</td></tr>
+        <tr><td><b>幽灵</b></td><td>城堡历史的见证者</td><td>会聊城堡往事，不直接解释暗线；记住很多活着时候的小事</td><td>怀念式叙述</td></tr>
+        <tr><td><b>画像</b></td><td>环境叙事与暗线伏笔载体</td><td>长廊老画像分三阶段：一年级缄默面壁 → 五年级邻像闲聊 → 七年级决战前侧身；随主线自动切换</td><td>年长沉稳男声，语速偏慢，句子间留长停顿</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="grid-3" style="margin-top:4px;">
+      <div class="card"><h3><span class="dot" style="color:#ae0001;">●</span> 格兰芬多</h3><ul><li><b>G1-S01</b> <span class="m">遗失的狮子徽章</span></li><li><b>G3-S02</b> <span class="m">营救受伤马人</span></li><li><b>G5-S03</b> <span class="m">决斗训练</span></li></ul></div>
+      <div class="card"><h3><span class="dot" style="color:#0e3a8a;">●</span> 拉文克劳</h3><ul><li><b>R1-S01</b> <span class="m">遗失星象手稿</span></li><li><b>R4-S01</b> <span class="m">手稿排序</span></li><li><b>R5-S02</b> <span class="m">预言碎片解读</span></li><li><b>R6-S03</b> <span class="m">星轨预言</span></li></ul></div>
+      <div class="card"><h3><span class="dot" style="color:#1a472a;">●</span> 斯莱特林</h3><ul><li><b>S2-S01</b> <span class="m">密室铭文抄录</span></li><li><b>S4-S02</b> <span class="m">毒草药剂调配</span></li><li><b>S6-S03</b> <span class="m">密室誓约</span></li></ul></div>
+      <div class="card"><h3><span class="dot" style="color:#a8842a;">●</span> 赫奇帕奇</h3><ul><li><b>H2-S01</b> <span class="m">储藏室种子保护</span></li><li><b>H4-S02</b> <span class="m">追踪走失獾类</span></li><li><b>H7-S03</b> <span class="m">守护储藏密室</span></li></ul></div>
+    </div>
+  </section>
+
+  <!-- ===== 主线 ===== -->
+  <section class="section" id="main">
+    <div class="sec-head">
+      <h2>主线任务 <span class="g">· TST-IDEA-006 V6.3</span></h2>
+      <p>13 条主线 + 1 条彩蛋主线，按七学年排列。主线必做，解锁学年进度。</p>
+    </div>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th style="width:70px">编号</th><th style="width:120px">学年</th><th style="width:200px">任务</th><th>触发方式</th><th>怎么做</th><th style="width:170px">奖励</th></tr></thead>
+      <tbody id="mainRows"></tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- ===== 支线 ===== -->
+  <section class="section" id="side">
+    <div class="sec-head">
+      <h2>支线体系 <span class="g">· 42 条</span></h2>
+      <p>纯日常 16 ｜ 轻伏笔 8 ｜ 学院专属 12 ｜ 人物羁绊 6。支线不强制，不锁主线升学。</p>
+    </div>
+
+    <h3 style="font-size:15px;margin:6px 0 10px;color:var(--gold);">纯日常支线（16 条 · 可重复接取）</h3>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th style="width:80px">编号</th><th style="width:190px">名称</th><th style="width:80px">学年</th><th>怎么做</th><th style="width:140px">奖励</th></tr></thead>
+      <tbody id="dailyRows"></tbody>
+    </table>
+    </div>
+
+    <h3 style="font-size:15px;margin:6px 0 10px;color:var(--gold);">轻伏笔支线（8 条 · 全程无提示）</h3>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th style="width:80px">编号</th><th style="width:190px">名称</th><th style="width:80px">学年</th><th>伏笔内容</th><th style="width:140px">奖励</th></tr></thead>
+      <tbody id="foreshadowRows"></tbody>
+    </table>
+    </div>
+
+    <h3 style="font-size:15px;margin:6px 0 10px;color:var(--gold);">人物羁绊支线（6 条 · 完成前置轻伏笔并重复接取一次后解锁）</h3>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th style="width:80px">编号</th><th style="width:190px">名称</th><th style="width:80px">学年</th><th>羁绊内容</th><th style="width:140px">奖励</th></tr></thead>
+      <tbody id="bondRows"></tbody>
+    </table>
+    </div>
+    <div class="note">学院专属支线仅本院可接，非本院玩家靠近触发 NPC 时无任何交互响应；多周目换学院可体验不同视角。</div>
+  </section>
+
+  <!-- ===== 地图 ===== -->
+  <section class="section" id="map">
+    <div class="sec-head">
+      <h2>地图任务 <span class="g">· 区域 / NPC 动线</span></h2>
+      <p>按区域聚合的全部任务（含主线与支线）。输入关键词可即时筛选。</p>
+    </div>
+    <div class="searchbar">
+      <input type="text" id="mapSearch" placeholder="搜索任务名 / 编号 / 关键词…">
+      <button class="fbtn" data-f="all">全部</button>
+      <button class="fbtn" data-f="主线">主线</button>
+      <button class="fbtn" data-f="日常">日常</button>
+      <button class="fbtn" data-f="轻伏笔">轻伏笔</button>
+      <button class="fbtn" data-f="学院">学院</button>
+      <button class="fbtn" data-f="羁绊">羁绊</button>
+    </div>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th style="width:110px">区域</th><th style="width:80px">编号</th><th style="width:180px">任务</th><th style="width:90px">类型</th><th>触发方式</th><th>怎么做</th><th style="width:150px">奖励</th></tr></thead>
+      <tbody id="mapRows"></tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- ===== 道具 ===== -->
+  <section class="section" id="items">
+    <div class="sec-head">
+      <h2>道具与剧情关联 <span class="g">· TST-XREF-001 / TST-ITEM-001 / TST-SPELL-001</span></h2>
+      <p>主线 / 羁绊关键道具，及其在剧情中的定位。</p>
+    </div>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th style="width:150px">道具</th><th style="width:90px">类型</th><th style="width:110px">获取任务</th><th>剧情定位 / 说明</th></tr></thead>
+      <tbody>
+        <tr><td><b>老旧相片碎片</b></td><td>伏笔道具</td><td>1-S01</td><td>阁楼褪色相片，两个少年并肩站在阳光下——戈德里克山谷伏笔起点</td></tr>
+        <tr><td><b>泛黄信纸</b></td><td>伏笔道具</td><td>2-S02</td><td>未寄出的信：理念一致的时光太过短暂</td></tr>
+        <tr><td><b>墓园野花</b></td><td>伏笔道具</td><td>3-S01</td><td>磨损墓碑旁拾取：不必为理想殉葬，但人总会为挚爱奔赴毁灭</td></tr>
+        <tr><td><b>诗歌残页</b></td><td>伏笔道具</td><td>3-S02</td><td>无名歌谣讲述戈德里克山谷的夏日风暴</td></tr>
+        <tr><td><b>决斗记录残卷</b></td><td>伏笔道具</td><td>4-S01</td><td>旧羊皮纸记录两个天才巫师的一场对决</td></tr>
+        <tr><td><b>镜子碎片</b></td><td>伏笔道具</td><td>5-S02</td><td>碎裂镜子中倒影重叠两个人影</td></tr>
+        <tr><td><b>思辨笔记</b></td><td>伏笔道具</td><td>6-S01</td><td>为了更大的善，可以牺牲少数人吗？中立玩家解锁隐藏对话</td></tr>
+        <tr><td><b>冥想盆记忆碎片</b></td><td>彩蛋道具</td><td>7-S01</td><td>终极彩蛋；前置完成 1-S01、3-S01、4-S01</td></tr>
+        <tr><td><b>古代魔法抗性护符</b></td><td>能力道具</td><td>5-02</td><td>玩家唯一拥有古代魔法本源抗性的具象化护符</td></tr>
+        <tr><td><b>终极战斗药剂包</b></td><td>消耗道具</td><td>7-01</td><td>终章战斗补给</td></tr>
+        <tr><td><b>纪念短片 / 称号</b></td><td>收藏</td><td>7-03</td><td>「双子星火」+ 戈德里克山谷夏日无声短片</td></tr>
+        <tr><td><b>称号「星火见证者」</b></td><td>收藏</td><td>7-J05</td><td>羁绊链终章：阁楼碎片拼合，完整戈德里克山谷记忆</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="note">咒语效果对照表、物品道具咒语清单、设定冲突校验表为附表文档，本页摘录与任务强关联条目；完整清单见文档原文。</div>
+  </section>
+
+  <!-- ===== 规则 ===== -->
+  <section class="section" id="rules">
+    <div class="sec-head">
+      <h2>伏笔规则与项目约束 <span class="g">· TST-RISK-001 / TST-CONF-001</span></h2>
+      <p>实现时不可破坏的硬性规则。</p>
+    </div>
+    <div class="grid-2">
+      <div class="card"><h3><span class="t">暗线叙事规则</span></h3><ul>
+        <li>不存在单独的暗线专属任务</li>
+        <li>所有伏笔嵌入普通任务流程，与普通对话共用同一套表现形式</li>
+        <li>没有高亮、没有闪光特效、没有专属提示音效、没有弹窗提醒、不写入任务面板</li>
+        <li>真假线索混杂，顿悟依靠玩家记忆与意象共鸣，不强制触发</li>
+        <li><b>错过伏笔，永久丢失</b></li>
+      </ul></div>
+      <div class="card"><h3><span class="t">静默解锁规则</span></h3><ul>
+        <li>称号「守秘之人」「双子星火」「星火见证者」全部静默解锁</li>
+        <li>没有弹窗通知，只有主动打开个人称号列表才能看见</li>
+        <li>结局留白短片自动播放，无旁白、无解说字幕，只用纯意象镜头叙事</li>
+      </ul></div>
+      <div class="card"><h3><span class="t">分支一致性</span></h3><ul>
+        <li>六年级 6-01 立场影响七年级对话与隐藏剧情开放权限，不锁死主线通关</li>
+        <li>中立玩家解锁额外内容（隐藏对话、额外独白）</li>
+        <li>7-01 走东侧楼梯 → 7-03 彩蛋永久无法解锁</li>
+      </ul></div>
+      <div class="card"><h3><span class="t">永久噪声伏笔</span></h3><ul>
+        <li>三年级天文课：「一颗光太强盖住另一颗微光」</li>
+        <li>永不回收、永不解释，作为世界观噪声存在</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- ===== 进度 ===== -->
+  <section class="section" id="progress">
+    <div class="sec-head">
+      <h2>开发进度</h2>
+      <p>立项于 2026.06.25。世界基准与任务方案已定稿（2026.10.19）。</p>
+    </div>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <thead><tr><th style="width:140px">阶段</th><th>内容</th><th style="width:120px">状态</th></tr></thead>
+      <tbody>
+        <tr><td><b>企划</b></td><td>立项</td><td><span class="tag">完成 2026.06.25</span></td></tr>
+        <tr><td><b>企划</b></td><td>世界观总纲</td><td><span class="tag">V1.0 定稿</span></td></tr>
+        <tr><td><b>企划</b></td><td>全局任务方案（13 主线 + 42 支线）</td><td><span class="tag">V6.3 定稿</span></td></tr>
+        <tr><td><b>企划</b></td><td>区域 / 角色 / 道具 / 魔法系统设定</td><td><span class="tag">定稿</span></td></tr>
+        <tr><td><b>企划</b></td><td>策划经济系统与商业体系</td><td><span class="tag red">当前进行</span></td></tr>
+        <tr><td><b>开发</b></td><td>核心系统 / 场景搭建 / 任务实现 / 美术音效</td><td><span class="tag gray">未开始</span></td></tr>
+        <tr><td><b>测试</b></td><td>Alpha 内部测试 / 测试打磨</td><td><span class="tag gray">未开始</span></td></tr>
+        <tr><td><b>上线</b></td><td>Beta 公测 / 正式上线</td><td><span class="tag gray">未开始</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="note">进度 3% —— 刚把饼画出来，面团都还没和。催更请轻拍，鸽子也是会害羞的。</div>
+  </section>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="big">Tide of Remnant · 三代黑暗余烬</div>
+    <p>策划专用资料台 · 仅供内部查询</p>
+  </div>
+</footer>
+
+<script>
+// ===== 数据（按 14 份定稿文档整理）=====
+var MAIN=[
+ {c:'1-01',yr:'一年级',n:'长廊里的叮嘱',t:'新生入学仪式结束、完成分院后，进入城堡西侧长廊指定区域，区域强制触发',h:'黄昏路过长廊，麦格教授站在盔甲塑像旁说出叮嘱：懂得控制力量，才是巫师一生的课题。这句话写入记忆碎片，与终局台词对仗',r:'霍格沃茨新生长袍、基础魔杖、城堡简易地图'},
+ {c:'1-02',yr:'一年级',n:'禁林边缘的异动',t:'海格小屋门口点击海格',h:'帮海格在禁林外围巡查一圈，标记异常扰动位置。不要跨过古老橡树界碑（触碰会触发警告，两次触碰后任务仍可完成但海格会加重提醒）',r:'基础回复药剂、南瓜汁'},
+ {c:'2-01',yr:'二年级',n:'会低语的旧课本',t:'魔咒课教室课后，弗立维教授主动叫住你',h:'读二手课本上的批注，听清模糊低语：力量……不必压抑……裂痕终将扩大。向弗立维复述，了解这是残留的情绪',r:'咒语·无声咒入门'},
+ {c:'2-02',yr:'二年级',n:'密室流言',t:'城堡走廊听见学生议论，自动触发',h:'与差点没头的尼克对话，前往图书馆查阅旧校报，返回走廊交谈。仔细阅读可额外获得碎片化伏笔文字',r:'图书馆特殊阅览许可'},
+ {c:'3-01',yr:'三年级',n:'摄魂怪的阴影',t:'完成 2-02、开启三年级后，霍格莫德村口遇到卢平教授',h:'跟随卢平练习守护神咒：集中内心快乐的记忆抵御寒意，不必强求召唤实体。练习成功与否仅改变对话',r:'咒语·呼神护卫'},
+ {c:'3-02',yr:'三年级',n:'古老魔法残痕',t:'禁林深处古老石阵，靠近自动触发',h:'触碰发光古代魔法纹路，脑海涌入失控魔法碎片画面。与邓布利多对话，了解力量本身中立',r:'古代魔法基础感知'},
+ {c:'4-01',yr:'四年级',n:'圣徒伏击',t:'完成 3-02、开启四年级后，霍格莫德外郊山谷，跟随教授调查魔法异动',h:'圣徒埋伏在山谷，战斗触发。目标并非击杀，是搜寻关于默然者的情报。战斗结束敌人撤离',r:'防护药剂'},
+ {c:'4-02',yr:'四年级',n:'圣徒密信',t:'4-01 战斗结算完毕，密信自动存入背包',h:'打开背包取出泛黄密信，交给邓布利多解读。圣徒仍在搜寻默然者，此事暂不大范围散播',r:'黑魔法防御术高级笔记'},
+ {c:'5-01',yr:'五年级',n:'城堡疏散演练',t:'城堡大礼堂，集会自动触发',h:'带领一小队新生走完撤离路线。新生受惊乱跑时可选择安抚或直接赶路（安抚解锁额外对话）。演练结束城堡密道全部解锁',r:'应急烟雾药剂'},
+ {c:'5-02',yr:'五年级',n:'暗流涌动',t:'图书馆密室档案区，邓布利多等候',h:'在格林德沃鼎盛时期的档案卷宗间对话，了解圣徒的谋划与格林德沃的过往',r:'古代魔法抗性护符'},
+ {c:'6-01',yr:'六年级',n:'抉择的岔路口',t:'天文台顶楼，黄昏',h:'与邓布利多对话，三选一标记立场：站在光明一方 / 保持中立 / 力量才是一切。立场影响七年级对话与隐藏剧情开放权限，不锁死主线通关',r:'高级护盾药剂'},
+ {c:'7-01',yr:'七年级',n:'两条长廊',t:'城堡主厅，NPC 提示前方有两条路',h:'自主选择：走画像长廊可看到侧身双人画像（7-03 前置）；走东侧楼梯直接前往决战场地（永久错过彩蛋）',r:'终极战斗药剂包'},
+ {c:'7-02',yr:'七年级',n:'三重黑暗聚合体',t:'进入决战场地',h:'多阶段战斗，目标不是击杀而是阻断仪式。战斗结束聚合体的声音与一年级台词意象对仗；六年级立场不同收尾台词不同，中立玩家获得额外独白',r:'终局称号「守秘之人」'},
+ {c:'7-03',yr:'七年级',n:'星火余影（彩蛋主线）',t:'完成 7-02 且 7-01 走过画像长廊后，主动回到长廊点击双人画像',h:'其余画像全部沉睡，只有这幅画像缓缓转向你，说出收尾台词，浮现戈德里克山谷夏日无声短片。走东侧楼梯的玩家点击画像只能看到基础慰问',r:'称号「双子星火」、纪念短片'}
+];
+var DAILY=[
+ {c:'1-S02',n:'照料独角兽',yr:'一年级',h:'海格小屋旁兽栏：清理荆棘、投喂特制甜苜蓿。动作要轻',r:'魔法生物饲料'},
+ {c:'1-S03',n:'猫头鹰分拣',yr:'一年级',h:'猫头鹰棚屋：分拣信件，区分本地与外地邮件，弄混猫头鹰会迷路',r:'猫头鹰零食'},
+ {c:'1-S04',n:'清理温室杂草',yr:'一年级',h:'草药课温室：拔除带刺杂草，小心别伤到曼德拉幼苗',r:'肥料'},
+ {c:'2-S01',n:'鹰头马身有翼兽梳洗',yr:'二年级',h:'海格小屋：先鞠躬再靠近，帮它梳理羽毛（自尊心很强）',r:'兽类安抚药剂'},
+ {c:'2-S03',n:'修复破碎玻璃器皿',yr:'二年级',h:'魔药课教室：用修复咒修补打碎的药瓶',r:'空魔药瓶'},
+ {c:'3-S03',n:'护树罗锅守护',yr:'三年级',h:'禁林边缘橡树：驱赶啃食树皮的小虫，护树罗锅藏在树皮缝隙',r:'小树枝护身符'},
+ {c:'3-S04',n:'图书馆整理古籍',yr:'三年级',h:'图书馆：把散落古籍放回书架、除尘',r:'书签'},
+ {c:'3-S05',n:'清理魔法溢散',yr:'三年级',h:'城堡各处：使用消寂咒平息随机溢散的魔法光点',r:'微量魔法粉末'},
+ {c:'4-S02',n:'夜骐照料',yr:'四年级',h:'海格小屋后方兽栏：投喂肉食、检查蹄子。能看见夜骐的人，都见证过死亡',r:'黑色马鬃饰品'},
+ {c:'4-S03',n:'修补城堡挂毯',yr:'四年级',h:'城堡长廊：修复被皮皮鬼扯破的古老挂毯',r:'丝线'},
+ {c:'5-S01',n:'蒲绒绒饲养',yr:'五年级',h:'神奇动物教室：收集蒲绒绒产出的绒毛',r:'蒲绒绒绒毛'},
+ {c:'5-S03',n:'送信前往霍格莫德',yr:'五年级',h:'猫头鹰棚屋：把密封包裹送到霍格莫德商店老板手中',r:'蜂蜜公爵糖果'},
+ {c:'6-S02',n:'校准天文望远镜',yr:'六年级',h:'天文台：调整镜片，观测星象记录',r:'星图手稿'},
+ {c:'6-S03',n:'精灵下午茶',yr:'六年级',h:'厨房入口：帮家养小精灵准备下午茶点心',r:'手工蜂蜜蛋糕'},
+ {c:'7-S02',n:'城堡盔甲维护',yr:'七年级',h:'长廊盔甲塑像：清理灰尘、修复松动部件',r:'抛光布'},
+ {c:'7-S03',n:'最后的温室收获',yr:'七年级',h:'草药课温室：收获成熟魔法草药，存放进储藏柜',r:'成品草药'}
+];
+var FORESHADOW=[
+ {c:'1-S01',n:'阁楼里的旧相片',yr:'一年级',f:'阁楼角落木盒的褪色相片，两个少年并肩站在阳光下。旁白：山谷的夏日，曾经有两个灵魂同频',r:'老旧相片碎片',pre:'7-S01 前置'},
+ {c:'2-S02',n:'废弃信件',yr:'二年级',f:'二楼废弃储物间，未寄出的信：理念一致的时光太过短暂',r:'泛黄信纸'},
+ {c:'3-S01',n:'墓碑铭文',yr:'三年级',f:'霍格莫德郊外小墓园，铭文磨损：不必为理想殉葬，但人总会为挚爱奔赴毁灭',r:'墓园野花',pre:'7-S01 前置'},
+ {c:'3-S02',n:'歌谣残页',yr:'三年级',f:'图书馆冷门诗歌手稿区，无名歌谣讲述戈德里克山谷的夏日风暴',r:'诗歌残页'},
+ {c:'4-S01',n:'破损决斗记录',yr:'四年级',f:'决斗俱乐部储藏室，旧羊皮纸记录两个天才巫师的一场对决',r:'决斗记录残卷',pre:'7-S01 前置'},
+ {c:'5-S02',n:'破碎镜子',yr:'五年级',f:'禁林边缘小屋，碎裂镜子中倒影重叠两个人影',r:'镜子碎片'},
+ {c:'6-S01',n:'哲学家的辩论',yr:'六年级',f:'天文台黄昏，老教授问：为了更大的善，可以牺牲少数人吗？中立玩家额外解锁隐藏对话',r:'思辨笔记'},
+ {c:'7-S01',n:'冥想盆里的残响',yr:'七年级',f:'邓布利多办公室冥想盆。前置：完成 1-S01、3-S01、4-S01。普通玩家只见两道模糊人影；哈迷可辨认戈德里克山谷场景',r:'冥想盆记忆碎片',pre:'终极彩蛋'}
+];
+var BOND=[
+ {c:'1-J01',n:'看守人的心事',yr:'一年级',f:'前置 1-S01。阁楼管理员望着旧相片：有些爱，会被时代评判为错误',r:'管理员金属书签'},
+ {c:'2-J01',n:'信的遗憾',yr:'二年级',f:'前置 2-S02。储物间管理员：这封信始终没能寄出，两个人走向不同道路',r:'旧丝带'},
+ {c:'3-J02',n:'墓园的怀念',yr:'三年级',f:'前置 3-S01。墓园看守：很多埋葬在这里的人曾满怀理想，理想燃烧殆尽后只剩墓碑',r:'干花束'},
+ {c:'4-J03',n:'决斗者的遗憾',yr:'四年级',f:'前置 4-S01。决斗俱乐部管理员：那场决斗不是仇恨开启，而是理念决裂，昔日知己兵刃相向',r:'旧决斗手套'},
+ {c:'5-J04',n:'镜中残影',yr:'五年级',f:'前置 5-S02。禁林小屋看守：镜子可以映照外形，照不碎人心之间的裂痕',r:'打磨镜布'},
+ {c:'7-J05',n:'星火回响',yr:'七年级',f:'前置：完成全部五条人物羁绊。阁楼黄昏，碎片拼合，浮现完整戈德里克山谷记忆——夏日阳光，两个少年畅谈他们新世界的构想',r:'称号「星火见证者」',pre:'羁绊链终章'}
+];
+var MAPS=[
+ {area:'霍格莫德村',c:'3-01',n:'摄魂怪的阴影',t:'主线',tr:'完成 2-02、开启三年级后，霍格莫德村口遇到卢平教授',h:'跟随卢平练习守护神咒：集中内心快乐的记忆抵御寒意',r:'咒语·呼神护卫'},
+ {area:'霍格莫德村',c:'3-S01',n:'墓碑铭文',t:'轻伏笔',tr:'霍格莫德郊外小墓园（三年级解锁）',h:'阅读磨损墓碑铭文，计入 7-S01 冥想盆前置',r:'墓园野花'},
+ {area:'霍格莫德村',c:'5-S03',n:'送信前往霍格莫德',t:'日常',tr:'猫头鹰棚屋接取（五年级解锁）',h:'把密封包裹送到霍格莫德商店老板手中',r:'蜂蜜公爵糖果'},
+ {area:'霍格莫德村',c:'3-J02',n:'墓园的怀念',t:'羁绊',tr:'完成 3-S01 并重复接取一次后，找墓园看守',h:'看守谈起长眠于此的人：很多埋葬在这里的人曾满怀理想，理想燃烧殆尽后只剩墓碑',r:'干花束'},
+ {area:'禁林',c:'1-02',n:'禁林边缘的异动',t:'主线',tr:'海格小屋门口点击海格',h:'帮海格在禁林外围巡查一圈，标记异常扰动位置。不要跨过古老橡树界碑',r:'基础回复药剂、南瓜汁'},
+ {area:'禁林',c:'3-02',n:'古老魔法残痕',t:'主线',tr:'禁林深处古老石阵，靠近自动触发',h:'触碰发光的古代魔法纹路，脑海涌入失控魔法碎片画面',r:'古代魔法基础感知'},
+ {area:'禁林',c:'2-S01',n:'鹰头马身有翼兽梳洗',t:'日常',tr:'海格小屋',h:'先鞠躬再靠近，帮它梳理羽毛',r:'兽类安抚药剂'},
+ {area:'禁林',c:'3-S03',n:'护树罗锅守护',t:'日常',tr:'禁林边缘橡树',h:'驱赶啃食树皮的小虫',r:'小树枝护身符'},
+ {area:'禁林',c:'4-S02',n:'夜骐照料',t:'日常',tr:'海格小屋后方兽栏',h:'投喂肉食、检查蹄子',r:'黑色马鬃饰品'},
+ {area:'禁林',c:'5-S02',n:'破碎镜子',t:'轻伏笔',tr:'禁林边缘小屋（五年级解锁）',h:'查看碎裂镜子——镜中倒影重叠两个人影',r:'镜子碎片'},
+ {area:'禁林',c:'G3-S02',n:'营救受伤马人',t:'学院·格兰芬多',tr:'禁林马人营地（格兰芬多专属）',h:'马人被陷阱所伤，帮忙包扎、安抚情绪',r:'马人赠予的箭羽'},
+ {area:'禁林',c:'H4-S02',n:'追踪走失獾类',t:'学院·赫奇帕奇',tr:'禁林边缘（赫奇帕奇专属）',h:'寻找走失的魔法獾，引导回到巢穴',r:'獾爪吊坠'},
+ {area:'禁林',c:'5-J04',n:'镜中残影',t:'羁绊',tr:'完成 5-S02 并重复接取一次后，找禁林小屋看守',h:'看守：镜子可以映照外形，照不碎人心之间的裂痕',r:'打磨镜布'},
+ {area:'林间裂隙',c:'4-01',n:'圣徒伏击',t:'主线',tr:'完成 3-02、开启四年级后，霍格莫德外郊山谷',h:'圣徒埋伏在山谷，战斗触发。目标并非击杀，是搜寻默然者情报',r:'防护药剂'},
+ {area:'林间裂隙',c:'4-02',n:'圣徒密信',t:'主线',tr:'4-01 战斗结算完毕，密信自动存入背包',h:'取出密信交给邓布利多解读，此事暂不大范围散播',r:'黑魔法防御术高级笔记'},
+ {area:'城堡',c:'1-01',n:'长廊里的叮嘱',t:'主线',tr:'完成分院后，进入城堡西侧长廊指定区域，区域强制触发',h:'黄昏路过长廊，麦格教授说出叮嘱。这句话写入记忆碎片，与终局台词对仗',r:'霍格沃茨新生长袍、基础魔杖、城堡简易地图'},
+ {area:'城堡',c:'2-01',n:'会低语的旧课本',t:'主线',tr:'魔咒课教室课后，弗立维教授主动叫住你',h:'读二手课本批注，听清低语：力量……不必压抑……裂痕终将扩大',r:'咒语·无声咒入门'},
+ {area:'城堡',c:'2-02',n:'密室流言',t:'主线',tr:'城堡走廊听见学生议论，自动触发',h:'与差点没头的尼克对话，查阅旧校报，仔细阅读可获碎片化伏笔',r:'图书馆特殊阅览许可'},
+ {area:'城堡',c:'5-01',n:'城堡疏散演练',t:'主线',tr:'城堡大礼堂，集会自动触发',h:'带一小队新生走完撤离路线，可安抚或直接赶路。演练结束城堡密道全部解锁',r:'应急烟雾药剂'},
+ {area:'城堡',c:'5-02',n:'暗流涌动',t:'主线',tr:'图书馆密室档案区，邓布利多等候',h:'在格林德沃档案卷宗间对话，了解圣徒谋划与过往',r:'古代魔法抗性护符'},
+ {area:'城堡',c:'6-01',n:'抉择的岔路口',t:'主线',tr:'天文台顶楼，黄昏',h:'三选一标记立场：光明 / 中立 / 力量。立场影响七年级对话与隐藏剧情开放权限',r:'高级护盾药剂'},
+ {area:'城堡',c:'7-01',n:'两条长廊',t:'主线',tr:'城堡主厅，NPC 提示前方有两条路',h:'走画像长廊可看侧身双人画像（7-03 前置）；走东侧楼梯永久错过彩蛋',r:'终极战斗药剂包'},
+ {area:'城堡',c:'7-02',n:'三重黑暗聚合体',t:'主线',tr:'进入决战场地',h:'多阶段战斗，目标是阻断仪式。收尾台词与一年级意象对仗',r:'终局称号「守秘之人」'},
+ {area:'城堡',c:'7-03',n:'星火余影',t:'主线·彩蛋',tr:'完成 7-02 且 7-01 走过画像长廊后，点击双人画像',h:'画像缓缓转向你，浮现戈德里克山谷夏日无声短片',r:'称号「双子星火」、纪念短片'},
+ {area:'城堡',c:'1-S01',n:'阁楼里的旧相片',t:'轻伏笔',tr:'城堡阁楼入口，点击阁楼管理员',h:'查看角落木盒里的褪色相片，计入 7-S01 冥想盆前置',r:'老旧相片碎片'},
+ {area:'城堡',c:'2-S02',n:'废弃信件',t:'轻伏笔',tr:'城堡二楼废弃储物间',h:'查看储物箱里未寄出的信：理念一致的时光太过短暂',r:'泛黄信纸'},
+ {area:'城堡',c:'3-S02',n:'歌谣残页',t:'轻伏笔',tr:'图书馆冷门诗歌手稿区',h:'阅读无名歌谣——讲述戈德里克山谷的夏日风暴',r:'诗歌残页'},
+ {area:'城堡',c:'4-S01',n:'破损决斗记录',t:'轻伏笔',tr:'决斗俱乐部储藏室',h:'阅读旧羊皮纸记录的早年决斗，计入 7-S01 前置',r:'决斗记录残卷'},
+ {area:'城堡',c:'6-S01',n:'哲学家的辩论',t:'轻伏笔',tr:'天文台，黄昏',h:'老教授提问：为了更大的善，可以牺牲少数人吗？中立玩家解锁隐藏对话',r:'思辨笔记'},
+ {area:'城堡',c:'7-S01',n:'冥想盆里的残响',t:'轻伏笔·彩蛋',tr:'邓布利多办公室冥想盆（前置：1-S01、3-S01、4-S01）',h:'观看记忆碎片。普通玩家只见模糊人影；哈迷可辨认戈德里克山谷场景',r:'冥想盆记忆碎片'},
+ {area:'城堡',c:'1-S03',n:'猫头鹰分拣',t:'日常',tr:'猫头鹰棚屋',h:'分拣信件，区分本地与外地邮件',r:'猫头鹰零食'},
+ {area:'城堡',c:'1-S04',n:'清理温室杂草',t:'日常',tr:'草药课温室',h:'拔除带刺杂草，小心别伤到曼德拉幼苗',r:'肥料'},
+ {area:'城堡',c:'2-S03',n:'修复破碎玻璃器皿',t:'日常',tr:'魔药课教室',h:'用修复咒修补打碎的药瓶',r:'空魔药瓶'},
+ {area:'城堡',c:'3-S04',n:'图书馆整理古籍',t:'日常',tr:'图书馆',h:'把散落古籍放回书架、除尘',r:'书签'},
+ {area:'城堡',c:'3-S05',n:'清理魔法溢散',t:'日常',tr:'城堡各处随机光点',h:'使用消寂咒平息溢散魔法',r:'微量魔法粉末'},
+ {area:'城堡',c:'4-S03',n:'修补城堡挂毯',t:'日常',tr:'城堡长廊',h:'修复被皮皮鬼扯破的古老挂毯',r:'丝线'},
+ {area:'城堡',c:'5-S01',n:'蒲绒绒饲养',t:'日常',tr:'神奇动物教室',h:'收集蒲绒绒产出的绒毛',r:'蒲绒绒绒毛'},
+ {area:'城堡',c:'6-S02',n:'校准天文望远镜',t:'日常',tr:'天文台',h:'调整镜片，观测星象记录',r:'星图手稿'},
+ {area:'城堡',c:'6-S03',n:'精灵下午茶',t:'日常',tr:'厨房入口',h:'帮家养小精灵准备下午茶点心',r:'手工蜂蜜蛋糕'},
+ {area:'城堡',c:'7-S02',n:'城堡盔甲维护',t:'日常',tr:'长廊盔甲塑像',h:'清理灰尘、修复松动部件',r:'抛光布'},
+ {area:'城堡',c:'7-S03',n:'最后的温室收获',t:'日常',tr:'草药课温室',h:'收获成熟魔法草药，存放进储藏柜',r:'成品草药'},
+ {area:'城堡',c:'G1-S01',n:'遗失的狮子徽章',t:'学院·格兰芬多',tr:'格兰芬多公共休息室，学院级长',h:'取回遗失在城堡塔楼的旧狮子徽章',r:'复刻狮子徽章'},
+ {area:'城堡',c:'R1-S01',n:'遗失星象手稿',t:'学院·拉文克劳',tr:'拉文克劳塔楼级长',h:'找回被风吹走的星象手稿',r:'星象草稿'},
+ {area:'城堡',c:'S2-S01',n:'密室铭文抄录',t:'学院·斯莱特林',tr:'斯莱特林地牢级长',h:'在地牢墙壁抄录古老铭文',r:'铭文抄本'},
+ {area:'城堡',c:'H2-S01',n:'储藏室种子保护',t:'学院·赫奇帕奇',tr:'赫奇帕奇公共休息室',h:'保护珍贵魔法种子，阻止害虫啃食',r:'魔法种子'},
+ {area:'城堡',c:'G5-S03',n:'决斗训练',t:'学院·格兰芬多',tr:'决斗室',h:'练习防御决斗，重点学习克制',r:'决斗手套'},
+ {area:'城堡',c:'R4-S01',n:'手稿排序',t:'学院·拉文克劳',tr:'拉文克劳塔楼图书馆分馆',h:'阅读「力量与人性」辩论手稿片段，按逻辑排定顺序',r:'古哲学手稿抄录本'},
+ {area:'城堡',c:'S4-S02',n:'毒草药剂调配',t:'学院·斯莱特林',tr:'地牢魔药小室',h:'精准调配低毒性防御药剂',r:'防御型毒剂'},
+ {area:'城堡',c:'R5-S02',n:'预言碎片解读',t:'学院·拉文克劳',tr:'拉文克劳塔楼',h:'解读残缺预言手稿，分辨隐喻与字面描述',r:'预言笔记'},
+ {area:'城堡',c:'R6-S03',n:'星轨预言',t:'学院·拉文克劳',tr:'天文台拉文克劳观测台',h:'观测特殊星象，记录星轨变化，对照古老预言',r:'星轨手绘图'},
+ {area:'城堡',c:'S6-S03',n:'密室誓约',t:'学院·斯莱特林',tr:'地牢隐秘石室',h:'阅读萨拉查·斯莱特林留下的原话——最初的理念是保护巫师，而不是奴役其他人',r:'斯莱特林原始手记'},
+ {area:'城堡',c:'H7-S03',n:'守护储藏密室',t:'学院·赫奇帕奇',tr:'赫奇帕奇地下储藏室',h:'加固储藏室防护魔法，保护珍贵魔法物资',r:'守护护身符'},
+ {area:'城堡',c:'1-J01',n:'看守人的心事',t:'羁绊',tr:'完成 1-S01 后找阁楼管理员',h:'管理员望着旧相片：有些爱，会被时代评判为错误',r:'管理员金属书签'},
+ {area:'城堡',c:'2-J01',n:'信的遗憾',t:'羁绊',tr:'完成 2-S02 并重复接取一次后，找储物间管理员',h:'这封信始终没能寄出，两个人走向不同道路',r:'旧丝带'},
+ {area:'城堡',c:'4-J03',n:'决斗者的遗憾',t:'羁绊',tr:'完成 4-S01 并重复接取一次后，找决斗俱乐部管理员',h:'那场决斗不是仇恨开启，而是理念决裂——昔日知己，兵刃相向',r:'旧决斗手套'},
+ {area:'城堡',c:'7-J05',n:'星火回响',t:'羁绊·终章',tr:'完成全部五条人物羁绊后，自动收到提示前往阁楼',h:'阁楼黄昏，碎片拼合，浮现完整戈德里克山谷记忆',r:'称号「星火见证者」'},
+ {area:'地底裂隙',c:'7-02',n:'三重黑暗聚合体',t:'主线',tr:'完成 7-01 后，进入决战场地',h:'空间扭曲、黑雾翻涌，聚合体显现。战斗目标是阻断仪式',r:'终局称号「守秘之人」'}
+];
+</script>
+<script>
+(function(){
+  var AUTH='https://theslowtidefk.pages.dev/api';
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  var gate=document.getElementById('gate');
+  var mainBody=document.getElementById('mainBody');
+
+  // 权限判定：登录 + admin_level>=1
+  function check(){
+    var token=localStorage.getItem('tst_token')||'';
+    if(!token){
+      gate.style.display='flex';
+      document.getElementById('gateIcon').textContent='🔒';
+      document.getElementById('gateTitle').textContent='请先登录';
+      document.getElementById('gateMsg').textContent='本页面为策划专用资料台，需要登录后验证管理员认证。';
+      document.getElementById('gateLoginBtn').style.display='inline-block';
+      document.getElementById('gateBackBtn').style.display='inline-block';
+      return;
+    }
+    fetch(AUTH+'/admin/users',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'whoami'}),cache:'no-store'})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d && d.ok && (d.admin_level||0)>=1){
+        gate.style.display='none';
+        mainBody.style.display='flex';
+        var t=document.getElementById('hdAdminTag'); if(t) t.style.display='inline-block';
+        render();
+      }else{
+        gate.style.display='flex';
+        document.getElementById('gateIcon').textContent='🚫';
+        document.getElementById('gateTitle').textContent='权限不足';
+        document.getElementById('gateMsg').textContent='当前账号未通过管理员认证，无法查看策划资料。';
+        document.getElementById('gateLoginBtn').style.display='none';
+        document.getElementById('gateBackBtn').style.display='inline-block';
+      }
+    })
+    .catch(function(){
+      gate.style.display='flex';
+      document.getElementById('gateIcon').textContent='⚠️';
+      document.getElementById('gateTitle').textContent='验证失败';
+      document.getElementById('gateMsg').textContent='网络异常，请稍后重试。';
+      document.getElementById('gateLoginBtn').style.display='none';
+      document.getElementById('gateBackBtn').style.display='inline-block';
+    });
+  }
+
+  function render(){
+    // 主线
+    var mh=document.getElementById('mainRows');
+    mh.innerHTML=MAIN.map(function(x){return '<tr><td><b>'+esc(x.c)+'</b></td><td>'+esc(x.yr)+'</td><td><b>'+esc(x.n)+'</b></td><td class="dim">'+esc(x.t)+'</td><td>'+esc(x.h)+'</td><td>'+esc(x.r)+'</td></tr>';}).join('');
+    // 日常
+    var dh=document.getElementById('dailyRows');
+    dh.innerHTML=DAILY.map(function(x){return '<tr><td><b>'+esc(x.c)+'</b></td><td>'+esc(x.n)+'</td><td>'+esc(x.yr)+'</td><td>'+esc(x.h)+'</td><td>'+esc(x.r)+'</td></tr>';}).join('');
+    // 轻伏笔
+    var fh=document.getElementById('foreshadowRows');
+    fh.innerHTML=FORESHADOW.map(function(x){return '<tr><td><b>'+esc(x.c)+'</b>'+(x.pre?' <span class="tag red">'+esc(x.pre)+'</span>':'')+'</td><td>'+esc(x.n)+'</td><td>'+esc(x.yr)+'</td><td>'+esc(x.f)+'</td><td>'+esc(x.r)+'</td></tr>';}).join('');
+    // 羁绊
+    var bh=document.getElementById('bondRows');
+    bh.innerHTML=BOND.map(function(x){return '<tr><td><b>'+esc(x.c)+'</b>'+(x.pre?' <span class="tag red">'+esc(x.pre)+'</span>':'')+'</td><td>'+esc(x.n)+'</td><td>'+esc(x.yr)+'</td><td>'+esc(x.f)+'</td><td>'+esc(x.r)+'</td></tr>';}).join('');
+    // 地图
+    renderMap();
+    // 搜索
+    var si=document.getElementById('mapSearch');
+    var fbtns=document.querySelectorAll('.searchbar .fbtn');
+    var curF='all';
+    function renderMap(){
+      var kw=(si.value||'').trim().toLowerCase();
+      var rows=MAPS.filter(function(x){
+        if(curF!=='all'){
+          var ok=(curF==='主线'&&x.t.indexOf('主线')>=0)||(curF==='日常'&&x.t.indexOf('日常')>=0)||(curF==='轻伏笔'&&x.t.indexOf('轻伏笔')>=0)||(curF==='学院'&&x.t.indexOf('学院')>=0)||(curF==='羁绊'&&x.t.indexOf('羁绊')>=0);
+          if(!ok) return false;
+        }
+        if(!kw) return true;
+        return (x.n+x.c+x.area+x.t+x.tr+x.h+x.r).toLowerCase().indexOf(kw)>=0;
+      });
+      var box=document.getElementById('mapRows');
+      if(!rows.length){ box.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text-secondary);padding:20px;">没有匹配的任务</td></tr>'; return; }
+      box.innerHTML=rows.map(function(x){
+        var tcls='gray'; if(x.t.indexOf('主线')>=0) tcls=''; else if(x.t.indexOf('学院')>=0||x.t.indexOf('羁绊')>=0) tcls='red';
+        return '<tr><td><b>'+esc(x.area)+'</b></td><td>'+esc(x.c)+'</td><td><b>'+esc(x.n)+'</b></td><td><span class="tag '+tcls+'">'+esc(x.t)+'</span></td><td class="dim">'+esc(x.tr)+'</td><td>'+esc(x.h)+'</td><td>'+esc(x.r)+'</td></tr>';
+      }).join('');
+    }
+    if(si) si.addEventListener('input',renderMap);
+    fbtns.forEach(function(b){
+      b.addEventListener('click',function(){
+        fbtns.forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on');
+        curF=b.getAttribute('data-f');
+        renderMap();
+      });
+    });
+  }
+  check();
+})();
+</script>
+</body>
+</html>

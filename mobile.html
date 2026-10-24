@@ -3452,6 +3452,8 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 
 <a class="feedback-btn" href="login.html" id="navProfileLink">登录</a>
 
+<a class="feedback-btn" href="planning.html" id="planLink" style="display:none;">策划</a>
+
 <span class="points-badge" id="ptsBadge" style="display:none;" onclick="openPtsModal()" title="查看积分明细"><span id="ptsNum">--</span><span style="font-size:12px;opacity:.8;margin-left:2px;">积分</span></span>
 
 <a class="feedback-btn" href="profile.html" id="navLoginBtn">我的</a>
@@ -9903,3 +9905,15 @@ try{ eval('const __t=()=>1;'); }catch(e){
 </script>
 </body>
 </html>
+<script>
+// 管理员入口：whoami 判定
+(function(){
+  var token=localStorage.getItem('tst_token')||'';
+  var link=document.getElementById('planLink');
+  if(!link) return;
+  if(!token){ link.style.display='none'; return; }
+  fetch('https://theslowtidefk.pages.dev/api/admin/users',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'whoami'}),cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+    if(d && d.ok && (d.admin_level||0)>=1){ link.style.display='inline-block'; }
+  }).catch(function(){});
+})();
+</script>

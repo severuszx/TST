@@ -1210,8 +1210,9 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
 <div id="lgUserAvatar" style="width:52px;height:52px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;flex-shrink:0;">👤</div>
 <div style="flex:1;min-width:0;">
-<div style="font-size:17px;font-weight:600;" id="lgUserNick">--</div>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><div style="font-size:17px;font-weight:600;" id="lgUserNick">--</div><span id="lgAdminTag" style="display:none;font-size:11px;color:#fff;background:var(--accent);border-radius:8px;padding:2px 9px;font-weight:600;letter-spacing:1px;">管理</span></div>
 <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="lgUserEmail">--</div>
+<div id="lgAdminLinks" style="display:none;margin-top:10px;"><a href="planning.html" style="display:inline-block;padding:7px 14px;border:1px solid var(--gold);border-radius:8px;background:var(--gold-soft);color:var(--gold);font-size:13px;font-weight:600;">策划资料台</a></div>
 </div>
 </div>
 <!-- 资料设置 -->
@@ -3560,6 +3561,17 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
         renderUidRow(d.uid);
         setToken(token, d.email, d.uid);
         loadMine('posts');
+        // ===== 管理员认证：显示管理标签 + 策划资料台入口 =====
+        fetch(AUTH+'/admin/users',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'whoami'}),cache:'no-store'}).then(function(r){return r.json();}).then(function(w){
+          var isAdmin = w && w.ok && (w.admin_level||0) >= 1;
+          var tag=document.getElementById('lgAdminTag');
+          var links=document.getElementById('lgAdminLinks');
+          if(tag) tag.style.display = isAdmin ? 'inline-block' : 'none';
+          if(links) links.style.display = isAdmin ? 'block' : 'none';
+          var hd=document.getElementById('hdAdminTag');
+          if(hd) hd.style.display = isAdmin ? 'inline-block' : 'none';
+          if(isAdmin) localStorage.setItem('tst_is_admin','1'); else localStorage.removeItem('tst_is_admin');
+        }).catch(function(){ var tag=document.getElementById('lgAdminTag'); if(tag) tag.style.display='none'; var links=document.getElementById('lgAdminLinks'); if(links) links.style.display='none'; });
       }else{
         setToken(null,null,null);
         location.href='login.html';
