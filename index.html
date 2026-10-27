@@ -354,6 +354,14 @@ html[data-theme="dark"] .eco-ok,html[data-theme="glass"] .eco-ok{color:#93e6a0;}
 .eco-pick{flex:none;width:38px;padding:0;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text-secondary);cursor:pointer;font-size:13px;line-height:1;height:38px;box-shadow:none;}
 /* 普通模式（浅色/深色）：关闭鼠标悬停位移/缩放/过渡动效；玻璃主题保留其效果 */
 html[data-theme="light"] :hover,html[data-theme="dark"] :hover{transform:none !important;transition:none !important;}
+
+/* 导航平铺：去掉下拉，手机端横向滚动 */
+.main-nav{flex-wrap:wrap;row-gap:6px;}
+.nav-more,.more-menu{display:none!important;}
+@media(max-width:820px){
+  .main-nav{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
+  .main-nav::-webkit-scrollbar{display:none;}
+}
 </style>
 
 <script>
@@ -2999,21 +3007,13 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <button class="nav-link" data-nav="rule">玩家公约</button>
 
-<div class="nav-more" id="navMore">
-
-<button class="nav-link" id="navMoreBtn">更多<span class="more-caret">&#9662;</span></button>
-
-<div class="more-menu" id="moreMenu">
-
 <button class="nav-link" data-nav="event">赛事活动</button>
 
 <button class="nav-link" data-nav="cdkey">兑换码</button>
 
 <button class="nav-link" data-nav="sponsor">服务器赞助</button>
 
-</div>
-
-</div>
+<button class="nav-link" data-nav="download">下载</button>
 
 </nav>
 
@@ -3751,6 +3751,33 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <div class="tip-message" id="ruleTip"></div>
 
 <div class="rule-scroll" id="ruleScrollDom"><div id="ruleContent"></div></div>
+
+</div>
+
+</section>
+
+
+<section id="download" class="page">
+
+<div class="container">
+
+<div class="section-title">下载客户端</div>
+
+<div class="card">
+
+  <h3 style="margin:0 0 6px;">The Slow Tide 官方客户端</h3>
+
+  <p style="margin:0 0 14px;color:var(--text-secondary);font-size:14px;">安卓指令工具 · 官网账号登录 · 指令库云端同步 · 选区助手 · 自动部署 · 官网功能直达</p>
+
+  <div class="search-row">
+
+    <a class="btn btn-primary" href="TheSlowTide.apk" download>下载 APK（v1.3.0）</a>
+
+  </div>
+
+  <p style="margin:12px 0 0;color:var(--text-secondary);font-size:12.5px;">安装时请允许「安装未知应用」。更新内容见公告；客户端更新可直接在应用内公告页下载安装包。</p>
+
+</div>
 
 </div>
 
