@@ -1,6 +1,6 @@
 {
-  "versionCode": 3,
-  "versionName": "1.2.0",
+  "versionCode": 4,
+  "versionName": "1.3.0",
   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
-  "note": "修复自动部署：兼容网易版自绘命令方块界面；新增坐标兜底与手动粘贴辅助；界面风格对齐主站液态玻璃"
+  "note": "界面重做去多余按钮；新增官网工具直达、指令库云端同步、选区助手、客户端内更新公告；修复自动部署无反应（失败自动复制指令到剪贴板）"
 }

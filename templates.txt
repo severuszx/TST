@@ -1,0 +1,40 @@
+# The Slow Tide 指令库
+# 每行格式: 指令名 | 说明 | 指令内容
+# 客户端会自动拉取本文件展示, 增删条目无需改客户端
+
+## 基础
+给玩家钻石 | 给自己 64 颗钻石（@s 可换成玩家名） | /give @s diamond 64
+设置时间 | 白天 1000 / 夜晚 13000 / 午夜 18000 | /time set 1000
+切换天气 | 晴朗 clear / 下雨 rain / 雷暴 thunder | /weather clear
+传送到坐标 | 传送到指定坐标（基岩版 X Y Z） | /tp @s 0 100 0
+设置重生点 | 把当前所在位置设为重生点 | /spawnpoint @s
+全服广播 | 向全服广播一条消息 | /tellraw @a {"rawtext":[{"text":"欢迎来到 The Slow Tide！"}]}
+
+## 常用
+防爆 | 关闭生物破坏（防爆常用） | /gamerule mobGriefing false
+防火焰蔓延 | 关闭火焰蔓延 | /gamerule doFireTick false
+全员传送 | 把所有人传送到身边 | /tp @a @s
+清空物品栏 | 清空指定玩家物品栏 | /clear @s
+给予所有玩家钻石 | 给服务器内所有玩家钻石 | /give @a diamond 32
+服务器规则 | 显示当前游戏规则列表 | /gamerule
+
+## 生物与 Boss
+召唤凋灵 | 在坐标处召唤凋灵（Boss） | /summon wither 0 100 0
+召唤末影龙 | 在坐标处召唤末影龙（Boss） | /summon ender_dragon 0 100 0
+玩家头顶祝福 | 给自己速度 2 效果 60 秒 | /effect @s speed 60 1
+
+## 建筑与区域
+封锁区域 | 填充玻璃方块封住区域（X1 Y1 Z1 到 X2 Y2 Z2） | /fill 0 0 0 10 10 10 glass
+清空区域 | 用空气填充一个区域 | /fill 0 0 0 10 10 10 air
+补全区域 | 用水填充一个区域 | /fill 0 0 0 10 10 10 water
+传送门 | 生成一个下界传送门框架（X1 Y1 Z1 到 X2 Y2 Z2） | /fill 0 0 0 10 10 10 nether_portal_frame
+
+## 服务器管理
+封禁玩家 | 封禁指定玩家 | /ban 玩家名
+解封玩家 | 解封指定玩家 | /pardon 玩家名
+踢出玩家 | 把指定玩家踢下线 | /kick 玩家名
+给予管理员 | 给予指定玩家管理员权限 | /op 玩家名
+移除管理员 | 移除指定玩家管理员权限 | /deop 玩家名
+白名单添加 | 把玩家加入白名单 | /whitelist add 玩家名
+白名单移除 | 把玩家移出白名单 | /whitelist remove 玩家名
+传送请求 | 传送一个玩家到自己身边 | /tp 玩家名 @s
