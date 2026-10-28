@@ -2,6 +2,13 @@
  "items": [
   {
    "date": "2026-10-28",
+   "title": "v1.4.2 新增终端与调试码体系",
+   "version": "1.4.2",
+   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
+   "body": "【新增：终端（百宝箱内）】\n· Windows 终端风格：深色背景、等宽字体、命令行交互。\n· 下载历史版本客户端必须通过终端调试码：输入 Download theslowtide 1.4.1 / 1.4.0 等即可下载对应版本安装包（客户端内不提供直接入口）。\n· 终端内支持 TSTSEED|种子 上报终端种子、whoami 查看账号、version 查看版本等调试码。\n\n【调整】\n· 主页底部精简为一行：版本 + 开源链接（不再堆按钮）。\n· 功能卡片图标去掉表情，改用单色符号。\n\n【修复】\n· 版本号统一由构建脚本注入，避免「已是最新还弹更新」误报。"
+  },
+  {
+   "date": "2026-10-28",
    "title": "v1.4.1 客户端 PCL2 化改造上线",
    "version": "1.4.1",
    "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
