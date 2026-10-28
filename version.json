@@ -1,6 +1,6 @@
 {
   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
-  "versionCode": 9,
-  "versionName": "1.4.4",
-  "note": "v1.4.4 修复启动闪退：登录按钮类型不匹配导致的崩溃已修复（崩溃日志定位到 MainActivity 登录按钮强转）。此前 v1.4.2/v1.4.3 启动闪退即由此引起。"
+  "versionCode": 10,
+  "versionName": "1.4.5",
+  "note": "v1.4.5 主页重做为 PCL2 交互布局（左侧导航栏+账号区+大启动钮），终端调试码大幅扩充：seed/skin/mc 直达跳转、points 查积分、工具直达。"
 }

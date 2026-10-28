@@ -2,6 +2,13 @@
  "items": [
   {
    "date": "2026-10-28",
+   "title": "v1.4.5 主页重做为 PCL2 交互布局 · 终端调试码扩充",
+   "version": "1.4.5",
+   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
+   "body": "【主页】\n· 全面改为 PCL2 式交互：左侧导航栏（主页/百宝箱/官网/商店/设置）+ 大启动按钮（开启悬浮窗进行导入）+ 账号头像卡片。\n\n【终端调试码扩充】\n· seed <种子>：直接打开种子查找器并加载该种子，无需手动粘贴。\n· skin <正版ID>：直接打开皮肤查询并查询该 ID（含 3D 预览）。\n· mc <版本>：直接打开 MC 下载并定位版本。\n· points：查询当前积分。\n· base64 / json / snowball / selector / sites / notice / lib / tools：直达对应工具。\n· 历史版本客户端仍用 Download theslowtide <版本> 下载。"
+  },
+  {
+   "date": "2026-10-28",
    "title": "v1.4.4 修复启动闪退（真正根因）",
    "version": "1.4.4",
    "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
