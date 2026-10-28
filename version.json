@@ -1,6 +1,6 @@
 {
   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
-  "versionCode": 7,
-  "versionName": "1.4.2",
-  "note": "v1.4.2：新增「终端」功能（Windows 终端风格），历史版本客户端只能通过终端调试码下载（Download theslowtide 版本号）；主页底部精简为一行版本+开源；功能卡片图标去表情化；版本号统一由构建注入，不再误报更新。"
+  "versionCode": 8,
+  "versionName": "1.4.3",
+  "note": "v1.4.3 稳定性修复：修复客户端启动闪退问题（清理构建残留 + 启动流程全面防崩，任何异常都会记录到崩溃日志而不直接退出）；历史版本继续通过终端调试码下载（Download theslowtide 1.4.0~1.4.2）。"
 }

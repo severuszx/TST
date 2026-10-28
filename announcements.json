@@ -2,6 +2,13 @@
  "items": [
   {
    "date": "2026-10-28",
+   "title": "v1.4.3 修复启动闪退",
+   "version": "1.4.3",
+   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
+   "body": "【修复】\n· 修复 v1.4.2 打开即闪退的问题：构建产物全量清理，杜绝旧代码残留；启动流程整体加固，异常会记录到崩溃日志并用提示代替退出。\n\n【保持】\n· 历史版本客户端仍只通过终端调试码下载：终端输入 Download theslowtide 1.4.2 / 1.4.1 / 1.4.0 即可下载对应版本。\n· 主页底部一行版本+开源；功能卡片单色图标。"
+  },
+  {
+   "date": "2026-10-28",
    "title": "v1.4.2 新增终端与调试码体系",
    "version": "1.4.2",
    "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
