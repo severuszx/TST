@@ -1,6 +1,6 @@
 {
-    "url":  "https://theslowtide.pages.dev/TheSlowTide.apk",
-    "versionCode":  5,
-    "versionName":  "1.4.0",
-    "note":  "v1.4.0 客户端全面重做：官网同款浅色风格；功能独立入口+每页问号帮助；新增 Base64 互译/JSON 显示/雪球菜单/MC 下载(含 PCL2 2.1.4)/网站直达/皮肤查询；公告详细重写；所有下载在软件内完成；图标修复。"
+  "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
+  "versionCode": 5,
+  "versionName": "1.4.0",
+  "note": "v1.4.0 客户端全面重做：官网同款浅色风格；功能独立入口+每页问号帮助；新增种子查找器(输入种子看世界地形与村庄/要塞，扫描消耗 800 积分)、Base64 互译/JSON 显示/雪球菜单/MC 下载(含 PCL2 2.1.4)/网站直达/皮肤查询；公告详细重写；所有下载在软件内完成；图标修复。"
 }
