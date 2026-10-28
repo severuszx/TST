@@ -1,6 +1,6 @@
 {
   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
-  "versionCode": 8,
-  "versionName": "1.4.3",
-  "note": "v1.4.3 稳定性修复：修复客户端启动闪退问题（清理构建残留 + 启动流程全面防崩，任何异常都会记录到崩溃日志而不直接退出）；历史版本继续通过终端调试码下载（Download theslowtide 1.4.0~1.4.2）。"
+  "versionCode": 9,
+  "versionName": "1.4.4",
+  "note": "v1.4.4 修复启动闪退：登录按钮类型不匹配导致的崩溃已修复（崩溃日志定位到 MainActivity 登录按钮强转）。此前 v1.4.2/v1.4.3 启动闪退即由此引起。"
 }

@@ -2,6 +2,13 @@
  "items": [
   {
    "date": "2026-10-28",
+   "title": "v1.4.4 修复启动闪退（真正根因）",
+   "version": "1.4.4",
+   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
+   "body": "【修复】\n· 根据崩溃日志定位到根因：主页登录按钮在布局里是 TextView，代码按 Button 读取导致启动即崩溃（ClassCastException）。已修复。\n· 这是 v1.4.2/v1.4.3 启动闪退的真正原因，此版本请务必更新。\n\n【保持】\n· 历史版本客户端通过终端调试码下载（Download theslowtide 1.4.0~1.4.3）。"
+  },
+  {
+   "date": "2026-10-28",
    "title": "v1.4.3 修复启动闪退",
    "version": "1.4.3",
    "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
