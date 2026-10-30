@@ -1,6 +1,13 @@
 {
  "items": [
   {
+   "date": "2026-10-29",
+   "title": "v1.4.6 终端去AI味 + 皮肤查询修复",
+   "version": "1.4.6",
+   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
+   "body": "【终端】\n· 删除顶部红黄绿圆点与多余提示文案。\n· 新增调试码：notice（公告）、lib（指令库）、tools（工具列表）；Download 支持 latest；version 输出修正。\n· 登录检测改为直接读取客户端登录状态。\n\n【皮肤查询】\n· 修复进不去/卡死问题：接口失败会给出明确提示与重试按钮，浏览器模式也可查询。"
+  },
+  {
    "date": "2026-10-28",
    "title": "v1.4.5 主页重做为 PCL2 交互布局 · 终端调试码扩充",
    "version": "1.4.5",

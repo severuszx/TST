@@ -1,6 +1,6 @@
 {
   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
-  "versionCode": 10,
-  "versionName": "1.4.5",
-  "note": "v1.4.5 主页重做为 PCL2 交互布局（左侧导航栏+账号区+大启动钮），终端调试码大幅扩充：seed/skin/mc 直达跳转、points 查积分、工具直达。"
+  "versionCode": 11,
+  "versionName": "1.4.6",
+  "note": "v1.4.6 终端页去AI味：删除红黄绿圆点与多余提示，新增 notice/lib/tools 等调试码；修复皮肤查询进不去与终端登录检测。"
 }
