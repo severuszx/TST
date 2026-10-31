@@ -1,6 +1,6 @@
 {
   "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
-  "versionCode": 11,
-  "versionName": "1.4.6",
-  "note": "v1.4.6 终端页去AI味：删除红黄绿圆点与多余提示，新增 notice/lib/tools 等调试码；修复皮肤查询进不去与终端登录检测。"
+  "versionCode": 12,
+  "versionName": "1.4.7",
+  "note": "v1.4.7 主页与百宝箱全面照搬 PCL2 布局（顶栏导航+左侧账号面板+右侧内容区），换 TST 配色；删除官网/商店跳转与所有多余符号；终端入口移入百宝箱底部低调收纳；终端 help 带功能注解、去掉输入框占位文字。"
 }
