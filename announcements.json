@@ -2,6 +2,13 @@
   "items": [
     {
       "date": "2026-11-01",
+      "title": "v1.4.9 下载改 PCL2 式大圆圈弹窗",
+      "version": "1.4.9",
+      "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
+      "body": "【下载】改成 PCL2 式下载弹窗：左边大圆圈显示总进度%，右边列出每个下载任务的文件名、进度条和状态。开始下载自动弹出，主页点击「下载」也能打开。"
+    },
+    {
+      "date": "2026-11-01",
       "title": "v1.4.8 单窗口切换 + 设置独立页 + 隐私原文",
       "version": "1.4.8",
       "url": "https://theslowtide.pages.dev/TheSlowTide.apk",

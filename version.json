@@ -1,1 +1,1 @@
-{"url": "https://theslowtide.pages.dev/TheSlowTide.apk", "versionCode": 13, "versionName": "1.4.8", "note": "v1.4.8 PCL2 式单窗口：顶部导航固定，切换只在导航栏下方内容区更换（主页/百宝箱/设置/功能页），页面不跳转、不弹新页；设置改为独立页收纳登录/版本号/开源/隐私/权限/说明；隐私政策打开正式稿原文；终端页全屏。"}
+{"url": "https://theslowtide.pages.dev/TheSlowTide.apk", "versionCode": 14, "versionName": "1.4.9", "note": "v1.4.9 下载改 PCL2 式大圆圈弹窗：左边大圆圈显示总进度百分比，右边列出每个下载任务（文件名/进度条/状态），开始下载自动弹出，主页点击「下载」也能打开。"}
