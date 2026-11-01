@@ -2,6 +2,13 @@
   "items": [
     {
       "date": "2026-11-01",
+      "title": "v1.5.0 启动加载动画（PCL2 式镐子挖方块）",
+      "version": "1.5.0",
+      "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
+      "body": "【加载动画】点击主页「开启悬浮窗进行导入」，先播放 PCL2 式启动加载动画：像素镐子挖掘草方块、方块随进度出现裂缝、底部绿色进度条推进到 100%，完成后自动开启悬浮窗。"
+    },
+    {
+      "date": "2026-11-01",
       "title": "v1.4.9 下载改 PCL2 式大圆圈弹窗",
       "version": "1.4.9",
       "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
