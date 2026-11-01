@@ -1,1 +1,1 @@
-{"url": "https://theslowtide.pages.dev/TheSlowTide.apk", "versionCode": 15, "versionName": "1.5.0", "note": "v1.5.0 主页「开启悬浮窗进行导入」点击显示 PCL2 式启动加载动画：像素镐子挖掘草方块、方块随进度出现裂缝、底部绿色进度条推进到 100%，完成后自动开启悬浮窗。"}
+{"url": "https://theslowtide.pages.dev/TheSlowTide.apk", "versionCode": 16, "versionName": "1.5.1", "note": "v1.5.1 修复 MC 下载页卡死：请求改异步不再同步卡住；基岩版点版本跳第三方站（MCPEDL）下载对应版本；功能页打开时显示 PCL2 式镐子挖方块加载动画覆盖加载空窗。"}

@@ -2,6 +2,13 @@
   "items": [
     {
       "date": "2026-11-01",
+      "title": "v1.5.1 修复下载卡死 + 基岩版第三方下载 + 功能页加载动画",
+      "version": "1.5.1",
+      "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
+      "body": "【MC 下载】修复点下载卡死：请求改异步，不再同步卡住页面。基岩版点版本跳第三方站（MCPEDL）下载对应版本安装包。\n【加载动画】功能页（如 MC 下载）打开加载时显示 PCL2 式镐子挖方块动画，加载完成自动消失。"
+    },
+    {
+      "date": "2026-11-01",
       "title": "v1.5.0 启动加载动画（PCL2 式镐子挖方块）",
       "version": "1.5.0",
       "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
