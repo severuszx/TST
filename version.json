@@ -1,1 +1,1 @@
-{"url": "https://theslowtide.pages.dev/TheSlowTide.apk", "versionCode": 16, "versionName": "1.5.1", "note": "v1.5.1 修复 MC 下载页卡死：请求改异步不再同步卡住；基岩版点版本跳第三方站（MCPEDL）下载对应版本；功能页打开时显示 PCL2 式镐子挖方块加载动画覆盖加载空窗。"}
+{"url": "https://theslowtide.pages.dev/TheSlowTide.apk", "versionCode": 17, "versionName": "1.5.2", "note": "v1.5.2 下载大圆圈直接内联主页下载区（不再点开弹窗）；MC 下载只走国内镜像不再闪退；功能页加载动画覆盖到页面数据就绪；页面内 JS 弹窗（alert/confirm）全部改为软件自绘弹窗。"}
