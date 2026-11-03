@@ -1,1 +1,6 @@
-{"url": "https://theslowtide.pages.dev/TheSlowTide.apk", "versionCode": 17, "versionName": "1.5.2", "note": "v1.5.2 下载大圆圈直接内联主页下载区（不再点开弹窗）；MC 下载只走国内镜像不再闪退；功能页加载动画覆盖到页面数据就绪；页面内 JS 弹窗（alert/confirm）全部改为软件自绘弹窗。"}
+{
+  "url": "https://theslowtide.pages.dev/TheSlowTide.apk",
+  "versionCode": 18,
+  "versionName": "1.5.3",
+  "note": "v1.5.3 修复点击功能页面串台（显示上一次功能页）；修复皮肤查询卡死不可用；Java 版下载改为原生后台解析（不再卡在获取链接、不再闪退）；加载动画所有功能页均可见；更新公告只提供最新版安装包下载，不再能下往期包。"
+}
