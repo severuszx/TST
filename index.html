@@ -1363,17 +1363,31 @@ padding:14px 18px;box-shadow:var(--shadow);
 
 }
 
-.java-top{display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-size:14px;}
+.java-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;}
 
-.java-top .label{color:var(--text-secondary);}
+.java-name{font-weight:600;font-size:15px;}
 
-.java-addr{margin-top:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:14px;}
+.java-state{font-size:13px;color:var(--text-secondary);}
+
+.java-updated{margin-left:auto;font-size:12.5px;color:var(--text-secondary);}
+
+.java-addr{margin-top:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:14px;}
+
+.java-addr .label{color:var(--text-secondary);}
+
+.java-meta{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+
+.jstat-k{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:2px;}
+
+.jstat-v{display:block;font-size:15px;font-weight:600;letter-spacing:.2px;}
+
+.java-note{margin-top:10px;font-size:12.5px;line-height:1.65;color:var(--text-secondary);}
 
 .status-dot.off{background:#ef4444;}
 
 .status-dot.idle{background:#94a3b8;}
 
-.players-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.players-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;}
 
 .pchip{display:flex;align-items:center;gap:7px;padding:3px 9px 3px 3px;border:1px solid var(--border);border-radius:8px;}
 
@@ -3353,29 +3367,39 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <div class="java-card">
 
-<div class="java-top">
+<div class="java-head">
 
-<div class="item"><span class="status-dot idle" id="javaDot"></span><strong id="javaState">检测中</strong><span class="label" id="javaUpdated"></span></div>
+<span class="status-dot idle" id="javaDot"></span>
 
-<div class="item"><span class="label">在线：</span><strong id="javaCount">—</strong></div>
+<span class="java-name">Java 版 · the slow tide</span>
 
-<div class="item"><span class="label">版本：</span><span id="javaVer">—</span></div>
+<span class="java-state" id="javaState">检测中</span>
 
-<div class="item"><span class="label">TPS：</span><span id="javaTps">—</span></div>
+<span class="java-updated" id="javaUpdated"></span>
 
 </div>
 
 <div class="java-addr">
 
-<span class="label">Java 版 · the slow tide：</span><span class="addr" id="javaAddr">mcp17.rhymc.com:1073</span>
+<span class="label">地址：</span><span class="addr" id="javaAddr">mcp17.rhymc.com:1073</span>
 
 <button class="btn" id="javaCopyBtn" style="padding:5px 10px;font-size:13px;">复制</button>
 
-<span class="label" style="font-size:12.5px;">Paper 1.21.1 · 与网易基岩服独立存档、独立规则、不互通</span>
+</div>
+
+<div class="java-meta">
+
+<div><span class="jstat-k">在线人数</span><span class="jstat-v" id="javaCount">—</span></div>
+
+<div><span class="jstat-k">版本</span><span class="jstat-v" id="javaVer">—</span></div>
+
+<div><span class="jstat-k">TPS</span><span class="jstat-v" id="javaTps">—</span></div>
 
 </div>
 
 <div class="players-strip" id="javaPlayers"><span class="pempty">正在读取在线玩家…</span></div>
+
+<div class="java-note">Paper 1.21.1 · 与网易基岩服独立存档、独立规则、不互通</div>
 
 </div>
 
@@ -9158,8 +9182,8 @@ try{ eval('const __t=()=>1;'); }catch(e){
   function ago(ts){
     if(!ts) return '';
     var s=Math.max(0,Math.round((Date.now()-ts)/1000));
-    if(s<60) return '· 上次上报 '+s+' 秒前';
-    return '· 上次上报 '+Math.round(s/60)+' 分钟前';
+    if(s<60) return '上次上报 '+s+' 秒前';
+    return '上次上报 '+Math.round(s/60)+' 分钟前';
   }
 
   function render(d){
