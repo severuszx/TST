@@ -1351,6 +1351,38 @@ padding:14px 18px;box-shadow:var(--shadow);
 
 .addr{font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--accent);word-break:break-all;}
 
+/* ===== Java 服 · the slow tide（真实状态检测） ===== */
+
+.java-bar{padding:0 0 6px;}
+
+.java-card{
+
+background:var(--card);border:1px solid var(--border);border-radius:10px;
+
+padding:14px 18px;box-shadow:var(--shadow);
+
+}
+
+.java-top{display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-size:14px;}
+
+.java-top .label{color:var(--text-secondary);}
+
+.java-addr{margin-top:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:14px;}
+
+.status-dot.off{background:#ef4444;}
+
+.status-dot.idle{background:#94a3b8;}
+
+.players-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+
+.pchip{display:flex;align-items:center;gap:7px;padding:3px 9px 3px 3px;border:1px solid var(--border);border-radius:8px;}
+
+.pavatar{width:26px;height:26px;border-radius:4px;display:block;image-rendering:pixelated;}
+
+.pname{font-size:13px;line-height:1;}
+
+.pempty{font-size:13px;color:var(--text-secondary);}
+
 /* ===== Section 通用 ===== */
 
 .section{padding:26px 0;}
@@ -3308,6 +3340,42 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <button class="btn" id="copyAddrBtn" style="padding:5px 10px;font-size:13px;">复制</button></div>
 
 <div class="item"><span class="label">QQ交流群：</span><button class="btn" id="openQQGroup" style="padding:5px 10px;font-size:13px;">833470853</button></div>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="java-bar">
+
+<div class="container">
+
+<div class="java-card">
+
+<div class="java-top">
+
+<div class="item"><span class="status-dot idle" id="javaDot"></span><strong id="javaState">检测中</strong><span class="label" id="javaUpdated"></span></div>
+
+<div class="item"><span class="label">在线：</span><strong id="javaCount">—</strong></div>
+
+<div class="item"><span class="label">版本：</span><span id="javaVer">—</span></div>
+
+<div class="item"><span class="label">TPS：</span><span id="javaTps">—</span></div>
+
+</div>
+
+<div class="java-addr">
+
+<span class="label">Java 版 · the slow tide：</span><span class="addr" id="javaAddr">mcp17.rhymc.com:1073</span>
+
+<button class="btn" id="javaCopyBtn" style="padding:5px 10px;font-size:13px;">复制</button>
+
+<span class="label" style="font-size:12.5px;">Paper 1.21.1 · 与网易基岩服独立存档、独立规则、不互通</span>
+
+</div>
+
+<div class="players-strip" id="javaPlayers"><span class="pempty">正在读取在线玩家…</span></div>
 
 </div>
 
@@ -6779,7 +6847,7 @@ intro:[
 
 toc:[
 
-['sec1','基础行为规范'],['sec2','聊天与社交规范'],['sec3','建筑与领地保护'],['sec4','资源采集与环境维护'],['sec5','经济与交易规则'],['sec6','PVP与战斗行为'],['sec7','红石与生电设备规范'],['sec8','生物与村民管理'],['sec9','玩家权益与反馈渠道'],['sec10','违规处理与处罚制度'],['sec11','服务器管理组职责'],['sec12','活动与赛事规则'],['sec13','数据与存档管理'],['sec14','规则更新与解释权'],['sec15','末地公约']
+['sec1','基础行为规范'],['sec2','聊天与社交规范'],['sec3','建筑与领地保护'],['sec4','资源采集与环境维护'],['sec5','经济与交易规则'],['sec6','PVP与战斗行为'],['sec7','红石与生电设备规范'],['sec8','生物与村民管理'],['sec9','玩家权益与反馈渠道'],['sec10','违规处理与处罚制度'],['sec11','服务器管理组职责'],['sec12','活动与赛事规则'],['sec13','数据与存档管理'],['sec14','规则更新与解释权'],['sec15','末地公约'],['sec16','Java服（the slow tide）独立规则']
 
 ],
 
@@ -7031,6 +7099,30 @@ sections:[
 '禁止利用漏洞重复获取龙蛋、鞘翅等稀有物品，违者按违规处理。',
 '鼓励合理采集与探索，带走资源的同时尽量维护末地原貌。破坏末地环境者，将视情节予以警告、清除违规资产或封禁处罚。',
 '末地全境禁止放置哭泣的黑曜石。'
+]},
+
+{id:'sec16',title:'16. Java 服（the slow tide）独立规则',paras:[
+
+'Java 版服务器「the slow tide」与网易基岩版 TST 山头独立运营：独立存档、独立规则、账号与数据不互通。本条约其余条款在不与本条冲突的前提下同样适用于 Java 服。',
+
+'服务器地址 mcp17.rhymc.com:1073，核心为 Paper 1.21.1，采用离线登录（不校验正版账号）。进服后请立即用 /login 设置自己的密码并牢记；昵称先到先得，禁止冒用他人昵称、顶替他人身份上线。',
+
+'离线登录意味着任何人都可能用任意昵称进服，务必设置密码。因未设密码、密码外泄导致的物品丢失、账号被顶，管理组不承担赔偿责任。',
+
+'Java 服对红石机械、刷怪塔、村民交易所等生电设施采取宽松态度：允许建造并长期运行，不设规模上限。但仍须遵守三点：设备带独立开关、人走机停；禁止刻意制造卡顿的超高频红石钟与超大范围实体聚集装置；服务器 TPS 持续低于 15 时，管理组有权要求限流或拆除相关设施。',
+
+'领地保护使用 GriefPrevention 圈地，未圈地区域同样不受保护；主城、出生点与公共设施周边禁止圈地占位。',
+
+'禁止使用外挂、自动挖矿、飞行、X-Ray 等任何作弊客户端与模组。光影、小地图等纯客户端优化允许使用，但不得读取服务端未发送的数据。',
+
+'禁止利用离线登录机制批量注册小号刷物资、刷领地；同一玩家的小号共享处罚。',
+
+'Java 服与网易基岩服之间不提供任何形式的物品、货币、建筑、存档转移，两边经济与规则各自独立。',
+
+'Java 服的问题反馈与申诉同样走官网反馈站（https://theslowtidefk.pages.dev/）与官方 QQ 群 833470853，不接受私聊管理处理纠纷。',
+
+'本条自 Java 服上线起生效。管理组可根据实际运行情况调整并在官网公告，调整后继续游玩即视为同意。'
+
 ]}
 
 ],
@@ -9027,5 +9119,92 @@ try{ eval('const __t=()=>1;'); }catch(e){
   fetch('https://theslowtidefk.pages.dev/api/admin/users',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'whoami'}),cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
     if(d && d.ok && (d.admin_level||0)>=1){ link.style.display='inline-block'; }
   }).catch(function(){});
+})();
+</script>
+<script>
+// Java 服 · the slow tide 实时状态：数据来自服务器插件每 30 秒上报，不是模拟值
+(function(){
+  var URL_STATE='/api/tst-status/state';
+  var dot=document.getElementById('javaDot'), st=document.getElementById('javaState'),
+      cnt=document.getElementById('javaCount'), ver=document.getElementById('javaVer'),
+      tps=document.getElementById('javaTps'), strip=document.getElementById('javaPlayers'),
+      upd=document.getElementById('javaUpdated'), addr=document.getElementById('javaAddr'),
+      copyBtn=document.getElementById('javaCopyBtn');
+  if(!st) return;
+
+  function fnv(s){var h=2166136261>>>0;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=(h*16777619)>>>0;}return h>>>0;}
+  var SKIN=['#e8b796','#d8a07a','#c98f6a','#f0c8a8','#b87b56'];
+  var HAIR=['#2b1b12','#4a2f1b','#1c1c1c','#6b4a2a','#8c6239','#d9c27a'];
+  var SHIRT=['#3b6ea5','#2f7d5b','#a53b3b','#6a4fa3','#3f3f46','#b07a2c'];
+  function avatarDataUri(name){
+    var h=fnv(name||'?');
+    var skin=SKIN[h%SKIN.length], hair=HAIR[(h>>>5)%HAIR.length], shirt=SHIRT[(h>>>9)%SHIRT.length];
+    var r=[];
+    for(var y=0;y<8;y++){
+      for(var x=0;x<8;x++){
+        var c=skin;
+        if(y<2){ c=(((h>>>(y*8+x))&3)===0)?skin:hair; }
+        else if(y===7){ c=shirt; }
+        r.push('<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+c+'"/>');
+      }
+    }
+    r.push('<rect x="2" y="3" width="1" height="1" fill="#1f2328"/>');
+    r.push('<rect x="5" y="3" width="1" height="1" fill="#1f2328"/>');
+    r.push('<rect x="3" y="5" width="2" height="1" fill="#b07a72"/>');
+    var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8" width="26" height="26" shape-rendering="crispEdges">'+r.join('')+'</svg>';
+    return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+  }
+
+  function ago(ts){
+    if(!ts) return '';
+    var s=Math.max(0,Math.round((Date.now()-ts)/1000));
+    if(s<60) return '· 上次上报 '+s+' 秒前';
+    return '· 上次上报 '+Math.round(s/60)+' 分钟前';
+  }
+
+  function render(d){
+    d=d||{};
+    var online=!!d.online;
+    dot.className='status-dot '+(online?'':(d.reason==='no_data'?'idle':'off'));
+    st.textContent=online?'在线':(d.reason==='no_data'?'等待首次上报':'离线');
+    cnt.textContent=online?((d.onlineCount||0)+' / '+(d.max||0)):'—';
+    ver.textContent=d.version||'—';
+    tps.textContent=(online&&d.tps!==null&&d.tps!==undefined)?d.tps:'—';
+    upd.textContent=ago(d.receivedAt);
+    if(!online){
+      strip.innerHTML='<span class="pempty">'+(d.reason==='no_data'?'服务器插件还没上报过状态':'服务器当前未运行')+'</span>';
+      return;
+    }
+    var ps=d.players||[];
+    if(!ps.length){ strip.innerHTML='<span class="pempty">没有玩家在线</span>'; return; }
+    strip.innerHTML='';
+    ps.forEach(function(p){
+      var chip=document.createElement('div'); chip.className='pchip';
+      var img=document.createElement('img'); img.className='pavatar'; img.alt=p.name||'';
+      var fb=avatarDataUri(p.name||'');
+      if(p.skin && p.uuid){ img.src='https://mc-heads.net/avatar/'+encodeURIComponent(p.uuid)+'/26'; }
+      else { img.src=fb; }
+      img.onerror=function(){ img.onerror=null; img.src=fb; };
+      var nm=document.createElement('span'); nm.className='pname'; nm.textContent=p.name||'未知';
+      chip.appendChild(img); chip.appendChild(nm); strip.appendChild(chip);
+    });
+  }
+
+  function tick(){
+    fetch(URL_STATE,{cache:'no-store'})
+      .then(function(r){return r.json();})
+      .then(render)
+      .catch(function(){ render({online:false,reason:'error'}); });
+  }
+  if(copyBtn){
+    copyBtn.addEventListener('click',function(){
+      var v=(addr&&addr.textContent||'').trim();
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(v); }
+      copyBtn.textContent='已复制'; setTimeout(function(){copyBtn.textContent='复制';},1200);
+    });
+  }
+  tick();
+  setInterval(tick,30000);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden){ tick(); } });
 })();
 </script>
