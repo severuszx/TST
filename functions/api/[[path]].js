@@ -8,6 +8,12 @@
 const SUPABASE_URL = 'https://jilcbcodphxpasicjghv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs';
 const DATA_ORIGIN = 'https://tst-server-site.pages.dev';
+// Java 服（the slow tide）状态：插件每 30 秒 POST 一次，这里只做接收与缓存，不主动连服务器
+const TST_TOKEN = '0e18fe94d4f9259cb0eb3f59c44f6984a8a280ad399b1fb7';
+const TST_KEY = 'tst_status_v1';
+const TST_STALE_MS = 95000; // 上报间隔 30 秒，超过 95 秒没消息即判离线
+function tstMemSet(rec) { try { globalThis.__TST_STATUS_REC = rec; } catch (e) { /* 忽略 */ } }
+function tstMemGet() { try { return globalThis.__TST_STATUS_REC || null; } catch (e) { return null; } }
 // 管理员口令：注意此文件在公开仓库，密码会随源码可见；后续需改为环境变量+数据库侧改密
 let ADMIN_PWD = null; // 管理员口令：仅由 onRequest 从环境变量 ADMIN_PWD 注入（仓库不含口令）
 // ===== 调试台验证（同源；前端优先调用，兜底反馈站）=====
@@ -116,6 +122,71 @@ export async function onRequest(context) {
     const feat = DEBUG_CODES[code];
     if (feat) return json({ ok: true, feature: feat }, 200, request);
     return json({ ok: false, error: 'bad_code' }, 200, request);
+  }
+
+  // ===== Java 服 · the slow tide：状态推送与查询（插件只出站 POST，不占任何端口）=====
+  if (path === '/api/tst-status/push' && request.method === 'POST') {
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    const want = (context && context.env && context.env.TST_STATUS_TOKEN) || TST_TOKEN;
+    if (String(bd.token || '') !== want) return json({ ok: false, error: 'bad_token' }, 403, request);
+    const players = Array.isArray(bd.players) ? bd.players.slice(0, 64).map(function (p) {
+      return {
+        name: String((p && p.name) || '').slice(0, 32),
+        uuid: String((p && p.uuid) || '').slice(0, 64),
+        skin: (p && p.skin) ? String(p.skin).slice(0, 512) : null,
+      };
+    }).filter(function (p) { return p.name; }) : [];
+    const rec = {
+      name: String(bd.name || 'The Slow Tide').slice(0, 48),
+      online: Number(bd.online) || 0,
+      max: Number(bd.max) || 0,
+      version: String(bd.version || '').slice(0, 32),
+      tps: (typeof bd.tps === 'number') ? bd.tps : null,
+      shutdown: !!bd.shutdown,
+      players: players,
+      receivedAt: Date.now(),
+    };
+    try {
+      const tstKv = (context && context.env && context.env.SITE_CACHE) || null;
+      if (tstKv) await tstKv.put(TST_KEY, JSON.stringify(rec), { expirationTtl: 3600 });
+      else tstMemSet(rec);
+    } catch (e) {
+      tstMemSet(rec);
+      return json({ ok: false, error: 'kv_unavailable', receivedAt: rec.receivedAt }, 200, request);
+    }
+    return json({ ok: true, receivedAt: rec.receivedAt }, 200, request);
+  }
+
+  if (path === '/api/tst-status/state') {
+    let rec = null;
+    try {
+      const tstKv = (context && context.env && context.env.SITE_CACHE) || null;
+      if (tstKv) {
+        const raw = await tstKv.get(TST_KEY);
+        if (raw) rec = JSON.parse(raw);
+      }
+    } catch (e) { rec = null; }
+    if (!rec) rec = tstMemGet();
+    const noStore = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
+    if (!rec) {
+      return new Response(JSON.stringify({ ok: true, online: false, reason: 'no_data' }), { status: 200, headers: { ...noStore, ...corsHeaders(request) } });
+    }
+    const age = Date.now() - (rec.receivedAt || 0);
+    const online = !rec.shutdown && age < TST_STALE_MS;
+    return new Response(JSON.stringify({
+      ok: true,
+      online: online,
+      reason: online ? 'live' : (rec.shutdown ? 'shutdown' : 'stale'),
+      onlineCount: online ? rec.online : 0,
+      max: rec.max,
+      version: rec.version,
+      tps: rec.tps,
+      players: online ? rec.players : [],
+      receivedAt: rec.receivedAt,
+      ageMs: age,
+      name: rec.name,
+    }), { status: 200, headers: { ...noStore, ...corsHeaders(request) } });
   }
 
   // ===== 抽奖状态查询（含开放状态/剩余码数/今日已抽）=====
@@ -299,3 +370,4 @@ export async function onRequest(context) {
 
   return new Response('Not found', { status: 404 });
 }
+
