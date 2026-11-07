@@ -6570,7 +6570,7 @@ function appendChat(m){
     +'<span class="c-text">'+esc(m.message||'')+'</span><span class="c-time">'+t+'</span>';
   row.innerHTML=html;
   var nb=row.querySelector('.c-name');
-  if(nb)nb.onclick=function(){openNickMenu(this.getAttribute('data-nick'),this);};
+  if(nb)nb.onclick=function(ev){ev.stopPropagation();openNickMenu(this.getAttribute('data-nick'),this);};
   var near=box.scrollHeight-box.scrollTop-box.clientHeight<70;
   box.appendChild(row);
   if(near||!box.dataset.userScroll)box.scrollTop=box.scrollHeight;
@@ -6610,7 +6610,7 @@ function loadOlderChat(){
       var safe=esc(m.sender||'');
       row.innerHTML=srcTag(m.kind)+'<button class="c-name" type="button" data-nick="'+safe+'">'+safe+'</button><span class="c-text">'+esc(m.message||'')+'</span><span class="c-time">'+esc((m.ts||'').toString().slice(11,16))+'</span>';
       var nb=row.querySelector('.c-name');
-      if(nb)nb.onclick=function(){openNickMenu(this.getAttribute('data-nick'),this);};
+      if(nb)nb.onclick=function(ev){ev.stopPropagation();openNickMenu(this.getAttribute('data-nick'),this);};
       frag.insertBefore(row,frag.firstChild);
     });
     box.insertBefore(frag,box.firstChild);
@@ -6634,7 +6634,7 @@ function doChatSearch(){
       var safe=esc(m.sender||'');
       row.innerHTML=srcTag(m.kind)+'<button class="c-name" type="button" data-nick="'+safe+'">'+safe+'</button><span class="c-text">'+esc(m.message||'')+'</span><span class="c-time">'+esc((m.ts||'').toString().slice(11,16))+'</span>';
       var nb=row.querySelector('.c-name');
-      if(nb)nb.onclick=function(){openNickMenu(this.getAttribute('data-nick'),this);};
+      if(nb)nb.onclick=function(ev){ev.stopPropagation();openNickMenu(this.getAttribute('data-nick'),this);};
       box.appendChild(row);
     });
     box.scrollTop=0;
