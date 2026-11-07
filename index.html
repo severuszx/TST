@@ -3955,15 +3955,11 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <input type="text" class="tst-field" id="logQuery" placeholder="关键词过滤，例如 Exception、TSTStatus" autocomplete="off">
 <button class="btn" id="logLoadBtn" type="button">刷新</button>
 </div>
-<div class="log-box" id="logBox">需要管理员密码后查看</div>
+<div class="log-box" id="logBox">请使用管理员账号登录后查看</div>
 <div class="panel-note">日志仅管理员可见，保留最近 2 天，最新的在最上面；ERROR / WARN 已按颜色标出。</div>
 </div>
 
 <div class="panel-pane" id="paneCmd">
-<div class="pw-row">
-<input type="password" class="tst-field" id="panelPw" placeholder="管理员密码" autocomplete="off">
-<button class="btn btn-primary" id="panelPwBtn" type="button">验证</button>
-</div>
 <div class="chat-input-row">
 <input type="text" class="tst-field" id="cmdInput" placeholder="输入指令，不带 /，例如 say 服务器将在 10 分钟后维护" autocomplete="off" maxlength="200">
 <button class="btn btn-primary" id="cmdSendBtn" type="button">下发</button>
@@ -6373,32 +6369,16 @@ function chatInit(){
 
 }
 
-async function openChatCmd(){
+function openChatCmd(){
 
-  var pw=await TSTUI.ask({title:'管理员验证',label:'管理员密码',type:'password'});
+  switchPage('panel');
+  if(window.__panelTab) window.__panelTab('paneCmd');
+  checkPanelAdminAndFocus();
+}
 
-  if(pw===null)return;
-
-  var cmd=await TSTUI.ask({title:'执行指令',label:'指令（不带 /）',placeholder:'例如 say 服务器将在 10 分钟后维护'});
-
-  if(cmd===null||!cmd.trim())return;
-
-  fetch('/api/chat/cmd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pw:pw,cmd:cmd.trim()})})
-
-  .then(function(r){return r.json();})
-
-  .then(function(d){
-
-    if(d&&d.ok){showToast('指令已下发至机器人执行');}
-
-    else if(d&&d.error==='wrong_password'){showToast('密码错误');}
-
-    else{showToast('下发失败，请重试');}
-
-  })
-
-  .catch(function(){showToast('下发失败，请稍后再试');});
-
+function checkPanelAdminAndFocus(){
+  // 面板内部会按账号管理员标签自动放行，这里只负责切页与聚焦
+  setTimeout(function(){ var i=document.getElementById('cmdInput'); if(i && !i.disabled) i.focus(); },300);
 }
 
 var chatBeforeId=0, chatSearchK="", chatUnread=0, chatOldestId=0, chatSeenId=0;
@@ -9782,7 +9762,29 @@ try{ eval('const __t=()=>1;'); }catch(e){
   };
 
   var inited=false;
-  function pw(){ return sessionStorage.getItem('tst_panel_pw')||''; }
+  var panelIsAdmin=false, adminChecked=false;
+  function tk(){ return localStorage.getItem('tst_token')||''; }
+  function authHeaders(){ return tk()?{'Authorization':'Bearer '+tk()}:{}; }
+  function checkAdmin(cb){
+    if(adminChecked){ if(cb)cb(); return; }
+    adminChecked=true;
+    var t=tk();
+    if(!t){ panelIsAdmin=false; if(cb)cb(); return; }
+    fetch('https://theslowtidefk.pages.dev/api/admin/users',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({action:'whoami'}),cache:'no-store'})
+      .then(function(r){return r.json();}).then(function(w){
+        panelIsAdmin=!!(w&&w.ok&&(Number(w.admin_level||0)>=1));
+        applyAdminGate();
+        if(cb)cb();
+      }).catch(function(){ panelIsAdmin=false; applyAdminGate(); if(cb)cb(); });
+  }
+  function applyAdminGate(){
+    var cmd=document.getElementById('cmdInput'), btn=document.getElementById('cmdSendBtn');
+    if(cmd) cmd.disabled=!panelIsAdmin;
+    if(btn) btn.disabled=!panelIsAdmin;
+    if(cmd) cmd.placeholder=panelIsAdmin?'输入指令，不带 /，例如 say 服务器将在 10 分钟后维护':'需要管理员账号才能下发指令';
+    var box=document.getElementById('logBox');
+    if(box && !panelIsAdmin) box.textContent='请使用管理员账号登录后查看';
+  }
   function setMsg(el,t){ if(el) el.textContent=t; }
 
   function loadStats(){
@@ -9810,13 +9812,13 @@ try{ eval('const __t=()=>1;'); }catch(e){
   function loadLog(){
     var box=document.getElementById('logBox');
     if(!box) return;
-    if(!pw()){ box.textContent='需要管理员密码后查看'; return; }
+    if(!panelIsAdmin){ box.textContent='请使用管理员账号登录后查看'; checkAdmin(loadLog); return; }
     var lv=(document.getElementById('logLevel')||{}).value||'';
     var q=((document.getElementById('logQuery')||{}).value||'').trim();
     var url='/api/tst-log/list?limit=400'+(lv?'&level='+encodeURIComponent(lv):'')+(q?'&q='+encodeURIComponent(q):'');
     box.textContent='读取中…';
-    fetch(url,{cache:'no-store',headers:{'x-admin-pw':pw()}}).then(function(r){return r.json();}).then(function(d){
-      if(!d||!d.ok){ box.textContent=d&&d.error==='forbidden'?'密码错误或权限不足':('读取失败：'+((d&&d.error)||'未知')); return; }
+    fetch(url,{cache:'no-store',headers:authHeaders()}).then(function(r){return r.json();}).then(function(d){
+      if(!d||!d.ok){ box.textContent=d&&d.error==='forbidden'?'当前账号没有管理员权限':('读取失败：'+((d&&d.error)||'未知')); return; }
       var logs=d.logs||[];
       if(!logs.length){ box.textContent='暂无日志'; return; }
       box.innerHTML=logs.map(function(l){
@@ -9868,14 +9870,14 @@ try{ eval('const __t=()=>1;'); }catch(e){
     if(!inp||!out) return;
     var cmd=(inp.value||'').trim();
     if(!cmd){ inp.focus(); return; }
-    if(!pw()){ out.textContent='请先在上方填入管理员密码'; return; }
+    if(!panelIsAdmin){ out.textContent='当前账号没有管理员权限，请用管理员账号登录'; checkAdmin(function(){}); return; }
     out.textContent+=(out.textContent?'\n':'')+'> '+cmd+'\n  下发中…';
-    fetch('/api/tst-cmd/send',{method:'POST',headers:{'Content-Type':'application/json','x-admin-pw':pw()},body:JSON.stringify({cmd:cmd})})
+    fetch('/api/tst-cmd/send',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},authHeaders()),body:JSON.stringify({cmd:cmd})})
       .then(function(r){return r.json();}).then(function(d){
         out.textContent=out.textContent.replace('  下发中…','');
         if(d&&d.ok){ out.textContent+='  已排队，等待插件取走…\n'; pollCmdResult(cmd); }
         else if(d&&d.error==='command_blocked'){ out.textContent+='  该指令不在放行名单里\n'; }
-        else if(d&&d.error==='forbidden'){ out.textContent+='  密码错误或权限不足\n'; }
+        else if(d&&d.error==='forbidden'){ out.textContent+='  当前账号没有管理员权限\n'; }
         else { out.textContent+='  下发失败：'+((d&&d.error)||'未知')+'\n'; }
         out.scrollTop=out.scrollHeight;
         inp.value='';
@@ -9884,16 +9886,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
 
   window.panelInit=function(){
     if(inited) return; inited=true;
-    var pwin=document.getElementById('panelPw');
-    if(pwin && pw()) pwin.value=pw();
-    var pbtn=document.getElementById('panelPwBtn');
-    if(pbtn) pbtn.onclick=function(){
-      var v=(pwin.value||'').trim();
-      if(!v){ showToast('请输入管理员密码'); return; }
-      sessionStorage.setItem('tst_panel_pw',v);
-      showToast('密码已保存，本页有效');
-      loadLog();
-    };
+    checkAdmin(function(){});
     document.querySelectorAll('.panel-tab').forEach(function(t){
       t.onclick=function(){
         document.querySelectorAll('.panel-tab').forEach(function(x){x.classList.remove('on');});
@@ -9902,6 +9895,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
         var p=document.getElementById(t.getAttribute('data-pane'));
         if(p) p.classList.add('on');
         if(t.getAttribute('data-pane')==='paneLog') loadLog();
+        if(t.getAttribute('data-pane')==='paneCmd') checkAdmin(function(){});
         if(t.getAttribute('data-pane')==='paneEvt') loadEvt();
         if(t.getAttribute('data-pane')==='panePerf'){ loadStats(); window.TSTDrawPerf('panelChart','panelPerfNote'); }
       };
