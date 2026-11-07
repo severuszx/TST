@@ -3832,6 +3832,36 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 .status-line .dot{width:10px;height:10px;border-radius:50%;background:#888;flex:none;}
 .status-line .dot.on{background:#3ddc84;box-shadow:0 0 8px rgba(61,220,132,.7);}
 .status-line .dot.off{background:#e05a5a;box-shadow:0 0 8px rgba(224,90,90,.6);}
+.chat-tools{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+.chat-tools .tst-field{flex:1;min-width:140px;max-width:260px;}
+.chat-tools .btn{padding:7px 12px;font-size:13px;}
+.chat-msg .c-src{font-size:11px;padding:1px 5px;border-radius:4px;flex:none;}
+.chat-msg .c-src.game{background:rgba(61,220,132,.16);color:#3ddc84;}
+.chat-msg .c-src.web{background:rgba(155,108,255,.16);color:#bda0ff;}
+.chat-msg .c-name{background:none;border:none;padding:0;cursor:pointer;font:inherit;font-weight:700;color:var(--primary,#5aa8ff);}
+.chat-msg.web .c-name{color:var(--accent,#9b6cff);}
+.chat-msg .c-name:hover{text-decoration:underline;}
+.nick-pop{position:fixed;z-index:1200;min-width:152px;background:var(--card,#1b1b1b);border:1px solid rgba(127,127,127,.35);border-radius:8px;box-shadow:0 12px 28px rgba(0,0,0,.35);padding:5px;display:none;}
+.nick-pop button{display:block;width:100%;text-align:left;background:none;border:none;color:inherit;padding:8px 10px;border-radius:6px;font-size:13px;cursor:pointer;}
+.nick-pop button:hover{background:rgba(127,127,127,.18);}
+.dm-panel{position:fixed;right:14px;bottom:14px;width:300px;max-width:92vw;background:var(--card,#1b1b1b);border:1px solid rgba(127,127,127,.32);border-radius:10px;box-shadow:0 14px 38px rgba(0,0,0,.42);z-index:1150;display:none;flex-direction:column;overflow:hidden;}
+.dm-head{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:1px solid rgba(127,127,127,.22);font-size:13px;font-weight:600;}
+.dm-head button{background:none;border:none;color:inherit;font-size:16px;cursor:pointer;line-height:1;}
+.dm-body{height:240px;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:7px;font-size:13px;}
+.dm-row{display:flex;flex-direction:column;gap:2px;}
+.dm-row.me{align-items:flex-end;}
+.dm-bubble{display:inline-block;padding:6px 9px;border-radius:8px;background:rgba(127,127,127,.16);max-width:86%;word-break:break-word;}
+.dm-row.me .dm-bubble{background:rgba(90,168,255,.22);}
+.dm-who{font-size:11px;opacity:.6;}
+.dm-foot{display:flex;gap:6px;padding:8px;border-top:1px solid rgba(127,127,127,.22);}
+.dm-foot input{flex:1;min-width:0;}
+.tst-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1300;display:none;align-items:center;justify-content:center;padding:16px;}
+.tst-modal .tst-modal-box{width:min(360px,94vw);background:var(--card,#1b1b1b);border:1px solid rgba(127,127,127,.3);border-radius:10px;padding:16px 18px;box-shadow:0 18px 46px rgba(0,0,0,.45);}
+.tst-modal h4{margin:0 0 10px;font-size:15px;}
+.tst-modal .m-row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:5px 0;border-bottom:1px dashed rgba(127,127,127,.18);}
+.tst-modal .m-row span:last-child{opacity:.8;text-align:right;word-break:break-word;}
+.tst-modal .m-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
+.nav-badge{display:inline-block;min-width:16px;height:16px;line-height:16px;padding:0 4px;border-radius:8px;background:#e05a5a;color:#fff;font-size:11px;text-align:center;margin-left:4px;}
 </style>
 
 <div class="card" style="margin-bottom:14px;">
@@ -3856,6 +3886,12 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
     <span style="display:flex;align-items:center;gap:10px;"><span class="chat-hint" id="chatHint">连接中…</span><button class="btn" id="chatAdminBtn" style="padding:3px 10px;font-size:12px;">控制台</button></span>
 
+  </div>
+
+  <div class="chat-tools">
+    <input type="text" class="tst-field" id="chatSearch" placeholder="搜聊天记录：昵称或关键词" maxlength="32" autocomplete="off">
+    <button class="btn" id="chatSearchBtn" type="button">搜索</button>
+    <button class="btn" id="chatOlderBtn" type="button">加载更早</button>
   </div>
 
   <div class="chat-scroll" id="chatMsgList"><p class="empty-hint">加载中…</p></div>
@@ -6256,7 +6292,7 @@ function chatInit(){
 
   var hint=document.getElementById('chatHint');
 
-  if(hint)hint.textContent='已连接 · 每 6 秒同步';
+  if(hint)hint.textContent='已连接 · 每 3 秒同步';
 
   chatMe={nickname:''};
   loadChatMe();
@@ -6309,6 +6345,22 @@ function chatInit(){
 
   if(ab)ab.onclick=function(){ switchPage('panel'); window.__panelTab&&window.__panelTab('paneCmd'); };
 
+  var sIn=document.getElementById('chatSearch'),sBtn=document.getElementById('chatSearchBtn'),oBtn=document.getElementById('chatOlderBtn');
+  if(sBtn)sBtn.onclick=doChatSearch;
+  if(sIn)sIn.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doChatSearch();}});
+  if(oBtn)oBtn.onclick=loadOlderChat;
+
+  var box=document.getElementById('chatMsgList');
+  if(box)box.addEventListener('scroll',function(){box.dataset.userScroll=(box.scrollHeight-box.scrollTop-box.clientHeight>90)?'1':'';});
+
+  document.querySelectorAll('.nav-link[data-nav="chat"]').forEach(function(b){b.addEventListener('click',function(){setTimeout(chatSeenNow,300);});});
+  setInterval(function(){if(chatPageActive())chatSeenNow();},2000);
+
+  var dmS=document.getElementById('dmSend'),dmI=document.getElementById('dmInput'),dmC=document.getElementById('dmClose');
+  if(dmS)dmS.onclick=sendDm;
+  if(dmI)dmI.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();sendDm();}});
+  if(dmC)dmC.onclick=closeDm;
+
 }
 
 function openChatCmd(){
@@ -6339,52 +6391,254 @@ function openChatCmd(){
 
 }
 
+var chatBeforeId=0, chatSearchK="", chatUnread=0, chatOldestId=0, chatSeenId=0;
+
+function chatPageActive(){var pg=document.getElementById('chat');return !!pg&&pg.className.indexOf('active')>=0;}
+
+function chatBadge(n){
+  var nb=document.querySelector('.nav-link[data-nav="chat"]'); if(!nb)return;
+  var old=nb.querySelector('.nav-badge'); if(old)old.remove();
+  if(n>0){var b=document.createElement('span');b.className='nav-badge';b.textContent=n>99?'99+':n;nb.appendChild(b);}
+}
+
+function chatSeenNow(){chatSeenId=chatLastId;chatUnread=0;chatBadge(0);}
+
+function modalShow(title,rows,btns){
+  var m=document.getElementById('tstModal'),box=document.getElementById('tstModalBox');
+  if(!m||!box)return;
+  var html='<h4>'+esc(title)+'</h4>';
+  (rows||[]).forEach(function(r){html+='<div class="m-row"><span>'+esc(r[0])+'</span><span>'+esc(r[1])+'</span></div>';});
+  html+='<div class="m-btns"><button class="btn" type="button" data-x="close">关闭</button></div>';
+  box.innerHTML=html;
+  box.querySelector('[data-x="close"]').onclick=function(){m.style.display='none';};
+  m.style.display='flex';
+  m.onclick=function(e){if(e.target===m)m.style.display='none';};
+}
+
+function placeNickPop(anchor){
+  var pop=document.getElementById('nickPop'); if(!pop)return;
+  var r=anchor.getBoundingClientRect();
+  pop.style.display='block';
+  var w=pop.offsetWidth||160,h=pop.offsetHeight||180;
+  var left=Math.min(r.left,window.innerWidth-w-8), top=r.bottom+4;
+  if(top+h>window.innerHeight-8) top=r.top-h-4;
+  pop.style.left=Math.max(8,left)+'px'; pop.style.top=Math.max(8,top)+'px';
+}
+
+function openNickMenu(name,anchor){
+  var pop=document.getElementById('nickPop'); if(!pop||!name)return;
+  var items=[['@ 提及','mention'],['发私聊','dm'],['看名片','card'],['打赏积分','tip'],['举报该玩家','report']];
+  pop.innerHTML='';
+  items.forEach(function(it){
+    var b=document.createElement('button'); b.type='button'; b.textContent=it[0];
+    b.onclick=function(ev){ev.stopPropagation();pop.style.display='none';nickAction(it[1],name);};
+    pop.appendChild(b);
+  });
+  pop.onclick=function(e){e.stopPropagation();};
+  placeNickPop(anchor);
+}
+
+document.addEventListener('click',function(){var p=document.getElementById('nickPop');if(p)p.style.display='none';});
+window.addEventListener('resize',function(){var p=document.getElementById('nickPop');if(p)p.style.display='none';});
+
+function nickAction(kind,name){
+  if(kind==='mention'){
+    var inp=document.getElementById('chatInput');
+    if(!inp){switchPage('chat');inp=document.getElementById('chatInput');}
+    if(!inp)return;
+    var has=inp.value&&/[^\s]$/.test(inp.value);
+    inp.value=(inp.value||'')+(has?' ':'')+'@'+name+' ';
+    inp.focus();
+    return;
+  }
+  if(kind==='dm'){openDm(name);return;}
+  if(kind==='card'){showCard(name);return;}
+  if(kind==='tip'){tipUser(name);return;}
+  if(kind==='report'){reportUser(name);return;}
+}
+
+function showCard(name){
+  var rows=[['昵称',name],['游戏在线',(window.chatOnline||[]).some(function(n){return (n||'').toLowerCase()===name.toLowerCase();})?'在线':'不在线'],['官网在线','以官网状态为准'],['积分','读取中…'],['UID','读取中…'],['注册时间','读取中…']];
+  modalShow(name+' 的名片',rows,[]);
+  fetch('https://theslowtidefk.pages.dev/api/card?name='+encodeURIComponent(name)).then(function(r){return r.json();})
+  .then(function(d){
+    if(!d||!d.ok){modalShow(name+' 的名片',[['昵称',name],['说明',(d&&d.error==='not_found')?'该玩家还没有注册官网账号':'读取失败']],[]);return;}
+    var rows2=[['昵称',d.nickname||name],['游戏在线',(window.chatOnline||[]).some(function(n){return (n||'').toLowerCase()===name.toLowerCase();})?'在线':'不在线'],['积分',String(d.points==null?'0':d.points)],['UID',d.uid?String(d.uid):'未绑定'],['注册时间',(d.created_at||'').toString().slice(0,10)||'未知']];
+    modalShow(name+' 的名片',rows2,[]);
+  }).catch(function(){modalShow(name+' 的名片',[['昵称',name],['说明','名片读取失败，请稍后再试']],[]);});
+}
+
+function tipUser(name){
+  var me=localStorage.getItem('tst_token')||'';
+  if(!me){showToast('请先登录官网账号');return;}
+  var v=prompt('给 '+name+' 打赏多少积分？（1-500）','10');
+  if(v===null)return;
+  var n=parseInt(v,10);
+  if(!n||n<1||n>500){showToast('积分要填 1-500 之间的整数');return;}
+  fetch('https://theslowtidefk.pages.dev/api/tip',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+me},body:JSON.stringify({to:name,amount:n})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d&&d.ok){showToast('已打赏 '+n+' 积分给 '+name);}
+    else if(d&&d.error==='insufficient'){showToast('你的积分不够');}
+    else if(d&&d.error==='not_found'){showToast('对方还没有注册官网账号');}
+    else if(d&&d.error==='self'){showToast('不能给自己打赏');}
+    else{showToast('打赏失败：'+((d&&d.error)||'未知错误'));}
+  }).catch(function(){showToast('打赏失败，请稍后再试');});
+}
+
+function reportUser(name){
+  var tk=localStorage.getItem('tst_token')||'';
+  if(!tk){showToast('请先登录官网账号再举报');return;}
+  var reason=prompt('举报 '+name+' 的理由（会把他最近 30 条聊天一起发给管理员）：','辱骂/刷屏');
+  if(reason===null)return;
+  if(!reason.trim()){showToast('请填一下理由');return;}
+  fetch('/api/chat/report',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({target:name,reason:reason.trim()})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d&&d.ok){showToast('已提交举报，管理员会尽快处理');}
+    else if(d&&d.error==='login_required'){showToast('登录状态失效，请重新登录');}
+    else{showToast('举报提交失败，请稍后再试');}
+  }).catch(function(){showToast('举报提交失败，请稍后再试');});
+}
+
+var dmWith='', dmTimer=null;
+
+function openDm(name){
+  if(!name)return;
+  var me=localStorage.getItem('tst_token')||'';
+  if(!me){showToast('私聊需要先登录官网账号');return;}
+  if(name.toLowerCase()===(chatMe&&chatMe.nickname?chatMe.nickname:'').toLowerCase()){showToast('不能和自己私聊');return;}
+  dmWith=name;
+  document.getElementById('dmTitle').textContent='与 '+name+' 私聊';
+  document.getElementById('dmPanel').style.display='flex';
+  document.getElementById('dmBody').innerHTML='';
+  loadDm();
+  if(dmTimer)clearInterval(dmTimer);
+  dmTimer=setInterval(loadDm,3000);
+}
+
+function closeDm(){
+  document.getElementById('dmPanel').style.display='none';
+  if(dmTimer){clearInterval(dmTimer);dmTimer=null;}
+  dmWith='';
+}
+
+function loadDm(){
+  if(!dmWith)return;
+  var tk=localStorage.getItem('tst_token')||''; if(!tk)return;
+  fetch('/api/chat/dm?with='+encodeURIComponent(dmWith),{headers:{'Authorization':'Bearer '+tk}}).then(function(r){return r.json();})
+  .then(function(d){
+    if(!d||!Array.isArray(d.messages))return;
+    var body=document.getElementById('dmBody'); var me=(chatMe&&chatMe.nickname)||'';
+    body.innerHTML='';
+    if(!d.messages.length){body.innerHTML='<p class="empty-hint">还没有私聊记录，说句话开始吧</p>';return;}
+    d.messages.forEach(function(m){
+      var mine=(m.from_name||'')===me;
+      var row=document.createElement('div'); row.className='dm-row'+(mine?' me':'');
+      row.innerHTML='<span class="dm-who">'+esc(m.from_name||'')+' · '+esc((m.ts||'').toString().slice(11,16))+'</span><span class="dm-bubble">'+esc(m.msg||'')+'</span>';
+      body.appendChild(row);
+    });
+    body.scrollTop=body.scrollHeight;
+  }).catch(function(){});
+}
+
+function sendDm(){
+  var inp=document.getElementById('dmInput'); var v=(inp.value||'').trim(); if(!v||!dmWith)return;
+  var tk=localStorage.getItem('tst_token')||'';
+  fetch('/api/chat/dm',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({to:dmWith,msg:v})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d&&d.ok){inp.value='';loadDm();}
+    else if(d&&d.error==='login_required'){showToast('登录状态失效，请重新登录');}
+    else if(d&&d.error==='too_fast'){showToast('发太快了，歇一下');}
+    else{showToast('私聊发送失败');}
+  }).catch(function(){showToast('私聊发送失败');});
+}
+
+function srcTag(kind){
+  if(kind==='game')return '<span class="c-src game">游戏</span>';
+  if(kind==='web')return '<span class="c-src web">网页</span>';
+  return '';
+}
+
 function appendChat(m){
-
   var box=document.getElementById('chatMsgList');
-
   if(!box)return;
-
   if(box.querySelector('.empty-hint'))box.innerHTML='';
-
   var row=document.createElement('div');
-
   row.className='chat-msg'+(m.kind==='web'?' web':'')+(m.kind==='sys'?' sys':'');
-
   var t=(m.ts||'').toString().slice(11,16);
-
-  row.innerHTML='<span class="c-name">'+esc(m.sender)+'</span><span class="c-text">'+esc(m.message)+'</span><span class="c-time">'+t+'</span>';
-
+  var safe=esc(m.sender||'');
+  var html=srcTag(m.kind)+'<button class="c-name" type="button" data-nick="'+safe+'">'+safe+'</button>'
+    +'<span class="c-text">'+esc(m.message||'')+'</span><span class="c-time">'+t+'</span>';
+  row.innerHTML=html;
+  var nb=row.querySelector('.c-name');
+  if(nb)nb.onclick=function(){openNickMenu(this.getAttribute('data-nick'),this);};
+  var near=box.scrollHeight-box.scrollTop-box.clientHeight<70;
   box.appendChild(row);
-
-  box.scrollTop=box.scrollHeight;
-
+  if(near||!box.dataset.userScroll)box.scrollTop=box.scrollHeight;
+  if(m.id&&m.id>chatSeenId&&!chatPageActive()){chatUnread++;chatBadge(chatUnread);}
 }
 
 function loadChatHistory(){
-
+  if(chatSearchK)return;
   var box=document.getElementById('chatMsgList');
-
   if(!box)return;
-
   fetch('/api/chat/history?after='+chatLastId).then(function(r){return r.json();})
-
   .then(function(d){
-
     if(!d||!Array.isArray(d.messages))return;
-
     if(!d.messages.length&&!chatLastId){box.innerHTML='<p class="empty-hint">暂无聊天记录，游戏里说句话试试</p>';return;}
-
     d.messages.forEach(function(m){
-
       if(m.id>chatLastId){chatLastId=m.id;appendChat(m);}
-
+      if(!chatOldestId||m.id<chatOldestId)chatOldestId=m.id;
     });
+  }).catch(function(){});
+}
 
-  })
+function loadOlderChat(){
+  var box=document.getElementById('chatMsgList');
+  if(!box)return;
+  if(chatSearchK){showToast('先清空搜索框再翻历史');return;}
+  if(!chatOldestId){showToast('还没有更早的记录了');return;}
+  var keep=box.scrollHeight;
+  fetch('/api/chat/history?before='+chatOldestId).then(function(r){return r.json();})
+  .then(function(d){
+    if(!d||!Array.isArray(d.messages)||!d.messages.length){showToast('没有更早的记录了');return;}
+    var frag=document.createDocumentFragment();
+    d.messages.forEach(function(m){
+      if(m.id<chatOldestId)chatOldestId=m.id;
+      if(box.querySelector('.empty-hint'))box.innerHTML='';
+      var row=document.createElement('div');
+      row.className='chat-msg'+(m.kind==='web'?' web':'')+(m.kind==='sys'?' sys':'');
+      var safe=esc(m.sender||'');
+      row.innerHTML=srcTag(m.kind)+'<button class="c-name" type="button" data-nick="'+safe+'">'+safe+'</button><span class="c-text">'+esc(m.message||'')+'</span><span class="c-time">'+esc((m.ts||'').toString().slice(11,16))+'</span>';
+      var nb=row.querySelector('.c-name');
+      if(nb)nb.onclick=function(){openNickMenu(this.getAttribute('data-nick'),this);};
+      frag.insertBefore(row,frag.firstChild);
+    });
+    box.insertBefore(frag,box.firstChild);
+    box.scrollTop=box.scrollHeight-keep+box.scrollTop;
+  }).catch(function(){showToast('读取历史失败');});
+}
 
-  .catch(function(){});
-
+function doChatSearch(){
+  var q=document.getElementById('chatSearch'); var v=(q&&q.value||'').trim();
+  var box=document.getElementById('chatMsgList'); if(!box)return;
+  chatSearchK=v;
+  if(!v){box.innerHTML='<p class="empty-hint">正在重新读取…</p>';chatLastId=0;chatOldestId=0;loadChatHistory();return;}
+  box.innerHTML='<p class="empty-hint">搜索中…</p>';
+  fetch('/api/chat/history?q='+encodeURIComponent(v)).then(function(r){return r.json();})
+  .then(function(d){
+    box.innerHTML='';
+    if(!d||!Array.isArray(d.messages)||!d.messages.length){box.innerHTML='<p class="empty-hint">没有匹配「'+esc(v)+'」的聊天</p>';return;}
+    d.messages.forEach(function(m){
+      var row=document.createElement('div');
+      row.className='chat-msg'+(m.kind==='web'?' web':'')+(m.kind==='sys'?' sys':'');
+      var safe=esc(m.sender||'');
+      row.innerHTML=srcTag(m.kind)+'<button class="c-name" type="button" data-nick="'+safe+'">'+safe+'</button><span class="c-text">'+esc(m.message||'')+'</span><span class="c-time">'+esc((m.ts||'').toString().slice(11,16))+'</span>';
+      var nb=row.querySelector('.c-name');
+      if(nb)nb.onclick=function(){openNickMenu(this.getAttribute('data-nick'),this);};
+      box.appendChild(row);
+    });
+    box.scrollTop=0;
+  }).catch(function(){box.innerHTML='<p class="empty-hint">搜索失败，请重试</p>';});
 }
 
 function loadChatStatus(){
@@ -6398,6 +6652,8 @@ function loadChatStatus(){
   .then(function(d){
 
     if(!d)return;
+
+    window.chatOnline=(d.status==='online'&&Array.isArray(d.players))?d.players:[];
 
     if(d.status==='online'){
 
@@ -6414,6 +6670,8 @@ function loadChatStatus(){
       txt.textContent='服务器离线';
 
       if(meta)meta.textContent='等待服务器上报…';
+
+      window.chatOnline=[];
 
     }
 
@@ -9637,3 +9895,12 @@ try{ eval('const __t=()=>1;'); }catch(e){
   };
 })();
 </script>
+
+<div class="nick-pop" id="nickPop"></div>
+<div class="dm-panel" id="dmPanel">
+  <div class="dm-head"><span id="dmTitle">私聊</span><button type="button" id="dmClose">×</button></div>
+  <div class="dm-body" id="dmBody"></div>
+  <div class="dm-foot"><input type="text" class="tst-field" id="dmInput" placeholder="说点什么…" maxlength="160" autocomplete="off"><button class="btn btn-primary" id="dmSend" type="button">发送</button></div>
+</div>
+<div class="tst-modal" id="tstModal"><div class="tst-modal-box" id="tstModalBox"></div></div>
+
