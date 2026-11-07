@@ -14,11 +14,12 @@ document.documentElement.setAttribute('data-theme',mode);
 })();
 
 function clearLocalData(){
-  if(!confirm('确定清除本地数据吗？')) return;
+  TSTUI.confirm('确定清除本地数据吗？',{title:'清除本地数据',okText:'清除'}).then(function(ok){ if(!ok) return;
   localStorage.removeItem("tst_last_checkin");
   localStorage.removeItem("tst_checkin_days");
   localStorage.removeItem("tst_admin_token");
   showToast("本地数据已清除");
+});
 }
 </script>
 <style>
@@ -2251,7 +2252,7 @@ document.addEventListener('click',async(e)=>{
   if(!btn || !ADMIN_TOKEN){ return; }
   const kind=btn.dataset.del, id=btn.dataset.id;
   const action=kind==='announcement'?'deleteAnnouncement':kind==='feed'?'deleteFeed':kind==='sponsor'?'deleteSponsor':kind==='replay'?'deleteReplay':'deleteImage';
-  if(!confirm('确定删除这条记录吗？')){ return; }
+  if(!await TSTUI.confirm('确定删除这条记录吗？',{title:'删除记录',okText:'删除'})){ return; }
   const d=await adminApi(action,{id});
   if(d && d.ok){
     SITE_DATA={...SITE_DATA,...d};
@@ -2505,7 +2506,7 @@ document.addEventListener('click',async(e)=>{
   }
   const dg=e.target.closest('[data-delimg]');
   if(!dg || !ADMIN_TOKEN){ return; }
-  if(!confirm('确定删除这张图片吗？引用它的动态将无法显示图片。')){ return; }
+  if(!await TSTUI.confirm('确定删除这张图片吗？引用它的动态将无法显示图片。',{title:'删除图片',okText:'删除'})){ return; }
   const d=await adminApi('deleteImage',{id:dg.dataset.delimg});
   if(d && d.ok){
     SITE_DATA.images=d.images;
@@ -3736,31 +3737,50 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   var pb=document.getElementById('secPwBtn');
   if(pb)pb.onclick=function(){
     var t=tk(); if(!t){msg('请先登录账号');return;}
-    var oldPw=prompt('当前密码（还没设过密码就直接留空）：','');
-    if(oldPw===null)return;
-    var np=prompt('新密码（8-64 位，只能用字母、数字和英文符号）：','');
-    if(np===null)return;
-    var np2=prompt('再输一次新密码：','');
-    if(np2===null)return;
-    if(np!==np2){msg('两次输入的新密码不一致');return;}
-    pb.disabled=true; var old=pb.textContent; pb.textContent='提交中…';
-    fetch(API+'/change-password',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({old:oldPw,new:np})})
-    .then(function(r){return r.json();}).then(function(d){
-      pb.disabled=false; pb.textContent=old;
-      if(d&&d.ok){msg('密码已更新，下次登录用新密码');try{showToast('密码已更新');}catch(e){}}
-      else msg((d&&d.msg)||'修改失败，请稍后再试');
-    }).catch(function(){pb.disabled=false;pb.textContent=old;msg('网络异常，请稍后再试');});
+    TSTUI.form({
+      title:'修改密码',
+      desc:'还没设过密码的账号，当前密码留空即可。新密码 8-64 位，只能用字母、数字和英文符号。',
+      okText:'确认修改',
+      fields:[
+        {name:'old',label:'当前密码',type:'password',placeholder:'没设过密码就留空'},
+        {name:'new',label:'新密码',type:'password',placeholder:'8-64 位'},
+        {name:'new2',label:'再输一次新密码',type:'password',placeholder:'再输一次'}
+      ],
+      validate:function(v){
+        if(!v.new||v.new.length<8) return '新密码至少 8 位';
+        if(v.new!==v.new2) return '两次输入的新密码不一致';
+        return '';
+      },
+      onDone:function(v){
+        pb.disabled=true; var old=pb.textContent; pb.textContent='提交中…';
+        fetch(API+'/change-password',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({old:v.old,new:v.new})})
+        .then(function(r){return r.json();}).then(function(d){
+          pb.disabled=false; pb.textContent=old;
+          if(d&&d.ok){msg('密码已更新，下次登录用新密码');try{showToast('密码已更新');}catch(e){}}
+          else msg((d&&d.msg)||'修改失败，请稍后再试');
+        }).catch(function(){pb.disabled=false;pb.textContent=old;msg('网络异常，请稍后再试');});
+      }
+    });
   };
   var db=document.getElementById('secDelBtn');
   if(db)db.onclick=function(){
     var t=tk(); if(!t){msg('请先登录账号');return;}
-    var c=prompt('注销后积分、聊天身份、绑定 UID 全部删除且不能恢复。\n确认请完整输入：注销账号','');
-    if(c===null)return;
-    if(c.trim()!=='注销账号'){msg('确认文字不对，已取消');return;}
-    var pw=prompt('账号密码（没设过密码就留空）：','');
-    if(pw===null)return;
-    db.disabled=true; var old=db.textContent; db.textContent='注销中…';
-    fetch(API+'/delete-account',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({confirm:c.trim(),password:pw})})
+    TSTUI.form({
+      title:'注销账号',
+      desc:'注销后积分、聊天身份、绑定 UID 全部删除且不能恢复。请在下面完整输入「注销账号」。',
+      okText:'确认注销',
+      danger:true,
+      fields:[
+        {name:'confirm',label:'确认文字',placeholder:'注销账号'},
+        {name:'password',label:'账号密码',type:'password',placeholder:'没设过密码就留空'}
+      ],
+      validate:function(v){
+        if(String(v.confirm||'').trim()!=='注销账号') return '确认文字不对，请完整输入「注销账号」';
+        return '';
+      },
+      onDone:function(v){
+        db.disabled=true; var old=db.textContent; db.textContent='注销中…';
+        fetch(API+'/delete-account',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({confirm:String(v.confirm||'').trim(),password:v.password})})
     .then(function(r){return r.json();}).then(function(d){
       db.disabled=false; db.textContent=old;
       if(d&&d.ok){
@@ -3768,9 +3788,12 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
         msg('账号已注销，正在跳转…');
         setTimeout(function(){location.href='login.html';},1200);
       } else msg((d&&d.msg)||'注销失败，请稍后再试');
-    }).catch(function(){db.disabled=false;db.textContent=old;msg('网络异常，请稍后再试');});
+        }).catch(function(){db.disabled=false;db.textContent=old;msg('网络异常，请稍后再试');});
+      }
+    });
   };
 })();
 </script>
+<script src="/tst-ui.js"></script>
 </body>
 </html>
