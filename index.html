@@ -355,9 +355,8 @@ html[data-theme="dark"] .eco-ok,html[data-theme="glass"] .eco-ok{color:#93e6a0;}
 /* 普通模式（浅色/深色）：关闭鼠标悬停位移/缩放/过渡动效；玻璃主题保留其效果 */
 html[data-theme="light"] :hover,html[data-theme="dark"] :hover{transform:none !important;transition:none !important;}
 
-/* 导航平铺：去掉下拉，手机端横向滚动 */
-.main-nav{flex-wrap:wrap;row-gap:6px;}
-.nav-more,.more-menu{display:none!important;}
+/* 导航平铺 + 更多下拉；手机端横向滚动 */
+.main-nav{flex-wrap:nowrap;row-gap:6px;}
 @media(max-width:820px){
   .main-nav{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
   .main-nav::-webkit-scrollbar{display:none;}
@@ -1758,15 +1757,21 @@ font-size:14px;box-shadow:var(--shadow);
 
 @media(max-width:960px){
 
-.header-inner{gap:8px;flex-wrap:wrap;}
+.header-inner{gap:8px;flex-wrap:nowrap;}
 
-.main-nav{order:3;flex-basis:100%;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.main-nav{order:3;flex-basis:100%;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;}
 
 .main-nav::-webkit-scrollbar{display:none;}
 
 .nav-link{padding:7px 9px;font-size:13px;}
 
 .header-right{flex-wrap:nowrap;gap:6px;}
+
+.time-badge{display:none;}
+
+.more-menu{left:auto;right:0;transform:none;min-width:150px;}
+
+.nav-more.open .more-menu{transform:none;}
 
 .time-badge{padding:5px 10px;font-size:9px;line-height:1.4;cursor:pointer;-webkit-tap-highlight-color:rgba(253,224,71,.35);}
 
@@ -3042,22 +3047,36 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <button class="nav-link" data-nav="notice">公告</button>
 
 <button class="nav-link" data-nav="feed">动态</button>
-<a class="nav-link" href="shop.html">商店</a>
-<button class="nav-link" data-nav="vote">投票</button>
 
-<a class="nav-link" href="tool.html">便捷工具</a>
-
-<button class="nav-link" data-nav="tools">服务器工具</button>
+<button class="nav-link" data-nav="chat">聊天室</button>
 
 <button class="nav-link" data-nav="rule">玩家公约</button>
 
+<div class="nav-more" id="navMore">
+
+<button class="nav-link" id="navMoreBtn">更多 <span style="font-size:10px;opacity:.55;">▾</span></button>
+
+<div class="more-menu" id="moreMenu">
+
 <button class="nav-link" data-nav="event">赛事活动</button>
+
+<button class="nav-link" data-nav="vote">投票</button>
+
+<a class="nav-link" href="shop.html">商店</a>
 
 <button class="nav-link" data-nav="cdkey">兑换码</button>
 
 <button class="nav-link" data-nav="sponsor">服务器赞助</button>
 
+<a class="nav-link" href="tool.html">便捷工具</a>
+
+<button class="nav-link" data-nav="tools">服务器工具</button>
+
 <button class="nav-link" data-nav="download">下载</button>
+
+</div>
+
+</div>
 
 </nav>
 
@@ -3072,8 +3091,6 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 </div>
 
 <a class="feedback-btn" href="profile.html">我的</a>
-
-<a class="feedback-btn" href="planning.html" id="planLink" style="display:none;">策划</a>
 
 <a class="feedback-btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
 
@@ -6074,6 +6091,8 @@ function switchPage(pid){
   const t=document.getElementById(pid);
 
   if(t){ t.classList.add('active'); }
+
+  if(pid==='chat' && window.chatInit){ try{ window.chatInit(); }catch(e){} }
 
   window.scrollTo({top:0,behavior:'smooth'});
 
