@@ -1244,6 +1244,16 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 <div id="lgProfileMsg" style="font-size:12px;color:var(--text-secondary);margin-top:8px;"></div>
 </div>
 
+<!-- 账号安全 -->
+<div class="card" style="padding:18px;margin-bottom:16px;">
+<div style="font-size:15px;font-weight:600;margin-bottom:12px;">账号安全</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+<button id="secPwBtn" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--hover);color:var(--text);font-size:13px;cursor:pointer;">修改密码</button>
+<button id="secDelBtn" style="padding:8px 14px;border:1px solid #e05a5a;border-radius:8px;background:transparent;color:#e05a5a;font-size:13px;cursor:pointer;">注销账号</button>
+</div>
+<div id="secMsg" style="font-size:12px;color:var(--text-secondary);margin-top:10px;"></div>
+</div>
+
 <div class="card" style="background:linear-gradient(135deg,#facc15,#eab308);color:#1f2937;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
 <div style="flex:1;">
 <div style="display:flex;gap:6px;margin-bottom:8px;" id="weekDots"></div>
@@ -3718,6 +3728,48 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   if(mask) mask.addEventListener('click',closeD);
   if(closeBtn) closeBtn.addEventListener('click',closeD);
   if(drawer) drawer.addEventListener('click',function(e){ if(e.target.closest('a')) closeD(); });
+})();
+(function(){
+  var API='https://theslowtidefk.pages.dev/api';
+  function tk(){return localStorage.getItem('tst_token')||'';}
+  function msg(t){var m=document.getElementById('secMsg');if(m)m.textContent=t;}
+  var pb=document.getElementById('secPwBtn');
+  if(pb)pb.onclick=function(){
+    var t=tk(); if(!t){msg('请先登录账号');return;}
+    var oldPw=prompt('当前密码（还没设过密码就直接留空）：','');
+    if(oldPw===null)return;
+    var np=prompt('新密码（8-64 位，只能用字母、数字和英文符号）：','');
+    if(np===null)return;
+    var np2=prompt('再输一次新密码：','');
+    if(np2===null)return;
+    if(np!==np2){msg('两次输入的新密码不一致');return;}
+    pb.disabled=true; var old=pb.textContent; pb.textContent='提交中…';
+    fetch(API+'/change-password',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({old:oldPw,new:np})})
+    .then(function(r){return r.json();}).then(function(d){
+      pb.disabled=false; pb.textContent=old;
+      if(d&&d.ok){msg('密码已更新，下次登录用新密码');try{showToast('密码已更新');}catch(e){}}
+      else msg((d&&d.msg)||'修改失败，请稍后再试');
+    }).catch(function(){pb.disabled=false;pb.textContent=old;msg('网络异常，请稍后再试');});
+  };
+  var db=document.getElementById('secDelBtn');
+  if(db)db.onclick=function(){
+    var t=tk(); if(!t){msg('请先登录账号');return;}
+    var c=prompt('注销后积分、聊天身份、绑定 UID 全部删除且不能恢复。\n确认请完整输入：注销账号','');
+    if(c===null)return;
+    if(c.trim()!=='注销账号'){msg('确认文字不对，已取消');return;}
+    var pw=prompt('账号密码（没设过密码就留空）：','');
+    if(pw===null)return;
+    db.disabled=true; var old=db.textContent; db.textContent='注销中…';
+    fetch(API+'/delete-account',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({confirm:c.trim(),password:pw})})
+    .then(function(r){return r.json();}).then(function(d){
+      db.disabled=false; db.textContent=old;
+      if(d&&d.ok){
+        localStorage.removeItem('tst_token');localStorage.removeItem('tst_email');localStorage.removeItem('tst_uid');
+        msg('账号已注销，正在跳转…');
+        setTimeout(function(){location.href='login.html';},1200);
+      } else msg((d&&d.msg)||'注销失败，请稍后再试');
+    }).catch(function(){db.disabled=false;db.textContent=old;msg('网络异常，请稍后再试');});
+  };
 })();
 </script>
 </body>
