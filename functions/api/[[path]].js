@@ -146,6 +146,11 @@ export async function onRequest(context) {
       tps: (typeof bd.tps === 'number') ? bd.tps : null,
       shutdown: !!bd.shutdown,
       players: players,
+      perf: (bd.perf && typeof bd.perf === 'object') ? {
+        tps1: num(bd.perf.tps1), tps5: num(bd.perf.tps5), tps15: num(bd.perf.tps15),
+        mspt: num(bd.perf.mspt), mem: num(bd.perf.mem), memmax: num(bd.perf.memmax),
+        chunks: num(bd.perf.chunks), entities: num(bd.perf.entities), uptime: num(bd.perf.uptime),
+      } : null,
       receivedAt: Date.now(),
     };
     try {
@@ -224,6 +229,7 @@ export async function onRequest(context) {
       version: rec.version,
       tps: rec.tps,
       players: online ? rec.players : [],
+      perf: rec.perf || null,
       receivedAt: rec.receivedAt,
       ageMs: age,
       name: rec.name,
@@ -405,6 +411,18 @@ export async function onRequest(context) {
       rows = (r && r.results) || [];
     } catch (e) { return json({ ok: false, error: 'db_error', logs: [] }, 200, request); }
     return json({ ok: true, logs: rows }, 200, request);
+  }
+
+  // 游戏动态（进出/死亡/成就/指令记录）
+  if (path === '/api/tst-events/list' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db', events: [] }, 200, request);
+    const limit = Math.min(200, Math.max(5, Number(url.searchParams.get('limit') || 60)));
+    let rows = [];
+    try {
+      const r = await TST_DB.prepare('SELECT ts,kind,actor,detail FROM events ORDER BY id DESC LIMIT ' + limit).all();
+      rows = (r && r.results) || [];
+    } catch (e) { return json({ ok: false, error: 'db_error', events: [] }, 200, request); }
+    return json({ ok: true, events: rows }, 200, request);
   }
 
   // 服务器状态（老聊天室的在线状态条复用）
