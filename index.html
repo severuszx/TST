@@ -3925,7 +3925,7 @@ body:has(.embed-page.active){overflow:hidden;}
 
     <span id="chatWho" style="font-size:13px;opacity:.75;">正在读取账号…</span>
 
-    <a class="btn" id="chatLoginBtn" href="login.html" style="padding:5px 10px;font-size:13px;display:none;">去登录</a>
+    <a class="btn" id="chatLoginBtn" href="/login.html" style="padding:5px 10px;font-size:13px;display:none;">去登录</a>
 
   </div>
 
@@ -9964,6 +9964,19 @@ try{ eval('const __t=()=>1;'); }catch(e){
     try{
       var d=frame.contentDocument;
       d.open(); d.write(html); d.close();
+      try{
+        d.addEventListener('click',function(ev){
+          var a=ev.target&&ev.target.closest?ev.target.closest('a[href]'):null;
+          if(!a) return;
+          var h=a.getAttribute('href')||'';
+          if(/login\.html/.test(h)){ ev.preventDefault(); parent.location.href='/login.html'; return; }
+          var m=h.match(/(profile|shop|hogwarts|planning|tool)\.html/);
+          var k=m?m[1]:(h.charAt(0)==='#'?h.slice(1):'');
+          if(k && parent.switchPage && parent.document.getElementById(k)){
+            ev.preventDefault(); parent.switchPage(k);
+          }
+        },true);
+      }catch(e){}
       var st=d.createElement('style');
       st.textContent='header,.site-header,.topbar,.main-nav,.site-nav,footer,.site-footer{display:none!important}body{padding-top:0!important;margin-top:0!important}';
       (d.head||d.documentElement).appendChild(st);
@@ -9972,6 +9985,15 @@ try{ eval('const __t=()=>1;'); }catch(e){
     }catch(e){ frame.srcdoc=html; }
   }
   window.__embedLoad=loadEmbed;
+
+  document.addEventListener('click',function(ev){
+    var a=ev.target&&ev.target.closest?ev.target.closest('a[href]'):null;
+    if(!a) return;
+    var h=a.getAttribute('href')||'';
+    if(/login\.html/.test(h)){ ev.preventDefault(); location.href='/login.html'; return; }
+    var m=h.match(/(profile|shop|hogwarts|planning|tool)\.html/);
+    if(m && window.switchPage){ ev.preventDefault(); switchPage(m[1]); }
+  },true);
   document.addEventListener('click',function(e){
     var b=e.target.closest('[data-nav]');
     if(!b) return;
@@ -11137,7 +11159,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 <span class="tb-time" id="bjTime">--:--:--</span>
 <span class="tb-uptime" id="runTime">--</span>
 </div>
-<a class="feedback-btn" href="profile.html">我的</a>
+<a class="feedback-btn" href="#profile">我的</a>
 <a class="feedback-btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
 <a class="btn btn-primary" href="admin.html" style="text-decoration:none;display:inline-flex;align-items:center;">管理</a>
 <button class="theme-toggle" id="themeToggle" title="切换深色/浅色" aria-label="切换主题">
@@ -11154,27 +11176,27 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 <div class="drawer-panel" id="drawerPanel">
 <div class="drawer-head"><span class="drawer-title">导航菜单</span><button class="drawer-close" id="drawerClose">&#10005;</button></div>
 <div class="drawer-list">
-<a class="nav-link" href="index.html">首页</a>
-<a class="nav-link" href="index.html#notice">公告</a>
-<a class="nav-link" href="index.html#feed">动态</a>
-<a class="nav-link" href="index.html#vote">投票</a>
-<a class="nav-link" href="tool.html">便捷工具</a>
-<a class="nav-link" href="index.html#tools">服务器工具</a>
-<a class="nav-link" href="index.html#rule">玩家公约</a>
-<a class="nav-link" href="index.html#event">赛事活动</a>
-<a class="nav-link" href="index.html#cdkey">兑换码</a>
-<a class="nav-link" href="index.html#sponsor">服务器赞助</a>
-<a class="nav-link" href="shop.html">积分商店</a>
+<a class="nav-link" href="#home">首页</a>
+<a class="nav-link" href="#notice">公告</a>
+<a class="nav-link" href="#feed">动态</a>
+<a class="nav-link" href="#vote">投票</a>
+<a class="nav-link" href="#tool">便捷工具</a>
+<a class="nav-link" href="#tools">服务器工具</a>
+<a class="nav-link" href="#rule">玩家公约</a>
+<a class="nav-link" href="#event">赛事活动</a>
+<a class="nav-link" href="#cdkey">兑换码</a>
+<a class="nav-link" href="#sponsor">服务器赞助</a>
+<a class="nav-link" href="#shop">积分商店</a>
 <a class="nav-link" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
 </div>
 </div>
 </div>
 <!-- ===== 手机导航：底部 Tab ===== -->
 <div class="mobile-tabbar" id="mobileTabbar">
-<a class="mtab" href="index.html"><span class="mtab-ic">&#8962;</span><span class="mtab-tx">首页</span></a>
-<a class="mtab" href="index.html#notice"><span class="mtab-ic">&#9635;</span><span class="mtab-tx">公告</span></a>
-<a class="mtab" href="index.html#feed"><span class="mtab-ic">&#9993;</span><span class="mtab-tx">动态</span></a>
-<a class="mtab" href="profile.html"><span class="mtab-ic">&#9681;</span><span class="mtab-tx">我的</span></a>
+<a class="mtab" href="#home"><span class="mtab-ic">&#8962;</span><span class="mtab-tx">首页</span></a>
+<a class="mtab" href="#notice"><span class="mtab-ic">&#9635;</span><span class="mtab-tx">公告</span></a>
+<a class="mtab" href="#feed"><span class="mtab-ic">&#9993;</span><span class="mtab-tx">动态</span></a>
+<a class="mtab" href="#profile"><span class="mtab-ic">&#9681;</span><span class="mtab-tx">我的</span></a>
 </div>
 
 
@@ -11205,7 +11227,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 <div style="flex:1;min-width:0;">
 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><div style="font-size:17px;font-weight:600;" id="lgUserNick">--</div><span id="lgAdminTag" style="display:none;font-size:11px;color:#fff;background:var(--accent);border-radius:8px;padding:2px 9px;font-weight:600;letter-spacing:1px;">管理</span></div>
 <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="lgUserEmail">--</div>
-<div id="lgAdminLinks" style="display:none;margin-top:10px;"><a href="planning.html" style="display:inline-block;padding:7px 14px;border:1px solid var(--gold);border-radius:8px;background:var(--gold-soft);color:var(--gold);font-size:13px;font-weight:600;">策划资料台</a></div>
+<div id="lgAdminLinks" style="display:none;margin-top:10px;"><a href="#planning" style="display:inline-block;padding:7px 14px;border:1px solid var(--gold);border-radius:8px;background:var(--gold-soft);color:var(--gold);font-size:13px;font-weight:600;">策划资料台</a></div>
 </div>
 </div>
 <!-- 资料设置 -->
@@ -13974,20 +13996,20 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
   <div class="container header-inner">
     <div class="logo"><img src="https://theslowtide.pages.dev/logo.jpg" alt="The Slow Tide" class="logo-img"> The Slow Tide</div>
     <nav class="main-nav">
-      <a class="nav-link" href="index.html">首页</a>
-      <a class="nav-link" href="index.html#notice">公告</a>
-      <a class="nav-link" href="index.html#feed">动态</a>
-      <a class="nav-link" href="index.html#vote">投票</a>
-      <a class="nav-link" href="tool.html">便捷工具</a>
-      <a class="nav-link active" href="shop.html">积分商店</a>
+      <a class="nav-link" href="#home">首页</a>
+      <a class="nav-link" href="#notice">公告</a>
+      <a class="nav-link" href="#feed">动态</a>
+      <a class="nav-link" href="#vote">投票</a>
+      <a class="nav-link" href="#tool">便捷工具</a>
+      <a class="nav-link active" href="#shop">积分商店</a>
       <div class="nav-more" id="navMore">
         <button class="nav-link" id="navMoreBtn">更多<span class="more-caret">&#9662;</span></button>
         <div class="more-menu" id="moreMenu">
-          <a class="nav-link" href="index.html#tools">服务器工具</a>
-          <a class="nav-link" href="index.html#rule">玩家公约</a>
-          <a class="nav-link" href="index.html#event">赛事活动</a>
-          <a class="nav-link" href="index.html#cdkey">兑换码</a>
-          <a class="nav-link" href="index.html#sponsor">服务器赞助</a>
+          <a class="nav-link" href="#tools">服务器工具</a>
+          <a class="nav-link" href="#rule">玩家公约</a>
+          <a class="nav-link" href="#event">赛事活动</a>
+          <a class="nav-link" href="#cdkey">兑换码</a>
+          <a class="nav-link" href="#sponsor">服务器赞助</a>
         </div>
       </div>
     </nav>
@@ -13998,7 +14020,7 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
       </div>
       <span class="points-badge" id="ptsBadge" onclick="openPointsModal()" title="点击查看积分明细"><span class="plbl">积分</span><span id="ptsNum">--</span></span>
       <button class="fb-btn cart-bar" id="cartBtn" onclick="toggleCart()">购物车<span class="cart-count" id="cartCount" style="display:none;">0</span></button>
-      <a class="feedback-btn" href="login.html" id="navLoginBtn">登录</a>
+      <a class="feedback-btn" href="/login.html" id="navLoginBtn">登录</a>
       <a class="feedback-btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
       <button class="theme-toggle" id="themeToggle" title="切换主题（浅色/深色）" aria-label="切换主题">
         <span class="tt-ic tt-sun">☀</span>
@@ -14101,13 +14123,13 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
       <div class="footer-col">
         <h4>快捷导航</h4>
         <ul class="footer-links">
-          <li><a href="index.html">首页</a></li>
-          <li><a href="index.html#notice">公告</a></li>
-          <li><a href="index.html#feed">动态</a></li>
-          <li><a href="shop.html">积分商店</a></li>
-          <li><a href="index.html#event">赛事活动</a></li>
-          <li><a href="index.html#cdkey">兑换码</a></li>
-          <li><a href="index.html#sponsor">服务器赞助</a></li>
+          <li><a href="#home">首页</a></li>
+          <li><a href="#notice">公告</a></li>
+          <li><a href="#feed">动态</a></li>
+          <li><a href="#shop">积分商店</a></li>
+          <li><a href="#event">赛事活动</a></li>
+          <li><a href="#cdkey">兑换码</a></li>
+          <li><a href="#sponsor">服务器赞助</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -14230,7 +14252,7 @@ function loadAll(){
     myName=d.nickname||email.split('@')[0];
     document.getElementById('mainWrap').style.display='block';
     var nb=document.getElementById('navLoginBtn');
-    nb.textContent=myName; nb.href='profile.html'; nb.title=myName;
+    nb.textContent=myName; nb.href='#profile'; nb.title=myName;
     var st=res[1];
     if(st&&st.ok){ myPoints=st.points; document.getElementById('ptsNum').textContent=fmt(st.points); }
     var it=res[2];
@@ -14310,7 +14332,7 @@ function openPointsModal(){
     c.onclick=function(){
       var i=Number(c.getAttribute('data-w'));
       if(i===4) openSponsor();
-      else { closeMask('ptsMask'); if(i===0) location.href='profile.html'; else if(i===1||i===2) location.href='index.html'; else location.href='https://theslowtidefk.pages.dev/'; }
+      else { closeMask('ptsMask'); if(i===0) location.href='#profile'; else if(i===1||i===2) location.href='index.html'; else location.href='https://theslowtidefk.pages.dev/'; }
     };
   });
 }
@@ -15226,7 +15248,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
     <div class="logo">Tide of Remnant <span class="g">· 策划资料台</span></div>
     <div class="header-right">
       <span class="user-tag" id="hdAdminTag" style="display:none;">管理</span>
-      <a class="back-btn" href="index.html">返回官网</a>
+      <a class="back-btn" href="#home">返回官网</a>
     </div>
   </div>
 </header>
@@ -15238,7 +15260,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
     <h2 id="gateTitle">正在验证权限…</h2>
     <p id="gateMsg">本页面为策划专用资料台，仅对通过管理员认证的账号开放。</p>
     <div id="gateBtns">
-      <a class="btn primary" href="login.html" id="gateLoginBtn" style="display:none;">去登录</a>
+      <a class="btn primary" href="/login.html" id="gateLoginBtn" style="display:none;">去登录</a>
       <button class="btn" id="gateBackBtn" style="display:none;" onclick="location.href='index.html'">返回官网</button>
     </div>
     <div class="gate-sub" id="gateSub">需要登录且具有管理认证（admin_level ≥ 1）</div>
@@ -16724,15 +16746,15 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 <div class="nav-more" id="navMore">
 <button class="nav-link" id="navMoreBtn">更多<span class="more-caret">&#9662;</span></button>
 <div class="more-menu" id="moreMenu">
-<button class="nav-link active" onclick="location.href='tool.html'">便捷工具</button>
+<button class="nav-link active" onclick="location.href='#tool'">便捷工具</button>
 <button class="nav-link" onclick="location.href='index.html#vote'">投票</button>
 <button class="nav-link" onclick="location.href='index.html#tools'">服务器工具</button>
 <button class="nav-link" onclick="location.href='index.html#rule'">玩家公约</button>
 <button class="nav-link" onclick="location.href='index.html#event'">赛事活动</button>
 <button class="nav-link" onclick="location.href='index.html#cdkey'">兑换码</button>
 <button class="nav-link" onclick="location.href='index.html#sponsor'">服务器赞助</button>
-<button class="nav-link" onclick="location.href='shop.html'">积分商店</button>
-<button class="nav-link" onclick="location.href='profile.html'">我的</button>
+<button class="nav-link" onclick="location.href='#shop'">积分商店</button>
+<button class="nav-link" onclick="location.href='#profile'">我的</button>
 </div>
 </div>
 </nav>
@@ -16752,27 +16774,27 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 <div class="drawer-panel" id="drawerPanel">
 <div class="drawer-head"><span class="drawer-title">导航菜单</span><button class="drawer-close" id="drawerClose">&#10005;</button></div>
 <div class="drawer-list">
-<a class="nav-link" href="index.html">首页</a>
-<a class="nav-link" href="index.html#notice">公告</a>
-<a class="nav-link" href="index.html#feed">动态</a>
-<a class="nav-link" href="index.html#vote">投票</a>
-<a class="nav-link" href="tool.html">便捷工具</a>
-<a class="nav-link" href="index.html#tools">服务器工具</a>
-<a class="nav-link" href="index.html#rule">玩家公约</a>
-<a class="nav-link" href="index.html#event">赛事活动</a>
-<a class="nav-link" href="index.html#cdkey">兑换码</a>
-<a class="nav-link" href="index.html#sponsor">服务器赞助</a>
-<a class="nav-link" href="shop.html">积分商店</a>
+<a class="nav-link" href="#home">首页</a>
+<a class="nav-link" href="#notice">公告</a>
+<a class="nav-link" href="#feed">动态</a>
+<a class="nav-link" href="#vote">投票</a>
+<a class="nav-link" href="#tool">便捷工具</a>
+<a class="nav-link" href="#tools">服务器工具</a>
+<a class="nav-link" href="#rule">玩家公约</a>
+<a class="nav-link" href="#event">赛事活动</a>
+<a class="nav-link" href="#cdkey">兑换码</a>
+<a class="nav-link" href="#sponsor">服务器赞助</a>
+<a class="nav-link" href="#shop">积分商店</a>
 <a class="nav-link" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈</a>
 </div>
 </div>
 </div>
 <!-- ===== 手机导航：底部 Tab ===== -->
 <div class="mobile-tabbar" id="mobileTabbar">
-<a class="mtab" href="index.html"><span class="mtab-ic">&#8962;</span><span class="mtab-tx">首页</span></a>
-<a class="mtab" href="index.html#notice"><span class="mtab-ic">&#9635;</span><span class="mtab-tx">公告</span></a>
-<a class="mtab" href="index.html#feed"><span class="mtab-ic">&#9993;</span><span class="mtab-tx">动态</span></a>
-<a class="mtab" href="profile.html"><span class="mtab-ic">&#9681;</span><span class="mtab-tx">我的</span></a>
+<a class="mtab" href="#home"><span class="mtab-ic">&#8962;</span><span class="mtab-tx">首页</span></a>
+<a class="mtab" href="#notice"><span class="mtab-ic">&#9635;</span><span class="mtab-tx">公告</span></a>
+<a class="mtab" href="#feed"><span class="mtab-ic">&#9993;</span><span class="mtab-tx">动态</span></a>
+<a class="mtab" href="#profile"><span class="mtab-ic">&#9681;</span><span class="mtab-tx">我的</span></a>
 </div>
 
 <section class="section">
