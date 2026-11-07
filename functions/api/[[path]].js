@@ -331,7 +331,7 @@ export async function onRequest(context) {
     let bd = {};
     try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
     const to = String(bd.to || '').trim().slice(0, 24);
-    const msg = String(bd.message || '').trim().slice(0, 160);
+    const msg = String(bd.message || bd.msg || '').trim().slice(0, 160);
     if (!to || !msg) return json({ ok: false, error: 'empty' }, 200, request);
     const tk = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
     if (!tk) return json({ ok: false, error: 'login_required' }, 401, request);
@@ -378,7 +378,7 @@ export async function onRequest(context) {
       rows = ((r && r.results) || []).slice().reverse();
     } catch (e) {}
     return json({ ok: true, me: nick, messages: rows.map(function (x) {
-      return { id: x.id, ts: new Date((x.ts || 0) * 1000).toISOString(), from: x.from_name, to: x.to_name, message: x.msg };
+      return { id: x.id, ts: new Date((x.ts || 0) * 1000).toISOString(), from: x.from_name, to: x.to_name, from_name: x.from_name, to_name: x.to_name, message: x.msg, msg: x.msg };
     }) }, 200, request);
   }
 
@@ -391,12 +391,13 @@ export async function onRequest(context) {
     const reason = String(bd.reason || '').slice(0, 100);
     if (!target) return json({ ok: false, error: 'need_target' }, 200, request);
     const tk = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
-    let by = '匿名';
+    let by = '';
     try {
       const r = await fetch('https://theslowtidefk.pages.dev/api/me', { headers: { 'Authorization': 'Bearer ' + tk } });
       const d = await r.json();
-      if (d && d.ok) by = String(d.nickname || (d.email || '').split('@')[0] || '匿名');
-    } catch (e) {}
+      if (d && d.ok) by = String(d.nickname || (d.email || '').split('@')[0] || '').trim().slice(0, 24);
+    } catch (e) { by = ''; }
+    if (!by) return json({ ok: false, error: 'login_required' }, 401, request);
     try {
       await TST_DB.prepare('CREATE TABLE IF NOT EXISTS reports (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, by_name TEXT, target TEXT, reason TEXT, snapshot TEXT)').run();
     } catch (e) {}
@@ -416,6 +417,10 @@ export async function onRequest(context) {
   if (path === '/api/reports/list' && request.method === 'GET') {
     if (!TST_DB) return json({ ok: false, reports: [] }, 200, request);
     if (String(request.headers.get('x-admin-pw') || '') !== tstPwd() || !tstPwd()) return json({ ok: false, error: 'forbidden' }, 403, request);
+    const delId = Number(url.searchParams.get('del') || 0);
+    if (delId > 0) {
+      try { await TST_DB.prepare('DELETE FROM reports WHERE id=?').bind(delId).run(); } catch (e) {}
+    }
     try {
       const r = await TST_DB.prepare('SELECT id,ts,by_name,target,reason,snapshot FROM reports ORDER BY id DESC LIMIT 50').all();
       return json({ ok: true, reports: ((r && r.results) || []) }, 200, request);
