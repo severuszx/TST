@@ -1394,6 +1394,37 @@ padding:14px 18px;box-shadow:var(--shadow);
 
 .pempty{font-size:13px;color:var(--text-secondary);}
 
+/* Java 卡片 · 性能补充 */
+.jperf{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.jperf > div{display:flex;flex-direction:column;gap:3px;}
+.jperf-toggle{margin-top:12px;background:none;border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text-secondary);cursor:pointer;font-family:inherit;}
+.jperf-toggle:hover{color:var(--text);border-color:var(--text-secondary);}
+.jchart{margin-top:10px;}
+.jchart canvas{width:100%;height:170px;display:block;}
+.jchart-meta{margin-top:6px;font-size:12px;color:var(--text-secondary);display:flex;gap:14px;flex-wrap:wrap;}
+
+/* 服务器面板 */
+.panel-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.panel-tab{padding:7px 14px;border:1px solid var(--border);border-radius:7px;background:none;font-size:14px;cursor:pointer;font-family:inherit;color:var(--text-secondary);}
+.panel-tab.on{color:var(--text);border-color:var(--text);background:rgba(127,127,127,.1);}
+.panel-pane{display:none;}
+.panel-pane.on{display:block;}
+.p-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px;}
+.p-stat{border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.p-stat .k{font-size:12px;color:var(--text-secondary);}
+.p-stat .v{font-size:18px;font-weight:700;margin-top:4px;}
+.log-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center;}
+.log-tools input{flex:1;min-width:120px;}
+.log-box{font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.7;height:min(56vh,520px);overflow:auto;border:1px solid var(--border);border-radius:8px;padding:10px;background:rgba(127,127,127,.05);white-space:pre-wrap;word-break:break-word;}
+.log-line{display:block;}
+.log-line.err{color:#e05a5a;}
+.log-line.warn{color:#d9a13c;}
+.log-line .lt{opacity:.55;}
+.console-out{font-family:ui-monospace,Consolas,monospace;font-size:13px;line-height:1.7;height:min(40vh,360px);overflow:auto;border:1px solid var(--border);border-radius:8px;padding:10px;background:rgba(127,127,127,.05);white-space:pre-wrap;word-break:break-word;}
+.pw-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+.pw-row input{flex:1;min-width:140px;}
+.panel-note{font-size:12px;color:var(--text-secondary);margin-top:8px;}
+
 /* ===== Section 通用 ===== */
 
 .section{padding:26px 0;}
@@ -3058,6 +3089,8 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <div class="more-menu" id="moreMenu">
 
+<button class="nav-link" data-nav="panel">服务器面板</button>
+
 <button class="nav-link" data-nav="event">赛事活动</button>
 
 <button class="nav-link" data-nav="vote">投票</button>
@@ -3413,6 +3446,18 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 </div>
 
 <div class="players-strip" id="javaPlayers"><span class="pempty">正在读取在线玩家…</span></div>
+
+<div class="jperf">
+<div><span class="jstat-k">内存</span><span class="jstat-v" id="javaMem">—</span></div>
+<div><span class="jstat-k">MSPT</span><span class="jstat-v" id="javaMspt">—</span></div>
+<div><span class="jstat-k">实体</span><span class="jstat-v" id="javaEnt">—</span></div>
+</div>
+
+<button class="jperf-toggle" id="javaChartBtn" type="button">24 小时性能曲线</button>
+<div class="jchart" id="javaChartWrap" hidden>
+<canvas id="javaChart"></canvas>
+<div class="jchart-meta" id="javaChartMeta"></div>
+</div>
 
 </div>
 
@@ -3807,7 +3852,7 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
     <span>服务器实时聊天</span>
 
-    <span style="display:flex;align-items:center;gap:10px;"><span class="chat-hint" id="chatHint">连接中…</span><button class="btn" id="chatAdminBtn" style="padding:3px 10px;font-size:12px;">管理员指令</button></span>
+    <span style="display:flex;align-items:center;gap:10px;"><span class="chat-hint" id="chatHint">连接中…</span><button class="btn" id="chatAdminBtn" style="padding:3px 10px;font-size:12px;">控制台</button></span>
 
   </div>
 
@@ -3815,20 +3860,72 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
   <div class="chat-nick-row">
 
-    <input type="text" id="chatNick" placeholder="你的游戏昵称（广播时显示）" autocomplete="off" maxlength="24" style="flex:0 0 46%;">
+    <input type="text" id="chatNick" placeholder="你的游戏昵称（会显示在广播里）" autocomplete="off" maxlength="24" style="flex:0 0 46%;">
 
-    <span style="opacity:.6;font-size:12px;">昵称会显示在游戏广播里</span>
+    <span style="opacity:.6;font-size:12px;">发言以「【官网】昵称」广播到游戏内</span>
 
   </div>
 
   <div class="chat-input-row">
 
-    <input type="text" id="chatInput" placeholder="在游戏内发布消息…（进入服务器的玩家都能看到）" autocomplete="off" maxlength="200">
+    <input type="text" id="chatInput" placeholder="发条消息到游戏里，在线玩家都能看到" autocomplete="off" maxlength="200">
 
     <button class="btn btn-primary" id="chatSendBtn">发送</button>
 
   </div>
 
+</div>
+
+</div>
+
+</section>
+
+<!-- 服务器面板 -->
+
+<section id="panel" class="page">
+
+<div class="container">
+
+<div class="section-title">服务器面板</div>
+
+<div class="panel-tabs">
+<button class="panel-tab on" data-pane="panePerf" type="button">性能</button>
+<button class="panel-tab" data-pane="paneLog" type="button">日志</button>
+<button class="panel-tab" data-pane="paneCmd" type="button">控制台</button>
+<button class="panel-tab" data-pane="paneEvt" type="button">游戏动态</button>
+</div>
+
+<div class="panel-pane on" id="panePerf">
+<div class="p-stat-grid" id="panelStats"></div>
+<div class="jchart"><canvas id="panelChart"></canvas></div>
+<div class="panel-note" id="panelPerfNote">数据每 3 分钟上报一次</div>
+</div>
+
+<div class="panel-pane" id="paneLog">
+<div class="log-tools">
+<select id="logLevel"><option value="">全部级别</option><option value="ERROR">ERROR</option><option value="WARN">WARN</option><option value="INFO">INFO</option></select>
+<input type="text" id="logQuery" placeholder="关键词过滤，例如 Exception、TSTStatus" autocomplete="off">
+<button class="btn" id="logLoadBtn" type="button">刷新</button>
+</div>
+<div class="log-box" id="logBox">需要管理员密码后查看</div>
+<div class="panel-note">日志仅管理员可见，保留最近 2 天；ERROR / WARN 已按颜色标出。</div>
+</div>
+
+<div class="panel-pane" id="paneCmd">
+<div class="pw-row">
+<input type="password" id="panelPw" placeholder="管理员密码" autocomplete="off">
+<button class="btn btn-primary" id="panelPwBtn" type="button">验证</button>
+</div>
+<div class="chat-input-row">
+<input type="text" id="cmdInput" placeholder="输入指令，不带 /，例如 say 服务器将在 10 分钟后维护" autocomplete="off" maxlength="200">
+<button class="btn btn-primary" id="cmdSendBtn" type="button">下发</button>
+</div>
+<div class="panel-note">只放行常用管理指令；指令进入队列后由插件在 15 秒内取走执行，执行结果回显在游戏动态里。</div>
+<div class="console-out" id="consoleOut"></div>
+</div>
+
+<div class="panel-pane" id="paneEvt">
+<div class="console-out" id="evtBox">加载中…</div>
 </div>
 
 </div>
@@ -6093,6 +6190,7 @@ function switchPage(pid){
   if(t){ t.classList.add('active'); }
 
   if(pid==='chat' && window.chatInit){ try{ window.chatInit(); }catch(e){} }
+  if(pid==='panel' && window.panelInit){ try{ window.panelInit(); }catch(e){} }
 
   window.scrollTo({top:0,behavior:'smooth'});
 
@@ -6116,13 +6214,13 @@ function chatInit(){
 
   loadChatHistory();
 
-  chatTimer=setInterval(loadChatHistory,3000);
+  chatTimer=setInterval(loadChatHistory,6000);
 
   setInterval(loadChatStatus,30000);
 
   var hint=document.getElementById('chatHint');
 
-  if(hint)hint.textContent='已连接 · 每 3 秒同步';
+  if(hint)hint.textContent='已连接 · 每 6 秒同步';
 
   var nick=document.getElementById('chatNick');
 
@@ -6168,7 +6266,7 @@ function chatInit(){
 
   var ab=document.getElementById('chatAdminBtn');
 
-  if(ab)ab.onclick=openChatCmd;
+  if(ab)ab.onclick=function(){ switchPage('panel'); window.__panelTab&&window.__panelTab('paneCmd'); };
 
 }
 
@@ -6272,9 +6370,9 @@ function loadChatStatus(){
 
       dot.className='dot off';
 
-      txt.textContent='服务器离线（机器人未上报）';
+      txt.textContent='服务器离线';
 
-      if(meta)meta.textContent='等待机器人连接…';
+      if(meta)meta.textContent='等待服务器上报…';
 
     }
 
@@ -9210,6 +9308,11 @@ try{ eval('const __t=()=>1;'); }catch(e){
     ver.textContent=d.version||'—';
     tps.textContent=(online&&d.tps!==null&&d.tps!==undefined)?d.tps:'—';
     upd.textContent=ago(d.receivedAt);
+    var mem=document.getElementById('javaMem'), msp=document.getElementById('javaMspt'), ent=document.getElementById('javaEnt');
+    var pf=d.perf||null;
+    if(mem) mem.textContent=(pf&&pf.mem)?(pf.mem+' / '+(pf.memmax||'?')+' MB'):'—';
+    if(msp) msp.textContent=(pf&&pf.mspt!==null&&pf.mspt!==undefined)?(pf.mspt+' ms'):'—';
+    if(ent) ent.textContent=(pf&&pf.entities!==null&&pf.entities!==undefined)?pf.entities:'—';
     if(!online){
       strip.innerHTML='<span class="pempty">'+(d.reason==='no_data'?'服务器插件还没上报过状态':'服务器当前未运行')+'</span>';
       return;
@@ -9242,8 +9345,202 @@ try{ eval('const __t=()=>1;'); }catch(e){
       copyBtn.textContent='已复制'; setTimeout(function(){copyBtn.textContent='复制';},1200);
     });
   }
+
+  // 24 小时性能曲线（点开才请求，不拖慢首页）
+  var chartBtn=document.getElementById('javaChartBtn'), chartWrap=document.getElementById('javaChartWrap');
+  if(chartBtn && chartWrap){
+    var chartLoaded=false;
+    chartBtn.addEventListener('click',function(){
+      var open=chartWrap.hasAttribute('hidden');
+      if(open){
+        chartWrap.removeAttribute('hidden');
+        chartBtn.textContent='收起性能曲线';
+        if(!chartLoaded){ chartLoaded=true; TSTDrawPerf('javaChart','javaChartMeta'); }
+      } else {
+        chartWrap.setAttribute('hidden','');
+        chartBtn.textContent='24 小时性能曲线';
+      }
+    });
+  }
   tick();
   setInterval(tick,180000);
   document.addEventListener('visibilitychange',function(){ if(!document.hidden){ tick(); } });
+})();
+</script><script>
+// 服务器面板：性能曲线 / 日志 / 控制台 / 游戏动态
+(function(){
+  function num(v){ var n=Number(v); return isFinite(n)?n:null; }
+  function pad(n){ return (n<10?'0':'')+n; }
+  function hhmm(ts){ var d=new Date(ts*1000); return pad(d.getHours())+':'+pad(d.getMinutes()); }
+
+  window.TSTDrawPerf=function(cvId,metaId){
+    var cv=document.getElementById(cvId);
+    if(!cv) return;
+    fetch('/api/tst-perf/history?hours=24',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      var pts=(d&&d.points)||[];
+      var meta=document.getElementById(metaId);
+      if(!pts.length){ if(meta)meta.textContent='还没有性能数据，插件上报后自动出现'; return; }
+      var w=cv.clientWidth||600, h=cv.clientHeight||170;
+      var dpr=window.devicePixelRatio||1;
+      cv.width=w*dpr; cv.height=h*dpr;
+      var g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+      var L=34,R=8,T=10,B=20;
+      var pw=w-L-R, ph=h-T-B;
+      g.strokeStyle='rgba(127,127,127,.28)'; g.lineWidth=1;
+      for(var i=0;i<=4;i++){ var y=T+ph*i/4; g.beginPath(); g.moveTo(L,y); g.lineTo(L+pw,y); g.stroke(); }
+      var mx=function(v){ var n=num(v); return n===null?null:n; };
+      var tps=pts.map(function(p){return mx(p.tps1);});
+      var mspt=pts.map(function(p){return mx(p.mspt);});
+      var on=pts.map(function(p){return mx(p.online);});
+      function line(arr,min,max,color){
+        var vals=arr.filter(function(v){return v!==null;});
+        if(!vals.length) return;
+        var vmin=Math.min.apply(null,vals), vmax=Math.max.apply(null,vals);
+        if(max!==undefined && max!==null){ vmax=Math.max(vmax,max*0.6); }
+        if(vmin===vmax){ vmin-=1; vmax+=1; }
+        g.beginPath(); g.strokeStyle=color; g.lineWidth=1.6;
+        var started=false;
+        arr.forEach(function(v,idx){
+          if(v===null){ started=false; return; }
+          var x=L+pw*(arr.length<2?0.5:idx/(arr.length-1));
+          var y=T+ph-(ph*(v-vmin)/(vmax-vmin));
+          if(!started){ g.moveTo(x,y); started=true; } else { g.lineTo(x,y); }
+        });
+        g.stroke();
+      }
+      line(tps,0,'#5aa8ff');
+      line(mspt,0,'#d9a13c');
+      line(on,0,'#3ddc84');
+      g.fillStyle='rgba(127,127,127,.8)'; g.font='11px system-ui,Segoe UI,sans-serif';
+      g.fillText('20',4,T+8); g.fillText('0',10,T+ph);
+      g.fillText(pts.length>0?hhmm(pts[0].ts):'',L,h-5);
+      g.fillText(pts.length>0?hhmm(pts[pts.length-1].ts):'',L+pw-30,h-5);
+      if(meta){
+        var last=pts[pts.length-1];
+        meta.innerHTML='<span style="color:#5aa8ff">TPS 1m '+(last.tps1==null?'—':last.tps1)+'</span>'+
+          '<span style="color:#d9a13c">MSPT '+(last.mspt==null?'—':last.mspt)+'ms</span>'+
+          '<span style="color:#3ddc84">在线 '+last.online+'</span>'+
+          '<span>内存 '+last.mem+' / '+last.memmax+' MB</span>'+
+          '<span>区块 '+last.chunks+'</span>'+
+          '<span>运行 '+Math.floor(last.uptime/3600)+'h</span>';
+      }
+    }).catch(function(){});
+  };
+
+  var inited=false;
+  function pw(){ return sessionStorage.getItem('tst_panel_pw')||''; }
+  function setMsg(el,t){ if(el) el.textContent=t; }
+
+  function loadStats(){
+    var box=document.getElementById('panelStats');
+    if(!box) return;
+    fetch('/api/tst-status/state',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      d=d||{};
+      var pf=d.perf||{};
+      var items=[
+        ['状态', d.online?'在线':'离线'],
+        ['在线人数', d.online?((d.onlineCount||0)+' / '+(d.max||0)):'—'],
+        ['TPS 1m', pf.tps1==null?'—':pf.tps1],
+        ['MSPT', pf.mspt==null?'—':pf.mspt+' ms'],
+        ['内存', pf.mem==null?'—':(pf.mem+' / '+pf.memmax+' MB')],
+        ['区块', pf.chunks==null?'—':pf.chunks],
+        ['实体', pf.entities==null?'—':pf.entities],
+        ['运行时长', pf.uptime==null?'—':Math.floor(pf.uptime/3600)+' 小时'],
+        ['版本', d.version||'—'],
+        ['上次上报', d.receivedAt?hhmm(d.receivedAt/1000):'—']
+      ];
+      box.innerHTML=items.map(function(it){ return '<div class="p-stat"><div class="k">'+it[0]+'</div><div class="v">'+it[1]+'</div></div>'; }).join('');
+    }).catch(function(){});
+  }
+
+  function loadLog(){
+    var box=document.getElementById('logBox');
+    if(!box) return;
+    if(!pw()){ box.textContent='需要管理员密码后查看'; return; }
+    var lv=(document.getElementById('logLevel')||{}).value||'';
+    var q=((document.getElementById('logQuery')||{}).value||'').trim();
+    var url='/api/tst-log/list?limit=400'+(lv?'&level='+encodeURIComponent(lv):'')+(q?'&q='+encodeURIComponent(q):'');
+    box.textContent='读取中…';
+    fetch(url,{cache:'no-store',headers:{'x-admin-pw':pw()}}).then(function(r){return r.json();}).then(function(d){
+      if(!d||!d.ok){ box.textContent=d&&d.error==='forbidden'?'密码错误或权限不足':('读取失败：'+((d&&d.error)||'未知')); return; }
+      var logs=d.logs||[];
+      if(!logs.length){ box.textContent='暂无日志'; return; }
+      box.innerHTML=logs.slice().reverse().map(function(l){
+        var cls=l.lvl==='ERROR'?'err':(l.lvl==='WARN'?'warn':'');
+        return '<span class="log-line '+cls+'"><span class="lt">'+hhmm(l.ts)+' '+l.lvl+' ['+l.src+']</span> '+esc(l.body)+'</span>';
+      }).join('');
+    }).catch(function(){ box.textContent='读取失败，请稍后再试'; });
+  }
+
+  function loadEvt(){
+    var box=document.getElementById('evtBox');
+    if(!box) return;
+    fetch('/api/tst-events/list?limit=80',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+      var evs=(d&&d.events)||[];
+      if(!evs.length){ box.textContent='还没有动态，玩家进出、死亡、成就与指令执行都会记在这里'; return; }
+      var map={join:'进服',quit:'离服',death:'死亡',advance:'成就',cmd:'指令',misc:'事件'};
+      box.innerHTML=evs.map(function(e){
+        return '<div style="margin-bottom:6px;"><span class="lt" style="opacity:.55">'+hhmm(e.ts)+'</span> <span style="color:#5aa8ff">['+(map[e.kind]||e.kind)+']</span> '+esc(e.detail||e.actor||'')+'</div>';
+      }).join('');
+    }).catch(function(){});
+  }
+
+  function sendCmd(){
+    var inp=document.getElementById('cmdInput'), out=document.getElementById('consoleOut');
+    if(!inp||!out) return;
+    var cmd=(inp.value||'').trim();
+    if(!cmd){ inp.focus(); return; }
+    if(!pw()){ out.textContent='请先在上方填入管理员密码'; return; }
+    out.textContent+=(out.textContent?'\n':'')+'> '+cmd+'\n  下发中…';
+    fetch('/api/tst-cmd/send',{method:'POST',headers:{'Content-Type':'application/json','x-admin-pw':pw()},body:JSON.stringify({cmd:cmd})})
+      .then(function(r){return r.json();}).then(function(d){
+        out.textContent=out.textContent.replace('  下发中…','');
+        if(d&&d.ok){ out.textContent+='  已进入队列，插件 15 秒内取走执行\n'; }
+        else if(d&&d.error==='command_blocked'){ out.textContent+='  该指令不在放行名单里\n'; }
+        else if(d&&d.error==='forbidden'){ out.textContent+='  密码错误或权限不足\n'; }
+        else { out.textContent+='  下发失败：'+((d&&d.error)||'未知')+'\n'; }
+        out.scrollTop=out.scrollHeight;
+        inp.value='';
+      }).catch(function(){ out.textContent+='  网络异常，请重试\n'; });
+  }
+
+  window.panelInit=function(){
+    if(inited) return; inited=true;
+    var pwin=document.getElementById('panelPw');
+    if(pwin && pw()) pwin.value=pw();
+    var pbtn=document.getElementById('panelPwBtn');
+    if(pbtn) pbtn.onclick=function(){
+      var v=(pwin.value||'').trim();
+      if(!v){ showToast('请输入管理员密码'); return; }
+      sessionStorage.setItem('tst_panel_pw',v);
+      showToast('密码已保存，本页有效');
+      loadLog();
+    };
+    document.querySelectorAll('.panel-tab').forEach(function(t){
+      t.onclick=function(){
+        document.querySelectorAll('.panel-tab').forEach(function(x){x.classList.remove('on');});
+        document.querySelectorAll('.panel-pane').forEach(function(x){x.classList.remove('on');});
+        t.classList.add('on');
+        var p=document.getElementById(t.getAttribute('data-pane'));
+        if(p) p.classList.add('on');
+        if(t.getAttribute('data-pane')==='paneLog') loadLog();
+        if(t.getAttribute('data-pane')==='paneEvt') loadEvt();
+        if(t.getAttribute('data-pane')==='panePerf'){ loadStats(); window.TSTDrawPerf('panelChart','panelPerfNote'); }
+      };
+    });
+    var lb=document.getElementById('logLoadBtn'); if(lb) lb.onclick=loadLog;
+    var lv=document.getElementById('logLevel'); if(lv) lv.onchange=loadLog;
+    var csv=document.getElementById('cmdSendBtn'); if(csv) csv.onclick=sendCmd;
+    var ci=document.getElementById('cmdInput');
+    if(ci) ci.addEventListener('keydown',function(e){ if(e.key==='Enter') sendCmd(); });
+    loadStats();
+    window.TSTDrawPerf('panelChart','panelPerfNote');
+    loadEvt();
+    setInterval(function(){ if(document.getElementById('panel').classList.contains('active')) loadStats(); },180000);
+  };
+  window.__panelTab=function(pid){
+    var t=document.querySelector('.panel-tab[data-pane="'+pid+'"]');
+    if(t) t.click();
+  };
 })();
 </script>
