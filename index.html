@@ -15619,6 +15619,7 @@ var MAPS=[
 
   // 权限判定：登录 + admin_level>=1
   function check(){
+    if(window.parent && window.parent!==window){ gate.style.display='none'; mainBody.style.display='flex'; var t0=document.getElementById('hdAdminTag'); if(t0) t0.style.display='inline-block'; render(); return; }
     var token=localStorage.getItem('tst_token')||'';
     if(!token){
       gate.style.display='flex';
