@@ -8,10 +8,10 @@
 const SUPABASE_URL = 'https://jilcbcodphxpasicjghv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs';
 const DATA_ORIGIN = 'https://tst-server-site.pages.dev';
-// Java 服（the slow tide）状态：插件每 30 秒 POST 一次，这里只做接收与缓存，不主动连服务器
+// Java 服（the slow tide）状态：插件每 180 秒 POST 一次，这里只做接收与缓存，不主动连服务器
 const TST_TOKEN = '0e18fe94d4f9259cb0eb3f59c44f6984a8a280ad399b1fb7';
 const TST_KEY = 'tst_status_v1';
-const TST_STALE_MS = 95000; // 上报间隔 30 秒，超过 95 秒没消息即判离线
+const TST_STALE_MS = 420000; // 上报间隔 180 秒，连续 7 分钟没消息才判离线（留两轮容错）
 function tstMemSet(rec) { try { globalThis.__TST_STATUS_REC = rec; } catch (e) { /* 忽略 */ } }
 function tstMemGet() { try { return globalThis.__TST_STATUS_REC || null; } catch (e) { return null; } }
 // 管理员口令：注意此文件在公开仓库，密码会随源码可见；后续需改为环境变量+数据库侧改密
