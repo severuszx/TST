@@ -340,6 +340,9 @@ export async function onRequest(context) {
       await TST_DB.prepare('CREATE TABLE IF NOT EXISTS dm (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, from_name TEXT, to_name TEXT, msg TEXT)').run();
       await TST_DB.prepare('INSERT INTO dm (ts,from_name,to_name,msg) VALUES (?,?,?,?)')
         .bind(tstNowS(), from, to, msg).run();
+      await TST_DB.prepare('CREATE TABLE IF NOT EXISTS mc_link (mc TEXT PRIMARY KEY, nickname TEXT, ts INTEGER)').run();
+      await TST_DB.prepare('INSERT INTO mc_link (mc,nickname,ts) VALUES (?,?,?) ON CONFLICT(mc) DO UPDATE SET nickname=excluded.nickname, ts=excluded.ts')
+        .bind(from, to, tstNowS()).run();
       return json({ ok: true, from: from, to: to }, 200, request);
     } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
   }
@@ -364,10 +367,11 @@ export async function onRequest(context) {
     if (to === nick) return json({ ok: false, error: 'self' }, 200, request);
     let mc = '';
     try {
-      const r2 = await fetch('https://theslowtidefk.pages.dev/api/card?name=' + encodeURIComponent(to));
-      const c2 = await r2.json();
-      if (c2 && c2.ok) mc = String(c2.mc || '').trim().slice(0, 16);
+      await TST_DB.prepare('CREATE TABLE IF NOT EXISTS mc_link (mc TEXT PRIMARY KEY, nickname TEXT, ts INTEGER)').run();
+      const lk = await TST_DB.prepare('SELECT mc FROM mc_link WHERE nickname = ? COLLATE NOCASE LIMIT 1').bind(to).first();
+      if (lk && lk.mc) mc = String(lk.mc).trim().slice(0, 16);
     } catch (e) { mc = ''; }
+
     try {
       await TST_DB.prepare('CREATE TABLE IF NOT EXISTS dm (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, from_name TEXT, to_name TEXT, msg TEXT)').run();
     } catch (e) {}
