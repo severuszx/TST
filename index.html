@@ -3100,11 +3100,98 @@ body:has(.embed-page.active){overflow:hidden;}
 .embed-page{padding:0!important;margin:0!important;}
 .embed-shell{width:100%;height:calc(100vh - 96px);height:calc(100dvh - 96px);min-height:520px;background:var(--bg,#f7f8fa);}
 .embed-frame{width:100%;height:100%;border:0;display:block;background:transparent;}
-@media (max-width:760px){.embed-shell{height:calc(100vh - 120px);height:calc(100dvh - 120px);}}
+@media (max-width:760px){.embed-shell{height:calc(100vh - 57px);height:calc(100dvh - 57px);}}
 </style>
 </head>
 
 <body>
+<script>
+(function(){
+  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn); else fn(); }
+  ready(function(){
+    /* ---- 09 手机导航：旧主页面没有汉堡，这里补一个可靠的抽屉 ---- */
+    var header=document.querySelector('.site-header .header-inner')||document.querySelector('.site-header');
+    var nav=document.getElementById('mainNav');
+    if(header && nav && !document.getElementById('navBurgerFix')){
+      var css=document.createElement('style');
+      css.textContent='@media(max-width:960px){#mainNav{display:none!important}#navBurgerFix{display:flex!important}.tst-drawer{display:none;position:fixed;inset:0;z-index:10060}.tst-drawer.open{display:block}.tst-drawer .mask{position:absolute;inset:0;background:rgba(10,16,30,.46)}.tst-drawer .panel{position:absolute;top:0;right:0;bottom:0;width:78%;max-width:300px;background:var(--card,#fff);border-left:1px solid var(--border,#ddd);box-shadow:-8px 0 30px rgba(0,0,0,.18);transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;overflow-y:auto}.tst-drawer.open .panel{transform:none}.tst-drawer .head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border,#ddd);font-weight:700}.tst-drawer .close{border:0;background:none;font-size:18px;cursor:pointer;color:var(--text-secondary,#888)}.tst-drawer .list{display:flex;flex-direction:column;padding:10px 14px;gap:2px}.tst-drawer .list button{padding:12px 14px;border:0;border-radius:10px;background:none;color:var(--text,#333);font-size:15px;text-align:left;cursor:pointer}.tst-drawer .list button:hover{background:var(--hover,#eef2f7)}}@media(min-width:961px){#navBurgerFix{display:none!important}.tst-drawer{display:none!important}}';
+      document.head.appendChild(css);
+      var btn=document.createElement('button');
+      btn.id='navBurgerFix'; btn.className='nav-burger'; btn.type='button'; btn.setAttribute('aria-label','菜单'); btn.textContent='☰';
+      btn.style.cssText='display:none;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid var(--border,#ddd);border-radius:8px;background:var(--card,#fff);color:var(--text,#333);font-size:18px;cursor:pointer;line-height:1;padding:0;flex:none;';
+      header.appendChild(btn);
+      var drawer=document.createElement('div');
+      drawer.className='tst-drawer'; drawer.id='tstDrawer';
+      drawer.innerHTML='<div class="mask"></div><div class="panel"><div class="head">导航<button class="close" type="button" aria-label="关闭">✕</button></div><div class="list"></div></div>';
+      var list=drawer.querySelector('.list');
+      nav.querySelectorAll('[data-nav]').forEach(function(item){
+        var b=document.createElement('button'); b.type='button'; b.textContent=(item.textContent||'').trim();
+        b.addEventListener('click',function(){ var id=item.getAttribute('data-nav'); drawer.classList.remove('open'); var target=document.querySelector('[data-nav="'+id+'"]'); if(target) target.click(); });
+        list.appendChild(b);
+      });
+      var more=document.getElementById('moreMenu');
+      if(more){ more.querySelectorAll('[data-nav]').forEach(function(item){ var b=document.createElement('button'); b.type='button'; b.textContent=(item.textContent||'').trim(); b.addEventListener('click',function(){ var id=item.getAttribute('data-nav'); drawer.classList.remove('open'); var target=document.querySelector('[data-nav="'+id+'"]'); if(target) target.click(); }); list.appendChild(b); }); }
+      document.body.appendChild(drawer);
+      btn.addEventListener('click',function(){ drawer.classList.add('open'); });
+      drawer.querySelector('.mask').addEventListener('click',function(){ drawer.classList.remove('open'); });
+      drawer.querySelector('.close').addEventListener('click',function(){ drawer.classList.remove('open'); });
+    }
+
+    /* ---- 11 投票页：不再永久“加载中…” ---- */
+    var voteBody=document.getElementById('voteBody');
+    var voteTabs=document.getElementById('voteTabs');
+    if(voteBody && !voteBody.getAttribute('data-ready')){
+      voteBody.setAttribute('data-ready','1');
+      voteBody.innerHTML='<p class="empty-hint">投票功能维护中：服务端统计接口尚未接入，开放后会在此页和公告同步通知。</p>';
+      if(voteTabs){ voteTabs.querySelectorAll('button').forEach(function(b){ b.addEventListener('click',function(){ voteTabs.querySelectorAll('button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); }); }); }
+    }
+
+    /* ---- 02 嵌入页主题持续同步（每秒一次，开销极低） ---- */
+    function syncEmbedTheme(){
+      var th=localStorage.getItem('tst-theme')||'light';
+      if(th==='glass') th='light';
+      document.querySelectorAll('.embed-frame').forEach(function(f){
+        try{ if(f.contentDocument && f.contentDocument.documentElement) f.contentDocument.documentElement.setAttribute('data-theme',th); }catch(e){}
+      });
+    }
+    syncEmbedTheme(); setTimeout(syncEmbedTheme,800); setTimeout(syncEmbedTheme,2000);
+    var __tt=document.getElementById('themeToggle'); if(__tt) __tt.addEventListener('click',function(){ setTimeout(syncEmbedTheme,80); });
+
+    /* ---- 13 最小错误记录（本地留痕，便于复现） ---- */
+    window.__TST_ERRORS=window.__TST_ERRORS||[];
+    window.addEventListener('error',function(e){ try{ window.__TST_ERRORS.push({t:Date.now(),m:String(e.message||''),s:String(e.filename||''),l:e.lineno||0}); if(window.__TST_ERRORS.length>30) window.__TST_ERRORS.shift(); }catch(x){} });
+    window.addEventListener('unhandledrejection',function(e){ try{ window.__TST_ERRORS.push({t:Date.now(),m:'unhandled: '+String(e.reason&&e.reason.message||e.reason||'')}); if(window.__TST_ERRORS.length>30) window.__TST_ERRORS.shift(); }catch(x){} });
+  });
+})();
+</script>
+<script>
+(function(){
+  if(window.__tstDedupeFetch) return;
+  window.__tstDedupeFetch=1;
+  function key(x){
+    var d=x&&(x.date||x.created_at||x.time||'');
+    return String(x&&x.title||'')+'|'+String(d)+'|'+String(x&&x.content||'').slice(0,120);
+  }
+  function dedupe(list){
+    if(!Array.isArray(list)) return list;
+    var seen={}, out=[];
+    list.forEach(function(x){var k=key(x);if(!seen[k]){seen[k]=1;out.push(x);}});
+    return out;
+  }
+  var orig=window.fetch;
+  window.fetch=function(input,init){
+    var url=String(input&&input.url?input.url:input);
+    if(url.indexOf('/api/data')<=-1) return orig.apply(this,arguments);
+    return orig.apply(this,arguments).then(function(r){
+      return r.clone().json().then(function(j){
+        if(j&&Array.isArray(j.announcements)) j.announcements=dedupe(j.announcements);
+        if(j&&Array.isArray(j.feeds)) j.feeds=dedupe(j.feeds);
+        return new Response(JSON.stringify(j),{status:r.status,headers:{'Content-Type':'application/json; charset=utf-8'}});
+      });
+    });
+  };
+})();
+</script>
 
 <script>
 
@@ -6509,7 +6596,7 @@ function switchPage(pid){
 
   const _nm=document.getElementById('navMore');if(_nm)_nm.classList.remove('open');
 
-  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',chat:'聊天室 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide',plugins:'插件公示 - The Slow Tide',privacy:'隐私政策 - The Slow Tide',shopterms:'商城与赞助协议 - The Slow Tide'};
+  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',chat:'聊天室 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide',plugins:'插件公示 - The Slow Tide',privacy:'隐私政策 - The Slow Tide',shopterms:'商城与赞助协议 - The Slow Tide',shop:'积分商店 - The Slow Tide',hogwarts:'霍格沃茨 - The Slow Tide',planning:'服务器策划 - The Slow Tide',download:'下载 - The Slow Tide',panel:'服务器面板 - The Slow Tide',profile:'个人中心 - The Slow Tide',tool:'便捷工具 - The Slow Tide',login:'登录 - The Slow Tide'};
 
   document.title=TITLES[pid]||'The Slow Tide 官网';
 
@@ -10063,7 +10150,14 @@ try{ eval('const __t=()=>1;'); }catch(e){
     try{
       var d=frame.contentDocument;
       d.open(); d.write(html); d.close();
-      try{
+        try{
+          var __th=(localStorage.getItem('tst-theme')||'light');
+          if(__th==='glass') __th='light';
+          d.documentElement.setAttribute('data-theme',__th);
+          var __st=d.createElement('style');
+          __st.textContent='html{color-scheme:'+__th+'!important}';
+          (d.head||d.documentElement).appendChild(__st);
+        }catch(e){}      try{
         d.addEventListener('click',function(ev){
           var a=ev.target&&ev.target.closest?ev.target.closest('a[href]'):null;
           if(!a) return;
@@ -13909,6 +14003,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 })();
 <\/script>
 <script src="/tst-ui.js"><\/script>
+
 </body>
 </html></script>
 <script type="text/plain" id="embed-shop"><!DOCTYPE html>
@@ -13985,7 +14080,7 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 .points-badge .plbl{font-size:12px;color:var(--text-secondary);font-weight:400;}
 .fb-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
 .fb-btn:hover{border-color:var(--accent);color:var(--primary);}
-.fb-btn.primary{background:var(--primary);color:#fff;border-color:var(--primary);}
+.fb-btn.primary{background:var(--primary);color:var(--bg);border-color:var(--primary);}
 .fb-btn.primary:hover{opacity:.9;}
 .u-name{font-size:13px;font-weight:600;color:var(--text);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .wrap{max-width:1120px;margin:0 auto;padding:24px 22px 60px;}
@@ -14020,7 +14115,7 @@ html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 .item .btns .btn{width:100%;}
 .btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:13px;cursor:pointer;font-weight:600;transition:all .15s;}
 .btn:hover{border-color:var(--accent);color:var(--primary);}
-.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff;width:100%;}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:var(--bg);width:100%;}
 .btn.primary:hover{opacity:.9;}
 .btn.sm{padding:5px 8px;font-size:12px;border-radius:7px;font-weight:600;}
 .btn.danger{color:var(--danger);}
