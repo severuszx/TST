@@ -3,7 +3,7 @@
   <url><loc>https://theslowtide.pages.dev/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
   <url><loc>https://theslowtide.pages.dev/#notice</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://theslowtide.pages.dev/#feed</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://theslowtide.pages.dev/#activity</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://theslowtide.pages.dev/#event</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://theslowtide.pages.dev/#tools</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://theslowtide.pages.dev/#rule</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://theslowtide.pages.dev/#download</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>

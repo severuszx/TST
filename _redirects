@@ -11,4 +11,5 @@
 /tool /index.html#tool 301
 /download.html /index.html#download 301
 /download /index.html#download 301
-/activity /index.html#activity 301
+/activity /index.html#event 301
+/activity.html /index.html#event 301
