@@ -570,10 +570,13 @@ function showShop(){ document.getElementById('mainWrap').style.display='block'; 
 /* ===== 管理 ===== */
 function enterAdmin(){
   if(!ADMIN_ON){
-    var p=prompt('请输入管理员密码：');
-    if(p===null) return;
-    if(!p){ toast('未输入密码'); return; }
-    sessionStorage.setItem('tstShopAdmin',p); ADMIN_ON=true; toast('已进入管理');
+    TSTUI.ask({title:'管理员验证',label:'管理员密码',type:'password'}).then(function(p){
+      if(p===null) return;
+      if(!p){ toast('未输入密码'); return; }
+      sessionStorage.setItem('tstShopAdmin',p); ADMIN_ON=true; toast('已进入管理');
+      enterAdmin();
+    });
+    return;
   }
   document.getElementById('mainWrap').style.display='none';
   document.getElementById('meWrap').style.display='none';
@@ -617,12 +620,22 @@ function addCodesFor(id,name){
   var itemId=id||Number(document.getElementById('cdItemSel').value)||0;
   var nm=name||'该商品';
   if(!itemId){ toast('请先选择商品'); return; }
-  var s=prompt('为「'+nm+'」批量添加兑换码（每行一个，最多 200 个）：\n\n输入兑换码或留空自动生成');
-  if(s===null) return;
-  var codes=[];
-  if(s.trim()){ codes=s.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean); }
-  else { codes=autoGen(Number(prompt('生成数量（1~200）：','10'))||10); }
-  adminApi({action:'codes_add',item_id:itemId,codes:codes}).then(function(d){ if(d&&d.ok){ toast('已添加 '+d.added+' 个'); loadCodes(); } else toast('添加失败'); });
+  TSTUI.form({
+    title:'批量添加兑换码',
+    desc:'为「'+nm+'」添加兑换码。每行一个，最多 200 个；留空则按下面数量自动生成。',
+    okText:'添加',
+    fields:[
+      {name:'codes',label:'兑换码（每行一个）',type:'textarea',rows:6,placeholder:'留空则自动生成'},
+      {name:'count',label:'自动生成数量（1~200）',value:'10'}
+    ],
+    onDone:function(v){
+      var codes=[];
+      var txt=String(v.codes||'');
+      if(txt.trim()){ codes=txt.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean); }
+      else { var n=Math.max(1,Math.min(200,Number(v.count)||10)); codes=autoGen(n); }
+      adminApi({action:'codes_add',item_id:itemId,codes:codes}).then(function(d){ if(d&&d.ok){ toast('已添加 '+d.added+' 个'); loadCodes(); } else toast('添加失败'); });
+    }
+  });
 }
 function autoGen(n){ var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; var out=[]; for(var i=0;i<n;i++){ var s=''; for(var j=0;j<12;j++) s+=chars[Math.floor(Math.random()*chars.length)]; out.push('TSTC-'+s); } return out; }
 function loadCodes(){
@@ -660,7 +673,7 @@ function loadAdminPosts(){
   });
 }
 function adminPin(id){ postAdmin({action:'pin',id:id}).then(function(d){ if(d&&d.ok){ toast('已更新'); loadAdminPosts(); } }); }
-function adminDelPost(id){ if(!confirm('确定删除该帖子吗？其评论、点赞、收藏、投币将一并删除。')) return; postAdmin({action:'del_post',id:id}).then(function(d){ if(d&&d.ok){ toast('已删除'); loadAdminPosts(); } }); }
+function adminDelPost(id){ TSTUI.confirm('确定删除该帖子吗？其评论、点赞、收藏、投币将一并删除。',{title:'删除帖子',okText:'删除'}).then(function(ok){ if(!ok) return; postAdmin({action:'del_post',id:id}).then(function(d){ if(d&&d.ok){ toast('已删除'); loadAdminPosts(); } }); }); }
 function loadAdminOrders(){
   adminApi({action:'orders_list'}).then(function(d){
     var box=document.getElementById('adOrders');
@@ -691,5 +704,6 @@ api('/shop/items',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).
   sel.innerHTML=(d&&d.items||[]).map(function(it){ return '<option value="'+it.id+'">'+esc(it.name)+'</option>'; }).join('');
 });
 </script>
+<script src="/tst-ui.js"></script>
 </body>
 </html>
