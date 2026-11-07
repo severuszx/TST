@@ -526,10 +526,10 @@ var MAPS=[
       document.getElementById('gateBackBtn').style.display='inline-block';
       return;
     }
-    fetch(AUTH+'/admin/users',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action:'whoami'}),cache:'no-store'})
+    fetch('https://theslowtide.pages.dev/api/tst-log/list?limit=1',{headers:{'Authorization':'Bearer '+token},cache:'no-store'})
     .then(function(r){return r.json();})
     .then(function(d){
-      if(d && d.ok && (d.admin_level||0)>=1){
+      if(d && d.ok){
         gate.style.display='none';
         mainBody.style.display='flex';
         var t=document.getElementById('hdAdminTag'); if(t) t.style.display='inline-block';
