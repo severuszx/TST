@@ -3053,7 +3053,24 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 .vote-admin-item .vai-ops button:hover{border-color:var(--accent);color:var(--accent);}
 
-@media (max-width:720px){ .cf-wrap{grid-template-columns:1fr!important;} }
+@media (max-width:720px){ 
+/* ===== 插件公示 ===== */
+.plugins-intro{max-width:780px;font-size:14px;line-height:1.85;color:var(--text-secondary);margin:0;}
+.plugins-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:18px;}
+.plugin-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 16px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;}
+.plugin-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.plugin-no{font-size:11px;color:var(--text-secondary);font-variant-numeric:tabular-nums;min-width:18px;}
+.plugin-name{font-size:16px;font-weight:700;margin:0;color:var(--text);line-height:1.35;}
+.plugin-tag{margin-left:auto;font-size:11px;color:var(--accent);border:1px solid var(--border);border-radius:4px;padding:1px 6px;white-space:nowrap;flex:none;}
+.plugin-desc{font-size:13.5px;line-height:1.7;color:var(--text-secondary);margin:0 0 12px;flex:1;}
+.plugin-links{display:flex;flex-wrap:wrap;gap:12px;}
+.plugin-link{font-size:12.5px;color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;}
+.plugin-link:hover{border-bottom-color:var(--accent);}
+.plugin-local{font-size:12.5px;color:var(--text-secondary);}
+.plugins-foot{margin-top:16px;font-size:12.5px;line-height:1.8;color:var(--text-secondary);}
+@media (max-width:720px){.plugins-grid{grid-template-columns:1fr;gap:10px;}.plugin-card{padding:14px;}.plugins-intro{font-size:13px;}}
+
+.cf-wrap{grid-template-columns:1fr!important;} }
 </style>
 
 <meta name="color-scheme" content="light">
@@ -3164,6 +3181,8 @@ body:has(.embed-page.active){overflow:hidden;}
 <button class="nav-link" data-nav="tool" type="button">便捷工具</button>
 
 <button class="nav-link" data-nav="tools">服务器工具</button>
+
+<button class="nav-link" data-nav="plugins">插件公示</button>
 <button class="nav-link" data-nav="hogwarts" type="button">霍格沃茨</button>
 <button class="nav-link" data-nav="planning" type="button">服务器策划</button>
 
@@ -4039,6 +4058,58 @@ body:has(.embed-page.active){overflow:hidden;}
   <p style="margin:12px 0 0;color:var(--text-secondary);font-size:12.5px;">安装时请允许「安装未知应用」。更新内容见公告；客户端更新可直接在应用内公告页下载安装包。</p>
 
 </div>
+
+</div>
+
+</section>
+
+<section id="plugins" class="page">
+
+<div class="container">
+
+<div class="section-title">插件公示</div>
+
+<p class="plugins-intro">这里列出 Java 版当前安装的插件和各自负责的功能。插件名下方的链接指向作者官方页面、文档站或 Modrinth / SpigotMC 介绍页，方便查配置和更新日志。</p>
+
+<div class="plugins-grid">
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">01</span><h3 class="plugin-name">AuthMe</h3><span class="plugin-tag">登录</span></div><p class="plugin-desc">离线登录与账号注册，负责玩家进服时的密码验证。</p><div class="plugin-links"><a class="plugin-link" href="https://github.com/AuthMe/AuthMeReloaded" target="_blank" rel="noopener">GitHub</a><a class="plugin-link" href="https://www.spigotmc.org/resources/authmereloaded.6269/" target="_blank" rel="noopener">SpigotMC</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">02</span><h3 class="plugin-name">LuckPerms</h3><span class="plugin-tag">权限</span></div><p class="plugin-desc">权限组、继承与节点管理，控制玩家能用哪些指令和功能。</p><div class="plugin-links"><a class="plugin-link" href="https://luckperms.net/" target="_blank" rel="noopener">官网</a><a class="plugin-link" href="https://github.com/LuckPerms/LuckPerms" target="_blank" rel="noopener">GitHub</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">03</span><h3 class="plugin-name">Vault</h3><span class="plugin-tag">经济</span></div><p class="plugin-desc">经济与权限接口的桥梁，让商店、菜单等插件统一读取经济数据。</p><div class="plugin-links"><a class="plugin-link" href="https://github.com/MilkBowl/Vault" target="_blank" rel="noopener">GitHub</a><a class="plugin-link" href="https://www.spigotmc.org/resources/vault.34315/" target="_blank" rel="noopener">SpigotMC</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">04</span><h3 class="plugin-name">EssentialsX</h3><span class="plugin-tag">核心</span></div><p class="plugin-desc">全功能基础插件，提供经济、传送、家、聊天与常用管理指令。</p><div class="plugin-links"><a class="plugin-link" href="https://essentialsx.net/" target="_blank" rel="noopener">官网</a><a class="plugin-link" href="https://github.com/EssentialsX/Essentials" target="_blank" rel="noopener">GitHub</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">05</span><h3 class="plugin-name">EconomyShopGUI</h3><span class="plugin-tag">商店</span></div><p class="plugin-desc">系统商店的图形界面、收购与出售分类、限购和价格配置。</p><div class="plugin-links"><a class="plugin-link" href="https://www.spigotmc.org/resources/economyshopgui.69927/" target="_blank" rel="noopener">SpigotMC</a><a class="plugin-link" href="https://wiki.gpplugins.com/economyshopgui/" target="_blank" rel="noopener">Wiki 文档</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">06</span><h3 class="plugin-name">DeluxeMenus</h3><span class="plugin-tag">菜单</span></div><p class="plugin-desc">自定义箱子菜单，用指令打开各类功能面板和服务器入口。</p><div class="plugin-links"><a class="plugin-link" href="https://www.spigotmc.org/resources/deluxemenus.11734/" target="_blank" rel="noopener">SpigotMC</a><a class="plugin-link" href="https://github.com/HelpChat/DeluxeMenus" target="_blank" rel="noopener">GitHub</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">07</span><h3 class="plugin-name">TAB</h3><span class="plugin-tag">显示</span></div><p class="plugin-desc">统一负责所有显示：聊天格式、Tab 列表、头顶名称与计分板。</p><div class="plugin-links"><a class="plugin-link" href="https://github.com/NEZNAMY/TAB" target="_blank" rel="noopener">GitHub</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">08</span><h3 class="plugin-name">PlayerTitle</h3><span class="plugin-tag">称号</span></div><p class="plugin-desc">只负责称号的仓库、商城与佩戴，不参与聊天和 Tab 显示。</p><div class="plugin-links"><a class="plugin-link" href="https://ricedoc.handyplus.cn/wiki/PlayerTitle/" target="_blank" rel="noopener">插件 Wiki</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">09</span><h3 class="plugin-name">PlaceholderAPI</h3><span class="plugin-tag">变量</span></div><p class="plugin-desc">变量占位库，向菜单、称号、聊天等插件提供统一的动态变量。</p><div class="plugin-links"><a class="plugin-link" href="https://wiki.placeholderapi.com/" target="_blank" rel="noopener">Wiki 文档</a><a class="plugin-link" href="https://github.com/PlaceholderAPI/PlaceholderAPI" target="_blank" rel="noopener">GitHub</a><a class="plugin-link" href="https://www.spigotmc.org/resources/placeholderapi.6245/" target="_blank" rel="noopener">SpigotMC</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">10</span><h3 class="plugin-name">MiniMOTD</h3><span class="plugin-tag">列表</span></div><p class="plugin-desc">服务器列表外观，控制 MOTD 文字、图标和悬停提示。</p><div class="plugin-links"><a class="plugin-link" href="https://modrinth.com/plugin/minimotd" target="_blank" rel="noopener">Modrinth</a><a class="plugin-link" href="https://github.com/MiniMOTD/MiniMOTD" target="_blank" rel="noopener">GitHub</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">11</span><h3 class="plugin-name">CoreProtect</h3><span class="plugin-tag">防护</span></div><p class="plugin-desc">方块与容器操作记录，用于查熊、回档和追溯破坏行为。</p><div class="plugin-links"><a class="plugin-link" href="https://coreprotect.net/" target="_blank" rel="noopener">官网</a><a class="plugin-link" href="https://www.spigotmc.org/resources/coreprotect.8631/" target="_blank" rel="noopener">SpigotMC</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">12</span><h3 class="plugin-name">InvSee++</h3><span class="plugin-tag">管理</span></div><p class="plugin-desc">管理员查看和编辑玩家背包，支持离线玩家与末影箱。</p><div class="plugin-links"><a class="plugin-link" href="https://modrinth.com/plugin/invsee++" target="_blank" rel="noopener">Modrinth</a><a class="plugin-link" href="https://www.spigotmc.org/resources/invsee.82342/" target="_blank" rel="noopener">SpigotMC</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">13</span><h3 class="plugin-name">GrimAC</h3><span class="plugin-tag">反作弊</span></div><p class="plugin-desc">服务端反作弊，检测移动、战斗和场景交互中的异常行为。</p><div class="plugin-links"><a class="plugin-link" href="https://grim.ac/" target="_blank" rel="noopener">官网</a><a class="plugin-link" href="https://github.com/GrimAnticheat/Grim" target="_blank" rel="noopener">GitHub</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">14</span><h3 class="plugin-name">Oreveil</h3><span class="plugin-tag">反矿透</span></div><p class="plugin-desc">服务端反矿透，隐藏或扰乱非法透视看到的矿物信息。</p><div class="plugin-links"><a class="plugin-link" href="https://soymods.com/oreveil/" target="_blank" rel="noopener">官网</a><a class="plugin-link" href="https://www.spigotmc.org/threads/oreveil.721999/" target="_blank" rel="noopener">SpigotMC 介绍</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">15</span><h3 class="plugin-name">Chunky</h3><span class="plugin-tag">性能</span></div><p class="plugin-desc">开服前预生成区块，减少玩家跑图时实时生成带来的卡顿。</p><div class="plugin-links"><a class="plugin-link" href="https://modrinth.com/plugin/chunky" target="_blank" rel="noopener">Modrinth</a><a class="plugin-link" href="https://github.com/pop4959/Chunky" target="_blank" rel="noopener">GitHub</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">16</span><h3 class="plugin-name">ViaVersion + ViaBackwards</h3><span class="plugin-tag">兼容</span></div><p class="plugin-desc">兼容旧版客户端，让低版本玩家也能连入当前版本服务器。</p><div class="plugin-links"><a class="plugin-link" href="https://viaversion.com/" target="_blank" rel="noopener">官网</a><a class="plugin-link" href="https://modrinth.com/plugin/viaversion" target="_blank" rel="noopener">ViaVersion</a><a class="plugin-link" href="https://modrinth.com/plugin/viabackwards" target="_blank" rel="noopener">ViaBackwards</a></div></article>
+
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">17</span><h3 class="plugin-name">TSTStatus</h3><span class="plugin-tag">自研</span></div><p class="plugin-desc">自研官网联动核心，负责状态上报、官网聊天与游戏内私聊、指令下发。</p><div class="plugin-links"><span class="plugin-local">本站自研 · 无外部页面</span></div></article>
+
+</div>
+
+<p class="plugins-foot">插件版本会随服务端更新调整；页面只做功能公示，不提供下载。需要某份配置说明可以直接在群里问。</p>
 
 </div>
 
@@ -6236,7 +6307,7 @@ function switchPage(pid){
 
   const _nm=document.getElementById('navMore');if(_nm)_nm.classList.remove('open');
 
-  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',chat:'聊天室 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide'};
+  var TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',chat:'聊天室 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide',plugins:'插件公示 - The Slow Tide'};
 
   document.title=TITLES[pid]||'The Slow Tide 官网';
 
