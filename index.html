@@ -11737,11 +11737,13 @@ applyTheme();
 // ============================================================
 const navBtns=document.querySelectorAll('.main-nav .nav-link');
 const pages=document.querySelectorAll('.page');
+const PAGE_TITLES={home:'The Slow Tide 官网',notice:'公告 - The Slow Tide',feed:'动态 - The Slow Tide',activity:'活动 - The Slow Tide',vote:'投票 - The Slow Tide',tools:'服务器工具 - The Slow Tide',chat:'聊天室 - The Slow Tide',rule:'玩家公约 - The Slow Tide',event:'赛事活动 - The Slow Tide',cdkey:'兑换码 - The Slow Tide',sponsor:'服务器赞助 - The Slow Tide',plugins:'插件公示 - The Slow Tide',privacy:'隐私政策 - The Slow Tide',shopterms:'商城与赞助协议 - The Slow Tide',shop:'积分商店 - The Slow Tide',hogwarts:'霍格沃茨 - The Slow Tide',planning:'服务器策划 - The Slow Tide',download:'下载 - The Slow Tide',panel:'服务器面板 - The Slow Tide',profile:'个人中心 - The Slow Tide',tool:'便捷工具 - The Slow Tide',login:'登录 - The Slow Tide'};
 function switchPage(pid){
   pages.forEach(p=>p.classList.remove('active'));
   navBtns.forEach(b=>b.classList.toggle('active',b.dataset.nav===pid));
   const t=document.getElementById(pid);
   if(t){ t.classList.add('active'); }
+  document.title=PAGE_TITLES[pid]||'The Slow Tide 官网';
   window.scrollTo({top:0,behavior:'smooth'});
 }
 navBtns.forEach(b=>{ b.onclick=()=>{
