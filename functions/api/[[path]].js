@@ -382,30 +382,6 @@ export async function onRequest(context) {
     }) }, 200, request);
   }
 
-  // 网页 /tpa：由插件在游戏内替玩家发起传送请求
-  if (path === '/api/chat/tpa' && request.method === 'POST') {
-    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
-    let bd = {};
-    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
-    const to = String(bd.to || '').trim().slice(0, 24);
-    if (!to) return json({ ok: false, error: 'need_target' }, 200, request);
-    const tk = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
-    if (!tk) return json({ ok: false, error: 'login_required' }, 401, request);
-    let nick = '';
-    try {
-      const r = await fetch('https://theslowtidefk.pages.dev/api/me', { headers: { 'Authorization': 'Bearer ' + tk } });
-      const d = await r.json();
-      if (d && d.ok) nick = String(d.nickname || (d.email || '').split('@')[0] || '').trim().slice(0, 24);
-    } catch (e) { nick = ''; }
-    if (!nick) return json({ ok: false, error: 'login_required' }, 401, request);
-    if (to === nick) return json({ ok: false, error: 'self' }, 200, request);
-    try {
-      await TST_DB.prepare('INSERT INTO outbox (ts,kind,payload,state) VALUES (?,?,?,0)')
-        .bind(tstNowS(), 'tpa', JSON.stringify({ to: to, from: nick })).run();
-      return json({ ok: true, from: nick, to: to }, 200, request);
-    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
-  }
-
   // 举报：把该玩家最近 30 条聊天打包给管理员
   if (path === '/api/chat/report' && request.method === 'POST') {
     if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
@@ -510,7 +486,6 @@ export async function onRequest(context) {
       const lines = tasks.map(function (t) {
         if (t.kind === 'chat') return t.id + '\tchat\t' + b64(t.data.name || '官网') + '\t' + b64(t.data.msg || '');
         if (t.kind === 'dm') return t.id + '\tdm\t' + b64(t.data.to || '') + '\t' + b64(t.data.from || '官网') + '\t' + b64(t.data.msg || '');
-        if (t.kind === 'tpa') return t.id + '\ttpa\t' + b64(t.data.to || '') + '\t' + b64(t.data.from || '');
         return t.id + '\tcmd\t' + b64(t.data.cmd || '') + '\t' + b64(t.data.by || 'admin');
       });
       return new Response(lines.join('\n'), {
