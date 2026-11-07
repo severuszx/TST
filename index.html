@@ -9955,15 +9955,14 @@ try{ eval('const __t=()=>1;'); }catch(e){
     if(frame.getAttribute('data-loaded')==='1') return;
     var html=src.textContent.replace(/<\\\/script/g,'</script');
     frame.setAttribute('data-loaded','1');
-    frame.srcdoc=html;
-    frame.onload=function(){
-      try{
-        var d=frame.contentDocument;
-        if(!d) return;
-        d.querySelectorAll('header, .site-header, .topbar, .main-nav, .site-nav, #backTop, .more-menu').forEach(function(el){ el.parentNode.removeChild(el); });
-        if(d.body){ d.body.style.paddingTop='0px'; d.body.style.marginTop='0px'; }
-      }catch(e){}
-    };
+    try{
+      var d=frame.contentDocument;
+      d.open(); d.write(html); d.close();
+      var st=d.createElement('style');
+      st.textContent='header,.site-header,.topbar,.main-nav,.site-nav,footer,.site-footer{display:none!important}body{padding-top:0!important;margin-top:0!important}';
+      (d.head||d.documentElement).appendChild(st);
+      if(d.body){ d.body.style.paddingTop='0px'; d.body.style.marginTop='0px'; }
+    }catch(e){ frame.srcdoc=html; }
   }
   window.__embedLoad=loadEmbed;
   document.addEventListener('click',function(e){
