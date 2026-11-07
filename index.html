@@ -4123,6 +4123,8 @@ body:has(.embed-page.active){overflow:hidden;}
 
 <article class="plugin-card"><div class="plugin-head"><span class="plugin-no">18</span><h3 class="plugin-name">TSTStatus</h3><span class="plugin-tag">自研</span></div><p class="plugin-desc">自研官网联动核心，负责状态上报、官网聊天与游戏内私聊、指令下发。</p><div class="plugin-links"><span class="plugin-local">本站自研 · 无外部页面</span></div></article>
 
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">19</span><h3 class="plugin-name">SkinSystem</h3><span class="plugin-tag">皮肤</span></div><p class="plugin-desc">离线服皮肤选择与显示：玩家可自行选皮肤并同步外观；皮肤库为 Web 端，需配合 SkinsRestorer 使用。</p><div class="plugin-links"><a class="plugin-link" href="https://github.com/SkinsRestorer/SkinSystem" target="_blank" rel="noopener">GitHub</a><a class="plugin-link" href="https://skinsrestorer.net/" target="_blank" rel="noopener">SkinsRestorer</a></div></article>
+
 </div>
 
 <p class="plugins-foot">插件版本会随服务端更新调整；页面只做功能公示，不提供下载。需要某份配置说明可以直接在群里问。</p>
@@ -7204,7 +7206,7 @@ async function loadData(){
 
     try{
 
-      const r=await fetch('/api/data');
+      const r=await fetch('/api/data?sdv=20261107');
 
       if(r.status===503||r.status===502||r.status===504){
 
@@ -11667,7 +11669,7 @@ if($('#openQQGroup')) $('#openQQGroup').onclick=()=>{
 function hideBoot(){ var b=document.getElementById('bootLoad'); if(b) b.classList.add('hide'); }
 async function loadData(){
   try{
-    const r=await fetch('/api/data');
+    const r=await fetch('/api/data?sdv=20261107');
     const d=await r.json();
     hideBoot();
     if(d.ok){
