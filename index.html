@@ -4599,6 +4599,16 @@ body:has(.embed-page.active){overflow:hidden;}
 
 </div>
 
+<div class="card" style="margin-top:14px;">
+
+<div class="form-row"><label>LuckPerms 权限编辑器</label></div>
+
+<div class="hint" style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">仅管理员可用。链接由服务器下发，页面源码中不保存。</div>
+
+<button class="btn" id="lpEditorBtn">打开 LuckPerms 编辑器</button>
+
+</div>
+
 </div>
 
 <div class="admin-pane" id="paneVote">
@@ -8205,6 +8215,36 @@ function showAdminPanel(){
   refreshAdminLists();
 
   loadStats();
+
+}
+
+const lpEditorBtn=$('#lpEditorBtn');
+
+if(lpEditorBtn){
+
+  lpEditorBtn.onclick=async()=>{
+
+    const pw=sessionStorage.getItem('tst_admin_pw')||'';
+
+    const headers=pw?{'x-admin-pw':pw}:{'Authorization':'Bearer '+(ADMIN_TOKEN||'')};
+
+    const w=window.open('about:blank','_blank');
+
+    if(w){ try{ w.opener=null; }catch(e){} }
+
+    try{
+
+      const r=await fetch('/api/admin/luckperms',{headers:headers});
+
+      const d=await r.json();
+
+      if(d&&d.ok&&d.url){ if(w){ w.location.href=d.url; } else { showToast('浏览器拦截了新窗口'); } }
+
+      else{ if(w){ w.close(); } showToast(d&&d.error==='not_configured'?'权限编辑器链接未配置':(d&&d.error==='forbidden'?'无管理员权限':'打开失败')); }
+
+    }catch(e){ if(w){ w.close(); } showToast('网络错误，请稍后重试'); }
+
+  };
 
 }
 
