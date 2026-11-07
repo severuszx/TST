@@ -9974,6 +9974,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
           var k=m?m[1]:(h.charAt(0)==='#'?h.slice(1):'');
           if(k && parent.switchPage && parent.document.getElementById(k)){
             ev.preventDefault(); parent.switchPage(k);
+            try{ parent.location.hash=k; }catch(e){}
           }
         },true);
       }catch(e){}
