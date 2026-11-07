@@ -130,6 +130,7 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
 
 <!-- ===== 登录视图 ===== -->
 <div class="view show" id="viewLogin">
+<form id="loginForm" onsubmit="doLogin();return false;" novalidate>
   <div class="mode-row" id="loginModeRow">
     <div class="mode-item on" data-loginmode="pwd">密码登录</div>
     <div class="mode-item" data-loginmode="code">验证码登录</div>
@@ -152,16 +153,18 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
     </div>
     <div class="hint" id="lcHint">6 位数字，10 分钟内有效。</div>
   </div>
-  <button class="btn btn-primary" id="loginBtn">登录</button>
+  <button class="btn btn-primary" id="loginBtn" type="submit">登录</button>
   <div class="hint" id="loginHint" style="margin-top:10px;"></div>
   <div class="foot">
     <a onclick="switchView('viewRegister')">还没有账号？注册</a><br>
     <a onclick="switchView('viewReset')">忘记密码？</a>
   </div>
+</form>
 </div>
 
 <!-- ===== 注册视图 ===== -->
 <div class="view" id="viewRegister">
+<form id="registerForm" onsubmit="doRegister();return false;" novalidate>
   <div class="field">
     <label for="re">邮箱</label>
     <input class="inp" id="re" type="email" maxlength="100" placeholder="name@example.com" autocomplete="email" inputmode="email">
@@ -193,15 +196,17 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
     <input type="checkbox" id="ra2">
     <span>我已阅读并同意 <a href="javascript:;" onclick="showModal('terms_privacy')">《服务器隐私政策》</a></span>
   </div>
-  <button class="btn btn-primary" id="regBtn">注册</button>
+  <button class="btn btn-primary" id="regBtn" type="submit">注册</button>
   <div class="hint" id="regHint" style="margin-top:10px;"></div>
   <div class="foot">
     <a onclick="switchView('viewLogin')">已有账号？去登录</a>
   </div>
+</form>
 </div>
 
 <!-- ===== 忘记密码视图 ===== -->
 <div class="view" id="viewReset">
+<form id="resetForm" onsubmit="doReset();return false;" novalidate>
   <div class="field">
     <label for="fpe">邮箱</label>
     <input class="inp" id="fpe" type="email" maxlength="100" placeholder="name@example.com" autocomplete="email" inputmode="email">
@@ -225,11 +230,12 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
     <input class="inp" id="fnp2" type="password" maxlength="64" placeholder="再次输入新密码" autocomplete="new-password">
     <div class="hint" id="fnp2Hint"></div>
   </div>
-  <button class="btn btn-primary" id="resetBtn">重置密码</button>
+  <button class="btn btn-primary" id="resetBtn" type="submit">重置密码</button>
   <div class="hint" id="resetHint" style="margin-top:10px;"></div>
   <div class="foot">
     <a onclick="switchView('viewLogin')">返回登录</a>
   </div>
+</form>
 </div>
 </div>
 </div>
