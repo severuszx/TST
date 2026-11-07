@@ -691,6 +691,31 @@ export async function onRequest(context) {
     }
     return new Response(slimText, { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev', 'Cache-Control': 'public, max-age=300, s-maxage=300', 'CDN-Cache-Control': 'public, max-age=300' } });
   }
+  // 管理员专属：LuckPerms 网页编辑器入口。链接只存 D1，不出现在前端源码。
+  if (path === '/api/admin/luckperms') {
+    if (!(await tstIsAdmin(request))) return json({ ok: false, error: 'forbidden' }, 403, request);
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    if (request.method === 'GET') {
+      try {
+        const row = await TST_DB.prepare('SELECT value FROM settings WHERE key=?').bind('luckperms_editor_url').first();
+        if (!row || !row.value) return json({ ok: false, error: 'not_configured' }, 200, request);
+        return json({ ok: true, url: row.value }, 200, request);
+      } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+    }
+    if (request.method === 'POST') {
+      let bd = {};
+      try { bd = await request.json(); } catch (e) { bd = {}; }
+      const u = String(bd.url || '').trim();
+      if (!/^https:\/\/luckperms\.net\/editor\/[A-Za-z0-9_-]+$/.test(u)) return json({ ok: false, error: 'bad_url' }, 400, request);
+      try {
+        await TST_DB.prepare('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)').run();
+        await TST_DB.prepare('INSERT OR REPLACE INTO settings (key,value) VALUES (?,?)').bind('luckperms_editor_url', u).run();
+        return json({ ok: true }, 200, request);
+      } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+    }
+    return json({ ok: false, error: 'method_not_allowed' }, 405, request);
+  }
+
   if (path === '/api/admin' || path.startsWith('/api/admin/')) {
     return proxyFetch(DATA_ORIGIN + '/api/admin' + url.search, request);
   }
