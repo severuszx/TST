@@ -1086,6 +1086,8 @@ min-height:56px;
 
 flex-wrap:nowrap;
 
+position:relative;
+
 }
 
 .logo{
@@ -1140,19 +1142,15 @@ text-decoration:none;
 
 .nav-more{position:relative;z-index:10002;}
 
-.more-menu{position:absolute;top:calc(100% + 12px);left:50%;min-width:178px;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:8px;display:flex;flex-direction:column;gap:2px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s ease,visibility .12s;}
+.more-menu{position:absolute;top:calc(100% + 8px);right:14px;left:auto;min-width:186px;transform:none;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:8px;display:flex;flex-direction:column;gap:2px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s ease,visibility .12s;}
 
-.more-menu::before{content:'';position:absolute;left:50%;top:-6px;transform:translateX(-50%) rotate(45deg);width:12px;height:12px;background:var(--card);border-left:1px solid var(--border);border-top:1px solid var(--border);}
+.nav-more.open .more-menu,.more-menu.open{opacity:1;visibility:visible;pointer-events:auto;transform:none;}
 
-.nav-more.open .more-menu{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(-50%);}
+.more-menu .nav-link{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:9px;color:#2a3650;font-size:14px;font-weight:600;letter-spacing:2px;transition:background-color .14s ease,color .14s ease;}
 
-.more-menu .nav-link{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:9px;color:#2a3650;font-size:14px;font-weight:600;letter-spacing:2px;transition:background .14s ease,transform .14s ease,color .14s ease;}
+.more-menu .nav-link::after{content:'›';opacity:.35;font-weight:700;transition:opacity .14s ease;}
 
-.more-menu .nav-link::after{content:'›';opacity:.35;font-weight:700;transition:transform .14s ease,opacity .14s ease;}
-
-.more-menu .nav-link:hover{background:linear-gradient(90deg,rgba(56,189,248,.16),rgba(125,211,252,.06));color:#0369a1;transform:translateX(3px);}
-
-.more-menu .nav-link:hover::after{opacity:.8;transform:translateX(2px);}
+.more-menu .nav-link:hover,.more-menu .nav-link:focus{background:linear-gradient(90deg,rgba(56,189,248,.16),rgba(125,211,252,.06));color:#0369a1;transform:none;}
 
 html[data-theme="dark"] .more-menu{background:linear-gradient(165deg,rgba(18,26,44,.94),rgba(10,16,30,.97));border-color:rgba(148,163,184,.22);}
 
@@ -1405,7 +1403,10 @@ padding:14px 18px;box-shadow:var(--shadow);
 
 /* 服务器面板 */
 .panel-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
-.panel-tab{padding:7px 14px;border:1px solid var(--border);border-radius:7px;background:none;font-size:14px;cursor:pointer;font-family:inherit;color:var(--text-secondary);}
+.panel-tab{padding:7px 12px;border:1px solid var(--border);border-radius:6px;background:var(--card);font-size:13px;cursor:pointer;font-family:inherit;color:var(--text-secondary);}
+.tst-field{flex:1;min-width:130px;padding:10px 14px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-size:14px;outline:none;font-family:inherit;}
+.tst-field:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+.tst-select{flex:0 0 auto;min-width:104px;cursor:pointer;}
 .panel-tab.on{color:var(--text);border-color:var(--text);background:rgba(127,127,127,.1);}
 .panel-pane{display:none;}
 .panel-pane.on{display:block;}
@@ -3087,28 +3088,6 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <button class="nav-link" id="navMoreBtn">更多 <span style="font-size:10px;opacity:.55;">▾</span></button>
 
-<div class="more-menu" id="moreMenu">
-
-<button class="nav-link" data-nav="panel">服务器面板</button>
-
-<button class="nav-link" data-nav="event">赛事活动</button>
-
-<button class="nav-link" data-nav="vote">投票</button>
-
-<a class="nav-link" href="shop.html">商店</a>
-
-<button class="nav-link" data-nav="cdkey">兑换码</button>
-
-<button class="nav-link" data-nav="sponsor">服务器赞助</button>
-
-<a class="nav-link" href="tool.html">便捷工具</a>
-
-<button class="nav-link" data-nav="tools">服务器工具</button>
-
-<button class="nav-link" data-nav="download">下载</button>
-
-</div>
-
 </div>
 
 </nav>
@@ -3138,6 +3117,28 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <span class="tt-thumb" id="themeThumb"></span>
 
 </button>
+
+</div>
+
+<div class="more-menu" id="moreMenu">
+
+<button class="nav-link" data-nav="panel">服务器面板</button>
+
+<button class="nav-link" data-nav="event">赛事活动</button>
+
+<button class="nav-link" data-nav="vote">投票</button>
+
+<a class="nav-link" href="shop.html">商店</a>
+
+<button class="nav-link" data-nav="cdkey">兑换码</button>
+
+<button class="nav-link" data-nav="sponsor">服务器赞助</button>
+
+<a class="nav-link" href="tool.html">便捷工具</a>
+
+<button class="nav-link" data-nav="tools">服务器工具</button>
+
+<button class="nav-link" data-nav="download">下载</button>
 
 </div>
 
@@ -3858,11 +3859,11 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
   <div class="chat-scroll" id="chatMsgList"><p class="empty-hint">加载中…</p></div>
 
-  <div class="chat-nick-row">
+  <div class="chat-nick-row" id="chatWhoRow">
 
-    <input type="text" id="chatNick" placeholder="你的游戏昵称（会显示在广播里）" autocomplete="off" maxlength="24" style="flex:0 0 46%;">
+    <span id="chatWho" style="font-size:13px;opacity:.75;">正在读取账号…</span>
 
-    <span style="opacity:.6;font-size:12px;white-space:nowrap;">游戏内显示为「【官网】昵称」</span>
+    <a class="btn" id="chatLoginBtn" href="login.html" style="padding:5px 10px;font-size:13px;display:none;">去登录</a>
 
   </div>
 
@@ -3903,21 +3904,21 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 <div class="panel-pane" id="paneLog">
 <div class="log-tools">
-<select id="logLevel"><option value="">全部级别</option><option value="ERROR">ERROR</option><option value="WARN">WARN</option><option value="INFO">INFO</option></select>
-<input type="text" id="logQuery" placeholder="关键词过滤，例如 Exception、TSTStatus" autocomplete="off">
+<select id="logLevel" class="tst-field tst-select"><option value="">全部级别</option><option value="ERROR">ERROR</option><option value="WARN">WARN</option><option value="INFO">INFO</option></select>
+<input type="text" class="tst-field" id="logQuery" placeholder="关键词过滤，例如 Exception、TSTStatus" autocomplete="off">
 <button class="btn" id="logLoadBtn" type="button">刷新</button>
 </div>
 <div class="log-box" id="logBox">需要管理员密码后查看</div>
-<div class="panel-note">日志仅管理员可见，保留最近 2 天；ERROR / WARN 已按颜色标出。</div>
+<div class="panel-note">日志仅管理员可见，保留最近 2 天，最新的在最上面；ERROR / WARN 已按颜色标出。</div>
 </div>
 
 <div class="panel-pane" id="paneCmd">
 <div class="pw-row">
-<input type="password" id="panelPw" placeholder="管理员密码" autocomplete="off">
+<input type="password" class="tst-field" id="panelPw" placeholder="管理员密码" autocomplete="off">
 <button class="btn btn-primary" id="panelPwBtn" type="button">验证</button>
 </div>
 <div class="chat-input-row">
-<input type="text" id="cmdInput" placeholder="输入指令，不带 /，例如 say 服务器将在 10 分钟后维护" autocomplete="off" maxlength="200">
+<input type="text" class="tst-field" id="cmdInput" placeholder="输入指令，不带 /，例如 say 服务器将在 10 分钟后维护" autocomplete="off" maxlength="200">
 <button class="btn btn-primary" id="cmdSendBtn" type="button">下发</button>
 </div>
 <div class="panel-note">只放行常用管理指令；指令进入队列后由插件在 15 秒内取走执行，执行结果回显在游戏动态里。</div>
@@ -6202,7 +6203,41 @@ navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
 
 // ===== 聊天室（调试码 chat 激活，内测功能）=====
 
-var chatTimer=null, chatLastId=0, chatInited=false;
+var chatTimer=null, chatLastId=0, chatInited=false, chatMe={nickname:''};
+
+function loadChatMe(){
+
+  var who=document.getElementById('chatWho'), btn=document.getElementById('chatLoginBtn');
+
+  var t=localStorage.getItem('tst_token')||'';
+
+  if(!t){ if(who)who.textContent='未登录，登录后才能发言'; if(btn)btn.style.display='inline-block'; chatMe.nickname=''; return; }
+
+  if(who)who.textContent='正在读取账号…';
+
+  fetch('https://theslowtidefk.pages.dev/api/me',{headers:{'Authorization':'Bearer '+t},cache:'no-store'})
+
+  .then(function(r){return r.json();})
+
+  .then(function(d){
+
+    if(d&&d.ok){
+
+      chatMe.nickname=String(d.nickname||(d.email||'').split('@')[0]||'玩家').slice(0,24);
+
+      if(who)who.innerHTML='以 <b>'+esc(chatMe.nickname)+'</b> 的身份发言';
+
+      if(btn)btn.style.display='none';
+
+    } else {
+
+      chatMe.nickname=''; if(who)who.textContent='登录已失效，请重新登录'; if(btn)btn.style.display='inline-block';
+
+    }
+
+  }).catch(function(){ if(who)who.textContent='账号信息读取失败'; });
+
+}
 
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
@@ -6222,9 +6257,8 @@ function chatInit(){
 
   if(hint)hint.textContent='已连接 · 每 6 秒同步';
 
-  var nick=document.getElementById('chatNick');
-
-  if(nick){nick.value=localStorage.getItem('tst_chat_nick')||'';nick.addEventListener('change',function(){localStorage.setItem('tst_chat_nick',nick.value.trim());});}
+  chatMe={nickname:''};
+  loadChatMe();
 
   var inp=document.getElementById('chatInput'),btn=document.getElementById('chatSendBtn');
 
@@ -6234,9 +6268,11 @@ function chatInit(){
 
     if(!v){inp.focus();return;}
 
-    var nm=(nick?nick.value:'').trim()||'官网';
+    if(!chatMe.nickname){ showToast('请先登录官网账号再发言'); return; }
+    var tk=localStorage.getItem('tst_token')||'';
+    var nm=chatMe.nickname;
 
-    fetch('/api/chat/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:v,sender:nm})})
+    fetch('/api/chat/send',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({message:v})})
 
     .then(function(r){return r.json();})
 
@@ -6248,9 +6284,13 @@ function chatInit(){
 
         inp.value='';
 
-      } else if(d&&d.error==='command_blocked'){
+      } else if(d&&d.error==='login_required'){
 
-        showToast(d.msg||'消息包含指令内容，已被拒绝发送');
+        showToast('登录状态失效，请重新登录');
+
+      } else if(d&&d.error==='too_fast'){
+
+        showToast('发送太快，歇一下再发');
 
       } else { showToast('发送失败，请重试'); }
 
@@ -6406,19 +6446,25 @@ const navMoreBtn=document.getElementById('navMoreBtn');
 
 const navMore=document.getElementById('navMore');
 
-if(navMoreBtn){
+const moreMenu=document.getElementById('moreMenu');
+
+function closeMore(){ if(moreMenu)moreMenu.classList.remove('open'); if(navMore)navMore.classList.remove('open'); }
+
+if(navMoreBtn && moreMenu){
 
   document.addEventListener('click',function(e){
 
     const opt=e.target.closest('#moreMenu .nav-link');
 
-    if(opt){ if(opt.dataset.nav)switchPage(opt.dataset.nav); navMore.classList.remove('open'); if(window.sfx)window.sfx('click'); return; }
+    if(opt){ if(opt.dataset.nav)switchPage(opt.dataset.nav); closeMore(); if(window.sfx)window.sfx('click'); return; }
 
     if(e.target.closest('#navMoreBtn')){
 
       e.stopPropagation();
 
-      navMore.classList.toggle('open');
+      const open=moreMenu.classList.toggle('open');
+
+      if(navMore)navMore.classList.toggle('open',open);
 
       if(window.sfx)window.sfx('pop');
 
@@ -6426,7 +6472,7 @@ if(navMoreBtn){
 
     }
 
-    if(!navMore.contains(e.target))navMore.classList.remove('open');
+    if(!moreMenu.contains(e.target))closeMore();
 
   },true);
 
@@ -9465,7 +9511,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
       if(!d||!d.ok){ box.textContent=d&&d.error==='forbidden'?'密码错误或权限不足':('读取失败：'+((d&&d.error)||'未知')); return; }
       var logs=d.logs||[];
       if(!logs.length){ box.textContent='暂无日志'; return; }
-      box.innerHTML=logs.slice().reverse().map(function(l){
+      box.innerHTML=logs.map(function(l){
         var cls=l.lvl==='ERROR'?'err':(l.lvl==='WARN'?'warn':'');
         return '<span class="log-line '+cls+'"><span class="lt">'+hhmm(l.ts)+' '+l.lvl+' ['+l.src+']</span> '+esc(l.body)+'</span>';
       }).join('');
