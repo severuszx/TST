@@ -9960,6 +9960,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
     if(!frame||!src) return;
     if(frame.getAttribute('data-loaded')==='1') return;
     var html=src.textContent.replace(/<\\\/script/g,'</script');
+    html=html.replace(/location\.href\s*=\s*(['"])login\.html\1/g,"parent.location.href='/login.html'");
     frame.setAttribute('data-loaded','1');
     try{
       var d=frame.contentDocument;
