@@ -325,6 +325,25 @@ export async function onRequest(context) {
     }
   }
 
+  // 游戏内 /com → 官网私聊：插件带令牌写入
+  if (path === '/api/game/dm' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    const want = (context && context.env && context.env.TST_STATUS_TOKEN) || TST_TOKEN;
+    if (String(bd.token || '') !== want) return json({ ok: false, error: 'bad_token' }, 403, request);
+    const from = String(bd.from || '').trim().slice(0, 24);
+    const to = String(bd.to || '').trim().slice(0, 24);
+    const msg = String(bd.msg || '').trim().slice(0, 160);
+    if (!from || !to || !msg) return json({ ok: false, error: 'empty' }, 200, request);
+    try {
+      await TST_DB.prepare('CREATE TABLE IF NOT EXISTS dm (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, from_name TEXT, to_name TEXT, msg TEXT)').run();
+      await TST_DB.prepare('INSERT INTO dm (ts,from_name,to_name,msg) VALUES (?,?,?,?)')
+        .bind(tstNowS(), from, to, msg).run();
+      return json({ ok: true, from: from, to: to }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
   // 私聊：官网 → 官网 / 游戏内玩家
   if (path === '/api/chat/dm' && request.method === 'POST') {
     if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
