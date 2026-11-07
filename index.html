@@ -9970,6 +9970,9 @@ try{ eval('const __t=()=>1;'); }catch(e){
     var b=e.target.closest('[data-nav]');
     if(!b) return;
     var id=b.getAttribute('data-nav');
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+    var t=document.getElementById(id);
+    if(t) t.classList.add('active');
     if(EMBEDS[id]) setTimeout(function(){ loadEmbed(id); },0);
   },true);
   var h=(location.hash||'').replace('#','');
