@@ -17,7 +17,7 @@ function tstMemGet() { try { return globalThis.__TST_STATUS_REC || null; } catch
 // 管理员口令：注意此文件在公开仓库，密码会随源码可见；后续需改为环境变量+数据库侧改密
 let ADMIN_PWD = null; // 管理员口令：仅由 onRequest 从环境变量 ADMIN_PWD 注入（仓库不含口令）
 // ===== 调试台验证（同源；前端优先调用，兜底反馈站）=====
-const DEBUG_CODES = { 'TST-G4N7QX': 'bench3d', K3M9X7: 'glass', X2W5V8: 'light', Q8N4R2: 'desktop', M7Z1P6: 'mobile', H6D3B9: 'perf', F5J8C4: 'dev', R2T7W1: 'reset', 'TST-7KQ2WP': 'chat' };
+const DEBUG_CODES = { 'TST-G4N7QX': 'bench3d', 'TST-K3M9X7': 'glass', 'TST-X2W5V8': 'light', 'TST-Q8N4R2': 'desktop', 'TST-M7Z1P6': 'mobile', 'TST-H6D3B9': 'perf', 'TST-F5J8C4': 'dev', 'TST-R2T7W1': 'reset', 'TST-7KQ2WP': 'chat', K3M9X7: 'glass', X2W5V8: 'light', Q8N4R2: 'desktop', M7Z1P6: 'mobile', H6D3B9: 'perf', F5J8C4: 'dev', R2T7W1: 'reset' };
 
 // ===== 国庆&开服100天双庆抽奖（时区：北京时间 UTC+8）=====
 const L_START = new Date('2026-10-01T00:00:00+08:00');  // 2026-10-01 00:00 正式开放
