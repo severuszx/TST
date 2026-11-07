@@ -282,14 +282,22 @@ export async function onRequest(context) {
     return json({ ok: true, messages: messages }, 200, request);
   }
 
-  // 官网发言 → 写入聊天记录 + 指令队列
+  // 官网发言 → 写入聊天记录 + 指令队列（昵称取自官网登录账号，不能自己改）
   if (path === '/api/chat/send' && request.method === 'POST') {
     if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
     let bd = {};
     try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
     const msg = String(bd.message || '').trim().slice(0, 200);
-    const sender = String(bd.sender || '官网').trim().slice(0, 24) || '官网';
     if (!msg) return json({ ok: false, error: 'empty' }, 200, request);
+    const tk = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+    if (!tk) return json({ ok: false, error: 'login_required' }, 401, request);
+    let nick = '';
+    try {
+      const r = await fetch('https://theslowtidefk.pages.dev/api/me', { headers: { 'Authorization': 'Bearer ' + tk } });
+      const d = await r.json();
+      if (d && d.ok) nick = String(d.nickname || (d.email || '').split('@')[0] || '').trim().slice(0, 24);
+    } catch (e) { nick = ''; }
+    if (!nick) return json({ ok: false, error: 'login_required' }, 401, request);
     const rl = globalThis.__TST_CHAT_RL || (globalThis.__TST_CHAT_RL = new Map());
     const ip = clientIp(request);
     const last = rl.get(ip) || 0;
@@ -298,13 +306,13 @@ export async function onRequest(context) {
     try {
       const now = tstNowS();
       await TST_DB.batch([
-        TST_DB.prepare('INSERT INTO chat (ts,src,name,msg) VALUES (?,?,?,?)').bind(now, 'web', sender, msg),
-        TST_DB.prepare('INSERT INTO outbox (ts,kind,payload,state) VALUES (?,?,?,0)').bind(now, 'chat', JSON.stringify({ name: sender, msg: msg })),
+        TST_DB.prepare('INSERT INTO chat (ts,src,name,msg) VALUES (?,?,?,?)').bind(now, 'web', nick, msg),
+        TST_DB.prepare('INSERT INTO outbox (ts,kind,payload,state) VALUES (?,?,?,0)').bind(now, 'chat', JSON.stringify({ name: nick, msg: msg })),
       ]);
+      return json({ ok: true, sender: nick }, 200, request);
     } catch (e) {
       return json({ ok: false, error: 'db_error' }, 200, request);
     }
-    return json({ ok: true }, 200, request);
   }
 
   // 官网管理员指令下发（聊天室里的那个按钮）
