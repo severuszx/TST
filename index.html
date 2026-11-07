@@ -245,11 +245,16 @@ try{ var gbInit=localStorage.getItem('tst-glass-bg'); if(gbInit){document.docume
   var aBtn=document.getElementById('toolsAdminBtn');
   if(aBtn) aBtn.onclick=function(){
     if(!isAdmin()){
-      var p=prompt('请输入管理员密码：');
-      if(p===null) return;
-      sessionStorage.setItem('tstToolsPw',p||'');
-      sessionStorage.setItem('tstToolsAdmin',p?'1':'0');
-      if(!p){ tipTxt('未输入密码'); return; }
+      TSTUI.ask({title:'管理员验证',label:'管理员密码',type:'password'}).then(function(p){
+        if(p===null) return;
+        sessionStorage.setItem('tstToolsPw',p||'');
+        sessionStorage.setItem('tstToolsAdmin',p?'1':'0');
+        if(!p){ tipTxt('未输入密码'); return; }
+        adminBox.style.display='block';
+        adminTitle.textContent=tmode==='items'?'新增禁用物品':'新增任务';
+        tipTxt('');
+      });
+      return;
     }
     adminBox.style.display='block';
     adminTitle.textContent=tmode==='items'?'新增禁用物品':'新增任务';
@@ -924,12 +929,17 @@ function renderEcoUI(){
   /* 重置 */
   var rU=document.getElementById('ecoResetU'), rA=document.getElementById('ecoResetAll');
   if(rU) rU.onclick=function(){
-    if(ECO_USER.length&&!confirm('确定清空你的自定义物价库吗？')) return;
-    ECO_USER=[]; ecoSaveUser(); renderEcoUI();
+    if(!ECO_USER.length){ ECO_USER=[]; ecoSaveUser(); renderEcoUI(); return; }
+    TSTUI.confirm('确定清空你的自定义物价库吗？',{title:'清空物价库',okText:'清空'}).then(function(ok){
+      if(!ok) return;
+      ECO_USER=[]; ecoSaveUser(); renderEcoUI();
+    });
   };
   if(rA) rA.onclick=function(){
-    if(!confirm('确定全部重置吗？将清空自定义物价并恢复所有输入为初始状态。')) return;
-    ECO_USER=[]; ecoSaveUser(); renderEcoUI();
+    TSTUI.confirm('确定全部重置吗？将清空自定义物价并恢复所有输入为初始状态。',{title:'全部重置',okText:'重置'}).then(function(ok){
+      if(!ok) return;
+      ECO_USER=[]; ecoSaveUser(); renderEcoUI();
+    });
   };
 
   /* （经济模拟器为双栏布局，无节点切换） */
@@ -6363,13 +6373,13 @@ function chatInit(){
 
 }
 
-function openChatCmd(){
+async function openChatCmd(){
 
-  var pw=prompt('管理员密码：');
+  var pw=await TSTUI.ask({title:'管理员验证',label:'管理员密码',type:'password'});
 
   if(pw===null)return;
 
-  var cmd=prompt('输入要在服务器执行的指令（不带 /）：');
+  var cmd=await TSTUI.ask({title:'执行指令',label:'指令（不带 /）',placeholder:'例如 say 服务器将在 10 分钟后维护'});
 
   if(cmd===null||!cmd.trim())return;
 
@@ -8468,7 +8478,7 @@ document.addEventListener('click',async(e)=>{
 
   const action=kind==='announcement'||kind==='history'?'deleteAnnouncement':kind==='feed'?'deleteFeed':kind==='sponsor'?'deleteSponsor':kind==='replay'?'deleteReplay':'deleteImage';
 
-  if(!confirm('确定删除这条记录吗？')){ return; }
+  if(!await TSTUI.confirm('确定删除这条记录吗？',{title:'删除记录',okText:'删除'})){ return; }
 
   const d=await adminApi(action,{id});
 
@@ -9034,7 +9044,7 @@ document.addEventListener('click',async(e)=>{
 
   if(!dg || !ADMIN_TOKEN){ return; }
 
-  if(!confirm('确定删除这张图片吗？引用它的动态将无法显示图片。')){ return; }
+  if(!await TSTUI.confirm('确定删除这张图片吗？引用它的动态将无法显示图片。',{title:'删除图片',okText:'删除'})){ return; }
 
   const d=await adminApi('deleteImage',{id:dg.dataset.delimg});
 
@@ -9920,4 +9930,4 @@ try{ eval('const __t=()=>1;'); }catch(e){
   <div class="dm-foot"><input type="text" class="tst-field" id="dmInput" placeholder="说点什么…" maxlength="160" autocomplete="off"><button class="btn btn-primary" id="dmSend" type="button">发送</button></div>
 </div>
 <div class="tst-modal" id="tstModal"><div class="tst-modal-box" id="tstModalBox"></div></div>
-
+<script src="/tst-ui.js"></script>
