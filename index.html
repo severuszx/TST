@@ -6403,6 +6403,20 @@ function chatBadge(n){
 
 function chatSeenNow(){chatSeenId=chatLastId;chatUnread=0;chatBadge(0);}
 
+function modalAsk(title,label,defVal,onOk){
+  var m=document.getElementById('tstModal'),box=document.getElementById('tstModalBox');
+  if(!m||!box)return;
+  box.innerHTML='<h4>'+esc(title)+'</h4><div style="font-size:13px;opacity:.72;margin-bottom:8px;line-height:1.5;">'+esc(label)+'</div>'
+    +'<input id="modalAskInput" class="tst-field" style="width:100%;box-sizing:border-box;" value="'+esc(defVal||'')+'">'
+    +'<div class="m-btns"><button class="btn" type="button" data-x="c">取消</button><button class="btn primary" type="button" data-x="k">确定</button></div>';
+  m.style.display='flex';
+  var inp=box.querySelector('#modalAskInput');
+  function close(){m.style.display='none';}
+  box.querySelector('[data-x="c"]').onclick=close;
+  box.querySelector('[data-x="k"]').onclick=function(){var v=inp.value;close();onOk(v);};
+  inp.focus();inp.select();
+}
+
 function modalShow(title,rows,btns){
   var m=document.getElementById('tstModal'),box=document.getElementById('tstModalBox');
   if(!m||!box)return;
@@ -6427,7 +6441,7 @@ function placeNickPop(anchor){
 
 function openNickMenu(name,anchor){
   var pop=document.getElementById('nickPop'); if(!pop||!name)return;
-  var items=[['@ 提及','mention'],['发私聊','dm'],['请求传送到他那儿 (/tpa)','tpa'],['看名片','card'],['打赏积分','tip'],['举报该玩家','report']];
+  var items=[['@ 提及','mention'],['发私聊','dm'],['看名片','card'],['打赏积分','tip'],['举报该玩家','report']];
   pop.innerHTML='';
   items.forEach(function(it){
     var b=document.createElement('button'); b.type='button'; b.textContent=it[0];
@@ -6452,22 +6466,9 @@ function nickAction(kind,name){
     return;
   }
   if(kind==='dm'){openDm(name);return;}
-  if(kind==='tpa'){tpaUser(name);return;}
   if(kind==='card'){showCard(name);return;}
   if(kind==='tip'){tipUser(name);return;}
   if(kind==='report'){reportUser(name);return;}
-}
-
-function tpaUser(name){
-  var tk=localStorage.getItem('tst_token')||'';
-  if(!tk){showToast('请求传送需要先登录官网账号');return;}
-  fetch('/api/chat/tpa',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({to:name})})
-  .then(function(r){return r.json();}).then(function(d){
-    if(d&&d.ok){showToast('已向 '+name+' 发起传送请求，等他在游戏里 /tpaccept');}
-    else if(d&&d.error==='login_required'){showToast('登录状态失效，请重新登录');}
-    else if(d&&d.error==='self'){showToast('不用传送到自己那儿');}
-    else{showToast('传送请求发送失败');}
-  }).catch(function(){showToast('传送请求发送失败');});
 }
 
 function showCard(name){
@@ -6482,34 +6483,37 @@ function showCard(name){
 }
 
 function tipUser(name){
-  var me=localStorage.getItem('tst_token')||'';
-  if(!me){showToast('请先登录官网账号');return;}
-  var v=prompt('给 '+name+' 打赏多少积分？（1-500）','10');
-  if(v===null)return;
-  var n=parseInt(v,10);
-  if(!n||n<1||n>500){showToast('积分要填 1-500 之间的整数');return;}
-  fetch('https://theslowtidefk.pages.dev/api/tip',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+me},body:JSON.stringify({to:name,amount:n})})
-  .then(function(r){return r.json();}).then(function(d){
-    if(d&&d.ok){showToast('已打赏 '+n+' 积分给 '+name);}
-    else if(d&&d.error==='insufficient'){showToast('你的积分不够');}
-    else if(d&&d.error==='not_found'){showToast('对方还没有注册官网账号');}
-    else if(d&&d.error==='self'){showToast('不能给自己打赏');}
-    else{showToast('打赏失败：'+((d&&d.error)||'未知错误'));}
-  }).catch(function(){showToast('打赏失败，请稍后再试');});
+  var tk=localStorage.getItem('tst_token')||'';
+  if(!tk){showToast('请先登录官网账号');return;}
+  fetch('https://theslowtidefk.pages.dev/api/card?name='+encodeURIComponent(name)).then(function(r){return r.json();}).then(function(c){
+    if(!c||!c.ok){showToast(name+' 没有绑定官网账号，不能打赏');return;}
+    modalAsk('打赏 '+name,'输入要打赏的积分（1-500），从你的账户余额扣','10',function(v){
+      var n=parseInt(v,10);
+      if(!n||n<1||n>500){showToast('积分要填 1-500 之间的整数');return;}
+      fetch('https://theslowtidefk.pages.dev/api/tip',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({to:name,amount:n})})
+      .then(function(r){return r.json();}).then(function(d){
+        if(d&&d.ok){showToast('已打赏 '+n+' 积分给 '+name);}
+        else if(d&&d.error==='insufficient'){showToast('你的积分不够');}
+        else if(d&&d.error==='not_found'){showToast('对方还没有注册官网账号');}
+        else if(d&&d.error==='self'){showToast('不能给自己打赏');}
+        else{showToast('打赏失败：'+((d&&d.error)||'未知错误'));}
+      }).catch(function(){showToast('打赏失败，请稍后再试');});
+    });
+  }).catch(function(){showToast('查不到这个玩家的账号信息');});
 }
 
 function reportUser(name){
   var tk=localStorage.getItem('tst_token')||'';
   if(!tk){showToast('请先登录官网账号再举报');return;}
-  var reason=prompt('举报 '+name+' 的理由（会把他最近 30 条聊天一起发给管理员）：','辱骂/刷屏');
-  if(reason===null)return;
-  if(!reason.trim()){showToast('请填一下理由');return;}
-  fetch('/api/chat/report',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({target:name,reason:reason.trim()})})
-  .then(function(r){return r.json();}).then(function(d){
-    if(d&&d.ok){showToast('已提交举报，管理员会尽快处理');}
-    else if(d&&d.error==='login_required'){showToast('登录状态失效，请重新登录');}
-    else{showToast('举报提交失败，请稍后再试');}
-  }).catch(function(){showToast('举报提交失败，请稍后再试');});
+  modalAsk('举报 '+name,'写清举报理由，系统会把他最近 30 条聊天一起发给管理员','辱骂/刷屏',function(v){
+    if(!v||!v.trim()){showToast('请填一下理由');return;}
+    fetch('/api/chat/report',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tk},body:JSON.stringify({target:name,reason:v.trim()})})
+    .then(function(r){return r.json();}).then(function(d){
+      if(d&&d.ok){showToast('已提交举报，管理员会尽快处理');}
+      else if(d&&d.error==='login_required'){showToast('登录状态失效，请重新登录');}
+      else{showToast('举报提交失败，请稍后再试');}
+    }).catch(function(){showToast('举报提交失败，请稍后再试');});
+  });
 }
 
 var dmWith='', dmTimer=null;
@@ -6519,6 +6523,8 @@ function openDm(name){
   var me=localStorage.getItem('tst_token')||'';
   if(!me){showToast('私聊需要先登录官网账号');return;}
   if(name.toLowerCase()===(chatMe&&chatMe.nickname?chatMe.nickname:'').toLowerCase()){showToast('不能和自己私聊');return;}
+  var online=(window.chatOnline||[]).map(function(x){return String(x).toLowerCase();});
+  if(online.indexOf(String(name).toLowerCase())<0){showToast('对方不在游戏内（或游戏 ID 与官网昵称不一致），私聊送不到，先别发');return;}
   dmWith=name;
   document.getElementById('dmTitle').textContent='与 '+name+' 私聊';
   document.getElementById('dmPanel').style.display='flex';
