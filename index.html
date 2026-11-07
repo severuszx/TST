@@ -9178,8 +9178,9 @@ try{ eval('const __t=()=>1;'); }catch(e){
   function ago(ts){
     if(!ts) return '';
     var s=Math.max(0,Math.round((Date.now()-ts)/1000));
-    if(s<60) return '上次上报 '+s+' 秒前';
-    return '上次上报 '+Math.round(s/60)+' 分钟前';
+    if(s<60) return '刚刚更新';
+    if(s<3600) return Math.round(s/60)+' 分钟前更新';
+    return Math.round(s/3600)+' 小时前更新';
   }
 
   function render(d){
@@ -9224,7 +9225,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
     });
   }
   tick();
-  setInterval(tick,30000);
+  setInterval(tick,180000);
   document.addEventListener('visibilitychange',function(){ if(!document.hidden){ tick(); } });
 })();
 </script>
