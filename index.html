@@ -1410,10 +1410,10 @@ padding:14px 18px;box-shadow:var(--shadow);
 .panel-tab.on{color:var(--text);border-color:var(--text);background:rgba(127,127,127,.1);}
 .panel-pane{display:none;}
 .panel-pane.on{display:block;}
-.p-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px;}
-.p-stat{border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
-.p-stat .k{font-size:12px;color:var(--text-secondary);}
-.p-stat .v{font-size:18px;font-weight:700;margin-top:4px;}
+.p-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-bottom:14px;}
+.p-stat{border:1px solid var(--border);border-radius:8px;padding:12px 14px;background:var(--card);min-width:0;}
+.p-stat .k{font-size:12px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.p-stat .v{font-size:17px;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums;line-height:1.25;word-break:break-word;}
 .log-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center;}
 .log-tools input{flex:1;min-width:120px;}
 .log-box{font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.7;height:min(56vh,520px);overflow:auto;border:1px solid var(--border);border-radius:8px;padding:10px;background:rgba(127,127,127,.05);white-space:pre-wrap;word-break:break-word;}
@@ -3826,6 +3826,7 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 .chat-nick-row{display:flex;gap:10px;align-items:center;margin-top:10px;}
 .chat-nick-row input{flex:0 0 46%;}
 .chat-input-row input{flex:1;min-width:0;}
+.chat-input-row .btn{padding:10px 16px;}
 .chat-input-row .btn{flex:none;}
 .status-line{display:flex;align-items:center;gap:10px;font-size:14px;}
 .status-line .dot{width:10px;height:10px;border-radius:50%;background:#888;flex:none;}
@@ -3869,7 +3870,7 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
   <div class="chat-input-row">
 
-    <input type="text" id="chatInput" placeholder="发条消息到游戏里，在线玩家都能看到" autocomplete="off" maxlength="200">
+    <input type="text" class="tst-field" id="chatInput" placeholder="发条消息到游戏里，在线玩家都能看到" autocomplete="off" maxlength="200">
 
     <button class="btn btn-primary" id="chatSendBtn">发送</button>
 
