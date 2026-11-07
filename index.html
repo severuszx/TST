@@ -6250,7 +6250,7 @@ function chatInit(){
 
   loadChatHistory();
 
-  chatTimer=setInterval(loadChatHistory,6000);
+  chatTimer=setInterval(loadChatHistory,3000);
 
   setInterval(loadChatStatus,30000);
 
@@ -9554,6 +9554,30 @@ try{ eval('const __t=()=>1;'); }catch(e){
     }).catch(function(){});
   }
 
+  function pollCmdResult(cmd){
+    var out=document.getElementById('consoleOut');
+    if(!out) return;
+    var tries=0;
+    var timer=setInterval(function(){
+      tries++;
+      if(tries>8){ clearInterval(timer); return; }
+      fetch('/api/tst-events/list?limit=20',{cache:'no-store'})
+        .then(function(r){return r.json();})
+        .then(function(d){
+          var evs=(d&&d.events)||[];
+          for(var i=0;i<evs.length;i++){
+            var e=evs[i];
+            if(e && e.kind==='cmd' && String(e.detail||'').indexOf('$ '+cmd)===0){
+              out.textContent+='  结果：'+String(e.detail).split(' → ').slice(1).join(' → ')+'\n';
+              out.scrollTop=out.scrollHeight;
+              clearInterval(timer);
+              return;
+            }
+          }
+        }).catch(function(){});
+    },2000);
+  }
+
   function sendCmd(){
     var inp=document.getElementById('cmdInput'), out=document.getElementById('consoleOut');
     if(!inp||!out) return;
@@ -9564,7 +9588,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
     fetch('/api/tst-cmd/send',{method:'POST',headers:{'Content-Type':'application/json','x-admin-pw':pw()},body:JSON.stringify({cmd:cmd})})
       .then(function(r){return r.json();}).then(function(d){
         out.textContent=out.textContent.replace('  下发中…','');
-        if(d&&d.ok){ out.textContent+='  已进入队列，插件 15 秒内取走执行\n'; }
+        if(d&&d.ok){ out.textContent+='  已排队，等待插件取走…\n'; pollCmdResult(cmd); }
         else if(d&&d.error==='command_blocked'){ out.textContent+='  该指令不在放行名单里\n'; }
         else if(d&&d.error==='forbidden'){ out.textContent+='  密码错误或权限不足\n'; }
         else { out.textContent+='  下发失败：'+((d&&d.error)||'未知')+'\n'; }
