@@ -6523,8 +6523,6 @@ function openDm(name){
   var me=localStorage.getItem('tst_token')||'';
   if(!me){showToast('私聊需要先登录官网账号');return;}
   if(name.toLowerCase()===(chatMe&&chatMe.nickname?chatMe.nickname:'').toLowerCase()){showToast('不能和自己私聊');return;}
-  var online=(window.chatOnline||[]).map(function(x){return String(x).toLowerCase();});
-  if(online.indexOf(String(name).toLowerCase())<0){showToast('对方不在游戏内（或游戏 ID 与官网昵称不一致），私聊送不到，先别发');return;}
   dmWith=name;
   document.getElementById('dmTitle').textContent='与 '+name+' 私聊';
   document.getElementById('dmPanel').style.display='flex';
