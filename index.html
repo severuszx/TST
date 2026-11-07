@@ -9968,6 +9968,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
       st.textContent='header,.site-header,.topbar,.main-nav,.site-nav,footer,.site-footer{display:none!important}body{padding-top:0!important;margin-top:0!important}';
       (d.head||d.documentElement).appendChild(st);
       if(d.body){ d.body.style.paddingTop='0px'; d.body.style.marginTop='0px'; }
+      setTimeout(function(){ try{ var dd=frame.contentDocument; var sw=dd.body.scrollWidth, cw=dd.documentElement.clientWidth; if(sw>cw+20 && cw>0){ dd.documentElement.style.zoom=String(cw/sw); } }catch(e){} },250);
     }catch(e){ frame.srcdoc=html; }
   }
   window.__embedLoad=loadEmbed;
