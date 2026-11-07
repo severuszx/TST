@@ -653,6 +653,25 @@ export async function onRequest(context) {
     return json({ ok: true, ...recInfo, serverDate: sdate }, 200, request);
   }
 
+
+  // /api/data 去重：同 id 或同 title+date 只保留第一条
+  function dedupeSiteData(obj) {
+    if (!obj) return obj;
+    function clean(list) {
+      if (!Array.isArray(list)) return list;
+      var seen = {}, out = [];
+      list.forEach(function (x) {
+        if (!x) return;
+        var k = String(x.id || '') + '|' + String(x.title || '') + '|' + String(x.date || x.created_at || '');
+        if (!seen[k]) { seen[k] = 1; out.push(x); }
+      });
+      return out;
+    }
+    if (Array.isArray(obj.announcements)) obj.announcements = clean(obj.announcements);
+    if (Array.isArray(obj.feeds)) obj.feeds = clean(obj.feeds);
+    return obj;
+  }
+
   // 数据/管理接口：转发到数据服务站点
   if (path === '/api/data' || path.startsWith('/api/data/')) {
     const kv = (context && context.env && context.env.SITE_CACHE) || null;
@@ -660,7 +679,14 @@ export async function onRequest(context) {
       try {
         const cached = await kv.get('site_data_v1');
         if (cached) {
-          return new Response(cached, { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev', 'Cache-Control': 'public, max-age=300, s-maxage=300', 'CDN-Cache-Control': 'public, max-age=300' } });
+          try {
+            const cobj = dedupeSiteData(JSON.parse(cached));
+            const ctext = JSON.stringify(cobj);
+            if (ctext !== cached) { try { await kv.put('site_data_v1', ctext, { expirationTtl: 300 }); } catch (e) {} }
+            return new Response(ctext, { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev', 'Cache-Control': 'public, max-age=300, s-maxage=300', 'CDN-Cache-Control': 'public, max-age=300' } });
+          } catch (e) {
+            return new Response(cached, { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev', 'Cache-Control': 'public, max-age=300, s-maxage=300', 'CDN-Cache-Control': 'public, max-age=300' } });
+          }
         }
       } catch (e) { /* KV 不可用则回源 */ }
     }
@@ -669,7 +695,7 @@ export async function onRequest(context) {
     let slimText = null;
     try {
       const raw = await upstream.clone().text();
-      const obj = JSON.parse(raw);
+      const obj = dedupeSiteData(JSON.parse(raw));
       if (obj && Array.isArray(obj.feeds)) {
         obj.feeds = obj.feeds.map(function (f) {
           if (!f) return f;
