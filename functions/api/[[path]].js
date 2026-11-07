@@ -362,6 +362,12 @@ export async function onRequest(context) {
     } catch (e) { nick = ''; }
     if (!nick) return json({ ok: false, error: 'login_required' }, 401, request);
     if (to === nick) return json({ ok: false, error: 'self' }, 200, request);
+    let mc = '';
+    try {
+      const r2 = await fetch('https://theslowtidefk.pages.dev/api/card?name=' + encodeURIComponent(to));
+      const c2 = await r2.json();
+      if (c2 && c2.ok) mc = String(c2.mc || '').trim().slice(0, 16);
+    } catch (e) { mc = ''; }
     try {
       await TST_DB.prepare('CREATE TABLE IF NOT EXISTS dm (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, from_name TEXT, to_name TEXT, msg TEXT)').run();
     } catch (e) {}
@@ -369,7 +375,7 @@ export async function onRequest(context) {
       const now = tstNowS();
       await TST_DB.batch([
         TST_DB.prepare('INSERT INTO dm (ts,from_name,to_name,msg) VALUES (?,?,?,?)').bind(now, nick, to, msg),
-        TST_DB.prepare('INSERT INTO outbox (ts,kind,payload,state) VALUES (?,?,?,0)').bind(now, 'dm', JSON.stringify({ to: to, from: nick, msg: msg })),
+        TST_DB.prepare('INSERT INTO outbox (ts,kind,payload,state) VALUES (?,?,?,0)').bind(now, 'dm', JSON.stringify({ to: to, from: nick, msg: msg, mc: mc })),
       ]);
       return json({ ok: true, from: nick, to: to }, 200, request);
     } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
@@ -504,7 +510,7 @@ export async function onRequest(context) {
       const b64 = function (s) { return btoa(unescape(encodeURIComponent(String(s == null ? '' : s)))); };
       const lines = tasks.map(function (t) {
         if (t.kind === 'chat') return t.id + '\tchat\t' + b64(t.data.name || '官网') + '\t' + b64(t.data.msg || '');
-        if (t.kind === 'dm') return t.id + '\tdm\t' + b64(t.data.to || '') + '\t' + b64(t.data.from || '官网') + '\t' + b64(t.data.msg || '');
+        if (t.kind === 'dm') return t.id + '\tdm\t' + b64(t.data.to || '') + '\t' + b64(t.data.from || '官网') + '\t' + b64(t.data.msg || '') + '\t' + b64(t.data.mc || '');
         return t.id + '\tcmd\t' + b64(t.data.cmd || '') + '\t' + b64(t.data.by || 'admin');
       });
       return new Response(lines.join('\n'), {
