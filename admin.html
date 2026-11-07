@@ -902,6 +902,11 @@ document.addEventListener('click',function(e){var b=e.target.closest('button');i
 </div>
 </div>
 <div id="adminPanel" style="display:none;">
+<div class="card" style="margin-bottom:14px;">
+<div class="form-row"><label>LuckPerms 权限编辑器</label></div>
+<div class="hint" style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">仅管理员可用。链接由服务器下发，页面源码中不保存。</div>
+<button class="btn" id="lpEditorBtn">打开 LuckPerms 编辑器</button>
+</div>
 <div class="admin-tabs">
 <button class="admin-tab active" data-tab="overview">概览</button>
 <button class="admin-tab" data-tab="notice">公告管理</button>
@@ -1134,6 +1139,14 @@ async function adminApi(action,data,extra){
 }
 $('#adminGoLogin').onclick=()=>{ location.href='login.html'; };
 function showAdminPanel(){$('#loginBox').style.display='none';$('#adminPanel').style.display='block';refreshLists();}
+$('#lpEditorBtn').onclick=async()=>{
+  try{
+    const r=await fetch('/api/admin/luckperms',{headers:{'Authorization':'Bearer '+ADMIN_TOKEN},cache:'no-store'});
+    const d=await r.json();
+    if(d&&d.ok&&d.url){window.open(d.url,'_blank');}
+    else{showToast(d&&d.error?d.error:'链接读取失败');}
+  }catch(e){showToast('网络错误，链接读取失败');}
+};
 document.querySelectorAll('.admin-tab').forEach(t=>{t.onclick=()=>{document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.admin-pane').forEach(x=>x.classList.remove('active'));t.classList.add('active');$('#pane'+t.dataset.tab.charAt(0).toUpperCase()+t.dataset.tab.slice(1)).classList.add('active');const tb=t.dataset.tab;if(tb==='users')loadUsers();if(tb==='shop')reloadShop();if(tb==='posts')loadPostsList();if(tb==='admins')loadAdmins();if(tb==='overview')loadStats();};});
 function resolveImg(src){if(typeof src==='string'&&src.startsWith('img:')&&Array.isArray(SITE_DATA.images)){const it=SITE_DATA.images.find(x=>x.id===src.slice(4));if(it)return it.data;}return src;}
 async function refreshLists(){await loadData();renderAdminHistory();renderNotices();renderFeeds();renderSponsors();renderReplays();renderImages();renderLottery();}
