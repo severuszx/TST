@@ -9177,10 +9177,9 @@ try{ eval('const __t=()=>1;'); }catch(e){
 
   function ago(ts){
     if(!ts) return '';
-    var s=Math.max(0,Math.round((Date.now()-ts)/1000));
-    if(s<60) return '刚刚更新';
-    if(s<3600) return Math.round(s/60)+' 分钟前更新';
-    return Math.round(s/3600)+' 小时前更新';
+    var d2=new Date(ts);
+    var hh=('0'+d2.getHours()).slice(-2), mm=('0'+d2.getMinutes()).slice(-2);
+    return '上次刷新 '+hh+':'+mm;
   }
 
   function render(d){
