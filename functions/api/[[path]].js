@@ -269,11 +269,17 @@ export async function onRequest(context) {
   if (path === '/api/chat/history' && request.method === 'GET') {
     if (!TST_DB) return json({ ok: false, error: 'no_db', messages: [] }, 200, request);
     const after = Number(url.searchParams.get('after') || 0) || 0;
+    const before = Number(url.searchParams.get('before') || 0) || 0;
+    const kw = String(url.searchParams.get('q') || '').trim().slice(0, 32);
     let rows = [];
     try {
-      const q = after
-        ? TST_DB.prepare('SELECT id,ts,src,name,msg FROM chat WHERE id>? ORDER BY id ASC LIMIT 60').bind(after)
-        : TST_DB.prepare('SELECT id,ts,src,name,msg FROM chat ORDER BY id DESC LIMIT 40');
+      const q = kw
+        ? TST_DB.prepare('SELECT id,ts,src,name,msg FROM chat WHERE name LIKE ? OR msg LIKE ? ORDER BY id DESC LIMIT 40').bind('%' + kw + '%', '%' + kw + '%')
+        : before
+          ? TST_DB.prepare('SELECT id,ts,src,name,msg FROM chat WHERE id<? ORDER BY id DESC LIMIT 40').bind(before)
+          : after
+            ? TST_DB.prepare('SELECT id,ts,src,name,msg FROM chat WHERE id>? ORDER BY id ASC LIMIT 60').bind(after)
+            : TST_DB.prepare('SELECT id,ts,src,name,msg FROM chat ORDER BY id DESC LIMIT 40');
       const r = await q.all();
       rows = (r && r.results) || [];
       if (!after) rows = rows.slice().reverse();
@@ -281,7 +287,7 @@ export async function onRequest(context) {
       return json({ ok: false, error: 'db_error', messages: [] }, 200, request);
     }
     const messages = rows.map(function (x) {
-      return { id: x.id, ts: new Date((x.ts || 0) * 1000).toISOString(), sender: x.name, message: x.msg, kind: x.src === 'web' ? 'web' : 'game' };
+      return { id: x.id, ts: new Date((x.ts || 0) * 1000).toISOString(), sender: x.name, message: x.msg, kind: x.src === 'web' ? 'web' : 'game', src: x.src || 'game' };
     });
     return json({ ok: true, messages: messages }, 200, request);
   }
@@ -317,6 +323,103 @@ export async function onRequest(context) {
     } catch (e) {
       return json({ ok: false, error: 'db_error' }, 200, request);
     }
+  }
+
+  // 私聊：官网 → 官网 / 游戏内玩家
+  if (path === '/api/chat/dm' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    const to = String(bd.to || '').trim().slice(0, 24);
+    const msg = String(bd.message || '').trim().slice(0, 160);
+    if (!to || !msg) return json({ ok: false, error: 'empty' }, 200, request);
+    const tk = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+    if (!tk) return json({ ok: false, error: 'login_required' }, 401, request);
+    let nick = '';
+    try {
+      const r = await fetch('https://theslowtidefk.pages.dev/api/me', { headers: { 'Authorization': 'Bearer ' + tk } });
+      const d = await r.json();
+      if (d && d.ok) nick = String(d.nickname || (d.email || '').split('@')[0] || '').trim().slice(0, 24);
+    } catch (e) { nick = ''; }
+    if (!nick) return json({ ok: false, error: 'login_required' }, 401, request);
+    if (to === nick) return json({ ok: false, error: 'self' }, 200, request);
+    try {
+      await TST_DB.prepare('CREATE TABLE IF NOT EXISTS dm (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, from_name TEXT, to_name TEXT, msg TEXT)').run();
+    } catch (e) {}
+    try {
+      const now = tstNowS();
+      await TST_DB.batch([
+        TST_DB.prepare('INSERT INTO dm (ts,from_name,to_name,msg) VALUES (?,?,?,?)').bind(now, nick, to, msg),
+        TST_DB.prepare('INSERT INTO outbox (ts,kind,payload,state) VALUES (?,?,?,0)').bind(now, 'dm', JSON.stringify({ to: to, from: nick, msg: msg })),
+      ]);
+      return json({ ok: true, from: nick, to: to }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  // 私聊历史：?with=对方昵称
+  if (path === '/api/chat/dm' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: false, messages: [] }, 200, request);
+    const tk = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+    if (!tk) return json({ ok: false, error: 'login_required' }, 401, request);
+    let nick = '';
+    try {
+      const r = await fetch('https://theslowtidefk.pages.dev/api/me', { headers: { 'Authorization': 'Bearer ' + tk } });
+      const d = await r.json();
+      if (d && d.ok) nick = String(d.nickname || (d.email || '').split('@')[0] || '').trim().slice(0, 24);
+    } catch (e) {}
+    if (!nick) return json({ ok: false, error: 'login_required' }, 401, request);
+    const withName = String(url.searchParams.get('with') || '').trim().slice(0, 24);
+    if (!withName) return json({ ok: false, error: 'need_with' }, 200, request);
+    let rows = [];
+    try {
+      await TST_DB.prepare('CREATE TABLE IF NOT EXISTS dm (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, from_name TEXT, to_name TEXT, msg TEXT)').run();
+      const r = await TST_DB.prepare("SELECT id,ts,from_name,to_name,msg FROM dm WHERE (from_name=? AND to_name=?) OR (from_name=? AND to_name=?) ORDER BY id DESC LIMIT 50")
+        .bind(nick, withName, withName, nick).all();
+      rows = ((r && r.results) || []).slice().reverse();
+    } catch (e) {}
+    return json({ ok: true, me: nick, messages: rows.map(function (x) {
+      return { id: x.id, ts: new Date((x.ts || 0) * 1000).toISOString(), from: x.from_name, to: x.to_name, message: x.msg };
+    }) }, 200, request);
+  }
+
+  // 举报：把该玩家最近 30 条聊天打包给管理员
+  if (path === '/api/chat/report' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    const target = String(bd.target || '').trim().slice(0, 24);
+    const reason = String(bd.reason || '').slice(0, 100);
+    if (!target) return json({ ok: false, error: 'need_target' }, 200, request);
+    const tk = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+    let by = '匿名';
+    try {
+      const r = await fetch('https://theslowtidefk.pages.dev/api/me', { headers: { 'Authorization': 'Bearer ' + tk } });
+      const d = await r.json();
+      if (d && d.ok) by = String(d.nickname || (d.email || '').split('@')[0] || '匿名');
+    } catch (e) {}
+    try {
+      await TST_DB.prepare('CREATE TABLE IF NOT EXISTS reports (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, by_name TEXT, target TEXT, reason TEXT, snapshot TEXT)').run();
+    } catch (e) {}
+    let snap = [];
+    try {
+      const r = await TST_DB.prepare('SELECT ts,src,name,msg FROM chat WHERE name=? ORDER BY id DESC LIMIT 30').bind(target).all();
+      snap = ((r && r.results) || []).slice().reverse();
+    } catch (e) {}
+    try {
+      await TST_DB.prepare('INSERT INTO reports (ts,by_name,target,reason,snapshot) VALUES (?,?,?,?,?)')
+        .bind(tstNowS(), by, target, reason, JSON.stringify(snap)).run();
+      return json({ ok: true }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  // 管理员看举报
+  if (path === '/api/reports/list' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: false, reports: [] }, 200, request);
+    if (String(request.headers.get('x-admin-pw') || '') !== tstPwd() || !tstPwd()) return json({ ok: false, error: 'forbidden' }, 403, request);
+    try {
+      const r = await TST_DB.prepare('SELECT id,ts,by_name,target,reason,snapshot FROM reports ORDER BY id DESC LIMIT 50').all();
+      return json({ ok: true, reports: ((r && r.results) || []) }, 200, request);
+    } catch (e) { return json({ ok: false, reports: [] }, 200, request); }
   }
 
   // 官网管理员指令下发（聊天室里的那个按钮）
@@ -377,6 +480,7 @@ export async function onRequest(context) {
       const b64 = function (s) { return btoa(unescape(encodeURIComponent(String(s == null ? '' : s)))); };
       const lines = tasks.map(function (t) {
         if (t.kind === 'chat') return t.id + '\tchat\t' + b64(t.data.name || '官网') + '\t' + b64(t.data.msg || '');
+        if (t.kind === 'dm') return t.id + '\tdm\t' + b64(t.data.to || '') + '\t' + b64(t.data.from || '官网') + '\t' + b64(t.data.msg || '');
         return t.id + '\tcmd\t' + b64(t.data.cmd || '') + '\t' + b64(t.data.by || 'admin');
       });
       return new Response(lines.join('\n'), {
@@ -448,7 +552,7 @@ export async function onRequest(context) {
     if (!st) return json({ ok: false, status: 'offline' }, 200, request);
     const age = Date.now() - (st.receivedAt || 0);
     const on = !st.shutdown && age < TST_STALE_MS;
-    return json({ ok: true, status: on ? 'online' : 'offline', online: on ? st.online : 0, max: st.max, tps: st.tps, latency: 0, ts: new Date(st.receivedAt || Date.now()).toISOString() }, 200, request);
+    return json({ ok: true, status: on ? 'online' : 'offline', online: on ? st.online : 0, max: st.max, tps: st.tps, latency: 0, ts: new Date(st.receivedAt || Date.now()).toISOString(), players: on && Array.isArray(st.players) ? st.players.map(function (x) { return String((x && x.name) || ''); }).filter(Boolean) : [] }, 200, request);
   }
 
   // ===== 抽奖状态查询（含开放状态/剩余码数/今日已抽）=====
