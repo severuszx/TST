@@ -1142,7 +1142,7 @@ text-decoration:none;
 
 .nav-more{position:relative;z-index:10002;}
 
-.more-menu{position:absolute;top:calc(100% + 8px);right:14px;left:auto;min-width:186px;transform:none;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:8px;display:flex;flex-direction:column;gap:2px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s ease,visibility .12s;}
+.more-menu{position:fixed;top:0;left:0;min-width:186px;transform:none;z-index:900;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:8px;display:flex;flex-direction:column;gap:2px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s ease,visibility .12s;}
 
 .nav-more.open .more-menu,.more-menu.open{opacity:1;visibility:visible;pointer-events:auto;transform:none;}
 
@@ -1801,7 +1801,7 @@ font-size:14px;box-shadow:var(--shadow);
 
 .time-badge{display:none;}
 
-.more-menu{left:auto;right:0;transform:none;min-width:150px;}
+.more-menu{min-width:170px;}
 
 .nav-more.open .more-menu{transform:none;}
 
@@ -3120,6 +3120,10 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 
 </div>
 
+</div>
+
+</header>
+
 <div class="more-menu" id="moreMenu">
 
 <button class="nav-link" data-nav="panel">服务器面板</button>
@@ -3141,10 +3145,6 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 <button class="nav-link" data-nav="download">下载</button>
 
 </div>
-
-</div>
-
-</header>
 
 <div class="glass-bg-picker hidden" id="glassBgPicker">
 
@@ -6450,6 +6450,26 @@ const moreMenu=document.getElementById('moreMenu');
 
 function closeMore(){ if(moreMenu)moreMenu.classList.remove('open'); if(navMore)navMore.classList.remove('open'); }
 
+function placeMore(){
+
+  if(!moreMenu||!navMoreBtn)return;
+
+  var r=navMoreBtn.getBoundingClientRect(), w=moreMenu.offsetWidth||186, h=moreMenu.offsetHeight||0;
+
+  var left=Math.min(Math.max(8, r.right-w), (window.innerWidth||r.right)-w-8);
+
+  var top=r.bottom+8;
+
+  if(top+h>(window.innerHeight||top+h)-8)top=Math.max(8, r.top-8-h);
+
+  moreMenu.style.left=left+'px'; moreMenu.style.top=top+'px';
+
+}
+
+window.addEventListener('resize',function(){ if(moreMenu&&moreMenu.classList.contains('open'))placeMore(); });
+
+window.addEventListener('scroll',function(){ closeMore(); },{passive:true});
+
 if(navMoreBtn && moreMenu){
 
   document.addEventListener('click',function(e){
@@ -6465,6 +6485,8 @@ if(navMoreBtn && moreMenu){
       const open=moreMenu.classList.toggle('open');
 
       if(navMore)navMore.classList.toggle('open',open);
+
+      if(open)placeMore();
 
       if(window.sfx)window.sfx('pop');
 
