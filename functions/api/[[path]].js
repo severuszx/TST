@@ -153,10 +153,14 @@ export async function onRequest(context) {
       } : null,
       receivedAt: Date.now(),
     };
+    // 只有带状态字段的包才更新「在线状态」，实时聊天/结果包不能把在线人数清零
+    const isStatus = (typeof bd.online === 'number') || Array.isArray(bd.players);
     try {
-      const tstKv = (context && context.env && context.env.SITE_CACHE) || null;
-      if (tstKv) await tstKv.put(TST_KEY, JSON.stringify(rec), { expirationTtl: 3600 });
-      else tstMemSet(rec);
+      if (isStatus) {
+        const tstKv = (context && context.env && context.env.SITE_CACHE) || null;
+        if (tstKv) await tstKv.put(TST_KEY, JSON.stringify(rec), { expirationTtl: 3600 });
+        else tstMemSet(rec);
+      }
     } catch (e) {
       tstMemSet(rec);
       return json({ ok: false, error: 'kv_unavailable', receivedAt: rec.receivedAt }, 200, request);
