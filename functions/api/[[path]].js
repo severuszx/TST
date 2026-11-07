@@ -91,6 +91,7 @@ function todayStr(d) {
   const dt = d || new Date();
   return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
 }
+function num(v) { const n = Number(v); return Number.isFinite(n) ? n : null; }
 function clientIp(req) {
   return req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For') || 'unknown';
 }
@@ -155,6 +156,46 @@ export async function onRequest(context) {
       tstMemSet(rec);
       return json({ ok: false, error: 'kv_unavailable', receivedAt: rec.receivedAt }, 200, request);
     }
+    // 同时写入 D1（性能历史 / 游戏内聊天 / 事件 / 日志 / 指令结果）
+    try {
+      const db = (context && context.env && context.env.TST_DB) || null;
+      if (db) {
+        const stmts = [];
+        const p = bd.perf && typeof bd.perf === 'object' ? bd.perf : null;
+        if (p) {
+          stmts.push(db.prepare('INSERT INTO perf (ts,tps1,tps5,tps15,mspt,mem,memmax,online,maxp,chunks,entities,uptime) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
+            .bind(rec.receivedAt / 1000 | 0, num(p.tps1), num(p.tps5), num(p.tps15), num(p.mspt), num(p.mem), num(p.memmax), num(rec.online), num(rec.max), num(p.chunks), num(p.entities), num(p.uptime)));
+        }
+        (Array.isArray(bd.chat) ? bd.chat.slice(-40) : []).forEach(function (c) {
+          const nm = String((c && c.name) || '').slice(0, 32);
+          const ms = String((c && c.msg) || '').slice(0, 200);
+          if (nm && ms) stmts.push(db.prepare('INSERT INTO chat (ts,src,name,msg) VALUES (?,?,?,?)').bind(num(c.ts) || (rec.receivedAt / 1000 | 0), 'game', nm, ms));
+        });
+        (Array.isArray(bd.events) ? bd.events.slice(-20) : []).forEach(function (v) {
+          stmts.push(db.prepare('INSERT INTO events (ts,kind,actor,detail) VALUES (?,?,?,?)')
+            .bind(num(v.ts) || (rec.receivedAt / 1000 | 0), String(v.kind || 'misc').slice(0, 24), String(v.actor || '').slice(0, 32), String(v.detail || '').slice(0, 300)));
+        });
+        (Array.isArray(bd.logs) ? bd.logs.slice(-120) : []).forEach(function (l) {
+          stmts.push(db.prepare('INSERT INTO logs (ts,lvl,src,body) VALUES (?,?,?,?)')
+            .bind(num(l.ts) || (rec.receivedAt / 1000 | 0), String(l.lvl || 'INFO').slice(0, 8), String(l.src || '').slice(0, 40), String(l.body || '').slice(0, 500)));
+        });
+        (Array.isArray(bd.results) ? bd.results.slice(-10) : []).forEach(function (r) {
+          stmts.push(db.prepare('INSERT INTO events (ts,kind,actor,detail) VALUES (?,?,?,?)')
+            .bind(num(r.ts) || (rec.receivedAt / 1000 | 0), 'cmd', String(r.by || 'admin').slice(0, 32), ('$ ' + String(r.cmd || '').slice(0, 120) + ' → ' + String(r.out || r.error || 'ok').slice(0, 200))));
+        });
+        // 老数据清理（插件每小时带 cleanup=true 触发一次）
+        if (bd.cleanup) {
+          const nowS = rec.receivedAt / 1000 | 0;
+          stmts.push(db.prepare('DELETE FROM logs WHERE ts < ?').bind(nowS - 172800));
+          stmts.push(db.prepare('DELETE FROM chat WHERE ts < ?').bind(nowS - 259200));
+          stmts.push(db.prepare('DELETE FROM perf WHERE ts < ?').bind(nowS - 604800));
+          stmts.push(db.prepare('DELETE FROM outbox WHERE state=1 AND ts < ?').bind(nowS - 86400));
+        }
+        if (stmts.length) await db.batch(stmts);
+      }
+    } catch (e) {
+      return json({ ok: true, receivedAt: rec.receivedAt, dbNote: String(e && e.message || e).slice(0, 80) }, 200, request);
+    }
     return json({ ok: true, receivedAt: rec.receivedAt }, 200, request);
   }
 
@@ -187,6 +228,197 @@ export async function onRequest(context) {
       ageMs: age,
       name: rec.name,
     }), { status: 200, headers: { ...noStore, ...corsHeaders(request) } });
+  }
+
+  // ===== Java 服 · 聊天 / 指令队列 / 性能 / 日志（D1: TST_DB）=====
+  const TST_DB = (context && context.env && context.env.TST_DB) || null;
+  const tstPwd = function () { return (context && context.env && context.env.SITE_ADMIN_PWD) || ADMIN_PWD || ''; };
+  const tstNowS = function () { return Math.floor(Date.now() / 1000); };
+  async function tstIsAdmin(req2) {
+    const pw = req2.headers.get('x-admin-pw') || '';
+    if (pw && tstPwd() && pw === tstPwd()) return true;
+    const tk = (req2.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+    if (!tk) return false;
+    try {
+      const r = await fetch('https://theslowtidefk.pages.dev/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tk },
+        body: JSON.stringify({ action: 'whoami' }),
+      });
+      const d = await r.json();
+      return !!(d && d.ok && Number(d.admin_level || 0) >= 1);
+    } catch (e) { return false; }
+  }
+  const TST_CMD_OK = ['say', 'tell', 'msg', 'broadcast', 'tps', 'list', 'time', 'weather', 'gamemode', 'tp', 'tphere', 'give', 'whitelist', 'kick', 'ban', 'unban', 'pardon', 'gamerule', 'save-all', 'save-off', 'save-on', 'difficulty', 'enchant', 'xp', 'effect', 'clear', 'spawnpoint', 'setworldspawn', 'title', 'playsound', 'seed', 'kickall'];
+  function tstCmdAllowed(cmd) {
+    const base = String(cmd || '').trim().replace(/^\//, '').split(/\s+/)[0].toLowerCase();
+    return !!base && TST_CMD_OK.indexOf(base) >= 0;
+  }
+
+  // 游戏内聊天记录
+  if (path === '/api/chat/history' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db', messages: [] }, 200, request);
+    const after = Number(url.searchParams.get('after') || 0) || 0;
+    let rows = [];
+    try {
+      const q = after
+        ? TST_DB.prepare('SELECT id,ts,src,name,msg FROM chat WHERE id>? ORDER BY id ASC LIMIT 60').bind(after)
+        : TST_DB.prepare('SELECT id,ts,src,name,msg FROM chat ORDER BY id DESC LIMIT 40');
+      const r = await q.all();
+      rows = (r && r.results) || [];
+      if (!after) rows = rows.slice().reverse();
+    } catch (e) {
+      return json({ ok: false, error: 'db_error', messages: [] }, 200, request);
+    }
+    const messages = rows.map(function (x) {
+      return { id: x.id, ts: new Date((x.ts || 0) * 1000).toISOString(), sender: x.name, message: x.msg, kind: x.src === 'web' ? 'web' : 'game' };
+    });
+    return json({ ok: true, messages: messages }, 200, request);
+  }
+
+  // 官网发言 → 写入聊天记录 + 指令队列
+  if (path === '/api/chat/send' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    const msg = String(bd.message || '').trim().slice(0, 200);
+    const sender = String(bd.sender || '官网').trim().slice(0, 24) || '官网';
+    if (!msg) return json({ ok: false, error: 'empty' }, 200, request);
+    const rl = globalThis.__TST_CHAT_RL || (globalThis.__TST_CHAT_RL = new Map());
+    const ip = clientIp(request);
+    const last = rl.get(ip) || 0;
+    if (Date.now() - last < 8000) return json({ ok: false, error: 'too_fast' }, 429, request);
+    rl.set(ip, Date.now());
+    try {
+      const now = tstNowS();
+      await TST_DB.batch([
+        TST_DB.prepare('INSERT INTO chat (ts,src,name,msg) VALUES (?,?,?,?)').bind(now, 'web', sender, msg),
+        TST_DB.prepare('INSERT INTO outbox (ts,kind,payload,state) VALUES (?,?,?,0)').bind(now, 'chat', JSON.stringify({ name: sender, msg: msg })),
+      ]);
+    } catch (e) {
+      return json({ ok: false, error: 'db_error' }, 200, request);
+    }
+    return json({ ok: true }, 200, request);
+  }
+
+  // 官网管理员指令下发（聊天室里的那个按钮）
+  if (path === '/api/chat/cmd' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    if (String(bd.pw || '') !== tstPwd() || !tstPwd()) return json({ ok: false, error: 'wrong_password' }, 200, request);
+    const cmd = String(bd.cmd || '').trim().slice(0, 200);
+    if (!cmd) return json({ ok: false, error: 'empty' }, 200, request);
+    if (!tstCmdAllowed(cmd)) return json({ ok: false, error: 'command_blocked' }, 200, request);
+    try {
+      await TST_DB.prepare('INSERT INTO outbox (ts,kind,payload,state) VALUES (?,?,?,0)')
+        .bind(tstNowS(), 'cmd', JSON.stringify({ cmd: cmd, by: '官网管理员' })).run();
+    } catch (e) {
+      return json({ ok: false, error: 'db_error' }, 200, request);
+    }
+    return json({ ok: true }, 200, request);
+  }
+
+  // 管理员控制台接口（带登录态）
+  if (path === '/api/tst-cmd/send' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    if (!(await tstIsAdmin(request))) return json({ ok: false, error: 'forbidden' }, 403, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    const cmd = String(bd.cmd || '').trim().slice(0, 200);
+    if (!cmd) return json({ ok: false, error: 'empty' }, 200, request);
+    if (!tstCmdAllowed(cmd)) return json({ ok: false, error: 'command_blocked' }, 200, request);
+    try {
+      await TST_DB.prepare('INSERT INTO outbox (ts,kind,payload,state) VALUES (?,?,?,0)')
+        .bind(tstNowS(), 'cmd', JSON.stringify({ cmd: cmd, by: '控制台' })).run();
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+    return json({ ok: true }, 200, request);
+  }
+
+  // 插件拉取待执行任务（聊天广播 / 指令）
+  if (path === '/api/tst-task/pull' && request.method === 'GET') {
+    const want = (context && context.env && context.env.TST_STATUS_TOKEN) || TST_TOKEN;
+    if (String(url.searchParams.get('token') || '') !== want) return json({ ok: false, error: 'bad_token' }, 403, request);
+    if (!TST_DB) return json({ ok: false, error: 'no_db', tasks: [] }, 200, request);
+    let rows = [];
+    try {
+      const r = await TST_DB.prepare('SELECT id,kind,payload FROM outbox WHERE state=0 ORDER BY id ASC LIMIT 20').all();
+      rows = (r && r.results) || [];
+      if (rows.length) {
+        const ids = rows.map(function (x) { return x.id; });
+        await TST_DB.prepare('UPDATE outbox SET state=1 WHERE id IN (' + ids.join(',') + ')').run();
+      }
+    } catch (e) { return json({ ok: false, error: 'db_error', tasks: [] }, 200, request); }
+    const tasks = rows.map(function (x) {
+      let p = {};
+      try { p = JSON.parse(x.payload || '{}'); } catch (e) { p = {}; }
+      return { id: x.id, kind: x.kind, data: p };
+    });
+    // fmt=line：给插件用的纯文本协议（避免在 Java 里写 JSON 解析）
+    if (String(url.searchParams.get('fmt') || '') === 'line') {
+      const b64 = function (s) { return btoa(unescape(encodeURIComponent(String(s == null ? '' : s)))); };
+      const lines = tasks.map(function (t) {
+        if (t.kind === 'chat') return t.id + '\tchat\t' + b64(t.data.name || '官网') + '\t' + b64(t.data.msg || '');
+        return t.id + '\tcmd\t' + b64(t.data.cmd || '') + '\t' + b64(t.data.by || 'admin');
+      });
+      return new Response(lines.join('\n'), {
+        status: 200,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev' },
+      });
+    }
+    return json({ ok: true, tasks: tasks }, 200, request);
+  }
+
+  // 性能历史（24h 折线）
+  if (path === '/api/tst-perf/history' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db', points: [] }, 200, request);
+    const hours = Math.min(168, Math.max(1, Number(url.searchParams.get('hours') || 24)));
+    const since = tstNowS() - hours * 3600;
+    let rows = [];
+    try {
+      const r = await TST_DB.prepare('SELECT ts,tps1,tps5,tps15,mspt,mem,memmax,online,maxp,chunks,entities,uptime FROM perf WHERE ts>=? ORDER BY ts ASC LIMIT 600').bind(since).all();
+      rows = (r && r.results) || [];
+    } catch (e) { return json({ ok: false, error: 'db_error', points: [] }, 200, request); }
+    return json({ ok: true, points: rows, hours: hours }, 200, request);
+  }
+
+  // 服务器日志（仅管理员）
+  if (path === '/api/tst-log/list' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db', logs: [] }, 200, request);
+    if (!(await tstIsAdmin(request))) return json({ ok: false, error: 'forbidden', logs: [] }, 403, request);
+    const lvl = String(url.searchParams.get('level') || '').toUpperCase().slice(0, 8);
+    const q = String(url.searchParams.get('q') || '').slice(0, 60);
+    const limit = Math.min(2000, Math.max(20, Number(url.searchParams.get('limit') || 300)));
+    let rows = [];
+    try {
+      let sql = 'SELECT ts,lvl,src,body FROM logs';
+      const cond = [];
+      if (lvl === 'WARN' || lvl === 'ERROR' || lvl === 'INFO') cond.push('lvl=?');
+      if (q) cond.push('body LIKE ?');
+      if (cond.length) sql += ' WHERE ' + cond.join(' AND ');
+      sql += ' ORDER BY id DESC LIMIT ' + limit;
+      const stmt = TST_DB.prepare(sql);
+      const binds = [];
+      if (lvl === 'WARN' || lvl === 'ERROR' || lvl === 'INFO') binds.push(lvl);
+      if (q) binds.push('%' + q + '%');
+      const r = await (binds.length ? stmt.bind.apply(stmt, binds) : stmt).all();
+      rows = (r && r.results) || [];
+    } catch (e) { return json({ ok: false, error: 'db_error', logs: [] }, 200, request); }
+    return json({ ok: true, logs: rows }, 200, request);
+  }
+
+  // 服务器状态（老聊天室的在线状态条复用）
+  if (path === '/api/server-status' && request.method === 'GET') {
+    let st = null;
+    try {
+      const kv = context.env && context.env.SITE_CACHE;
+      if (kv) { const raw = await kv.get(TST_KEY); if (raw) st = JSON.parse(raw); }
+    } catch (e) { st = null; }
+    if (!st) st = tstMemGet();
+    if (!st) return json({ ok: false, status: 'offline' }, 200, request);
+    const age = Date.now() - (st.receivedAt || 0);
+    const on = !st.shutdown && age < TST_STALE_MS;
+    return json({ ok: true, status: on ? 'online' : 'offline', online: on ? st.online : 0, max: st.max, tps: st.tps, latency: 0, ts: new Date(st.receivedAt || Date.now()).toISOString() }, 200, request);
   }
 
   // ===== 抽奖状态查询（含开放状态/剩余码数/今日已抽）=====
