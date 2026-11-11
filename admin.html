@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TST 管理后台</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--line:#e3e6ea;--text:#1b1f24;--mute:#68717d;--brand:#0f6b57;--warn:#b4451b;--ok:#1e7a4d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+a{color:var(--brand)}
+.top{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.top h1{margin:0;font-size:16px;font-weight:600;letter-spacing:.5px}
+.top .sp{flex:1}
+.chip{font-size:12px;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+.wrap{display:grid;grid-template-columns:188px 1fr;align-items:start}
+nav{position:sticky;top:57px;padding:14px 10px;display:flex;flex-direction:column;gap:4px}
+nav button{all:unset;cursor:pointer;padding:9px 12px;border-radius:8px;color:var(--mute);font-size:13px}
+nav button:hover{background:#eceff3;color:var(--text)}
+nav button.on{background:var(--brand);color:#fff}
+main{padding:18px 20px 60px;min-height:70vh}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+.panel h2{margin:0 0 12px;font-size:14px;font-weight:600}
+.sub{color:var(--mute);font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.card .k{color:var(--mute);font-size:12px}
+.card .v{font-size:24px;font-weight:600;margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:500;background:#fafbfc;position:sticky;top:0}
+td.clip{max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr:hover td{background:#fcfcfd}
+.bar{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:13px}
+.bar .n{width:64px;color:var(--mute)}
+.bar .track{flex:1;height:8px;background:#eceff3;border-radius:6px;overflow:hidden}
+.bar .fill{height:100%;background:var(--brand);border-radius:6px}
+.bar .c{width:42px;text-align:right;color:var(--mute)}
+input,textarea,select{font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--text);width:100%}
+textarea{min-height:96px;resize:vertical}
+label{display:block;font-size:12px;color:var(--mute);margin:8px 0 4px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.btn{all:unset;cursor:pointer;padding:7px 14px;border-radius:7px;background:var(--brand);color:#fff;font-size:13px}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--text)}
+.btn.danger{background:#fff;border:1px solid #f0c8bb;color:var(--warn)}
+.btn.xs{padding:3px 9px;font-size:12px}
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.toolbar input{max-width:240px}
+.msg{font-size:12px;padding:8px 10px;border-radius:7px;margin-top:8px;display:none}
+.msg.ok{display:block;background:#eaf7f0;color:var(--ok)}
+.msg.err{display:block;background:#fdeee9;color:var(--warn)}
+.mask{position:fixed;inset:0;background:rgba(16,20,24,.35);display:flex;align-items:center;justify-content:center;z-index:30}
+.login{background:#fff;border-radius:12px;padding:22px;width:330px;box-shadow:0 12px 40px rgba(0,0,0,.16)}
+.login h2{margin:0 0 4px;font-size:16px}
+.grid-img{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.grid-img figure{margin:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fafbfc}
+.grid-img img{width:100%;height:90px;object-fit:cover;display:block}
+.grid-img .cap{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:6px 8px;font-size:11px;color:var(--mute)}
+.pager{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:12px;color:var(--mute)}
+.empty{color:var(--mute);text-align:center;padding:22px}
+@media(max-width:720px){.wrap{grid-template-columns:1fr}nav{position:static;flex-direction:row;flex-wrap:wrap;top:auto}main{padding:14px}}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>The Slow Tide · 管理后台</h1>
+  <span class="chip" id="statChip">未连接</span>
+  <span class="sp"></span>
+  <button class="btn ghost xs" id="refreshBtn">刷新数据</button>
+  <button class="btn ghost xs" id="logoutBtn" style="display:none">退出</button>
+  <a class="btn ghost xs" href="/index.html" target="_blank" rel="noopener">打开前台</a>
+</div>
+
+<div class="wrap">
+  <nav id="nav"></nav>
+  <main id="main"><div class="empty">请先登录</div></main>
+</div>
+
+<div class="mask" id="loginMask">
+  <div class="login">
+    <h2>管理登录</h2>
+    <p class="sub">用管理员口令登录，登录态只存在当前标签页。</p>
+    <label for="pwd">口令</label>
+    <input id="pwd" type="password" autocomplete="current-password" placeholder="ADMIN_PWD">
+    <div class="msg" id="loginMsg"></div>
+    <div class="toolbar" style="margin-top:12px">
+      <button class="btn" id="loginBtn">登录</button>
+    </div>
+    <p class="sub" style="margin:10px 0 0">接口：tst-server-site /api/admin</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var DATA_API='https://tst-server-site.pages.dev/api/data';
+  var ADMIN_API='https://tst-server-site.pages.dev/api/admin';
+  var STATE={token:'',pwd:'',data:null,tab:'overview',page:{},filter:{},busy:false,lastFetch:0,fetchMs:0};
+
+  var $=function(id){return document.getElementById(id);};
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function uid(){return Math.random().toString(36).slice(2,10);}
+
+  /* ---------- 数据层：同一时刻只允许一个请求，结果整体替换，渲染按 id 去重 ---------- */
+  var inflight={};
+  function fetchData(force){
+    var now=Date.now();
+    if(!force && STATE.data && now-STATE.lastFetch<30000) return Promise.resolve(STATE.data);
+    if(inflight.data) return inflight.data;
+    var t0=now;
+    inflight.data=fetch(DATA_API,{cache:'no-store'}).then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    }).then(function(d){
+      STATE.data=d; STATE.lastFetch=Date.now(); STATE.fetchMs=Date.now()-t0;
+      setChip('已连接 · '+STATE.fetchMs+'ms');
+      return d;
+    }).catch(function(e){
+      setChip('接口异常');
+      throw e;
+    }).then(function(v){delete inflight.data;return v;},function(e){delete inflight.data;throw e;});
+    return inflight.data;
+  }
+
+  function adminApi(action,data,extra){
+    if(!STATE.token) return Promise.reject(new Error('未登录'));
+    var body=JSON.stringify(Object.assign({action:action,data:data||{}},extra||{}));
+    return fetch(ADMIN_API,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+STATE.token},body:body})
+      .then(function(r){
+        return r.text().then(function(t){
+          var d=null; try{d=t?JSON.parse(t):null;}catch(e){}
+          if(!d) throw new Error('服务响应异常（HTTP '+r.status+'）');
+          if(!d.ok && r.status===401){ STATE.token=''; showLogin(); throw new Error('登录已失效，请重新登录'); }
+          if(!d.ok) throw new Error(d.error||('操作失败（HTTP '+r.status+'）'));
+          return d;
+        });
+      });
+  }
+
+  function mergeList(name,list){
+    if(!Array.isArray(list)) return;
+    STATE.data=STATE.data||{};
+    STATE.data[name]=list;
+    render();
+  }
+
+  function setChip(txt){ $('statChip').textContent=txt; }
+
+  /* ---------- 登录 ---------- */
+  function showLogin(){ $('loginMask').style.display='flex'; $('logoutBtn').style.display='none'; }
+  function hideLogin(){ $('loginMask').style.display='none'; $('logoutBtn').style.display=''; }
+  function doLogin(){
+    var pwd=$('pwd').value.trim();
+    var m=$('loginMsg');
+    m.className='msg'; m.textContent='';
+    if(!pwd){ m.className='msg err'; m.textContent='请输入口令'; return; }
+    var b=$('loginBtn'); b.disabled=true; b.textContent='登录中…';
+    fetch(ADMIN_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password:pwd})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||!d.ok) throw new Error((d&&d.error)||'口令不正确');
+        STATE.token=d.token||''; STATE.pwd=pwd;
+        try{sessionStorage.setItem('tst_admin_token',STATE.token);}catch(e){}
+        hideLogin(); buildNav(); render(); loadAll();
+      })
+      .catch(function(e){ m.className='msg err'; m.textContent=e.message||'登录失败'; })
+      .then(function(){ b.disabled=false; b.textContent='登录'; });
+  }
+
+  /* ---------- 导航 ---------- */
+  var TABS=[
+    {id:'overview',name:'概览'},
+    {id:'ann',name:'服务器公告'},
+    {id:'feed',name:'赛事动态'},
+    {id:'sponsor',name:'赞助名单'},
+    {id:'image',name:'图片素材'},
+    {id:'replay',name:'录像'},
+    {id:'server',name:'服务器信息'},
+    {id:'release',name:'版本/发布'}
+  ];
+  function buildNav(){
+    var nav=$('nav'); nav.innerHTML='';
+    TABS.forEach(function(t){
+      var b=document.createElement('button');
+      b.textContent=t.name;
+      b.dataset.tab=t.id;
+      b.className=STATE.tab===t.id?'on':'';
+      b.onclick=function(){ STATE.tab=t.id; buildNav(); render(); };
+      nav.appendChild(b);
+    });
+  }
+
+  function render(){
+    if(!STATE.token){ $('main').innerHTML='<div class="empty">请先登录</div>'; return; }
+    var map={overview:renderOverview,ann:renderAnn,feed:renderFeed,sponsor:renderSponsor,image:renderImage,replay:renderReplay,server:renderServer,release:renderRelease};
+    (map[STATE.tab]||renderOverview)();
+  }
+
+  function data(){ return STATE.data||{}; }
+  function dedupe(list){
+    var seen={},out=[];
+    (list||[]).forEach(function(it){
+      var k=it&&it.id?it.id:uid();
+      if(seen[k]) return; seen[k]=1; out.push(it);
+    });
+    return out;
+  }
+  function paged(name,list){
+    var p=STATE.page[name]||1, size=12;
+    var f=(STATE.filter[name]||'').toLowerCase();
+    var rows=(list||[]).filter(function(it){
+      if(!f) return true;
+      return JSON.stringify(it).toLowerCase().indexOf(f)>=0;
+    });
+    var pages=Math.max(1,Math.ceil(rows.length/size));
+    if(p>pages) p=pages;
+    STATE.page[name]=p;
+    return {rows:rows.slice((p-1)*size,p*size),total:rows.length,page:p,pages:pages,size:size};
+  }
+  function pagerHtml(name,pg){
+    if(pg.pages<=1) return '<div class="pager">共 '+pg.total+' 条</div>';
+    return '<div class="pager">共 '+pg.total+' 条 · 第 '+pg.page+'/'+pg.pages+' 页 '+
+      '<button class="btn ghost xs" data-pg="'+name+':-1" '+(pg.page<=1?'disabled':'')+'>上一页</button>'+
+      '<button class="btn ghost xs" data-pg="'+name+':1" '+(pg.page>=pg.pages?'disabled':'')+'>下一页</button></div>';
+  }
+  document.addEventListener('click',function(e){
+    var t=e.target.closest?e.target.closest('[data-pg]'):null;
+    if(t){ var a=t.getAttribute('data-pg').split(':'); STATE.page[a[0]]=(STATE.page[a[0]]||1)+Number(a[1]); render(); }
+  });
+
+  function toolbar(name,extra){
+    return '<div class="toolbar"><input placeholder="搜索…" value="'+esc(STATE.filter[name]||'')+'" data-filter="'+name+'">'+ (extra||'') +'</div>';
+  }
+  document.addEventListener('input',function(e){
+    var t=e.target.getAttribute&&e.target.getAttribute('data-filter');
+    if(t){ STATE.filter[t]=e.target.value; STATE.page[t]=1; var pos=e.target.selectionStart; render(); var el=document.querySelector('[data-filter="'+t+'"]'); if(el){el.focus(); try{el.setSelectionRange(pos,pos);}catch(x){}} }
+  });
+
+  /* ---------- 概览：数字 + 条形，不用饼图 ---------- */
+  function renderOverview(){
+    var d=data();
+    var ann=dedupe(d.announcements),feeds=dedupe(d.feeds),sp=dedupe(d.sponsors),img=dedupe(d.images),rp=dedupe(d.replays);
+    var total=sp.reduce(function(s,x){return s+(Number(x.amount)||0);},0);
+    var months=monthBars(ann);
+    var maxM=Math.max.apply(null,[1].concat(months.map(function(m){return m.c;})));
+    var h='<div class="cards">'+
+      card('公告',ann.length)+card('动态',feeds.length)+card('赞助人数',sp.length)+
+      card('赞助合计(元)',total.toFixed(2))+card('图片',img.length)+card('录像',rp.length)+'</div>';
+    h+='<div class="panel"><h2>公告按月数量</h2>'+(months.length?months.map(function(m){
+      return '<div class="bar"><span class="n">'+esc(m.k)+'</span><span class="track"><span class="fill" style="width:'+(m.c/maxM*100).toFixed(0)+'%"></span></span><span class="c">'+m.c+'</span></div>';
+    }).join(''):'<div class="empty">没有可统计的日期</div>')+
+    '<p class="sub">只统计形如 YYYY-MM-DD 的日期；「今天 / 历史」这类相对日期不计入。</p></div>';
+    h+='<div class="panel"><h2>最近 6 条公告</h2><table><thead><tr><th style="width:110px">日期</th><th>标题</th><th>摘要</th></tr></thead><tbody>'+
+      ann.slice(0,6).map(function(a){return '<tr><td>'+esc(a.date||'')+'</td><td>'+esc(a.title||'')+'</td><td class="clip">'+esc(a.content||'')+'</td></tr>';}).join('')+
+      '</tbody></table></div>';
+    h+='<div class="panel"><h2>数据接口</h2><p class="sub">数据源：'+esc(DATA_API)+' · 上次拉取耗时 '+STATE.fetchMs+'ms · 缓存 30 秒，点右上角「刷新数据」可强制重取。</p></div>';
+    $('main').innerHTML=h;
+  }
+  function card(k,v){ return '<div class="card"><div class="k">'+k+'</div><div class="v">'+esc(v)+'</div></div>'; }
+  function monthBars(list){
+    var map={};
+    list.forEach(function(a){
+      var m=(String(a.date||'').match(/^\d{4}-\d{2}/)||[])[0];
+      if(m) map[m]=(map[m]||0)+1;
+    });
+    return Object.keys(map).sort().slice(-12).map(function(k){return {k:k,c:map[k]};});
+  }
+
+  /* ---------- 公告 ---------- */
+  function renderAnn(){
+    var pg=paged('ann',dedupe(data().announcements));
+    var h='<div class="panel"><h2>'+(STATE.editAnn?'编辑公告':'新增公告')+'</h2>'+
+      '<div class="row"><div><label>日期（可留空，写“今天”）</label><input id="annDate" value="'+esc(STATE.form&&STATE.form.annDate||'')+'" placeholder="2026-11-11 或 今天"></div>'+
+      '<div><label>标题</label><input id="annTitle" value="'+esc(STATE.form&&STATE.form.annTitle||'')+'" placeholder="标题"></div></div>'+
+      '<label>正文</label><textarea id="annContent" placeholder="正文内容">'+esc(STATE.form&&STATE.form.annContent||'')+'</textarea>'+
+      '<div class="toolbar" style="margin-top:10px"><button class="btn" id="annSave">'+(STATE.editAnn?'保存修改':'发布公告')+'</button>'+
+      (STATE.editAnn?'<button class="btn ghost" id="annCancel">取消编辑</button>':'')+'</div>'+
+      '<div class="msg" id="annMsg"></div></div>';
+    h+='<div class="panel"><h2>公告列表</h2>'+toolbar('ann')+
+      '<table><thead><tr><th style="width:110px">日期</th><th style="width:220px">标题</th><th>正文</th><th style="width:120px">操作</th></tr></thead><tbody>'+
+      (pg.rows.length?pg.rows.map(function(a){
+        return '<tr><td>'+esc(a.date||'')+'</td><td>'+esc(a.title||'')+'</td><td class="clip">'+esc(a.content||'')+'</td>'+
+        '<td><button class="btn ghost xs" data-ed="ann:'+esc(a.id)+'">编辑</button> <button class="btn danger xs" data-del="ann:'+esc(a.id)+'">删除</button></td></tr>';
+      }).join(''):'<tr><td colspan="4" class="empty">暂无公告</td></tr>')+
+      '</tbody></table>'+pagerHtml('ann',pg)+'</div>';
+    $('main').innerHTML=h;
+    $('annSave').onclick=saveAnn;
+    if($('annCancel')) $('annCancel').onclick=function(){ STATE.editAnn=null; STATE.form={}; render(); };
+  }
+  function saveAnn(){
+    var btn=$('annSave'),m=$('annMsg');
+    var date=$('annDate').value.trim(),title=$('annTitle').value.trim(),content=$('annContent').value.trim();
+    STATE.form={annDate:date,annTitle:title,annContent:content};
+    if(!title||!content){ m.className='msg err'; m.textContent='标题和正文都要填'; return; }
+    if(STATE.busy) return; STATE.busy=true; btn.disabled=true; btn.textContent='提交中…';
+    var payload={title:title,content:content,date:date||undefined};
+    var call=STATE.editAnn?adminApi('updateAnnouncement',payload,{id:STATE.editAnn}):adminApi('addAnnouncement',payload);
+    call.then(function(d){
+      mergeList('announcements',d.announcements);
+      STATE.editAnn=null; STATE.form={};
+      render();
+      var mm=$('annMsg'); if(mm){ mm.className='msg ok'; mm.textContent='已保存'; }
+    }).catch(function(e){
+      m.className='msg err'; m.textContent=e.message;
+    }).then(function(){ STATE.busy=false; btn.disabled=false; btn.textContent=STATE.editAnn?'保存修改':'发布公告'; });
+  }
+
+  /* ---------- 动态 ---------- */
+  function renderFeed(){
+    var pg=paged('feed',dedupe(data().feeds));
+    var h='<div class="panel"><h2>'+(STATE.editFeed?'编辑动态':'新增动态')+'</h2>'+
+      '<div class="row"><div><label>日期</label><input id="fdDate" value="'+esc(STATE.form&&STATE.form.fdDate||'')+'" placeholder="2026-11-11"></div>'+
+      '<div><label>标题</label><input id="fdTitle" value="'+esc(STATE.form&&STATE.form.fdTitle||'')+'"></div>'+
+      '<div><label>配图文件名（可留空）</label><input id="fdImage" value="'+esc(STATE.form&&STATE.form.fdImage||'')+'" placeholder="dt2.jpg"></div></div>'+
+      '<label>正文</label><textarea id="fdContent">'+esc(STATE.form&&STATE.form.fdContent||'')+'</textarea>'+
+      '<div class="toolbar" style="margin-top:10px"><label style="margin:0;display:flex;align-items:center;gap:6px;width:auto"><input type="checkbox" id="fdPinned" style="width:auto" '+(STATE.form&&STATE.form.fdPinned?'checked':'')+'> 置顶</label>'+
+      '<button class="btn" id="fdSave">'+(STATE.editFeed?'保存修改':'发布动态')+'</button>'+
+      (STATE.editFeed?'<button class="btn ghost" id="fdCancel">取消编辑</button>':'')+'</div><div class="msg" id="fdMsg"></div></div>';
+    h+='<div class="panel"><h2>动态列表</h2>'+toolbar('feed')+
+      '<table><thead><tr><th style="width:110px">日期</th><th style="width:200px">标题</th><th>正文</th><th style="width:70px">置顶</th><th style="width:120px">操作</th></tr></thead><tbody>'+
+      (pg.rows.length?pg.rows.map(function(f){
+        return '<tr><td>'+esc(f.date||'')+'</td><td>'+esc(f.title||'')+'</td><td class="clip">'+esc(f.content||'')+'</td><td>'+(f.pinned?'是':'—')+'</td>'+
+        '<td><button class="btn ghost xs" data-ed="feed:'+esc(f.id)+'">编辑</button> <button class="btn danger xs" data-del="feed:'+esc(f.id)+'">删除</button></td></tr>';
+      }).join(''):'<tr><td colspan="5" class="empty">暂无动态</td></tr>')+'</tbody></table>'+pagerHtml('feed',pg)+'</div>';
+    $('main').innerHTML=h;
+    $('fdSave').onclick=saveFeed;
+    if($('fdCancel')) $('fdCancel').onclick=function(){ STATE.editFeed=null; STATE.form={}; render(); };
+  }
+  function saveFeed(){
+    var btn=$('fdSave'),m=$('fdMsg');
+    var date=$('fdDate').value.trim(),title=$('fdTitle').value.trim(),content=$('fdContent').value.trim(),image=$('fdImage').value.trim(),pinned=$('fdPinned').checked;
+    STATE.form={fdDate:date,fdTitle:title,fdContent:content,fdImage:image,fdPinned:pinned};
+    if(!title||!content){ m.className='msg err'; m.textContent='标题和正文都要填'; return; }
+    if(STATE.busy) return; STATE.busy=true; btn.disabled=true; btn.textContent='提交中…';
+    var payload={title:title,content:content,image:image||undefined,pinned:pinned,date:date||undefined};
+    var call=STATE.editFeed?adminApi('updateFeed',payload,{id:STATE.editFeed}):adminApi('addFeed',payload);
+    call.then(function(d){
+      mergeList('feeds',d.feeds);
+      STATE.editFeed=null; STATE.form={};
+      render();
+      var mm=$('fdMsg'); if(mm){mm.className='msg ok';mm.textContent='已保存';}
+    }).catch(function(e){ m.className='msg err'; m.textContent=e.message; })
+      .then(function(){ STATE.busy=false; btn.disabled=false; btn.textContent='保存'; });
+  }
+
+  /* ---------- 赞助 ---------- */
+  function renderSponsor(){
+    var pg=paged('sponsor',dedupe(data().sponsors));
+    var h='<div class="panel"><h2>新增赞助</h2><div class="row">'+
+      '<div><label>名称</label><input id="spName" placeholder="赞助人名称"></div>'+
+      '<div><label>金额（元）</label><input id="spAmount" placeholder="7.27"></div></div>'+
+      '<div class="toolbar" style="margin-top:10px"><button class="btn" id="spSave">添加</button></div><div class="msg" id="spMsg"></div></div>';
+    h+='<div class="panel"><h2>赞助名单</h2>'+toolbar('sponsor')+
+      '<table><thead><tr><th>名称</th><th style="width:120px">金额</th><th style="width:160px">操作</th></tr></thead><tbody>'+
+      (pg.rows.length?pg.rows.map(function(s){
+        return '<tr><td>'+esc(s.name||'')+'</td><td>'+esc(s.amount||'')+'</td>'+
+        '<td><button class="btn danger xs" data-del="sponsor:'+esc(s.id)+'">删除</button></td></tr>';
+      }).join(''):'<tr><td colspan="3" class="empty">暂无赞助</td></tr>')+'</tbody></table>'+pagerHtml('sponsor',pg)+'</div>';
+    $('main').innerHTML=h;
+    $('spSave').onclick=function(){
+      var btn=$('spSave'),m=$('spMsg');
+      var name=$('spName').value.trim(),amount=$('spAmount').value.trim();
+      if(!name){m.className='msg err';m.textContent='请填名称';return;}
+      if(STATE.busy)return;STATE.busy=true;btn.disabled=true;btn.textContent='提交中…';
+      adminApi('addSponsor',{name:name,amount:amount||'0'}).then(function(d){
+        mergeList('sponsors',d.sponsors); render();
+        var mm=$('spMsg'); if(mm){mm.className='msg ok';mm.textContent='已添加';}
+      }).catch(function(e){m.className='msg err';m.textContent=e.message;})
+        .then(function(){STATE.busy=false;btn.disabled=false;btn.textContent='添加';});
+    };
+  }
+
+  /* ---------- 图片 ---------- */
+  function renderImage(){
+    var imgs=dedupe(data().images);
+    var h='<div class="panel"><h2>上传图片（≤1.5MB，建议先压缩）</h2>'+
+      '<div class="row"><div><label>显示名称</label><input id="imName" placeholder="留空用文件名"></div>'+
+      '<div><label>文件</label><input id="imFile" type="file" accept="image/*"></div></div>'+
+      '<div class="toolbar" style="margin-top:10px"><button class="btn" id="imUp">上传</button></div><div class="msg" id="imMsg"></div></div>';
+    h+='<div class="panel"><h2>已上传（'+imgs.length+'）</h2>'+
+      (imgs.length?'<div class="grid-img">'+imgs.map(function(i){
+        return '<figure><img loading="lazy" src="'+esc(i.data||i.url||'')+'" alt=""><div class="cap"><span>'+esc(i.name||'')+'</span><button class="btn danger xs" data-del="image:'+esc(i.id)+'">删</button></div></figure>';
+      }).join('')+'</div>':'<div class="empty">还没有图片</div>')+'</div>';
+    $('main').innerHTML=h;
+    $('imUp').onclick=function(){
+      var btn=$('imUp'),m=$('imMsg'),file=$('imFile').files[0];
+      if(!file){m.className='msg err';m.textContent='请选择图片';return;}
+      if(file.size>1.5*1024*1024){m.className='msg err';m.textContent='图片超过 1.5MB';return;}
+      if(STATE.busy)return;STATE.busy=true;btn.disabled=true;btn.textContent='上传中…';
+      var reader=new FileReader();
+      reader.onload=function(){
+        adminApi('uploadImage',{name:$('imName').value.trim()||file.name,data:reader.result}).then(function(d){
+          mergeList('images',d.images); render();
+          var mm=$('imMsg'); if(mm){mm.className='msg ok';mm.textContent='已上传';}
+        }).catch(function(e){m.className='msg err';m.textContent=e.message;})
+          .then(function(){STATE.busy=false;btn.disabled=false;btn.textContent='上传';});
+      };
+      reader.readAsDataURL(file);
+    };
+  }
+
+  /* ---------- 录像 ---------- */
+  function renderReplay(){
+    var pg=paged('replay',dedupe(data().replays));
+    var h='<div class="panel"><h2>'+(STATE.editRp?'编辑录像':'新增录像')+'</h2><div class="row">'+
+      '<div><label>日期</label><input id="rpDate" value="'+esc(STATE.form&&STATE.form.rpDate||'')+'"></div>'+
+      '<div><label>标题</label><input id="rpTitle" value="'+esc(STATE.form&&STATE.form.rpTitle||'')+'"></div>'+
+      '<div><label>视频链接</label><input id="rpUrl" value="'+esc(STATE.form&&STATE.form.rpUrl||'')+'" placeholder="https://…"></div></div>'+
+      '<div class="toolbar" style="margin-top:10px"><button class="btn" id="rpSave">'+(STATE.editRp?'保存修改':'添加')+'</button>'+
+      (STATE.editRp?'<button class="btn ghost" id="rpCancel">取消编辑</button>':'')+'</div><div class="msg" id="rpMsg"></div></div>';
+    h+='<div class="panel"><h2>录像列表</h2>'+toolbar('replay')+
+      '<table><thead><tr><th style="width:110px">日期</th><th style="width:220px">标题</th><th>链接</th><th style="width:120px">操作</th></tr></thead><tbody>'+
+      (pg.rows.length?pg.rows.map(function(r){
+        return '<tr><td>'+esc(r.date||'')+'</td><td>'+esc(r.title||'')+'</td><td class="clip">'+esc(r.url||'')+'</td>'+
+        '<td><button class="btn ghost xs" data-ed="replay:'+esc(r.id)+'">编辑</button> <button class="btn danger xs" data-del="replay:'+esc(r.id)+'">删除</button></td></tr>';
+      }).join(''):'<tr><td colspan="4" class="empty">暂无录像</td></tr>')+'</tbody></table>'+pagerHtml('replay',pg)+'</div>';
+    $('main').innerHTML=h;
+    $('rpSave').onclick=function(){
+      var btn=$('rpSave'),m=$('rpMsg');
+      var title=$('rpTitle').value.trim(),url=$('rpUrl').value.trim(),date=$('rpDate').value.trim();
+      STATE.form={rpDate:date,rpTitle:title,rpUrl:url};
+      if(!title||!url){m.className='msg err';m.textContent='标题和链接都要填';return;}
+      if(STATE.busy)return;STATE.busy=true;btn.disabled=true;btn.textContent='提交中…';
+      var call=STATE.editRp?adminApi('updateReplay',{title:title,url:url,date:date||undefined},{id:STATE.editRp}):adminApi('addReplay',{title:title,url:url,date:date||undefined});
+      call.then(function(d){ mergeList('replays',d.replays); STATE.editRp=null; STATE.form={}; render(); })
+        .catch(function(e){m.className='msg err';m.textContent=e.message;})
+        .then(function(){STATE.busy=false;btn.disabled=false;btn.textContent='添加';});
+    };
+    if($('rpCancel')) $('rpCancel').onclick=function(){STATE.editRp=null;STATE.form={};render();};
+  }
+
+  /* ---------- 服务器信息 ---------- */
+  function renderServer(){
+    var s=data().server||{};
+    var h='<div class="panel"><h2>服务器信息（只读展示；改动请走数据站接口）</h2>'+
+      '<table><tbody>'+
+      '<tr><th style="width:140px">地址</th><td>'+esc(s.address||'')+'</td></tr>'+
+      '<tr><th>QQ 群</th><td>'+esc(s.qq||'')+'</td></tr>'+
+      '<tr><th>开服时间</th><td>'+esc(s.start||'')+'</td></tr>'+
+      '</tbody></table><p class="sub">这三项目前没有开放写入 action，改需在数据站侧加接口。</p></div>';
+    $('main').innerHTML=h;
+  }
+
+  /* ---------- 版本/发布 ---------- */
+  function renderRelease(){
+    var h='<div class="panel"><h2>线上版本</h2><p class="sub" id="verLine">读取中…</p>'+
+      '<div class="toolbar"><button class="btn ghost xs" id="verReload">重新检查</button></div>'+
+      '<table style="margin-top:10px"><tbody id="verTable"></tbody></table></div>';
+    h+='<div class="panel"><h2>发布步骤（固定流程）</h2><table><thead><tr><th style="width:34px">#</th><th>做什么</th><th>在哪里</th></tr></thead><tbody>'+
+      '<tr><td>1</td><td>客户端打包并签名</td><td>build_apk/build.ps1 → out/TheSlowTide.apk</td></tr>'+
+      '<tr><td>2</td><td>上传 APK（根目录 + 版本归档名）</td><td>GitHub TST 仓库</td></tr>'+
+      '<tr><td>3</td><td>改 version.json（url / versionCode / versionName / note）</td><td>GitHub TST 仓库</td></tr>'+
+      '<tr><td>4</td><td>更新 HANDOFF.md 与本页</td><td>GitHub TST 仓库</td></tr>'+
+      '<tr><td>5</td><td>线上核对 version.json 与 APK 哈希</td><td>https://theslowtide.pages.dev</td></tr>'+
+      '</tbody></table></div>';
+    $('main').innerHTML=h;
+    var check=function(){
+      var t0=Date.now();
+      fetch('/version.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(v){
+        $('verLine').textContent='versionName '+v.versionName+' · versionCode '+v.versionCode+' · '+(Date.now()-t0)+'ms';
+        $('verTable').innerHTML=
+          '<tr><th style="width:140px">安装包地址</th><td>'+esc(v.url||'')+'</td></tr>'+
+          '<tr><th>更新说明</th><td>'+esc(v.note||'')+'</td></tr>';
+      }).catch(function(e){
+        $('verLine').textContent='读取失败：'+e.message;
+      });
+    };
+    check(); $('verReload').onclick=check;
+  }
+
+  /* ---------- 编辑/删除委托 ---------- */
+  document.addEventListener('click',function(e){
+    var ed=e.target.closest?e.target.closest('[data-ed]'):null;
+    var del=e.target.closest?e.target.closest('[data-del]'):null;
+    if(ed){
+      var p=ed.getAttribute('data-ed').split(':'); var id=p[1]; var kind=p[0];
+      var list=(kind==='ann'?data().announcements:kind==='feed'?data().feeds:data().replays)||[];
+      var item=list.filter(function(x){return String(x.id)===id;})[0];
+      if(!item) return;
+      if(kind==='ann'){ STATE.editAnn=id; STATE.form={annDate:item.date||'',annTitle:item.title||'',annContent:item.content||''}; STATE.tab='ann'; }
+      if(kind==='feed'){ STATE.editFeed=id; STATE.form={fdDate:item.date||'',fdTitle:item.title||'',fdContent:item.content||'',fdImage:item.image||'',fdPinned:!!item.pinned}; STATE.tab='feed'; }
+      if(kind==='replay'){ STATE.editRp=id; STATE.form={rpDate:item.date||'',rpTitle:item.title||'',rpUrl:item.url||''}; STATE.tab='replay'; }
+      buildNav(); render();
+    }
+    if(del){
+      var d=del.getAttribute('data-del').split(':'); var did=d[1]; var kind2=d[0];
+      var name={ann:'公告',feed:'动态',sponsor:'赞助',image:'图片',replay:'录像'}[kind2]||'条目';
+      if(!confirm('删除这条'+name+'？此操作不可撤销')) return;
+      var action={ann:'',feed:'',sponsor:'',image:'deleteImage',replay:''}[kind2];
+      if(kind2==='image') action='deleteImage';
+      else if(kind2==='ann') action='deleteAnnouncement';
+      else if(kind2==='feed') action='deleteFeed';
+      else if(kind2==='sponsor') action='deleteSponsor';
+      else if(kind2==='replay') action='deleteReplay';
+      adminApi(action,{id:did}).then(function(res){
+        var key={ann:'announcements',feed:'feeds',sponsor:'sponsors',image:'images',replay:'replays'}[kind2];
+        if(res && Array.isArray(res[key])) mergeList(key,res[key]);
+        else { fetchData(true).then(render); }
+      }).catch(function(err){ alert(err.message); });
+    }
+  });
+
+  /* ---------- 启动 ---------- */
+  function loadAll(){
+    setChip('读取中…');
+    fetchData(true).then(function(){ render(); }).catch(function(e){ setChip('接口异常：'+e.message); render(); });
+  }
+  $('loginBtn').onclick=doLogin;
+  $('pwd').addEventListener('keydown',function(e){ if(e.key==='Enter') doLogin(); });
+  $('refreshBtn').onclick=function(){ STATE.lastFetch=0; loadAll(); };
+  $('logoutBtn').onclick=function(){
+    STATE.token=''; try{sessionStorage.removeItem('tst_admin_token');}catch(e){}
+    showLogin(); render();
+  };
+  try{
+    var t=sessionStorage.getItem('tst_admin_token');
+    if(t){ STATE.token=t; hideLogin(); buildNav(); render(); loadAll(); }
+    else { buildNav(); showLogin(); }
+  }catch(e){ buildNav(); showLogin(); }
+})();
+</script>
+</body>
+</html>
