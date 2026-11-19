@@ -9,6 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>The Slow Tide 官网</title>
+<style>.nav-disabled{opacity:.45;cursor:not-allowed;filter:grayscale(1);}.ver-banner{border:1px solid #e6e8eb;border-radius:14px;padding:18px 20px;margin:0 0 22px;background:#fff;grid-column:1/-1;width:100%}.ver-banner-title{font-size:14px;font-weight:600;margin-bottom:14px;color:#20242a}.ver-banner-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.ver-box{border-radius:10px;padding:14px 16px;border:1px solid #e6e8eb}.ver-box-be{background:#f3fbf6;border-color:#bfe6cd}.ver-box-java{background:#f2f7ff;border-color:#c3d8f7}.ver-box{display:block}.ver-box strong{display:block;font-size:15px;margin:6px 0 8px}.ver-box-java strong{color:#1e5bb8}.ver-box-be strong{color:#1c7a45}.ver-box p{margin:0;font-size:13px;line-height:1.7;color:#5a6270}.ver-banner-foot{margin:12px 0 0;font-size:13px;color:#5a6270}@media (max-width:760px){.ver-banner-grid{grid-template-columns:1fr}}.license-note{margin:26px 0 0;padding:16px 18px;border:1px solid #e6e8eb;border-radius:12px;background:#fafbfc}.license-note h3{margin:0 0 10px;font-size:15px;color:#20242a}.license-note p{margin:0 0 8px;font-size:13px;line-height:1.75;color:#5a6270}.license-note ul{margin:0;padding-left:20px;font-size:13px;line-height:1.8;color:#5a6270}</style>
 
 <meta name="description" content="The Slow Tide 我的世界基岩版生存服务器官网：公告、动态、活动、玩家公约与便捷工具。">
 
@@ -3200,7 +3201,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <button class="nav-link" data-nav="rule">玩家公约</button>
 
-<a class="nav-link" href="/wiki">服务器 Wiki</a>
+<button class="nav-link" data-nav="wiki" type="button">服务器 Wiki</button>
 
 <div class="nav-more" id="navMore">
 
@@ -3245,9 +3246,9 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <div class="more-menu more-grid" id="moreMenu">
 <div class="mm-group">服务器</div>
-<button class="nav-link" data-nav="面板" type="button">服务器面板</button>
+<button class="nav-link" data-nav="panel" type="button">服务器面板</button>
 <button class="nav-link" data-nav="event" type="button">赛事活动</button>
-<button class="nav-link" data-nav="vote" type="button">投票</button>
+<button class="nav-link nav-disabled" data-nav="vote" type="button" title="投票功能维护中，暂未开放">投票</button>
 <button class="nav-link" data-nav="cdkey" type="button">兑换码</button>
 <button class="nav-link" data-nav="sponsor" type="button">服务器赞助</button>
 <button class="nav-link" data-nav="download" type="button">下载</button>
@@ -3602,7 +3603,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <div class="card-grid">
 
-<div class="card"><h3>生存世界</h3><div class="content">经典基岩版生存，自由探索、建造与合作，定期新增遗迹与玩法。</div></div>
+<div class="ver-banner"><div class="ver-banner-title">本站同时运营两个版本，账号、存档、插件、经济系统完全独立，先确认自己在玩哪一个</div><div class="ver-banner-grid"><div class="ver-box ver-box-be"><span class="ver-badge ver-be">网易版</span><strong>基岩版 1.21.50</strong><p>手机或网易《我的世界》客户端进入，地址见下方服务器状态卡里标着「服务器运行中」的那一条。经济系统、系统商店、全球市场、领地、公会、签到、抽奖、7stars 模组等功能只有这个版本有。</p></div><div class="ver-box ver-box-java"><span class="ver-badge ver-java">Java 版</span><strong>Paper 1.21.1</strong><p>正版 Java 账号、电脑客户端进入，地址见状态卡里标着「Java 版」的那一条。主菜单用 /menu，插件体系，商店、市场、领地由 GriefPrevention、Vault 等插件实现，数值与网易版不通用。</p></div></div><p class="ver-banner-foot">每个功能属于哪个版本、数值分别是多少，<a href="#" onclick="event.preventDefault();switchPage('wiki');return false;">服务器 Wiki 顶部有逐项对照表</a>。</p></div><div class="card"><h3>生存世界</h3><div class="content">经典基岩版生存，自由探索、建造与合作，定期新增遗迹与玩法。</div></div>
 
 <div class="card"><h3>赛事活动</h3><div class="content">定期举办裂痕杯等赛事，官方统一发放装备，公平竞技赢取奖励。</div></div>
 
@@ -3775,6 +3776,8 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 <div class="container">
 
 <div class="section-title">服务器公告</div>
+
+<p class="empty-hint" style="margin:-6px 0 14px;">公告直接在本页展开，不会跳转；内容较长时点「展开全部」，看完点「收起」即可回到列表。</p>
 
 <div class="card-grid" id="noticeList"></div>
 
@@ -4126,7 +4129,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
     <span id="chatWho" style="font-size:13px;opacity:.75;">正在读取账号…</span>
 
-    <a class="btn" id="chatLoginBtn" href="/login.html" style="padding:5px 10px;font-size:13px;display:none;">去登录</a>
+    <a class="btn" id="chatLoginBtn" href="/login" style="padding:5px 10px;font-size:13px;display:none;">去登录</a>
 
   </div>
 
@@ -4171,7 +4174,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 <input type="text" class="tst-field" id="logQuery" placeholder="关键词过滤，例如 Exception、TSTStatus" autocomplete="off">
 <button class="btn" id="logLoadBtn" type="button">刷新</button>
 </div>
-<div class="log-box" id="logBox">请使用管理员账号登录后查看</div>
+<div class="log-box" id="logBox"><div style="padding:18px 6px;text-align:center;"><p style="margin:0 0 10px;color:var(--text-secondary,#5b6675);">日志与控制台仅管理员可见，需先登录管理员账号。</p><a class="btn btn-primary" href="/profile" style="display:inline-block;">去登录管理员账号</a><p style="margin:12px 0 0;font-size:12px;color:var(--text-secondary,#5b6675);">登录后返回本页，日志会自动加载。</p></div></div>
 <div class="panel-note" id="logAutoNote">日志仅管理员可见，保留最近 2 天，最新的在最上面；ERROR / WARN 已按颜色标出。</div>
 </div>
 
@@ -4264,7 +4267,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 <article class="plugin-card"><div class="plugin-head"><span class="plugin-no">04</span><h3 class="plugin-name">EssentialsX</h3><span class="plugin-tag">核心</span></div><p class="plugin-desc">全功能基础插件，提供经济、传送、家、聊天与常用管理指令。</p><div class="plugin-links"><a class="plugin-link" href="https://essentialsx.net/" target="_blank" rel="noopener">官网</a><a class="plugin-link" href="https://github.com/EssentialsX/Essentials" target="_blank" rel="noopener">GitHub</a></div></article>
 
 
-<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">05</span><h3 class="plugin-name">TSTMenu</h3><span class="plugin-tag">自研 · 开源</span></div><p class="plugin-desc">服主自研的服务器主菜单，把快捷传送、商店与市场、每日福利、排行榜、个人中心、邮件与社交收进一个 GUI，等级/权限/经济全部对接现有系统。已独立开源发布，MIT 协议，免费版可直接下载。</p><div class="plugin-links"><a class="plugin-link" href="/wiki">使用说明</a><a class="plugin-link" href="https://tstmenu.pages.dev" target="_blank" rel="noopener">插件官网</a></div></article>
+<article class="plugin-card"><div class="plugin-head"><span class="plugin-no">05</span><h3 class="plugin-name">TSTMenu</h3><span class="plugin-tag">自研 · 开源</span></div><p class="plugin-desc">服主自研的服务器主菜单，把快捷传送、商店与市场、每日福利、排行榜、个人中心、邮件与社交收进一个 GUI，等级/权限/经济全部对接现有系统。已独立开源发布，MIT 协议，免费版可直接下载。</p><div class="plugin-links"><a class="plugin-link" href="#" onclick="event.preventDefault();switchPage('wiki');return false;">使用说明</a><a class="plugin-link" href="https://tstmenu.pages.dev" target="_blank" rel="noopener">插件官网</a></div></article>
 
 <article class="plugin-card"><div class="plugin-head"><span class="plugin-no">06</span><h3 class="plugin-name">TAB</h3><span class="plugin-tag">显示</span></div><p class="plugin-desc">统一负责所有显示：聊天格式、Tab 列表、头顶名称与计分板。</p><div class="plugin-links"><a class="plugin-link" href="https://github.com/NEZNAMY/TAB" target="_blank" rel="noopener">GitHub</a></div></article>
 
@@ -4298,7 +4301,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </div>
 
-<p class="plugins-foot">插件版本会随服务端更新调整；页面只做功能公示，不提供下载。需要某份配置说明可以直接在群里问。</p>
+<div class="license-note"><h3>关于授权：公益模式与商业版</h3><p>自研插件 TSTMenu 的授权状态由配置项 <code>licenseEnforced</code> 控制。两种状态都提供完整功能，差别在授权与支持，不在功能开关。本服当前使用哪一种，以服内 <code>/menu</code> 顶部提示为准。</p><ul><li><strong>公益模式（licenseEnforced = false）</strong>：不校验授权码。排行榜、邮件、交易、个人中心、签到等功能全部可用，适用于自建服、公益服与测试环境，不限制商用以外的用途。</li><li><strong>商业版（licenseEnforced = true）</strong>：需要正版授权码。功能与公益模式一致，额外提供授权有效期、版本更新通道与售后支持，并允许在商业运营场景下部署。</li></ul><p>一句话：商业版卖的是授权与支持，不是解锁功能。公益模式不会因为没授权码就把排行榜、邮件这类功能关掉。</p></div><p class="plugins-foot">插件版本会随服务端更新调整；页面只做功能公示，不提供下载。需要某份配置说明可以直接在群里问。</p>
 
 </div>
 
@@ -4362,7 +4365,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
   <p>上述服务提供商的服务器可能位于中国大陆境外，您的个人信息可能因此涉及跨境传输。我们会要求相关服务提供商遵守适用的数据保护法律法规。</p>
   <p><strong>3.2 存储期限</strong>：我们仅在实现本政策所述目的所必需的期限内保留您的个人信息，法律法规另有规定的除外。具体而言：账户信息在您的账户存续期间保留；反馈记录保留至问题处理完毕后合理期限；积分与抽奖记录保留至服务器运营期间及合理必要的期限；IP 与设备指纹记录用于防刷验证，保留至验证目的达成后的合理期限；浏览器本地数据由您自行控制，可随时清除。</p>
   <p><strong>3.3 安全措施</strong>：我们采取合理可行的技术和管理措施保护您的个人信息安全，包括但不限于：使用 HTTPS 加密传输数据；限制对个人信息的访问权限，仅授权必要的人员访问；定期审查数据收集、存储和使用流程；对数据库访问密钥进行管理，避免密钥公开暴露。</p>
-  <p>我们注意到，本服务器官网所使用的 Supabase 匿名密钥（anon key）曾在公开代码仓库中可见。我们已对该情况予以关注，并正在采取措施加强密钥管理与访问控制。请您理解，互联网环境并非绝对安全，我们无法保证信息的绝对安全。若发生个人信息安全事件，我们将依法及时通知您并向有关部门报告。</p>
+  <p>本服务器官网使用 Supabase 作为数据存储服务。其中使用的匿名密钥（anon key）属于设计上可公开的客户端凭据，作用只是标识项目，本身不构成访问授权；某一账号能读到、写到哪些数据，由数据库的行级安全（RLS）策略决定，而不是由持有这把密钥决定。我们会持续核查各数据表的访问策略与越权读写情况，一旦发现异常会立即收紧权限、清理数据并通知可能受影响的用户。请您理解，互联网环境并非绝对安全，我们无法保证信息的绝对安全。若发生个人信息安全事件，我们将依法及时通知您并向有关部门报告。</p>
 
   <h2>四、我们如何共享、转让、公开披露个人信息</h2>
   <p><strong>4.1 共享</strong>：我们不会与任何第三方共享您的个人信息，但以下情况除外：获得您的明确同意；根据法律法规的规定或行政、司法机关的合法要求；为保护本服务器、用户或公众的合法权益所必需；为提供服务所必需，与我们的服务提供商共享。具体而言，您的反馈记录、兑换码数据、抽奖防刷标记、IP 记录等存储于 Supabase 云数据库。我们已要求 Supabase 按照适用的数据保护法律法规处理您的个人信息。</p>
@@ -7101,7 +7104,36 @@ function switchPage(pid){
 
 }
 
+(function(){
+  var mm=document.getElementById('moreMenu');
+  if(!mm) return;
+  mm.addEventListener('click', function(e){
+    var b=e.target.closest('[data-nav]');
+    if(!b || b.classList.contains('nav-disabled')) return;
+    var id=b.getAttribute('data-nav');
+    if(!id) return;
+    e.stopPropagation();
+    if(typeof switchPage==='function') switchPage(id);
+    mm.classList.remove('open');
+  }, true);
+})();
 navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
+/* 投票维护中：入口置灰，点击只提示不跳转 */
+(function(){
+  var vb=document.querySelector('[data-nav="vote"]');
+  if(!vb) return;
+  function tip(){
+    var t=document.getElementById('tstToast');
+    if(!t){ t=document.createElement('div'); t.id='tstToast';
+      t.style.cssText='position:fixed;left:50%;bottom:36px;transform:translateX(-50%);z-index:9999;padding:12px 20px;border-radius:12px;background:rgba(24,32,48,.92);color:#fff;font-size:14px;line-height:1.5;box-shadow:0 8px 28px rgba(0,0,0,.25);opacity:0;transition:opacity .18s ease;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.textContent='投票功能维护中，服务端统计接口接入后开放，届时会在公告同步通知';
+    t.style.opacity='1';
+    clearTimeout(t._tm); t._tm=setTimeout(function(){ t.style.opacity='0'; },2600);
+  }
+  vb.onclick=function(e){ e.preventDefault(); e.stopPropagation(); tip(); };
+})();
 
 // ===== 聊天室（调试码 chat 激活，内测功能）=====
 
@@ -8105,7 +8137,7 @@ function renderNotices(){
 
         const open=bx.classList.toggle('open');
 
-        btn.textContent=open?'收起':'展开全部';
+        btn.textContent=open?'↩ 收起并返回列表':'展开全部';
 
       };
 
@@ -10622,7 +10654,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
     if(key==='admin'){
       var _af=document.querySelector('.embed-frame[data-embed="admin"]');
       if(_af && _af.getAttribute('data-loaded')!=='1'){
-        if(!localStorage.getItem('tst_token')){ location.href='/login.html'; return; }
+        if(!localStorage.getItem('tst_token')){ location.href='/login'; return; }
         _af.setAttribute('data-loaded','1');
         _af.src='/admin.html';
       }
@@ -11448,7 +11480,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
     <h2 id="gateTitle">正在验证权限…</h2>
     <p id="gateMsg">本页面为策划专用资料台，仅对通过管理员认证的账号开放。</p>
     <div id="gateBtns">
-      <a class="btn primary" href="/login.html" id="gateLoginBtn" style="display:none;">去登录</a>
+      <a class="btn primary" href="/login" id="gateLoginBtn" style="display:none;">去登录</a>
       <button class="btn" id="gateBackBtn" style="display:none;" onclick="location.href='index.html'">返回官网</button>
     </div>
     <div class="gate-sub" id="gateSub">需要登录且具有管理认证（admin_level ≥ 1）</div>
@@ -14363,11 +14395,11 @@ function renderMine() {
   var box = el('rkMine');
   var it = state.mine;
   if (!TOKEN) {
-    box.innerHTML = '<div class="mine"><span class="k">登录后</span><span class="v">可以看到自己的排名和角色</span><a href="/login.html">去登录</a></div>';
+    box.innerHTML = '<div class="mine"><span class="k">登录后</span><span class="v">可以看到自己的排名和角色</span><a href="/login">去登录</a></div>';
     return;
   }
   if (!it) {
-    box.innerHTML = '<div class="mine"><span class="k">你的角色</span><span class="v">还没有同步数据，进服并绑定角色后自动出现</span><a href="/profile.html">去绑定</a></div>';
+    box.innerHTML = '<div class="mine"><span class="k">你的角色</span><span class="v">还没有同步数据，进服并绑定角色后自动出现</span><a href="/profile">去绑定</a></div>';
     return;
   }
   box.innerHTML = '<div class="mine"><span class="k">你 · ' + esc(it.mc) + '</span><span class="v">第 <b>' + it.rank + '</b> 名 / 共 ' + (it.total || state.total) + ' 人 · ' + metricText(it.value) + '</span><a href="javascript:;" id="rkMineGo">查看我的角色</a></div>';
@@ -14457,7 +14489,7 @@ function openPlayer(mc) {
       + '<div><span>死亡次数</span><b>' + fmtInt(s.deaths) + '</b></div>'
       + '<div><span>最近同步</span><b style="font-size:13.5px">' + ago(s.ts) + '</b></div>';
     mountSkin(s);
-    el('dLock').innerHTML = '<div class="lock">护甲与背包在个人中心页面查看。<a href="/profile.html">去个人中心</a></div>';
+    el('dLock').innerHTML = '<div class="lock">护甲与背包在个人中心页面查看。<a href="/profile">去个人中心</a></div>';
   }).catch(function () {
     el('dStage').innerHTML = '<div class="fallback">网络异常</div>';
   });
