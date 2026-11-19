@@ -1,87 +1,130 @@
 # TST 接手文档（给三个月后的自己）
 
-> 最后更新：2026-11-11（发布 v1.5.4 客户端 + 新增独立管理后台 admin.html）
+## 目录
+- `index.html`：主站全部页面 + 管理员覆盖层 + 5 套子页模板（`script type="text/plain" id="embed-*"`）
+- `login.html`：登录 / 注册 / 重置密码三视图
+- `404.html`、`profile.html`、`tool.html`、`shop.html`、`hogwarts.html`、`planning.html`
+- `functions/api/[[path]].js`：Cloudflare Pages Functions 路由（登录、发帖、抽奖、数据代理、调试码）
+- `_redirects`：旧地址 301
+- `sitemap.xml`：搜索引擎索引
+- `predeploy_check.py`：部署前结构门禁
+- `RELEASE_CHECKLIST.md`：发版勾选清单
+- `TECH_DEBT.md`：已知债务
 
-## 一、目录
+## 数据与接口
+- 主站前端接口域名：`https://theslowtidefk.pages.dev/api`
+- 数据缓存：Cloudflare KV 键 `site_data_v1`（5 分钟）
+- 管理密码、JWT 密钥、插件令牌都在服务端 / 环境变量，不写前端
+- 反馈站：`https://theslowtidefk.pages.dev`，管理员列表接口带 `admin=1&pw=...`
 
-| 文件 | 作用 |
-| --- | --- |
-| `index.html` | 主站全部页面 + 管理员覆盖层 + 5 套子页模板（`script type="text/plain" id="embed-*"`），约 1MB 单文件 |
-| `admin.html` | **新的独立管理后台**（单独页面、单独标签页打开）。表格化界面，无饼图/环形图 |
-| `login.html` | 登录 / 注册 / 重置密码三视图 |
-| `404.html`、`up_profile.html`、`_idx_fix.html` | 备用/历史页面，正常情况用不到 |
-| `functions/api/[[path]].js` | Cloudflare Pages Functions 路由：`/api/data`、`/api/admin` 转发数据站；`/api/auth/*`、`/api/rest/*` 代理 Supabase；`/api/lottery/*` 抽奖 |
-| `version.json` | 客户端更新清单，App 更新公告页直接读它 |
-| `TheSlowTide.apk` | 下载按钮用的固定文件名安装包（**每次发版覆盖它**） |
-| `TheSlowTide-v1.5.4.apk` 等 | 历史版本归档，只增不改 |
-| `HANDOFF.md` | 本文件 |
-| `README.md` | 项目说明 |
-| `TECH_DEBT.md` | 已知技术债 |
-| `RELEASE_CHECKLIST.md` | 发版勾选清单 |
-| `predeploy_check.py` | 部署前结构门禁 |
-
-## 二、数据与接口
-
-- 数据服务：`https://tst-server-site.pages.dev`（无源站，可 API 直传）
-- `GET /api/data` → `{ok,announcements[],feeds[],sponsors[],images[],replays[],server{address,qq,start}}`
-  - `announcements` 项：`{id,title,content,date}`，历史公告用 `title:"hist:<日期>"` 前缀区分
-  - `feeds` 项：`{id,title,content,image,pinned,date}`
-  - `sponsors` 项：`{id,name,amount}`
-  - `images` 项：`{id,name,data|url}`
-  - `replays` 项：`{id,title,url,date}`
-- 后台接口：`POST https://tst-server-site.pages.dev/api/admin`
-  - 登录：`{action:"login",password:"<ADMIN_PWD>"}` → `{ok,token}`
-  - 其余：`Authorization: Bearer <token>`，body `{action,data,...extra}`
-- 已存在 action（前端只用这些）：
-  - `addAnnouncement{title,content,date}` / `updateAnnouncement{...}`（带 `{id}`）/ `deleteAnnouncement`（data 里放 `{id}`）
-  - `addFeed{title,content,image,pinned,date}` / `updateFeed` / `deleteFeed`
-  - `addSponsor{name,amount}` / `updateSponsor` / `deleteSponsor`
-  - `addReplay{title,url,date}` / `updateReplay` / `deleteReplay`
-  - `uploadImage{name,data:<dataURL>}`（前端限 1.5MB）/ `deleteImage{id}`
-  - **成功返回里通常直接带上被改动的整个集合**（如 `{ok,announcements:[...]}`），前端应该用它整体替换本地列表
-- 管理员口令在服务端环境变量 `ADMIN_PWD`，仓库里不含明文
-- 抽奖核销：`/api/lottery/*`，用 isolate 内存 Map 限抽 + 奖品名加 `【已使用】` 前缀做核销标记（不是真原子操作）
-
-## 三、管理后台 admin.html（2026-11-11 新做）
-
-- 地址：`https://theslowtide.pages.dev/admin.html`，单独页面，建议单独标签页常开
-- 标签：概览 / 服务器公告 / 赛事动态 / 赞助名单 / 图片素材 / 录像 / 服务器信息 / 版本发布
-- 设计约束（用户明确要求，改动时不要退回旧做法）：
-  - **不要饼图、环形图**；统计用数字卡 + 横向条形 + 表格
-  - 列表必须表格化，可搜索、可翻页（每页 12 条）
-  - 数据只拉一次（`/api/data`，缓存 30 秒，右上「刷新数据」强制重取），**不要加轮询**
-  - 提交时按钮禁用 + 全局 `busy` 锁，成功后接收服务端返回的集合整体替换本地列表，渲染按 `id` 去重
-    → 这是"上传一次出现好多条"的根治方法：旧后台把新条目 append 进列表、同时又整表刷新，导致重复渲染
-  - 删除类操作：`deleteXxx` 的 `id` 放进 `data` 里；`updateXxx` 的 `id` 放在 body 顶层（沿用旧前端习惯，不要混）
-
-## 四、发版流程（客户端）
-
-1. 构建：`& "C:\Users\Lenovo\Doubao\chats\2026-09-13\new-chat\build_apk\build.ps1"`，产物 `build_apk\out\TheSlowTide.apk`（本机没有 `powershell.exe`、没有 `git`）
-2. 上传 GitHub（网页 `/upload/main`）：
-   - 二进制改名为 `TheSlowTide-v<版本>.apk` 上传 —— **同名覆盖经常被静默吞掉**，用版本化文件名才可靠
-   - 再把同一个包命名为 `TheSlowTide.apk` 覆盖根目录（下载按钮写死这个名字）
-3. 改 `version.json`：`url` 指向 `https://theslowtide.pages.dev/TheSlowTide-v<版本>.apk`，同时改 `versionCode` / `versionName` / `note`
+## 部署
+本机无 `git` 命令时走 GitHub 网页上传：
+1. `https://github.com/severuszx/TST/upload/main`
+2. 选文件 → 填 Commit summary → Commit changes
+3. Functions 文件走 `/upload/main/functions/api`
 4. 等 Cloudflare Pages 自动构建 1–2 分钟
-5. 线上核对：`https://theslowtide.pages.dev/version.json` 内容、`HEAD` 安装包 200、下载回来算 SHA256 与本地一致
 
-**v1.5.4 已发布**：`versionCode 19`，包 303,799 B，SHA256 `5F9164789622C8D43404ECC5789B008F44135D318402A329514C13213008193D`
-
-## 五、每次做完必须更新
-
-- 更新 `HANDOFF.md`（本文件）与 `README.md`
-- 更新 `admin.html` 里的「版本/发布」页说明（如流程有变）
-- 记下本次踩的坑（操作方式、被平台吞掉的行为、绕路方案）
-
-## 六、已知坑（踩过的）
-
-- 本机 `hosts` 里有 29 行 `127.0.0.1 github*`，文件不可写、提权失败；实测 GitHub 仍可访问，暂不处理
-- GitHub 网页编辑器提交后可能没有真正覆盖二进制文件，必须用 GitHub API 复核 `size`
-- 产品浏览器（`bu`）在本机已失效（`no browser tab is available`），GitHub 操作走桌面 `cu` + 用户 Edge（`severuszx` 已登录）
-- `cu` 坐标是 0–1000 归一化，传像素会报 `PY_COORDINATE_SPACE_ERROR`
-- D1 每日 10 万行写配额可能被打满（曾发生在 2026-11-10，次日 00:00 UTC 重置）；打满期间写操作报错，存量数据不受影响
-
-## 七、验证手段
-
+## 验证
 - 本地：`python -m http.server 8899 --directory _deploy`
-- 线上：`https://theslowtide.pages.dev/?v=<时间戳>`，确认无重复数据、导航正常
-- 接口：直接 `GET https://tst-server-site.pages.dev/api/data` 看集合条数
+- 无头 Chrome：`chrome.exe --headless=new --virtual-time-budget=6000 --dump-dom http://127.0.0.1:8899/...`
+- 线上：打开 `https://theslowtide.pages.dev/?v=<时间戳>`，确认 `#navBurgerFix`、投票空状态、数据无重复
+
+## 调试码
+- 7 个码统一带 `TST-` 前缀，校验在 `functions/api/[[path]].js` 的 `DEBUG_CODES` 与 `/api/debug/verify`
+- 旧短码只做兼容，不再新增
+
+## 管理员页
+- `window.TSTOpenAdminPage()` 首次调用时动态创建 iframe 覆盖层
+- 管理员 HTML 以 base64 存在 `adminPageData`，源文件在 `_upload/admin.html`
+
+## TSTMenu 插件售卖站（tstmenu.pages.dev）
+- 源目录：`C:\Users\Lenovo\Doubao\chats\2026-09-13\new-chat\tstmenu-site\`（2026-11-14 从 Temp 整目录归档到这里，含 `.wrangler` 部署状态）；旧副本仍在 `C:\Users\Lenovo\AppData\Local\Temp\tstmenu_site`
+- 结构：`index.html` 单页、`dl/` 三个 jar（Pro/Free/src）、`demo/` 演示素材、`_headers`（demo 缓存头）
+- 回滚快照：`index.html.bak_demo`（加演示区前）、`index.html.bak_pro`（加商业版界面前）
+- 部署（本机无 wrangler 全局命令，用 npx 缓存里的 cli）：
+  - node：`C:\Users\Lenovo\AppData\Local\Doubao\User Data\sandbox_runtime\bases\772984f6fd3a8ae0ae7d2422cd7c2bfa\node\node.exe`
+  - cli：`C:\Users\Lenovo\AppData\Local\Temp\tstdeploy\npm-cache\_npx\0eedb5afd4158ff3\node_modules\wrangler\wrangler-dist\cli.js`
+  - `node cli.js pages deploy . --project-name tstmenu --branch main --commit-dirty=true`
+- 实机演示区（2026-11-13）：`section#demo` 编号 00，导航 PC/移动端各一项「实机演示」
+  - 视频 `demo/tstmenu-demo.mp4`，720p / 30fps / 124s / 17.9MB，moov 已前置（faststart=true）
+  - 截图 `menu.jpg` `shop.jpg` `rank.jpg` `bind.jpg`（900×473，各约 43KB）+ `poster.jpg`（58KB）
+- 商业版界面区（2026-11-14）：`section#pro` 编号 02，导航 PC/移动端各一项「商业版界面」
+  - 7 张卡：排行榜、个人中心、官网绑定、跨端社交、我的邮件、自定义菜单项 + 通栏「服务器信息上报」
+  - 内容全部来自解包 `TSTMenu-Pro-2.1.0.jar` 的字符串实证（`TSTMenuGui.class` 页面文案、`Report.class` 上报 JSON、jar 内 `config.yml` 默认值），没有编造截图
+  - 上报实证：`report.enabled/api-key/url/interval-seconds`（默认关、300 秒），POST `{"api_key","online","max","version","tps","modules","desc","motd"}`，默认地址 `https://tstservers.pages.dev/api/server/push`
+  - 原 02–09 已顺延为 03–10，现编号 00 演示 / 01 功能 / 02 商业版界面 / 03 安装 / 04 命令 / 05 配置 / 06 商品 / 07 常用改动 / 08 版本对比 / 09 FAQ / 10 下载
+  - 01 功能段里原有的三张商业版卡已删除（与新段重复），`sub` 改为指向下一节
+- 素材链路：用户录屏 1920×1080/120fps/412MB → 本机无 ffmpeg → `mediakit-cli video probe / transcode / extract-frames`（`--audio` 必须显式给 `bitrate_mode`，否则 MissingParameter）
+- 抽帧产物左下角带「预览」水印，脚本 `C:\Users\Lenovo\AppData\Local\Temp\tstmenu_pro\mkimg2.py` 底部裁 46px 后重导出
+- 已知限制：Cloudflare Pages 对该 mp4 的 Range 请求返回 200 而非 206（`_headers` 已写 `Accept-Ranges: bytes`，行为没变），拖动进度条可能触发整段重下；起播靠 faststart 正常。2026-11-14 复测：HEAD 200 `/video/mp4`，带 `Range: bytes=0-1023` 的 GET 仍回 200 全量 18,761,641 B、无 `Accept-Ranges`
+- 移动端：此前「390px 宽右侧 30px 被裁」是裸 headless 截图假象（`--window-size=390` 时真实视口恒为 500，`vw=sw=500`），站点本身无横向溢出；2026-11-14 在 500px 视口下发现**卡片内长代码串确实顶破卡片**，已在 `@media (max-width:560px)` 加 `.card{min-width:0}` 与 `code{overflow-wrap:anywhere}` 修掉
+- 服务器列表页（2026-11-14）：`servers.html` + `functions/api/servers.js`
+  - 页面：`https://tstmenu.pages.dev/servers.html`，导航 PC/移动端各一项「服务器列表」，02 段上报卡末尾也指向它
+  - 数据链路：浏览器 → 本站 `/api/servers`（Pages Functions 代理）→ 上游 `https://tstservers.pages.dev/api/servers`。上游无 CORS 头，必须走代理，不能前端直连
+  - 代理缓存 `public, max-age=60`，页面自身 60 秒轮询一次
+  - 上游接口实测（2026-11-14）：`GET /api/servers` 200 返回 `{ok,count,servers[]}`，字段 `slug/name/owner/desc/ip/port/edition/logo/online/max/version/tps/modules/last_seen/online_now/created_at`；`POST /api/server/push` 无 key 返回 401（端点存在并校验 api_key）；`POST /api/server/register` 是注册入口
+  - 上游目前只有 1 条测试条目（`潮汐服` / `play.example.com` / `last_seen=0` 从没上报），所以线上页面显示空数据是正常的，不是渲染问题
+- 部署注意：站点根有 `functions/` 后，`wrangler pages deploy .` 会自动编译并上传 Functions bundle（日志出现 `Compiled Worker successfully` / `Uploading Functions bundle`），不需要额外配置或 KV 绑定
+- 服主面板（2026-11-14，买家专属页）
+  - 路由 `functions/s/[slug].js` → `https://tstmenu.pages.dev/s/<slug>`，服务端直接渲染 HTML（数据在渲染时取，不依赖前端二次请求），无需为每个买家预建文件，上游出现新 slug 即自动有页
+  - 单台接口 `functions/api/mine/[slug].js` → `/api/mine/<slug>`，从上游列表里筛出这一台，返回 `{ok,server}`；slug 不合法 400，找不到 404
+  - 风格与售卖站刻意分开：售卖站是黑底绿字暗色；面板是 `#f4f3ed` 纸白底 + 墨黑字 + 深绿强调 + 等宽数字，表格化，无动效
+  - 页面内容：名/状态胶囊、四项指标（在线、上限、TPS、核心版本）、明细表（地址、客户端、服主、最后上报、接入时间）、已开启模块 chips（`teleport/shop/daily/rank/profile/social/mail` 映射为中文）；页内每 60 秒请求一次 `/api/mine/<slug>` 局部更新
+  - 已加 `<meta name="robots" content="noindex,nofollow">` 与 `x-robots-tag`，不进搜索
+  - 入口：`servers.html` 每行服务器名链到 `/s/<slug>`；`servers.html` 第 2 步与首页 `#pro` 上报卡都说明了 `/s/<slug>` 是服主自己那页
+  - **隔离强度**：只是"按 slug 各看各的"，没有密码。知道别人 slug 也能打开别人的页（这些数据本来就在公开 `/api/servers` 里）。若要做真正鉴权（凭 api_key 才能看），需要上游提供按 key 查询的接口，目前上游只有 `POST /api/server/push`（无 key 得 401），没有读取端
+  - 上游本身也已有同类页 `https://tstservers.pages.dev/s/<slug>`（暗色，2681 字节，只有 4 个数字 + 5 行明细 + 模块 chips），本页是独立重做，不依赖它
+  - 实测（2026-11-14）：`/s/s42ec78` 200 5,489 字节；`/s/abcdef` 404；`/api/mine/s42ec78` 200 JSON；`/api/mine/nosuch` 400 `bad_slug`
+
+
+## 2026-11-18 更新：Wiki 内联进首页 + 网易版/Java 版功能标注
+
+- 线上独立页 `/wiki`（30,547 B）已并入 `index.html` 单文件，不再保留独立页与 iframe，切页走 `switchPage('wiki')`
+- 新增 `<section id="wiki" class="page">`，插在主 `<footer class="site-footer">` 之前；PC 导航新增 `data-nav="wiki"`「服务器 Wiki」；`TITLES` 增加 `wiki:'服务器 Wiki - The Slow Tide'`
+- 样式 `<style id="wiki-style">` 注入主 `<head>`。原 wiki 的 `--muted` 映射为 `--text-secondary`、`--soft` 映射为 `--hover`（index 里没有这两个变量）
+- 内部锚点全部加 `wk-` 前缀，原 `#rank`、`#shop` 等会和首页已有 section id 撞车
+- 搜索脚本 `<script id="wiki-search">` 挂在正文最后一个 `</body>` 前，按 `#wkMain .wk-sec` 的 `data-kw` + 文本过滤，输入即筛，Esc 清空
+- **顺手修了一处原有 bug**：文件末尾脚本块结尾写成 `<\/script>`（转义形式），浏览器不认，把 `</body></html>` 连同后面那个 `</script>` 一起吞进脚本，导致月度报告那段 IIFE 语法错误。已改成真正的 `</script>` 并删掉 `</html>` 后多余的闭合标签
+- 版本标注：`<span class="ver-tag ver-java">Java</span>` / `ver-be` / `ver-both` 三种徽章，13 个 `.wk-sec` 全部带标签；顶部「版本对照」表逐项列出两端差异，玩家先看表再看细则
+- 网易版内容来源：用户两批游戏内截图（第一批 15 张实渲染，第二批 20 张全渲染），覆盖经济系统、系统商店 57 项、全球市场、领地、公会 Lv1–6、签到、任务、抽奖、公告、7stars、JEI 按键映射、横扫之刃、更好的末地
+- 本地产物：`index.html` 751,841 B / 668,804 字符（原线上 717,774 B），改前备份 `index.html.bak_20261118`
+- 部署：本机无 `git`、无 wrangler 登录态、无 CF API token，仍走 GitHub 网页上传 `https://github.com/severuszx/TST/upload/main` 覆盖根 `index.html`
+- 待办：部署后处理线上独立页 `/wiki`（建议 301 到 `/#wiki` 或直接删文件）与 `sitemap.xml` 中的 wiki 条目
+
+
+## 2026-11-19 更新：官网前端第二轮（UX 审计修复 + 双版本标注 + 授权说明）
+
+已上线，commit `8dcb7d17`，`index.html` 757,567 B（原 751,841 B），备份 `index.html.bak_20261119`。
+
+### 改动清单
+- **双版本标注**：首页 `.card-grid` 前新增 `.ver-banner` 说明条——「网易版 基岩 1.21.50」（绿）与「Java 版 Paper 1.21.1」（蓝）两栏，各写进入方式与专属功能，底部引导到 Wiki 版本对照表。Wiki 13 个 `.wk-sec` 全带 `ver-java` / `ver-be` / `ver-both` 徽章
+- **修复「服务器面板」点不动（真 bug）**：导航写的是 `data-nav="面板"`（中文），`switchPage(pid)` 取 `getElementById('面板')` 拿不到 section（实际 id 是 `panel`）→ 点击完全无响应。已改 `data-nav="panel"`
+- **主导航 Wiki 统一**：`<a class="nav-link" href="/wiki">` 改为 `<button data-nav="wiki">`，与 more 菜单里的入口一致，全部同页切换，不再跳独立页
+- **more 菜单加事件委托**：`#moreMenu` 捕获阶段监听 `closest('[data-nav]')`，跳过 `nav-disabled`，命中就 `switchPage` 并关菜单。修复原文件里菜单项点不动的问题
+- **投票入口置灰**：`nav-disabled` + `title="投票功能维护中，暂未开放"`，点击被 IIFE 拦截并弹 toast「投票功能维护中，服务端统计接口接入后开放，届时会在公告同步通知」，2.6 秒淡出
+- **公告详情返回**：展开按钮文案改「↩ 收起并返回列表」，卡片内联折叠，不依赖浏览器后退键
+- **服务器面板登录引导**：`#logBox` 原文案改为居中块 + `<a class="btn btn-primary" href="/profile">去登录管理员账号</a>`
+- **「我的」路径统一**：全部走 `/profile`，清掉 `href="/profile.html"` 与页内重定向残留
+- **隐私政策 anon key 段改写**：去掉「官方承认 anon key 曾在公开仓库可见」的自曝表述，改为机制说明——anon key 属设计上可公开的客户端凭据，只标识项目，能读写哪些数据由 RLS 决定，会持续核查而不写「已配置」
+- **插件公示页新增授权说明**：`.license-note`「关于授权：公益模式与商业版」——`licenseEnforced=false` 即公益模式，不校验授权码，排行榜/邮件/交易/个人中心/签到**全部可用**；商业版功能一致，差别在授权有效期、更新通道、售后与允许商用。一句话：**商业版卖的是授权与支持，不是解锁功能**
+
+### 验证（可复现）
+```powershell
+$r = Invoke-WebRequest "https://theslowtide.pages.dev/?v=$(Get-Random)" -UseBasicParsing
+# 期望：chars≈673120，data-nav="wiki"×2，id="wiki-style"，ver-banner，
+#      data-nav="panel"×1 且 data-nav="面板"×0，nav-disabled×3，license-note，收起并返回列表
+```
+- GitHub contents API：`index.html` size=757567，sha=`9186ae53eddc9e6905debfac454a6e1101ef3580`
+
+### 部署方式（本轮踩坑记录）
+- Chrome 与 Edge 首次打开 upload 页都显示 `Uploads are disabled` + `Sign in`（浏览器未登录 GitHub）
+- 正确做法：在 Edge 里点右上 `Sign in` → 浏览器已保存账号密码（`3057722030@qq.com`），自动填充后直接点绿色 `Sign in` 即登录成功，回到 upload 页
+- 登录后：`choose your files` → 原生文件对话框「文件名」框直接粘贴完整路径 → 回车 → 填 Commit summary → `Commit changes`
+- 本机 `git` 虽可用（`ls-remote` 能通且凭据在 Windows 凭据管理器），但 `git fetch origin main` 反复超时/被中断，还会留下 `.git/shallow.lock` 导致 `Unable to create '.git/shallow.lock': File exists`。**不要优先走本机 git**
+
+### 待办
+- 线上独立页 `/wiki` 与 `sitemap.xml` 中的 wiki 条目仍未清理
+- Supabase 八表（users/posts/comments/draws/cards/feedback/messages/profiles）的 RLS 是否生效**未判定**（本机直连超时）
+- 「`licenseEnforced=false` 下商业版功能全部可用」这一说法**未经 TSTMenu 源码核实**，是据页面现有文案与功能清单推断，需服主确认产品口径
+- `profile.html` 首屏（未绑定时的「去绑定」主按钮、已绑定时签到/金币置顶）本轮未评估
+- `more` 菜单事件委托修复**静态注入已确认**，真实点击在 CU 下未能复现验证（菜单动画位移导致坐标落空），需真人在浏览器里点一次「更多 → 服务器面板」确认
