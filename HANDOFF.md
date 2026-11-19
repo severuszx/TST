@@ -128,3 +128,39 @@ $r = Invoke-WebRequest "https://theslowtide.pages.dev/?v=$(Get-Random)" -UseBasi
 - 「`licenseEnforced=false` 下商业版功能全部可用」这一说法**未经 TSTMenu 源码核实**，是据页面现有文案与功能清单推断，需服主确认产品口径
 - `profile.html` 首屏（未绑定时的「去绑定」主按钮、已绑定时签到/金币置顶）本轮未评估
 - `more` 菜单事件委托修复**静态注入已确认**，真实点击在 CU 下未能复现验证（菜单动画位移导致坐标落空），需真人在浏览器里点一次「更多 → 服务器面板」确认
+
+
+---
+
+## 2026-11-19 · 第三轮：Wiki 改成纯玩家视角 + 首页减负
+
+服主反馈：上一版 Wiki「做得很怪、用着也不好用」。根因是把游戏内后台配置截图里的管理员字段当正文写了（「是否启用：开」「每人领地上限 5」「0 为关闭」「权限矩阵」「维度 ID 2」），玩家看不懂也用不上。另外首页开头那条双版本大卡片 AI 味重，「管理团队」「配置要求」两个区块要删。
+
+### 改动
+- **Wiki 全量重写为玩家视角**：13 节全部改成「我要干什么 → 怎么干 → 花多少钱」。删掉全部后台字段，只留玩家能感知的数字（领地 500 格免费 / 超出 0.3 一格 / 维护 0.01 / 欠费 7 天收回 / 20 天不上线收回；公会创建 10000 / 6 级人数 3-5-10-13-15-100 / 每交 100 给 1 贡献币；市场卖扣 10%、收扣 15%；商店示例价等）。
+- **每节强制标注版本**：标题右侧 `<span class="ver-tag ver-be">网易</span>` / `ver-java` / `ver-both`；Wiki 顶部加一行图例说明三个标签含义。版本对照表改成「想要 → Java 版怎么满足 → 网易版怎么满足」，12 行。
+- **删首页双版本大卡**（`ver-banner`）：换成一行 13px 提示「网易 基岩 1.21.50 / Java Paper 1.21.1，两边账号、存档、金币各走各的」，`grid-column:1/-1` 占满整行。
+- **删「管理团队」整块**（teamToggle / teamBlock / 服主卡 / 4 张成员卡 / team-note）。
+- **删「配置要求」整块**（cfgToggle / cfgBlock / 移动端与电脑端最低推荐配置表）。
+- **首页卡片 2×2**：首页 `.card-grid` 加 `id="homeCards"`，CSS `#homeCards{grid-template-columns:repeat(2,1fr)}`；移动端媒体查询同步补 `#homeCards`，避免 id 优先级压过 `.card-grid{1fr}`。`.card-grid` 是全局类（公告、赛事等多处复用），未动。
+- **`#wk{scroll-margin-top:84px}`**：外部链接直达 `#wiki` 时标题不被固定导航遮住。
+
+### 保留（有意为之）
+- 13 个 `wk-sec` 的 `data-kw` 属性全部保留——文末 `#wiki-search` 脚本靠它过滤，删了搜索即失效。
+- 两段折叠 JS（`cfgToggle` / `teamToggle`）未删：都有 `if(tg&&blk)` 判空保护，元素不存在不会抛错。
+- 服务器历史时间线里「管理团队亮相，与玩家一同守护这片潮汐」保留——那是历史文案，不是首页区块。
+
+### 验证（无头 Chrome 真实渲染，非字符串级）
+- 源文件 673,096 → 660,037 字符
+- 渲染后 DOM：`wk-sec`=13、`id="teamToggle"`=0、`id="cfgToggle"`=0、`class="ver-banner"`=0、「是否启用」=0、「当前值」=0、「权限矩阵」=0
+- 截图确认：首页版本提示占满一行、四张卡 2×2；Wiki 页 H1 + 三色图例 + 搜索 + 左目录 + 对照表，13 节全部渲染
+
+### 部署
+- Edge 已登录 GitHub：`https://github.com/severuszx/TST/upload/main` → choose your files → 文件名框粘贴绝对路径 → commit message 框内 **Ctrl+Enter**
+- commit `6873649`，仓库 499 Commits
+- GitHub contents API：`index.html` size=739,573（UTF-8 中文多字节），sha=`106d4bce61793edd70abda7667e8a8b70d77a113`
+- 提交按钮 `Commit changes` 点击依旧无效，只能 Ctrl+Enter
+
+### 待办（本轮遗留）
+- `ver-banner` 的 CSS 规则串、`#wk .wk-sub` 样式、两段空转折叠 JS 仍留在文件里，无引用、不影响功能，未清理
+- 本地 `section` 标签 open 60 / close 61 不配对：**改动前就是 62/63，差值一致**，属原文件固有，浏览器容错，非本轮引入
