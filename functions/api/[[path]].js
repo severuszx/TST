@@ -828,6 +828,102 @@ export async function onRequest(context) {
     return '';
   }
 
+  const SERVER_KEY = (context && context.env && context.env.TST_STATUS_TOKEN) || TST_TOKEN;
+  function serverAllowed(request) {
+    const k = String(request.headers.get('x-server-token') || '');
+    return !!k && k === SERVER_KEY;
+  }
+  async function ensureBindTables(db) {
+    try {
+      await db.batch([
+        db.prepare('CREATE TABLE IF NOT EXISTS bind_code (code TEXT PRIMARY KEY, nickname TEXT, created_at INTEGER, used INTEGER)'),
+        db.prepare('CREATE TABLE IF NOT EXISTS bind_link (nickname TEXT PRIMARY KEY COLLATE NOCASE, uuid TEXT, mc TEXT, bound_at INTEGER)'),
+      ]);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  if (path === '/api/tst/game/bind/code' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    const nick = await webNick(request);
+    if (!nick) return json({ ok: false, error: 'login_required' }, 401, request);
+    if (!await ensureBindTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const now = tstNowS();
+    try {
+      const linked = await TST_DB.prepare('SELECT nickname,uuid,mc,bound_at FROM bind_link WHERE nickname=? COLLATE NOCASE').bind(nick).first();
+      if (linked && linked.mc) return json({ ok: true, code: '', bound: true, mc: linked.mc, uuid: linked.uuid || '', message: '这个账号已经绑定了角色' }, 200, request);
+      const old = await TST_DB.prepare('SELECT code,created_at FROM bind_code WHERE nickname=? COLLATE NOCASE AND used=0 AND created_at>=? ORDER BY created_at DESC LIMIT 1').bind(nick, now - 600).first();
+      if (old) return json({ ok: true, code: old.code, bound: false, expires_in: Math.max(60, 600 - (now - Number(old.created_at))), command: '/bind ' + old.code }, 200, request);
+    } catch (e) {}
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+    try {
+      await TST_DB.prepare('DELETE FROM bind_code WHERE created_at < ?').bind(now - 3600).run();
+      await TST_DB.prepare('INSERT INTO bind_code (code,nickname,created_at,used) VALUES (?,?,?,0)').bind(code, nick, now).run();
+      return json({ ok: true, code: code, bound: false, expires_in: 600, nickname: nick, command: '/bind ' + code }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/tst/game/bind/status' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    const nick = await webNick(request);
+    if (!nick) return json({ ok: false, error: 'login_required' }, 401, request);
+    if (!await ensureBindTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    try {
+      const row = await TST_DB.prepare('SELECT nickname,uuid,mc,bound_at FROM bind_link WHERE nickname=? COLLATE NOCASE').bind(nick).first();
+      if (!row || !row.mc) return json({ ok: true, bound: false, nickname: nick }, 200, request);
+      return json({ ok: true, bound: true, nickname: nick, mc: row.mc, uuid: row.uuid || '', bound_at: Number(row.bound_at) || 0 }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/tst/game/bind' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    if (!serverAllowed(request)) return json({ ok: false, error: 'bad_token' }, 403, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    const code = String(bd.code || '').trim().toUpperCase().slice(0, 16);
+    const uuid = String(bd.uuid || '').trim().slice(0, 64);
+    const name = String(bd.name || '').trim().slice(0, 32);
+    if (!code || !uuid || !name) return json({ ok: false, error: 'bad_params' }, 200, request);
+    if (!await ensureBindTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    try {
+      const rec = await TST_DB.prepare('SELECT code,nickname,created_at,used FROM bind_code WHERE code=?').bind(code).first();
+      if (!rec || Number(rec.used) || (tstNowS() - Number(rec.created_at)) > 900) {
+        return json({ ok: false, error: 'code_invalid', message: '验证码无效或已过期' }, 404, request);
+      }
+      const sameUser = await TST_DB.prepare('SELECT nickname,uuid,mc FROM bind_link WHERE nickname=? COLLATE NOCASE').bind(rec.nickname).first();
+      if (sameUser && sameUser.uuid && String(sameUser.uuid) !== uuid) {
+        return json({ ok: false, error: 'already_bound', message: '该官网账号已经绑定了另一个游戏角色' }, 409, request);
+      }
+      const sameUuid = await TST_DB.prepare('SELECT nickname,uuid,mc FROM bind_link WHERE uuid=?').bind(uuid).first();
+      if (sameUuid && String(sameUuid.nickname).toLowerCase() !== String(rec.nickname).toLowerCase()) {
+        return json({ ok: false, error: 'mc_bound_other', message: '该游戏角色已经绑定了另一个官网账号' }, 409, request);
+      }
+      await TST_DB.batch([
+        TST_DB.prepare('INSERT INTO bind_link (nickname,uuid,mc,bound_at) VALUES (?,?,?,?) ON CONFLICT(nickname) DO UPDATE SET uuid=excluded.uuid, mc=excluded.mc, bound_at=excluded.bound_at').bind(rec.nickname, uuid, name, tstNowS()),
+        TST_DB.prepare('UPDATE bind_code SET used=1 WHERE code=?').bind(code),
+      ]);
+      return json({ ok: true, binding: { user_id: rec.nickname, username: rec.nickname, display_name: rec.nickname, mc: name, uuid: uuid } }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/tst/game/bind' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    if (!serverAllowed(request)) return json({ ok: false, error: 'bad_token' }, 403, request);
+    const uuid = String(url.searchParams.get('uuid') || '').trim().slice(0, 64);
+    const name = String(url.searchParams.get('name') || '').trim().slice(0, 32);
+    if (!uuid && !name) return json({ ok: false, error: 'bad_params' }, 200, request);
+    if (!await ensureBindTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    try {
+      const row = uuid
+        ? await TST_DB.prepare('SELECT nickname,uuid,mc,bound_at FROM bind_link WHERE uuid=?').bind(uuid).first()
+        : await TST_DB.prepare('SELECT nickname,uuid,mc,bound_at FROM bind_link WHERE mc=? COLLATE NOCASE').bind(name).first();
+      if (!row) return json({ ok: false, error: 'not_bound' }, 404, request);
+      return json({ ok: true, ready: true, binding: { user_id: row.nickname, username: row.nickname, display_name: row.nickname, mc: row.mc, uuid: row.uuid, bound_at: Number(row.bound_at) || 0 } }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
   if (path === '/api/player3d/push' && request.method === 'POST') {
     if (!pushAllowed(request)) return json({ ok: false, error: 'bad_token' }, 403, request);
     if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
@@ -861,9 +957,20 @@ export async function onRequest(context) {
     const col = metric === 'deaths' ? 'deaths' : (metric === 'coins' ? 'coins' : 'online_min');
     const limit = Math.max(1, Math.min(100, parseInt(url.searchParams.get('limit') || '30', 10) || 30));
     try {
-      const rows = await TST_DB.prepare('SELECT mc,' + col + ' AS value,ts FROM p3d WHERE ' + col + ' > 0 ORDER BY ' + col + ' DESC, ts DESC LIMIT ?').bind(limit).all();
+      const rows = await TST_DB.prepare('SELECT mc,online_min,deaths,coins,' + col + ' AS value,ts FROM p3d WHERE ' + col + ' > 0 ORDER BY ' + col + ' DESC, ts DESC LIMIT ?').bind(limit).all();
       const cnt = await TST_DB.prepare('SELECT COUNT(*) AS c FROM p3d WHERE ' + col + ' > 0').first();
-      return json({ ok: true, metric: metric, rows: ((rows && rows.results) || []).map(function (r) { return { mc: r.mc, value: Number(r.value) || 0, ts: Number(r.ts) || 0 }; }), total: Number((cnt && cnt.c) || 0), ts: tstNowS() }, 200, request);
+      let mine = null;
+      const nick = await webNick(request);
+      if (nick) {
+        try {
+          const row = await TST_DB.prepare('SELECT mc,online_min,deaths,coins,' + col + ' AS value,ts FROM p3d WHERE mc=? COLLATE NOCASE').bind(nick).first();
+          if (row) {
+            const above = await TST_DB.prepare('SELECT COUNT(*) AS c FROM p3d WHERE ' + col + ' > ?').bind(Number(row.value) || 0).first();
+            mine = { mc: row.mc, value: Number(row.value) || 0, rank: Number((above && above.c) || 0) + 1, total: Number((cnt && cnt.c) || 0), online_min: Number(row.online_min) || 0, coins: Number(row.coins) || 0, deaths: Number(row.deaths) || 0 };
+          }
+        } catch (e) {}
+      }
+      return json({ ok: true, metric: metric, rows: ((rows && rows.results) || []).map(function (r) { return { mc: r.mc, value: Number(r.value) || 0, online_min: Number(r.online_min) || 0, coins: Number(r.coins) || 0, deaths: Number(r.deaths) || 0, ts: Number(r.ts) || 0 }; }), mine: mine, total: Number((cnt && cnt.c) || 0), ts: tstNowS() }, 200, request);
     } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
   }
 
@@ -872,14 +979,17 @@ export async function onRequest(context) {
     if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
     const metric = ['online', 'deaths', 'coins'].includes(url.searchParams.get('metric')) ? url.searchParams.get('metric') : 'online';
     const col = metric === 'deaths' ? 'deaths' : (metric === 'coins' ? 'coins' : 'online_min');
-    const name = String(url.searchParams.get('name') || '').trim().slice(0, 32);
+    const name = String(url.searchParams.get('name') || url.searchParams.get('mc') || '').trim().slice(0, 32);
     if (!name) return json({ ok: false, error: 'bad_name' }, 200, request);
     try {
       const row = await TST_DB.prepare('SELECT mc,' + col + ' AS value,ts,coins,deaths,online_min,inv,armor FROM p3d WHERE mc=? COLLATE NOCASE').bind(name).first();
       if (!row) return json({ ok: false, error: 'not_found' }, 200, request);
       const above = await TST_DB.prepare('SELECT COUNT(*) AS c FROM p3d WHERE ' + col + ' > ?').bind(Number(row.value) || 0).first();
       const cnt = await TST_DB.prepare('SELECT COUNT(*) AS c FROM p3d WHERE ' + col + ' > 0').first();
-      return json({ ok: true, metric: metric, player: { mc: row.mc, value: Number(row.value) || 0, ts: Number(row.ts) || 0, rank: Number((above && above.c) || 0) + 1, total: Number((cnt && cnt.c) || 0), coins: Number(row.coins) || 0, deaths: Number(row.deaths) || 0, online_min: Number(row.online_min) || 0, inv: row.inv || '', armor: row.armor || '' } }, 200, request);
+      const rank = Number((above && above.c) || 0) + 1;
+      const total = Number((cnt && cnt.c) || 0);
+      const stats = { mc: row.mc, value: Number(row.value) || 0, ts: Number(row.ts) || 0, rank: rank, total: total, coins: Number(row.coins) || 0, deaths: Number(row.deaths) || 0, online_min: Number(row.online_min) || 0, inv: row.inv || '', armor: row.armor || '' };
+      return json({ ok: true, ready: true, metric: metric, snapshot: Object.assign({}, stats, { rank_online: rank }), player: stats }, 200, request);
     } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
   }
 
