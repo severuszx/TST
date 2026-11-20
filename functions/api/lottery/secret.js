@@ -1,7 +1,7 @@
-// The Slow Tide 神秘潮汐 —— 密钥核销端点（密钥与兑换码存 Supabase，不在代码里）
+
 const L_START = new Date('2026-10-01T00:30:00+08:00');
 const L_END = new Date('2026-10-08T23:59:59+08:00');
-let ADMIN_PWD = null; // 管理员口令：仅由 onRequest 从环境变量 ADMIN_PWD 注入（仓库不含口令）
+let ADMIN_PWD = null; 
 
 function cnDate(d) {
   return new Date(d.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10);
@@ -89,7 +89,7 @@ export async function onRequestPost(context) {
   if (key !== row.code) {
     return json({ sv: 'secret-file', ok: false, error: 'invalid', serverDate: sdate }, 200, request);
   }
-  // 查看模式：不核销，可无限次查看（与抽奖独立控制；后台标已用即关闭）
+  
   const code = extractCode(row.prize);
   return json({ sv: 'secret-file', ok: true, code: code, serverDate: sdate }, 200, request);
 }

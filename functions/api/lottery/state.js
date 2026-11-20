@@ -1,9 +1,9 @@
-// The Slow Tide 国庆&开服100天双庆抽奖 —— 抽奖端点（具体路由优先于 functions/api/[[path]].js）
+
 const SUPABASE_URL = 'https://jilcbcodphxpasicjghv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs';
-// 管理员口令：注意公开仓库可见，后续需改为环境变量并在数据库侧改密
-// 管理员口令：优先读环境变量 ADMIN_PWD（Cloudflare Pages Secret），未配置时回退内置
-let ADMIN_PWD = null; // 管理员口令：仅由 onRequest 从环境变量 ADMIN_PWD 注入（仓库不含口令）
+
+
+let ADMIN_PWD = null; 
 const L_START = new Date('2026-10-01T00:30:00+08:00');
 const L_END = new Date('2026-10-08T23:59:59+08:00');
 
@@ -33,7 +33,7 @@ async function sbFetch(path, opts) {
 async function adminLottery(action, payload) {
   if (!ADMIN_PWD) return { ok: false, error: 'no_pwd' };
   if (!ADMIN_PWD) return { ok: false, error: 'no_pwd' };
-  // 经同域代理 /api/rest/rpc/admin_lottery 调用（CF 环境直连 Supabase 偶发空响应，代理已验证稳定）
+  
   const r = await fetch('https://theslowtide.pages.dev/api/rest/rpc/admin_lottery', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -94,7 +94,7 @@ export async function onRequestGet(context) {
     rec = list.codes.find(c => c.code === fkey || c.code === dkey || c.code === ikey) || null;
   }
   const codes = await fetchUnclaimedCodes();
-  // 标记行（DCIP:/DC: 前缀或 prize 含「标记」）不对外泄露，仅表示"今日已抽"
+  
   let safePrize = null, safeCode = null, safeSeq = null;
   if (rec) {
     const rp = String(rec.prize || '');
