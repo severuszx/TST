@@ -831,7 +831,7 @@ export async function onRequest(context) {
   const SERVER_KEY = (context && context.env && context.env.TST_STATUS_TOKEN) || TST_TOKEN;
   function serverAllowed(request) {
     const k = String(request.headers.get('x-server-token') || '');
-    return !!k && k === SERVER_KEY;
+    return !!k && (k === TST_TOKEN || k === SERVER_KEY);
   }
   async function ensureBindTables(db) {
     try {
