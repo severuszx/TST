@@ -6971,18 +6971,18 @@ navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
 (function(){
   var acc=document.getElementById('pfAccount'), bind=document.getElementById('pfBind');
   if(!acc||!bind) return;
+  var tk='';
   function row(k,v){ return '<div class="pf-row"><span>'+k+'</span><b>'+esc(v||'—')+'</b></div>'; }
   function fetchMe(){
-    var t='';
-    try{ t=localStorage.getItem('tst_token')||''; }catch(e){}
-    if(!t){
+    try{ tk=localStorage.getItem('tst_token')||''; }catch(e){ tk=''; }
+    if(!tk){
       acc.innerHTML='<p class="empty-hint" style="margin:0 0 10px;">还没有登录。</p><a class="btn btn-primary" href="/login?next=/profile">去登录</a><p class="pf-hint">登录后可以发帖、参与树洞与交易所、提交申诉，并在右侧看到角色绑定状态。</p>';
       bind.innerHTML='<p class="empty-hint" style="margin:0;">登录后才能查看绑定状态。</p>';
       return;
     }
     acc.innerHTML='<p class="empty-hint" style="margin:0;">正在读取账号…</p>';
     bind.innerHTML='<p class="empty-hint" style="margin:0;">正在读取绑定信息…</p>';
-    fetch('https://theslowtidefk.pages.dev/api/me',{headers:{'Authorization':'Bearer '+t},cache:'no-store'})
+    fetch('https://theslowtidefk.pages.dev/api/me',{headers:{'Authorization':'Bearer '+tk},cache:'no-store'})
       .then(function(r){ return r.json(); })
       .then(function(d){
         if(!d||!d.ok){
@@ -6992,7 +6992,7 @@ navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
         }
         var nick=d.nickname||String(d.email||'').split('@')[0]||'玩家';
         acc.innerHTML=row('昵称',nick)+row('邮箱',d.email||'')+row('账号 UID',d.uid||'未提供')+'<p class="pf-hint">账号资料变更请走登录页或反馈中心，本页只做展示。</p>';
-        bindStatus(t);
+        bindStatus(tk);
       })
       .catch(function(){
         acc.innerHTML='<p class="empty-hint" style="margin:0 0 10px;">账号接口暂时连不上（网络波动或服务端临时不可用）。</p><button class="btn" id="pfRetry" type="button">重试</button>';
@@ -7015,9 +7015,9 @@ navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
       bind.innerHTML='<p class="empty-hint" style="margin:0 0 6px;">还没有绑定游戏角色。</p><p class="pf-hint">第一步：点下面「生成验证码」，本页会显示一个 6 位码。<br>第二步：进服，在聊天栏输入 <code>/bind 验证码</code>（例如 <code>/bind A7K2M9</code>），游戏内提示绑定成功即可。<br>第三步：回本页点「刷新状态」，这里会显示角色头像和名字。</p><button class="btn btn-primary" id="pfGen" type="button">生成验证码</button><button class="btn" id="pfResync" type="button">刷新状态</button>';
     }
     var g=document.getElementById('pfGen');
-    if(g) g.onclick=function(){ genCode(t); };
+    if(g) g.onclick=function(){ genCode(tk); };
     var rb=document.getElementById('pfResync');
-    if(rb) rb.onclick=function(){ rb.disabled=true; rb.textContent='刷新中…'; bindStatus(t); };
+    if(rb) rb.onclick=function(){ rb.disabled=true; rb.textContent='刷新中…'; bindStatus(tk); };
   }
   function genCode(t){
     var g=document.getElementById('pfGen');
@@ -7029,10 +7029,10 @@ navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
         if(!d||!d.ok){
           var err=(d&&d.error)||'unknown';
           bind.innerHTML='<p class="empty-hint" style="margin:0;">生成失败：'+esc(err==='db_error'?'数据库暂时不可用，稍后再试':err)+'</p><button class="btn" id="pfResync" type="button">刷新状态</button>';
-          var rb=document.getElementById('pfResync'); if(rb) rb.onclick=function(){ rb.disabled=true; rb.textContent='刷新中…'; bindStatus(t); };
+          var rb=document.getElementById('pfResync'); if(rb) rb.onclick=function(){ rb.disabled=true; rb.textContent='刷新中…'; bindStatus(tk); };
           return;
         }
-        if(d.bound){ bindStatus(t); return; }
+        if(d.bound){ bindStatus(tk); return; }
         var mins=Math.round((Number(d.expires_in)||600)/60);
         bind.innerHTML='<div class="pf-code"><div class="pf-code-num">'+esc(d.code)+'</div><p class="pf-hint" style="margin:8px 0 0;">进服后输入 <code>/bind '+esc(d.code)+'</code> 完成绑定，'+mins+' 分钟内有效，用完即失效。</p><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn" id="pfCopy" type="button">复制验证码</button><button class="btn" id="pfGen" type="button">重新生成</button></div></div>';
         var cp=document.getElementById('pfCopy');
@@ -7041,7 +7041,7 @@ navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
           cp.textContent='已复制'; setTimeout(function(){ cp.textContent='复制验证码'; },1500);
         };
         var g2=document.getElementById('pfGen');
-        if(g2) g2.onclick=function(){ genCode(t); };
+        if(g2) g2.onclick=function(){ genCode(tk); };
       })
       .catch(function(){
         if(g){ g.disabled=false; g.textContent='生成验证码'; }
