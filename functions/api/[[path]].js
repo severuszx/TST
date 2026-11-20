@@ -105,6 +105,38 @@ async function proxyFetch(target, request) {
   return new Response(upstream.body, { status: upstream.status, headers: respHeaders });
 }
 
+// ===== 边缘缓存：GET 只读接口命中 caches.default 直接返回，不再打后端 =====
+function cacheKeyOf(request) {
+  const u = new URL(request.url);
+  u.searchParams.delete('nocache');
+  return new Request(u.toString(), { method: 'GET' });
+}
+function canUseEdgeCache(request) {
+  return request.method === 'GET' && request.url.indexOf('nocache=1') < 0;
+}
+async function edgeGet(request) {
+  try {
+    const hit = await caches.default.match(cacheKeyOf(request));
+    if (!hit) return null;
+    const headers = new Headers(hit.headers);
+    headers.set('X-Cache', 'HIT');
+    return new Response(hit.body, { status: hit.status, headers: headers });
+  } catch (e) { return null; }
+}
+async function edgeStore(ctx, request, upstream, ttl) {
+  try {
+    const text = await upstream.text();
+    const headers = new Headers(upstream.headers);
+    headers.set('Cache-Control', 'public, max-age=' + ttl + ', s-maxage=' + ttl);
+    headers.set('X-Cache', 'MISS');
+    const out = new Response(text, { status: upstream.status, headers: headers });
+    if (upstream.status === 200 && ctx && ctx.waitUntil) {
+      ctx.waitUntil(caches.default.put(cacheKeyOf(request), out.clone()).catch(function () {}));
+    }
+    return out;
+  } catch (e) { return upstream; }
+}
+
 export async function onRequest(context) {
   if (context && context.env && context.env.ADMIN_PWD) ADMIN_PWD = context.env.ADMIN_PWD;
   if (context && context.env && context.env.ADMIN_PWD) ADMIN_PWD = context.env.ADMIN_PWD;
@@ -674,49 +706,79 @@ export async function onRequest(context) {
 
   // 数据/管理接口：转发到数据服务站点
   if (path === '/api/data' || path.startsWith('/api/data/')) {
+    if (request.method !== 'GET') return proxyFetch(DATA_ORIGIN + '/api/data' + url.search, request);
+    const useEdge = canUseEdgeCache(request);
+    if (useEdge) {
+      const hit = await edgeGet(request);
+      if (hit) return hit;
+    }
+    const baseHead = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev' };
     const kv = (context && context.env && context.env.SITE_CACHE) || null;
+    let stale = null, staleAge = 1e9;
     if (kv) {
       try {
         const cached = await kv.get('site_data_v1');
-        if (cached) {
-          try {
-            const cobj = dedupeSiteData(JSON.parse(cached));
-            const ctext = JSON.stringify(cobj);
-            if (ctext !== cached) { try { await kv.put('site_data_v1', ctext, { expirationTtl: 300 }); } catch (e) {} }
-            return new Response(ctext, { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev', 'Cache-Control': 'public, max-age=300, s-maxage=300', 'CDN-Cache-Control': 'public, max-age=300' } });
-          } catch (e) {
-            return new Response(cached, { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev', 'Cache-Control': 'public, max-age=300, s-maxage=300', 'CDN-Cache-Control': 'public, max-age=300' } });
-          }
+        const tsRaw = await kv.get('site_data_v1_ts');
+        if (cached) { stale = cached; staleAge = tsRaw ? (Date.now() - parseInt(tsRaw, 10)) : 1e9; }
+      } catch (e) {}
+    }
+    async function refresh() {
+      const up = await proxyFetch(DATA_ORIGIN + '/api/data' + url.search, request);
+      let text = null;
+      try {
+        const raw = await up.clone().text();
+        const obj = dedupeSiteData(JSON.parse(raw));
+        if (obj && Array.isArray(obj.feeds)) {
+          obj.feeds = obj.feeds.map(function (f) {
+            if (!f) return f;
+            var img = String(f.image || '');
+            if (/^data:image/i.test(img)) { f.image = ''; }
+            var c = String(f.content || '');
+            c = c.replace(/<img[^>]*src=["']data:image[^"']*["'][^>]*>/gi, '');
+            c = c.replace(/data:image\\?\s*\/?[^"'\s,;]{10,}/gi, '');
+            if (c.length > 6000) c = c.slice(0, 6000);
+            f.content = c;
+            return f;
+          });
         }
-      } catch (e) { /* KV 不可用则回源 */ }
-    }
-    const upstream = await proxyFetch(DATA_ORIGIN + '/api/data' + url.search, request);
-    // 瘦身：剥离动态内嵌 base64 大图（如 1MB 截图），单条内容截断，避免 1.9MB 拖垮主线程
-    let slimText = null;
-    try {
-      const raw = await upstream.clone().text();
-      const obj = dedupeSiteData(JSON.parse(raw));
-      if (obj && Array.isArray(obj.feeds)) {
-        obj.feeds = obj.feeds.map(function (f) {
-          if (!f) return f;
-          var img = String(f.image || '');
-          if (/^data:image/i.test(img)) { f.image = ''; }
-          var c = String(f.content || '');
-          c = c.replace(/<img[^>]*src=["']data:image[^"']*["'][^>]*>/gi, '');
-          c = c.replace(/data:image\\?\s*\/?[^"'\s,;]{10,}/gi, '');
-          if (c.length > 6000) c = c.slice(0, 6000);
-          f.content = c;
-          return f;
-        });
-        slimText = JSON.stringify(obj);
+        text = JSON.stringify(obj);
+      } catch (e) {}
+      if (text === null) text = await up.text();
+      if (kv) {
+        try {
+          await kv.put('site_data_v1', text, { expirationTtl: 1800 });
+          await kv.put('site_data_v1_ts', String(Date.now()), { expirationTtl: 1800 });
+        } catch (e) {}
       }
-    } catch (e) { /* 解析失败则原样返回 */ }
-    if (slimText === null) slimText = await upstream.text();
-    if (kv) {
-      try { await kv.put('site_data_v1', slimText, { expirationTtl: 300 }); } catch (e) { /* 写缓存失败不影响响应 */ }
+      return text;
     }
-    return new Response(slimText, { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev', 'Cache-Control': 'public, max-age=300, s-maxage=300', 'CDN-Cache-Control': 'public, max-age=300' } });
+    function wrap(text, tag, ttl) {
+      const headers = new Headers(baseHead);
+      headers.set('Cache-Control', 'public, max-age=30, s-maxage=' + ttl);
+      headers.set('X-Cache', tag);
+      return new Response(text, { status: 200, headers: headers });
+    }
+    if (stale) {
+      // 有旧数据就先给用户，过期了后台再刷：用户永远不等源站那 15 秒
+      if (staleAge > 240 && context.waitUntil) context.waitUntil(refresh().catch(function () {}));
+      const resp = wrap(stale, staleAge > 240 ? 'STALE' : 'KV', 60);
+      if (useEdge && staleAge <= 240 && context.waitUntil) {
+        context.waitUntil(caches.default.put(cacheKeyOf(request), resp.clone()).catch(function () {}));
+      }
+      return resp;
+    }
+    try {
+      const text = await refresh();
+      const resp = wrap(text, 'MISS', 60);
+      if (useEdge && context.waitUntil) {
+        context.waitUntil(caches.default.put(cacheKeyOf(request), resp.clone()).catch(function () {}));
+      }
+      return resp;
+    } catch (e) {
+      return json({ ok: false, error: 'data_unavailable' }, 503, request);
+    }
   }
+
   // 管理员专属：LuckPerms 网页编辑器入口。链接只存 D1，不出现在前端源码。
   if (path === '/api/admin/luckperms') {
     if (!(await tstIsAdmin(request))) return json({ ok: false, error: 'forbidden' }, 403, request);
@@ -780,15 +842,30 @@ export async function onRequest(context) {
 
   // 服务器工具（禁用物品/任务）转发到数据服务站点（反馈站 TSTFK 的 D1）
   if (path.startsWith('/api/tools')) {
+    if (canUseEdgeCache(request)) {
+      const hit = await edgeGet(request);
+      if (hit) return hit;
+      return edgeStore(context, request, await proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request), 45);
+    }
     return proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request);
   }
 
   // 玩家自由发帖（内测·卡密）转发到 TSTFK
   if (path.startsWith('/api/posts')) {
+    if (canUseEdgeCache(request)) {
+      const hit = await edgeGet(request);
+      if (hit) return hit;
+      return edgeStore(context, request, await proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request), 20);
+    }
     return proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request);
   }
 
   // 聊天桥 + 服务器状态转发到 TSTFK
+  if (path.startsWith('/api/server-status') && canUseEdgeCache(request)) {
+    const hit = await edgeGet(request);
+    if (hit) return hit;
+    return edgeStore(context, request, await proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request), 10);
+  }
   if (path.startsWith('/api/chat') || path.startsWith('/api/server-status')) {
     return proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request);
   }
