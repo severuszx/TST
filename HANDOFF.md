@@ -1,7 +1,29 @@
 # TST 接手文档（给三个月后的自己）
 
-## 最新变更（2026-11-20）
-线上最新 commit `8d47466`（514 Commits）。这一轮做了三件事：
+## 最新变更（2026-11-20 晚）
+线上最新 commit `b44d67f`（519 Commits）。三条急件：
+
+**1. 绑定流程改回「官网生成验证码 → 游戏内 /bind」**
+- 现状问题：后端 `functions/api/[[path]].js` 里根本没有 `/api/tst/game/*`，插件 `TSTBind.java` 的 POST/GET 全 404；官网「我的」页又把方向写反（说进服取码），前端也没有任何生成码控件。
+- 新增接口（全部走 D1 `TST_DB`）：
+  - `POST /api/tst/game/bind/code`（登录态 Bearer）→ 生成 6 位码（`ABCDEFGHJKLMNPQRSTUVWXYZ23456789`，排除易混字符），10 分钟有效，同一账号 10 分钟内复用旧码；已绑定则返回 `bound:true`。
+  - `GET /api/tst/game/bind/status`（登录态）→ `{ok,bound,mc,uuid,bound_at}`，供「我的」页展示。
+  - `POST /api/tst/game/bind`（`X-Server-Token`）body `{code,uuid,name,serverId}` → 成功回 `binding{user_id,username,display_name}`；码无效/过期 404、账号或角色已绑他人 409，与插件 `parseBinding` 和提示语完全对齐。
+  - `GET /api/tst/game/bind?uuid=`（`X-Server-Token`）→ 未绑定 404，已绑定回 `ready:true + binding`。
+- 鉴权：`serverAllowed()` 同时接受 `TST_TOKEN` 与线上环境变量 `TST_STATUS_TOKEN`（线上两者不同，只认其一会导致插件 403）。
+- 前端「我的」页：登录后先拉 `/api/tst/game/bind/status`；未绑定显示「生成验证码」+ 生成后大号码 + 复制 + 剩余有效期；已绑定显示 mc-heads 头像与角色名 + 刷新。Wiki FAQ `#wk-faq-bind` 与指令表同步改成「官网取码 → 进服 `/bind 码`」，新增 `/bind` 查状态一行。
+- 表：`bind_code(code PRIMARY KEY, nickname, created_at, used)`、`bind_link(nickname PRIMARY KEY COLLATE NOCASE, uuid, mc, bound_at)`。
+
+**2. 排行榜金币显示错乱 / 角色抽屉打不开**
+- 根因：内嵌模板读 `r.online_min / r.coins / r.deaths`、`/api/rank/player?mc=` 读 `d.ready / d.snapshot`，但后端只回 `rows[{mc,value,ts}]`、参数只认 `name`、返回只有 `player`。三处契约全错配 → 金币列全 0、点角色报 `bad_name`。
+- 修法：后端补齐字段而不是改模板样式（保住「以前的样子」）：`/api/rank/top` 回 `online_min/coins/deaths/value/ts` 并附登录态 `mine`；`/api/rank/player` 同时接受 `mc`/`name`，返回 `ready + snapshot(rank_online) + player`。
+- 顺带：列表头像与抽屉形象从不存在 `/api/skin`、`/assets/skinview3d.js` 换成 `mc-heads.net`（`avatar/40`、`body/180`），删掉 skinview3d 依赖，避免 404 与「3D 皮肤加载中」永久卡住。
+
+**3. 排行榜页面形态**
+- 保持上一轮的内嵌 `embed-rank`（不再走 `/rank.html`），所以顶部不会出现第二层导航与 404 页；这次的「样子怪」是数据错配造成的，不是模板本身。
+
+## 历史变更（2026-11-20 白天）
+线上 commit `8d47466`（514 Commits）。这一轮做了三件事：
 
 **1. 排行榜 404 修复**
 - 现象：排行榜 iframe 加载 `/rank.html` → 404，且 404 页自带顶栏 → 双层导航。
