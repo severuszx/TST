@@ -1314,6 +1314,36 @@ padding:14px 18px;box-shadow:var(--shadow);
 
 .pempty{font-size:13px;color:var(--text-secondary);}
 
+.x-tag{display:inline-block;font-size:11.5px;line-height:1.6;padding:1px 7px;border-radius:4px;border:1px solid var(--border);color:var(--text-secondary);}
+.x-tag.official{color:#b07a2c;border-color:#b07a2c;background:rgba(176,122,44,.1);}
+.x-tag.player{color:#3b6ea5;border-color:#3b6ea5;background:rgba(59,110,165,.1);}
+.x-tag.off{color:#a16207;border-color:#d9a13c;background:rgba(217,161,60,.12);}
+.x-tag.live{color:#15803d;border-color:#3ddc84;background:rgba(61,220,132,.12);}
+.x-tag.done{color:var(--text-secondary);border-color:var(--border);text-decoration:line-through;}
+.x-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 9px;font-size:12px;color:var(--text-secondary);}
+.x-meta .t{opacity:.8;}
+.x-facts{display:grid;gap:8px;margin-top:12px;}
+.x-facts > div{display:grid;grid-template-columns:72px 1fr;gap:10px;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;}
+.x-facts b{color:var(--text-secondary);font-weight:600;}
+.pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.pf-row{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;padding:7px 0;border-bottom:1px solid var(--border);}
+.pf-row:last-child{border-bottom:0;}
+.pf-row span{color:var(--text-secondary);}
+.pf-bindon{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.pf-av{width:40px;height:40px;border-radius:6px;image-rendering:pixelated;border:1px solid var(--border);}
+.pf-actions{display:flex;flex-wrap:wrap;gap:8px;}
+.pf-hint{font-size:12.5px;line-height:1.85;color:var(--text-secondary);margin:8px 0 0;}
+@media(max-width:760px){.pf-grid{grid-template-columns:1fr;}}
+select{font-family:inherit;font-size:13.5px;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px 30px 8px 10px;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b93a3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer;}
+select:focus{border-color:var(--text);}
+input[type="date"],input[type="datetime-local"],input[type="time"]{font-family:inherit;font-size:13.5px;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px 10px;outline:none;}
+input[type="date"]:focus,input[type="datetime-local"]:focus,input[type="time"]:focus{border-color:var(--text);}
+@media(max-width:760px){
+  .btn,button,input,select,textarea{min-height:40px;}
+  select,input[type="date"],input[type="datetime-local"],input[type="time"]{font-size:15px;}
+  .pf-actions .btn{flex:1 1 calc(50% - 8px);text-align:center;}
+}
+
 
 .jperf{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
 .jperf > div{display:flex;flex-direction:column;gap:3px;}
@@ -3015,9 +3045,6 @@ body:has(.embed-page.active){overflow:hidden;}
 .embed-frame{width:100%;height:100%;border:0;display:block;background:transparent;}
 @media (max-width:760px){.embed-shell{height:calc(100vh - 57px);height:calc(100dvh - 57px);}}
 </style>
-<script>
-(function(){ if(location.hash==='#profile'){ location.replace('/profile'); } })();
-</script>
 <style id="tst-more-grid-css">
 .more-menu.more-grid{width:min(440px,calc(100vw - 24px));min-width:0;padding:10px 10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;align-content:start;}
 .more-menu.more-grid .mm-group{grid-column:1/-1;margin:8px 2px 3px;padding-top:7px;font-size:11px;font-weight:800;letter-spacing:3px;color:var(--text-secondary,#8892a6);border-top:1px solid var(--border,#e5e9f2);text-transform:none;}
@@ -3047,6 +3074,10 @@ body:has(.embed-page.active){overflow:hidden;}
 #wk #wkQ{flex:1;min-width:220px;max-width:460px;padding:10px 13px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text);font-size:13.5px;font-family:inherit;outline:none;}
 #wk #wkQ:focus{border-color:var(--text);}
 #wk #wkHint{font-size:12.5px;color:var(--text-secondary);}
+#wk .wk-newbie{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 0;font-size:12.5px;}
+#wk .wk-newbie b{color:var(--text-secondary);font-weight:600;}
+#wk .wk-newbie a{color:var(--text);border:1px solid var(--border);border-radius:4px;padding:3px 9px;text-decoration:none;}
+#wk .wk-newbie a:hover{border-color:var(--text);}
 #wk .wk-body{display:flex;align-items:flex-start;gap:28px;}
 #wk .wk-toc{position:sticky;top:72px;flex:0 0 168px;display:flex;flex-direction:column;border-left:2px solid var(--border);padding-left:0;max-height:calc(100vh - 120px);overflow-y:auto;}
 #wk .wk-toc a{display:block;padding:7px 12px;font-size:13px;color:var(--text-secondary);text-decoration:none;border-left:2px solid transparent;margin-left:-2px;line-height:1.5;}
@@ -3544,7 +3575,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <div class="server-card">
 
-<div class="item"><span class="status-dot" id="statusDot"></span><strong id="statusText">服务器运行中</strong></div>
+<div class="item"><span class="status-dot" id="statusDot"></span><strong id="statusText">服务器运行中</strong><span class="pempty" style="font-size:12px;">由站点配置标注，非实时探测</span></div>
 
 <div class="item"><span class="label">地址：</span><span class="addr" id="serverAddr">mc.163.com/open/mc_realms/?realms=270239C36AD</span>
 
@@ -3735,9 +3766,9 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <div class="card">
 
-<h3>🏁 S1 裂痕杯</h3>
+<h3>🏁 S1 裂痕杯 <span class="x-tag off">筹备中</span></h3>
 
-<p class="date">赛事状态：筹备中</p>
+<div class="x-meta"><span class="t">赛事信息更新于 2026-11，以最新一条公告为准</span></div>
 
 <div class="content">「裂痕杯」是 The Slow Tide 服务器首个官方 PVP 赛事，面向全体玩家开放。赛事采用单人淘汰制，玩家需自备装备，在指定竞技场内进行对决。
 
@@ -3745,13 +3776,19 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 有意参与的玩家可提前做好装备与物资准备。期待在赛场上与各位相见。</div>
 
+<div class="x-facts">
+<div><b>报名方式</b><span>待公布。开放报名后会在「服务器公告」置顶，并在本卡直接显示报名入口。</span></div>
+<div><b>赛程</b><span>待公布。确定后按「报名截止 → 分组 → 淘汰赛 → 决赛」列出日期。</span></div>
+<div><b>奖励</b><span>待公布。发放名单与领取方式会随结果一起公示。</span></div>
+</div>
+
 </div>
 
 <div class="card" style="margin-top:14px;">
 
 <h3>📢 近期赛事动态</h3>
 
-<p class="empty-hint">暂无进行中赛事</p>
+<p class="empty-hint">暂无进行中赛事；已结束的赛事会在回放区标注「已结束」，不再占用这里。</p>
 
 </div>
 
@@ -3775,7 +3812,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <h3>可用兑换码</h3>
 
-<p class="empty-hint">暂无可用兑换码</p>
+<p class="empty-hint">暂无可用兑换码。兑换码由管理员在活动或赞助后发放，有效期与使用条件以发放时的公告为准。兑换失败常见原因：已经用过、已过期、账号还没绑定游戏角色、码输错。</p>
 
 </div>
 
@@ -3810,6 +3847,22 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 <h3>🏆 赞助排行榜</h3>
 
 <div id="sponsorList"></div>
+
+</div>
+
+</div>
+
+<div class="card" style="margin-top:14px;">
+
+<h3>赞助说明</h3>
+
+<div class="x-facts">
+<div><b>到账确认</b><span>扫码付款后，把「金额 + 你的游戏 ID + 付款截图」发到 QQ 群 833470853；管理员核对后 24 小时内登记，状态会在赞助榜更新。</span></div>
+<div><b>是否公开</b><span>默认以游戏 ID 公开鸣谢；付款时在群备注「匿名」则只记金额、不显示名字。</span></div>
+<div><b>发放</b><span>对应的积分或称号在 24 小时内发到已绑定的账号。没绑定角色的，先在「我的」页完成绑定。</span></div>
+</div>
+
+<p class="pf-hint">赞助是自愿支持，不构成等价交换；退款与争议按《商城与赞助协议》处理。</p>
 
 </div>
 
@@ -3898,6 +3951,8 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 <div class="container">
 
 <div class="section-title">聊天室</div>
+
+<p style="margin:-6px 0 14px;color:var(--text-secondary);font-size:13.5px;">网页和游戏内互通：这里发的消息会进服，游戏里说的话也会出现在这里。需要登录官网账号，消息每 12 秒同步一次，单条上限 200 字。</p>
 
 <style>
 .chat-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:15px;font-weight:600;}
@@ -4090,19 +4145,66 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <div class="card">
 
-  <h3 style="margin:0 0 6px;">The Slow Tide 官方客户端</h3>
+  <h3 style="margin:0 0 6px;">The Slow Tide 官方客户端 <span class="x-tag" id="dlVer">读取中</span></h3>
 
   <p style="margin:0 0 14px;color:var(--text-secondary);font-size:14px;">安卓指令工具 · 官网账号登录 · 指令库云端同步 · 选区助手 · 自动部署 · 官网功能直达</p>
 
   <div class="search-row">
 
-    <a class="btn btn-primary" href="TheSlowTide.apk" download>下载 APK（v1.5.5）</a>
+    <a class="btn btn-primary" href="TheSlowTide.apk" download id="dlBtn">下载 APK</a>
 
   </div>
 
-  <p style="margin:12px 0 0;color:var(--text-secondary);font-size:12.5px;">安装时请允许「安装未知应用」。更新内容见公告；客户端更新可直接在应用内公告页下载安装包。</p>
+  <div class="x-facts" style="margin-top:14px;">
+    <div><b>支持系统</b><span>Android 8 及以上（未逐机型验证；装不上请把机型和系统版本发到反馈中心）。iOS 与电脑端不提供 APK，电脑直接用浏览器访问官网。</span></div>
+    <div><b>安装步骤</b><span>下载 APK → 系统提示时允许「安装未知应用」→ 安装完成后打开 → 用官网账号登录 → 在设置里导入指令库。</span></div>
+    <div><b>登录方式</b><span>与官网同一账号：邮箱加密码，或邮箱验证码。登录后指令库、选区配置会在云端同步。</span></div>
+    <div><b>更新日志</b><span id="dlNote">读取中…</span></div>
+  </div>
+
+  <p class="pf-hint" style="margin-top:12px;">历史版本：<a href="TheSlowTide-v1.5.4.apk">v1.5.4</a> · <a href="TheSlowTide-v1.5.2.apk">v1.5.2</a> · <a href="TheSlowTide-v1.4.9.apk">v1.4.9</a> · <a href="TheSlowTide-v1.4.7.apk">v1.4.7</a>。旧版本仅用于回退，功能以最新版为准。</p>
 
 </div>
+
+</div>
+
+</section>
+
+<section id="profile" class="page">
+
+<div class="container">
+
+<div class="section-title">我的</div>
+
+<div class="pf-grid">
+
+<div class="card">
+<h3 style="margin:0 0 10px;">账号</h3>
+<div id="pfAccount"><p class="empty-hint">正在读取…</p></div>
+</div>
+
+<div class="card">
+<h3 style="margin:0 0 10px;">游戏角色</h3>
+<div id="pfBind"><p class="empty-hint">正在读取…</p></div>
+</div>
+
+</div>
+
+<div class="card" style="margin-top:14px;">
+<h3 style="margin:0 0 10px;">快捷入口</h3>
+<div class="pf-actions">
+<a class="btn" href="#feed">动态</a>
+<a class="btn" href="#treehole">树洞</a>
+<a class="btn" href="#rank">排行榜</a>
+<a class="btn" href="#appeal">封禁申诉</a>
+<a class="btn" href="#download">客户端下载</a>
+<a class="btn" href="https://theslowtidefk.pages.dev/" target="_blank" rel="noopener">反馈中心</a>
+<a class="btn" href="/login?next=/profile">忘记密码 / 重新登录</a>
+<button class="btn" id="pfLogout" type="button">退出登录</button>
+</div>
+</div>
+
+<p class="empty-hint" style="margin-top:14px;line-height:1.9;">游客可以直接看公告、动态、Wiki、公约、排行榜和下载页；发帖、树洞、交易所下注、申诉、查看个人数据需要登录。管理员额外可见管理台与策划台。</p>
 
 </div>
 
@@ -4351,6 +4453,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
     <input id="wkQ" type="text" placeholder="搜一下：领地、公会、JEI、横扫之刃、金币" autocomplete="off">
     <span id="wkHint"></span>
   </div>
+  <div class="wk-newbie"><b>新手先看</b><a href="#wk-connect">怎么进服</a><a href="#wk-faq-bind">官网怎么绑定角色</a><a href="#rule">规则红线</a></div>
 </div>
 
 <div class="wk-body">
@@ -4574,8 +4677,11 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
   <p class="wk-note">「按权限组」意思是服务器开着这条指令，但你在当前权限组里可能没有权限。点了没反应就问管理员，别反复试。</p>
 </section>
 
-<section class="wk-sec" id="wk-faq" data-kw="问题 faq 帮助 金币 负数 皮肤 菜单 签到 挂单 报错 版本 领不了">
+<section class="wk-sec" id="wk-faq" data-kw="问题 faq 帮助 金币 负数 皮肤 菜单 签到 挂单 报错 版本 领不了 绑定 bind uid 账号">
   <h2>常见问题 <span class="ver-tag ver-both">通用</span></h2>
+
+  <h3 id="wk-faq-bind">官网账号怎么和游戏角色绑定</h3>
+  <p>先在游戏里输入 <code>/bind 验证码</code> 拿到绑定码，再登录官网，在「我的」页面填入绑定码完成绑定。绑定成功后，个人中心会显示角色 UID 与昵称；官网显示已绑定但游戏里查不到时，回到「我的」页点一次「重新同步」再核对。</p>
 
   <h3>网易版里找不到 /menu 菜单</h3>
   <p>网易版没有 <code>/menu</code> 这种箱子界面，功能在游戏内的「服务器设定」里。这是两边实现不同，不是功能丢了。</p>
@@ -6860,6 +6966,73 @@ function switchPage(pid){
 navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
 
 (function(){
+  var acc=document.getElementById('pfAccount'), bind=document.getElementById('pfBind');
+  if(!acc||!bind) return;
+  function row(k,v){ return '<div class="pf-row"><span>'+k+'</span><b>'+esc(v||'—')+'</b></div>'; }
+  function fetchMe(){
+    var t='';
+    try{ t=localStorage.getItem('tst_token')||''; }catch(e){}
+    if(!t){
+      acc.innerHTML='<p class="empty-hint" style="margin:0 0 10px;">还没有登录。</p><a class="btn btn-primary" href="/login?next=/profile">去登录</a><p class="pf-hint">登录后可以发帖、参与树洞与交易所、提交申诉，并在右侧看到角色绑定状态。</p>';
+      bind.innerHTML='<p class="empty-hint" style="margin:0;">登录后才能查看绑定状态。</p>';
+      return;
+    }
+    acc.innerHTML='<p class="empty-hint" style="margin:0;">正在读取账号…</p>';
+    bind.innerHTML='<p class="empty-hint" style="margin:0;">正在读取绑定信息…</p>';
+    fetch('https://theslowtidefk.pages.dev/api/me',{headers:{'Authorization':'Bearer '+t},cache:'no-store'})
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d||!d.ok){
+          acc.innerHTML='<p class="empty-hint" style="margin:0 0 10px;">登录已失效（可能换了设备或很久没登录）。</p><a class="btn btn-primary" href="/login?next=/profile">重新登录</a>';
+          bind.innerHTML='<p class="empty-hint" style="margin:0;">登录失效，暂时读不到绑定信息。</p>';
+          return;
+        }
+        var nick=d.nickname||String(d.email||'').split('@')[0]||'玩家';
+        acc.innerHTML=row('昵称',nick)+row('邮箱',d.email||'')+row('账号 UID',d.uid||'未提供')+'<p class="pf-hint">账号资料变更请走登录页或反馈中心，本页只做展示。</p>';
+        var mc=d.mc||d.mcid||d.minecraft||'';
+        if(mc){
+          bind.innerHTML='<div class="pf-bindon"><img class="pf-av" alt="" src="https://mc-heads.net/avatar/'+encodeURIComponent(mc)+'/40"><div style="flex:1;"><div class="pf-row"><span>已绑定角色</span><b>'+esc(mc)+'</b></div><div class="pf-row"><span>游戏 UID</span><b>'+esc(d.mcuid||d.game_uid||d.uid||'—')+'</b></div></div></div><button class="btn" id="pfResync" type="button">重新同步</button><p class="pf-hint">官网显示已绑定、游戏内指令却查不到时，先在游戏里重新执行一次 <code>/bind</code>，再回本页点「重新同步」。需要解绑或换绑角色，联系管理员处理。</p>';
+        } else {
+          bind.innerHTML='<p class="empty-hint" style="margin:0;">还没有绑定游戏角色。</p><p class="pf-hint">做法：进服后输入 <code>/bind</code> 取到绑定码，按游戏内提示完成绑定；成功后回本页点「重新同步」，这里会显示角色名、头像与游戏 UID。</p><button class="btn" id="pfResync" type="button">重新同步</button>';
+        }
+        var rb=document.getElementById('pfResync');
+        if(rb) rb.onclick=function(){ rb.disabled=true; rb.textContent='同步中…'; fetchMe(); };
+      })
+      .catch(function(){
+        acc.innerHTML='<p class="empty-hint" style="margin:0 0 10px;">账号接口暂时连不上（网络波动或服务端临时不可用）。</p><button class="btn" id="pfRetry" type="button">重试</button>';
+        bind.innerHTML='<p class="empty-hint" style="margin:0;">绑定信息同样没读到。</p>';
+        var b=document.getElementById('pfRetry');
+        if(b) b.onclick=function(){ b.disabled=true; b.textContent='重试中…'; fetchMe(); };
+      });
+  }
+  var lo=document.getElementById('pfLogout');
+  if(lo) lo.onclick=function(){
+    if(!confirm('退出登录？退出后需要重新登录才能发帖、下注和申诉。')) return;
+    try{ localStorage.removeItem('tst_token'); localStorage.removeItem('tst_email'); localStorage.removeItem('tst_uid'); }catch(e){}
+    fetchMe();
+  };
+  function maybe(){ if((location.hash||'').replace('#','')==='profile') fetchMe(); }
+  window.addEventListener('hashchange', maybe);
+  setTimeout(maybe,0);
+})();
+
+(function(){
+  var ver=document.getElementById('dlVer'), note=document.getElementById('dlNote'), btn=document.getElementById('dlBtn');
+  if(!ver) return;
+  fetch('version.json',{cache:'no-store'}).then(function(r){ return r.json(); }).then(function(d){
+    var v=d.versionName||'';
+    ver.textContent='v'+(v||'未知');
+    if(v) ver.className='x-tag live';
+    if(note) note.textContent=(d.note||'暂无更新说明');
+    if(btn && v) btn.textContent='下载 APK（v'+v+'）';
+  }).catch(function(){
+    ver.textContent='版本信息读取失败';
+    ver.className='x-tag';
+    if(note) note.textContent='更新日志读取失败，可稍后刷新本页重试。';
+  });
+})();
+
+(function(){
   var vb=document.querySelector('[data-nav="vote"]');
   if(!vb) return;
   function tip(){
@@ -7808,7 +7981,7 @@ function renderNotices(){
 
       <h3>${esc(a.title)}</h3>
 
-      <div class="date">${esc(a.date||'')}</div>
+      <div class="x-meta"><span class="x-tag ${a.author?'player':'official'}">${a.author?'玩家投稿':'官方公告'}</span><span class="t">发布于 ${esc(a.date||'时间未标注')}</span></div>
 
       <div class="content collapse-box" id="nbox-${esc(a.id)}">${linkify(a.content)}</div>
 
@@ -10014,14 +10187,31 @@ try{ eval('const __t=()=>1;'); }catch(e){
   }
 
   function ago(ts){
-    if(!ts) return '';
-    var d2=new Date(ts);
-    var hh=('0'+d2.getHours()).slice(-2), mm=('0'+d2.getMinutes()).slice(-2);
-    return '上次刷新 '+hh+':'+mm;
+    if(!ts) return '尚无上报时间';
+    var sec=Math.floor((Date.now()-Number(ts))/1000);
+    if(!(sec>=0)) return '上报时间异常';
+    var rel;
+    if(sec<60) rel='刚刚';
+    else if(sec<3600) rel=Math.floor(sec/60)+' 分钟前';
+    else if(sec<86400) rel=Math.floor(sec/3600)+' 小时前';
+    else rel=Math.floor(sec/86400)+' 天前';
+    var stale=sec*1000>420000;
+    return '更新于 '+rel+(stale?' · 数据可能已过期':'');
   }
 
-  function render(d){
+  function stripMsg(html){ strip.innerHTML=html; }
+
+  function render(d,err){
     d=d||{};
+    if(err){
+      dot.className='status-dot off';
+      st.textContent='状态接口连接出错';
+      cnt.textContent='—'; tps.textContent='—'; upd.textContent='点右侧重试';
+      stripMsg('<span class="pempty">没能连上状态接口（可能是网络波动或服务端临时不可用），下面的在线名单暂时无法确认。</span><button type="button" class="btn" id="javaRetry" style="padding:4px 12px;font-size:12.5px;">重试</button>');
+      var rb=document.getElementById('javaRetry');
+      if(rb) rb.onclick=function(){ rb.disabled=true; rb.textContent='重试中…'; tick(true); };
+      return;
+    }
     var online=!!d.online;
     dot.className='status-dot '+(online?'':(d.reason==='no_data'?'idle':'off'));
     st.textContent=online?'在线':(d.reason==='no_data'?'等待首次上报':'离线');
@@ -10035,11 +10225,11 @@ try{ eval('const __t=()=>1;'); }catch(e){
     if(msp) msp.textContent=(pf&&pf.mspt!==null&&pf.mspt!==undefined)?(pf.mspt+' ms'):'—';
     if(ent) ent.textContent=(pf&&pf.entities!==null&&pf.entities!==undefined)?pf.entities:'—';
     if(!online){
-      strip.innerHTML='<span class="pempty">'+(d.reason==='no_data'?'服务器插件还没上报过状态':'服务器当前未运行')+'</span>';
+      stripMsg('<span class="pempty">'+(d.reason==='no_data'?'服务器插件还没上报过状态，在线名单会在这之后自动出现':'服务器当前未运行，名单为空属于正常')+'</span>');
       return;
     }
     var ps=d.players||[];
-    if(!ps.length){ strip.innerHTML='<span class="pempty">没有玩家在线</span>'; return; }
+    if(!ps.length){ stripMsg('<span class="pempty">当前没有玩家在线</span>'); return; }
     strip.innerHTML='';
     ps.forEach(function(p){
       var chip=document.createElement('div'); chip.className='pchip';
@@ -10053,11 +10243,13 @@ try{ eval('const __t=()=>1;'); }catch(e){
     });
   }
 
-  function tick(){
+  var firstLoad=true;
+  function tick(force){
+    if(firstLoad && !force){ st.textContent='正在读取服务器状态…'; }
     fetch(URL_STATE,{cache:'no-store'})
-      .then(function(r){return r.json();})
-      .then(render)
-      .catch(function(){ render({online:false,reason:'error'}); });
+      .then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+      .then(function(d){ firstLoad=false; render(d); })
+      .catch(function(){ firstLoad=false; render({}, 'error'); });
   }
   if(copyBtn){
     copyBtn.addEventListener('click',function(){
@@ -10908,7 +11100,7 @@ footer b{color:var(--wine)}
 <iframe id="authRelay" src="https://theslowtide.pages.dev/auth-relay.html" style="display:none"></iframe>
 
 <script>
-/* ===== 登录（本页邮箱+验证码，与主站同账号）===== */
+
 var AUTH='https://theslowtidefk.pages.dev/api';
 var mask=document.getElementById('loginMask'),dlgMsg=document.getElementById('dlgMsg'),
     emailEl=document.getElementById('loginEmail'),codeEl=document.getElementById('loginCode'),
@@ -10967,7 +11159,7 @@ function refreshUser(){
     }
   }).catch(function(){});
 }
-/* 读主站已有登录态 */
+
 var relay=document.getElementById('authRelay');
 relay.addEventListener('load',function(){try{relay.contentWindow.postMessage({type:'tst-auth-request'},'https://theslowtide.pages.dev');}catch(e){}});
 window.addEventListener('message',function(e){
@@ -10978,7 +11170,7 @@ window.addEventListener('message',function(e){
 });
 refreshUser();
 
-/* ===== 目录高亮（静态跟随，无动画）===== */
+
 var links=Array.prototype.slice.call(document.querySelectorAll('#toc a,#tocMob a'));
 var secs=Array.prototype.slice.call(document.querySelectorAll('.sec,#hero'));
 var so=new IntersectionObserver(function(es){
@@ -10991,12 +11183,12 @@ var so=new IntersectionObserver(function(es){
 },{rootMargin:'-45% 0px -50%'});
 secs.forEach(function(s){so.observe(s);});
 
-/* 移动端抽屉 */
+
 var burger=document.getElementById('burger'),tocMob=document.getElementById('tocMob');
 burger.addEventListener('click',function(){burger.classList.toggle('open');tocMob.classList.toggle('open');});
 tocMob.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){burger.classList.remove('open');tocMob.classList.remove('open');});});
 
-/* ===== 地图任务点 ===== */
+
 var TASKS={
 hogsmeade:{title:'霍格莫德 · 妖精工坊问询',tag:'主线·三年级',
  desc:'前往霍格莫德妖精工坊，询问 1890 年贮藏库封印的历史记录。',
@@ -11031,7 +11223,7 @@ pins.forEach(function(p){
 document.getElementById('tpClose').addEventListener('click',function(){pop.classList.remove('show');});
 wrap.addEventListener('click',function(e){if(!e.target.closest('.map-pin'))pop.classList.remove('show');});
 
-/* ===== 音乐：默认开 ===== */
+
 var mus=document.getElementById('mus'),bgm=document.getElementById('bgm');
 mus.addEventListener('click',function(){
   if(bgm.paused){bgm.volume=.5;bgm.play().catch(function(){});mus.classList.remove('off');}
@@ -11777,6 +11969,10 @@ font-size:21px;font-weight:700;margin-bottom:18px;color:var(--primary);
 .section-title::before{
 content:'';width:5px;height:22px;border-radius:0;background:var(--accent);
 }
+.tool-search{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 16px;}
+.tool-search input{flex:1;min-width:220px;max-width:420px;padding:9px 12px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-size:13.5px;font-family:inherit;outline:none;}
+.tool-search input:focus{border-color:var(--accent);}
+.tool-search span{font-size:12.5px;color:var(--text-secondary);}
 .tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
 .tool-card{
 background:var(--card);border:1px solid var(--border);border-radius:10px;
@@ -12715,24 +12911,27 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 
 <div id="toolList">
 <div class="section-title">便捷工具</div>
-<div class="tool-grid">
-<div class="tool-card" onclick="openCompiler()">
+<p style="margin:-6px 0 14px;color:var(--text-secondary);font-size:13.5px;">不用登录，全部在本机浏览器里完成，输入的文本和图片不会上传服务器。</p>
+<div class="tool-search"><input id="toolQ" type="text" placeholder="搜索工具：JSON、Base64、地图画、T显" autocomplete="off"><span id="toolQHint"></span></div>
+<div class="tool-grid" id="toolGrid">
+<div class="tool-card" data-kw="t显 文本 编译器 text 选择器 记分板 翻译键 json" onclick="openCompiler()">
 <h3>T显编译器</h3>
 <p>生成 Minecraft JSON 文本，支持文本 / 选择器 / 记分板 / 翻译键元素。</p>
 </div>
-<div class="tool-card" onclick="openJson()">
+<div class="tool-card" data-kw="json 格式化 压缩 转义 反转义" onclick="openJson()">
 <h3>JSON 工具</h3>
 <p>格式化 · 压缩 · 转义 · 反转义，快速处理 JSON 文本。</p>
 </div>
-<div class="tool-card" onclick="openMapArt()">
+<div class="tool-card" data-kw="地图画 图片 方块 fill setblock mapart 像素" onclick="openMapArt()">
 <h3>地图画生成器</h3>
 <p>图片转方块指令（fill / setblock），在游戏内一键铺出地图画。</p>
 </div>
-<div class="tool-card" onclick="openB64()">
+<div class="tool-card" data-kw="base64 图片 编码 解码 互转" onclick="openB64()">
 <h3>Base64 工具</h3>
 <p>图片 ⇄ Base64 互转，压缩图片为字符串，或把字符串还原为图片。</p>
 </div>
 </div>
+<div id="toolQEmpty" style="display:none;color:var(--text-secondary);font-size:13px;padding:10px 0;">没有匹配的工具，换个关键词试试。</div>
 </div>
 
 
@@ -12999,6 +13198,25 @@ $('#jsonPage').classList.remove('show');
 $('#base64Page').classList.remove('show');
 $('#toolList').style.display='block';
 }
+(function(){
+  var q=document.getElementById('toolQ'), hint=document.getElementById('toolQHint'), emp=document.getElementById('toolQEmpty');
+  if(!q) return;
+  var cards=[].slice.call(document.querySelectorAll('#toolGrid .tool-card'));
+  function run(){
+    var kw=(q.value||'').trim().toLowerCase();
+    var n=0;
+    cards.forEach(function(c){
+      var hay=(c.getAttribute('data-kw')+' '+c.textContent).toLowerCase();
+      var hit=!kw||hay.indexOf(kw)>=0;
+      c.style.display=hit?'':'none';
+      if(hit) n++;
+    });
+    if(emp) emp.style.display=n?'none':'block';
+    if(hint) hint.textContent=kw?(n?'匹配 '+n+' 个工具':'') : '';
+  }
+  q.addEventListener('input',run);
+  q.addEventListener('keydown',function(e){ if(e.key==='Escape'){ q.value=''; run(); } });
+})();
 function jTool(mode){
 const txt=$('#jsonIn').value;
 const out=$('#jsonOut');
@@ -13084,7 +13302,7 @@ $('#verHint').textContent=hint;
 updateAll();
 }
 
-/* ===== 渲染元素列表 ===== */
+
 function renderElems(){
 const box=$('#elemList');
 box.innerHTML='';
@@ -13233,7 +13451,7 @@ elems.push(newElem('text'));
 renderElems();
 }
 
-/* ===== 生成 JSON ===== */
+
 function elemToJson(el){
 const obj={};
 if(currentVer==='netease' && el.type==='text'){
@@ -13273,7 +13491,7 @@ const list=elems.map(elemToJson);
 return JSON.stringify(list.length===1?list[0]:list);
 }
 
-/* ===== 预览 ===== */
+
 function getCssColor(name){
 const map={
 'black':'#000','dark_blue':'#00a','dark_green':'#0a0','dark_aqua':'#0aa',
@@ -13313,7 +13531,7 @@ $('#previewBox').innerHTML=elems.map(elemPreviewHtml).join('');
 $('#outputBox').textContent=buildJson();
 }
 
-/* ===== 复制 / 重置 ===== */
+
 function copyCode(){
 const code=$('#outputBox').textContent;
 if(!code) return;
@@ -14112,7 +14330,7 @@ function render() {
   el('rkTotal').textContent = state.total || 0;
   if (rows.length) el('rkTime').textContent = '同步 ' + ago(rows[0].ts);
   if (!rows.length) {
-    box.innerHTML = '<div class="empty"><b>榜上还没有数据</b>服务器插件正在采集，需要至少有一名玩家在线 2 分钟以上。<br>进服玩一会儿，这里就会出现名字。</div>';
+    box.innerHTML = '<div class="empty"><b>榜上还没有数据</b>服务器插件约每 2 分钟上报一次；有玩家在线满 2 分钟后，榜单会在下一次同步出现。<br>进服玩一会儿，这里就会出现名字。</div>';
     return;
   }
   var html = '';
@@ -14139,12 +14357,18 @@ function render() {
   });
 }
 
+function bindRetry() {
+  var b = el('rkRetry');
+  if (b) b.onclick = function () { load(state.metric); };
+}
+
 function load(metric) {
   state.metric = metric || state.metric;
   el('rkList').innerHTML = '<div class="empty">正在读取…</div>';
   api('/api/rank/top?metric=' + state.metric + '&limit=30').then(function (d) {
     if (!d || !d.ok) {
-      el('rkList').innerHTML = '<div class="empty"><b>读取失败</b>' + esc((d && d.error) || 'unknown') + '</div>';
+      el('rkList').innerHTML = '<div class="empty"><b>读取失败</b>接口返回 ' + esc((d && d.error) || 'unknown') + '<br><button type="button" id="rkRetry" style="margin-top:10px;padding:5px 14px;font-size:12.5px;">重试</button></div>';
+      bindRetry();
       return;
     }
     state.rows = d.rows || [];
@@ -14153,11 +14377,12 @@ function load(metric) {
     renderMine();
     render();
   }).catch(function () {
-    el('rkList').innerHTML = '<div class="empty"><b>网络异常</b>稍后刷新重试</div>';
+    el('rkList').innerHTML = '<div class="empty"><b>网络异常</b>没能连上排行榜接口，可能是网络波动。<br><button type="button" id="rkRetry" style="margin-top:10px;padding:5px 14px;font-size:12.5px;">重试</button></div>';
+    bindRetry();
   });
 }
 
-/* ---------------- 详情抽屉 ---------------- */
+
 function openPlayer(mc) {
   document.body.classList.add('open');
   el('dName').textContent = mc;
@@ -14204,7 +14429,7 @@ function mountSkin(s) {
       if (v.controls) { v.controls.enableZoom = false; v.controls.enablePan = false; }
       state.viewer = v;
       return;
-    } catch (e) { /* 回落 */ }
+    } catch (e) { }
   }
   if (u) {
     stage.innerHTML = '<div style="width:100%;height:100%;background:url(\'' + u + '\') -100% -100%/800% 800% no-repeat;image-rendering:pixelated"></div>';
@@ -14774,7 +14999,7 @@ button{font-family:inherit;}
   function renderList() {
     var d = state.data;
     var box = el('mkList');
-    if (!d.items.length) { box.innerHTML = '<div class="mk-empty">暂无行情数据<br>等待插件上报</div>'; return; }
+    if (!d.items.length) { box.innerHTML = '<div class="mk-empty">暂无行情数据<br>插件按天上报价格；有报价后这里会显示最新买入价与涨跌，并在标题旁标出同步时间。</div>'; return; }
     box.innerHTML = '';
     d.items.forEach(function (it) {
       var row = document.createElement('div');
@@ -14870,15 +15095,22 @@ button{font-family:inherit;}
     var q = item ? '?item=' + encodeURIComponent(item) : '';
     api('/api/market/state' + q).then(function (d) {
       if (!d || !d.ok) {
-        el('mkList').innerHTML = '<div class="mk-empty">行情接口异常：' + ((d && d.error) || 'unknown') + '</div>';
+        el('mkList').innerHTML = '<div class="mk-empty">行情接口异常：' + ((d && d.error) || 'unknown') + '<br><button type="button" id="mkRetry" style="margin-top:10px;padding:5px 14px;font-size:12.5px;">重试</button></div>';
+        bindMarketRetry(item);
         return;
       }
       state.data = d;
       state.item = d.focus || '';
       render();
     }).catch(function () {
-      el('mkList').innerHTML = '<div class="mk-empty">网络异常，稍后再试</div>';
+      el('mkList').innerHTML = '<div class="mk-empty">网络异常，稍后再试<br><button type="button" id="mkRetry" style="margin-top:10px;padding:5px 14px;font-size:12.5px;">重试</button></div>';
+      bindMarketRetry(item);
     });
+  }
+
+  function bindMarketRetry(item) {
+    var b = el('mkRetry');
+    if (b) b.onclick = function () { load(item); };
   }
 
   document.querySelectorAll('.mk-dir button').forEach(function (b) {
@@ -14906,6 +15138,8 @@ button{font-family:inherit;}
     if (!TOKEN) { say('请先登录后再下注', true); return; }
     if (!state.item) { say('先选一个物品', true); return; }
     if (!(state.stake >= 100)) { say('下注金额至少 100', true); return; }
+    var dirTx = state.dir === 'up' ? '看涨' : '看跌';
+    if (!confirm('确认下注：' + state.item + ' · ' + dirTx + ' · ' + state.stake + ' 金币？下注后当天不能撤销。')) return;
     var btn = el('mkBetBtn');
     btn.disabled = true;
     api('/api/market/bet', { method: 'POST', body: JSON.stringify({ item: state.item, dir: state.dir, stake: state.stake }) })
@@ -15400,7 +15634,7 @@ button{font-family:inherit;}
       <span class="th-count" id="thCount">0 / 300</span>
       <button class="th-btn" id="thPostBtn" type="button">匿名发布</button>
     </div>
-    <div class="th-note" id="thMsg">登录后才可以发帖，发布时不会保存你的昵称。</div>
+    <div class="th-note" id="thMsg">登录后才能发布。规则：2-300 字，60 秒一条，每天最多 5 条；发布后公开可赞，但不显示你的昵称。</div>
   </div>
 
   <div class="th-tabs">
@@ -15959,7 +16193,7 @@ button{font-family:inherit;}
 
 <main class="container ap-main">
   <div class="ap-title">封禁申诉</div>
-  <div class="ap-sub">被 BAN 后在这里说明情况，管理员审批通过会自动下发解封指令。</div>
+  <div class="ap-sub">被 BAN 后在这里说明情况，管理员审批通过会自动下发解封指令。正文请写清游戏 ID、大概被封时间、当时在做什么、认为误判的理由；一般 3 个工作日内回复，结果同时出现在下方「我的申诉记录」里。</div>
 
   <div class="ap-card">
     <h3>我的角色</h3>

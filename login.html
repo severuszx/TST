@@ -353,6 +353,29 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
     if(input) input.classList.remove('err');
     if(hint && msg!==undefined){ hint.className='hint'; hint.textContent=msg; }
   }
+  function humanizeFail(d){
+    var m=String((d&&d.msg)||''), c=String((d&&(d.code||d.error))||'');
+    if(/人机验证|turnstile|captcha/i.test(m)||/captcha|turnstile/i.test(c)){
+      return {t:'人机验证没有通过', s:'常见原因：网络或代理拦截了验证脚本、验证已超时、浏览器拦截了第三方请求。点下面「重试」再登一次；连续失败可换网络或稍后再试，不是账号被锁。'};
+    }
+    if(/密码/i.test(m)) return {t:m, s:'记不清密码的话，点下面「忘记密码」，用注册邮箱收验证码重置即可。'};
+    if(/不存在|未注册|没有账号/i.test(m)) return {t:m, s:'这个邮箱还没有官网账号，可以用同一个邮箱先注册。'};
+    if(/频繁|稍后|限制|过多/i.test(m)) return {t:m, s:'触发了频率限制，等 1 分钟左右再试。'};
+    if(/验证码/i.test(m)) return {t:m, s:'验证码 10 分钟内有效，过期或输错都要重新获取。'};
+    return {t:m||'登录失败', s:''};
+  }
+  function showLoginFail(d){
+    var f=humanizeFail(d), h=$('loginHint');
+    h.innerHTML='';
+    var t=document.createElement('span'); t.textContent=f.t; h.appendChild(t);
+    if(f.s){ var s=document.createElement('div'); s.style.cssText='font-size:12.5px;color:var(--text-secondary);margin-top:5px;line-height:1.7;'; s.textContent=f.s; h.appendChild(s); }
+    var b=document.createElement('button');
+    b.type='button'; b.className='btn'; b.style.cssText='margin-top:9px;padding:5px 12px;font-size:12.5px;';
+    b.textContent='重试';
+    b.onclick=function(){ h.innerHTML=''; doLogin(); };
+    h.appendChild(b);
+    toast(f.t,'err');
+  }
 
   
   window.switchView=function(name){
@@ -450,8 +473,7 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
           toast('登录成功，欢迎回来','ok');
           setTimeout(function(){ location.href='profile.html'; },900);
         }else{
-          toast((d&&d.msg)||'登录失败','err');
-          $('loginHint').textContent=(d&&d.msg)||'登录失败';
+          showLoginFail(d);
         }
       })
       .catch(function(){ btn.disabled=false; btn.innerHTML='登录'; toast('网络异常，请稍后再试','err'); });
