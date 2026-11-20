@@ -1332,6 +1332,8 @@ padding:14px 18px;box-shadow:var(--shadow);
 .pf-bindon{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
 .pf-av{width:40px;height:40px;border-radius:6px;image-rendering:pixelated;border:1px solid var(--border);}
 .pf-actions{display:flex;flex-wrap:wrap;gap:8px;}
+.pf-code{margin-top:10px;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);}
+.pf-code-num{font-family:ui-monospace,Consolas,monospace;font-size:26px;font-weight:700;letter-spacing:4px;color:var(--text);}
 .pf-hint{font-size:12.5px;line-height:1.85;color:var(--text-secondary);margin:8px 0 0;}
 @media(max-width:760px){.pf-grid{grid-template-columns:1fr;}}
 select{font-family:inherit;font-size:13.5px;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px 30px 8px 10px;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b93a3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer;}
@@ -4672,7 +4674,8 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
     <tr><td><code>/warp 名字</code></td><td>去公共传送点</td><td>按权限组</td></tr>
     <tr><td><code>/tpa 玩家</code> <code>/tpaccept</code> <code>/tpdeny</code></td><td>请求互传 / 同意 / 拒绝</td><td>按权限组</td></tr>
     <tr><td><code>/rtp</code></td><td>随机传送</td><td>按权限组</td></tr>
-    <tr><td><code>/bind 验证码</code></td><td>把游戏角色绑到官网账号</td><td>所有人</td></tr>
+    <tr><td><code>/bind 验证码</code></td><td>把游戏角色绑到官网账号（验证码在官网「我的」页生成）</td><td>所有人</td></tr>
+    <tr><td><code>/bind</code></td><td>查看当前绑定状态</td><td>所有人</td></tr>
   </table>
   <p class="wk-note">「按权限组」意思是服务器开着这条指令，但你在当前权限组里可能没有权限。点了没反应就问管理员，别反复试。</p>
 </section>
@@ -4681,7 +4684,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
   <h2>常见问题 <span class="ver-tag ver-both">通用</span></h2>
 
   <h3 id="wk-faq-bind">官网账号怎么和游戏角色绑定</h3>
-  <p>先在游戏里输入 <code>/bind 验证码</code> 拿到绑定码，再登录官网，在「我的」页面填入绑定码完成绑定。绑定成功后，个人中心会显示角色 UID 与昵称；官网显示已绑定但游戏里查不到时，回到「我的」页点一次「重新同步」再核对。</p>
+  <p>第一步，登录官网，打开「我的」页面，点「生成验证码」，页面上会出现一个 6 位码（例如 <code>A7K2M9</code>），10 分钟内有效。第二步，进服后在聊天栏输入 <code>/bind A7K2M9</code>（把码换成你自己的），游戏内提示绑定成功就完成了。第三步，回官网「我的」页点一次「刷新状态」，那里会显示角色头像和名字。验证码只用于一次绑定，用完作废；想换角色要先解绑，找管理员处理。</p>
 
   <h3>网易版里找不到 /menu 菜单</h3>
   <p>网易版没有 <code>/menu</code> 这种箱子界面，功能在游戏内的「服务器设定」里。这是两边实现不同，不是功能丢了。</p>
@@ -6989,20 +6992,60 @@ navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
         }
         var nick=d.nickname||String(d.email||'').split('@')[0]||'玩家';
         acc.innerHTML=row('昵称',nick)+row('邮箱',d.email||'')+row('账号 UID',d.uid||'未提供')+'<p class="pf-hint">账号资料变更请走登录页或反馈中心，本页只做展示。</p>';
-        var mc=d.mc||d.mcid||d.minecraft||'';
-        if(mc){
-          bind.innerHTML='<div class="pf-bindon"><img class="pf-av" alt="" src="https://mc-heads.net/avatar/'+encodeURIComponent(mc)+'/40"><div style="flex:1;"><div class="pf-row"><span>已绑定角色</span><b>'+esc(mc)+'</b></div><div class="pf-row"><span>游戏 UID</span><b>'+esc(d.mcuid||d.game_uid||d.uid||'—')+'</b></div></div></div><button class="btn" id="pfResync" type="button">重新同步</button><p class="pf-hint">官网显示已绑定、游戏内指令却查不到时，先在游戏里重新执行一次 <code>/bind</code>，再回本页点「重新同步」。需要解绑或换绑角色，联系管理员处理。</p>';
-        } else {
-          bind.innerHTML='<p class="empty-hint" style="margin:0;">还没有绑定游戏角色。</p><p class="pf-hint">做法：进服后输入 <code>/bind</code> 取到绑定码，按游戏内提示完成绑定；成功后回本页点「重新同步」，这里会显示角色名、头像与游戏 UID。</p><button class="btn" id="pfResync" type="button">重新同步</button>';
-        }
-        var rb=document.getElementById('pfResync');
-        if(rb) rb.onclick=function(){ rb.disabled=true; rb.textContent='同步中…'; fetchMe(); };
+        bindStatus(t);
       })
       .catch(function(){
         acc.innerHTML='<p class="empty-hint" style="margin:0 0 10px;">账号接口暂时连不上（网络波动或服务端临时不可用）。</p><button class="btn" id="pfRetry" type="button">重试</button>';
         bind.innerHTML='<p class="empty-hint" style="margin:0;">绑定信息同样没读到。</p>';
         var b=document.getElementById('pfRetry');
         if(b) b.onclick=function(){ b.disabled=true; b.textContent='重试中…'; fetchMe(); };
+      });
+  }
+  function bindStatus(t){
+    fetch('/api/tst/game/bind/status',{headers:{'Authorization':'Bearer '+t},cache:'no-store'})
+      .then(function(r){ return r.json(); })
+      .then(function(d){ bindRender(d&&d.ok?d:{bound:false}); })
+      .catch(function(){ bindRender({bound:false}); });
+  }
+  function bindRender(d){
+    var bound=!!(d&&d.bound&&d.mc);
+    if(bound){
+      bind.innerHTML='<div class="pf-bindon"><img class="pf-av" alt="" src="https://mc-heads.net/avatar/'+encodeURIComponent(d.mc)+'/40"><div style="flex:1;"><div class="pf-row"><span>已绑定角色</span><b>'+esc(d.mc)+'</b></div><div class="pf-row"><span>绑定方式</span><b>验证码</b></div></div></div><button class="btn" id="pfResync" type="button">刷新状态</button><p class="pf-hint">换角色需要先在游戏里执行 <code>/bind unbind</code> 看解绑说明，或联系管理员在后台解除。</p>';
+    }else{
+      bind.innerHTML='<p class="empty-hint" style="margin:0 0 6px;">还没有绑定游戏角色。</p><p class="pf-hint">第一步：点下面「生成验证码」，本页会显示一个 6 位码。<br>第二步：进服，在聊天栏输入 <code>/bind 验证码</code>（例如 <code>/bind A7K2M9</code>），游戏内提示绑定成功即可。<br>第三步：回本页点「刷新状态」，这里会显示角色头像和名字。</p><button class="btn btn-primary" id="pfGen" type="button">生成验证码</button><button class="btn" id="pfResync" type="button">刷新状态</button>';
+    }
+    var g=document.getElementById('pfGen');
+    if(g) g.onclick=function(){ genCode(t); };
+    var rb=document.getElementById('pfResync');
+    if(rb) rb.onclick=function(){ rb.disabled=true; rb.textContent='刷新中…'; bindStatus(t); };
+  }
+  function genCode(t){
+    var g=document.getElementById('pfGen');
+    if(g){ g.disabled=true; g.textContent='生成中…'; }
+    fetch('/api/tst/game/bind/code',{method:'POST',headers:{'Authorization':'Bearer '+t},cache:'no-store'})
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(g){ g.disabled=false; g.textContent='重新生成验证码'; }
+        if(!d||!d.ok){
+          var err=(d&&d.error)||'unknown';
+          bind.innerHTML='<p class="empty-hint" style="margin:0;">生成失败：'+esc(err==='db_error'?'数据库暂时不可用，稍后再试':err)+'</p><button class="btn" id="pfResync" type="button">刷新状态</button>';
+          var rb=document.getElementById('pfResync'); if(rb) rb.onclick=function(){ rb.disabled=true; rb.textContent='刷新中…'; bindStatus(t); };
+          return;
+        }
+        if(d.bound){ bindStatus(t); return; }
+        var mins=Math.round((Number(d.expires_in)||600)/60);
+        bind.innerHTML='<div class="pf-code"><div class="pf-code-num">'+esc(d.code)+'</div><p class="pf-hint" style="margin:8px 0 0;">进服后输入 <code>/bind '+esc(d.code)+'</code> 完成绑定，'+mins+' 分钟内有效，用完即失效。</p><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn" id="pfCopy" type="button">复制验证码</button><button class="btn" id="pfGen" type="button">重新生成</button></div></div>';
+        var cp=document.getElementById('pfCopy');
+        if(cp) cp.onclick=function(){
+          try{ if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(d.code); }catch(e){}
+          cp.textContent='已复制'; setTimeout(function(){ cp.textContent='复制验证码'; },1500);
+        };
+        var g2=document.getElementById('pfGen');
+        if(g2) g2.onclick=function(){ genCode(t); };
+      })
+      .catch(function(){
+        if(g){ g.disabled=false; g.textContent='生成验证码'; }
+        bind.innerHTML='<p class="empty-hint" style="margin:0;">网络异常，稍后再试。</p>';
       });
   }
   var lo=document.getElementById('pfLogout');
@@ -14246,7 +14289,6 @@ body.open .drawer{transform:none}
   </div>
 </div>
 
-<script src="/assets/skinview3d.js"><\/script>
 <script>
 var TOKEN = '';
 try { TOKEN = localStorage.getItem('tst_token') || ''; } catch (e) { TOKEN = ''; }
@@ -14338,7 +14380,7 @@ function render() {
     var v = Number(state.metric === 'online' ? r.online_min : (state.metric === 'coins' ? r.coins : r.deaths)) || 0;
     html += '<div class="row" data-r="' + (i + 1) + '" data-mc="' + esc(r.mc) + '">'
       + '<div class="no">' + (i + 1) + '</div>'
-      + '<div class="av" data-skin="' + esc(skinHash(r.skin)) + '"></div>'
+      + '<div class="av" data-mc="' + esc(r.mc) + '"></div>'
       + '<div class="nm"><b>' + esc(r.mc) + '</b><span>' + ago(r.ts) + ' · 在线 ' + shortVal(r.online_min) + '</span></div>'
       + '<div class="val"><b>' + (state.metric === 'online' ? shortVal(v) : fmtInt(v)) + '</b><span>' + (state.metric === 'online' ? '累计在线' : (state.metric === 'coins' ? '金币' : '次数')) + '</span></div>'
       + '</div>';
@@ -14348,11 +14390,11 @@ function render() {
     row.onclick = function () { openPlayer(row.getAttribute('data-mc')); };
   });
   box.querySelectorAll('.av').forEach(function (av) {
-    var h = av.getAttribute('data-skin');
-    if (h) {
-      av.style.backgroundImage = 'url("/api/skin?t=' + h + '")';
-      av.style.backgroundSize = '800% 800%';
-      av.style.backgroundPosition = '-100% -100%';
+    var mc = av.getAttribute('data-mc');
+    if (mc) {
+      av.style.backgroundImage = 'url("https://mc-heads.net/avatar/' + encodeURIComponent(mc) + '/40")';
+      av.style.backgroundSize = 'cover';
+      av.style.backgroundPosition = 'center';
     }
   });
 }
@@ -14416,26 +14458,9 @@ function openPlayer(mc) {
 
 function mountSkin(s) {
   var stage = el('dStage');
-  var u = skinUrl(s.skin);
-  if (window.skinview3d && u) {
-    stage.innerHTML = '<canvas id="dCanvas" width="240" height="300"></canvas><div class="hint">按住拖动可旋转</div>';
-    try {
-      var v = new window.skinview3d.SkinViewer({
-        canvas: el('dCanvas'), width: 240, height: 300, skin: u, model: 'auto-detect'
-      });
-      v.zoom = 0.9;
-      v.autoRotate = true; v.autoRotateSpeed = 0.55;
-      v.animation = new window.skinview3d.IdleAnimation();
-      if (v.controls) { v.controls.enableZoom = false; v.controls.enablePan = false; }
-      state.viewer = v;
-      return;
-    } catch (e) { }
-  }
-  if (u) {
-    stage.innerHTML = '<div style="width:100%;height:100%;background:url(\'' + u + '\') -100% -100%/800% 800% no-repeat;image-rendering:pixelated"></div>';
-    return;
-  }
-  stage.innerHTML = '<div class="fallback">这个角色没有可读的皮肤纹理<br>（离线账号或未上报）</div>';
+  var mc = (s && s.mc) || '';
+  if (!mc) { stage.innerHTML = '<div class="fallback">没有角色名</div>'; return; }
+  stage.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><img alt="" style="width:150px;height:auto;image-rendering:pixelated;" src="https://mc-heads.net/body/' + encodeURIComponent(mc) + '/180"></div><div class="hint">形象由皮肤站生成，非正版账号显示默认皮肤</div>';
 }
 
 el('dClose').onclick = function () { document.body.classList.remove('open'); };
