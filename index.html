@@ -14378,7 +14378,7 @@ function render() {
   var html = '';
   rows.forEach(function (r, i) {
     var v = Number(state.metric === 'online' ? r.online_min : (state.metric === 'coins' ? r.coins : r.deaths)) || 0;
-    html += '<div class="row" data-r="' + (i + 1) + '" data-mc="' + esc(r.mc) + '">'
+    html += '<div class="row" data-r="' + (i + 1) + '" data-mc="' + esc(r.mc) + '" onclick="openPlayer(this.getAttribute(\'data-mc\'))">'
       + '<div class="no">' + (i + 1) + '</div>'
       + '<div class="av" data-mc="' + esc(r.mc) + '"></div>'
       + '<div class="nm"><b>' + esc(r.mc) + '</b><span>' + ago(r.ts) + ' · 在线 ' + shortVal(r.online_min) + '</span></div>'
