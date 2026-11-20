@@ -47,3 +47,15 @@ v1.5.4 更新点：登录注册全部重做（密码登录、邮箱验证码、�
 推送 main 分支后 Cloudflare Pages 自动构建: `npx wrangler pages deploy . --project-name=theslowtide`
 
 发版流程、接口契约与踩坑记录见 `HANDOFF.md`。每次改动完成后同步更新 `README.md` 和 `HANDOFF.md`。
+
+## 数据接口性能（2026-11-20）
+
+读到数据库的页面不再每次等 Worker 回源：
+
+- `functions/api/[[path]].js` 加了三级缓存：isolate 内存（10 分钟）→ KV `site_data_v1`（单次 `getWithMetadata`，时间戳在 metadata，TTL 1800s）→ `caches.default` 边缘缓存。响应头 `X-Cache` 会写 `MEM / KV / HIT / STALE / MISS`，加 `?nocache=1` 可绕过。
+- `/api/data` 命中直接返回；超过 20 分钟才 `waitUntil` 后台刷新，并发刷新有单飞锁；回源失败返回 503 `data_unavailable`，前端不会再干等。
+- `/api/tools/*` 45s、`/api/posts/*` 20s、`/api/server-status` 10s 走边缘缓存。
+- `index.html` 打开先渲染本地 `tst_site_cache`，再后台覆盖；请求 9 秒超时、重试 3×300ms；任何 `/api/*` 请求 pending 超过 150ms 显示顶部 `#loadBar`，无缓存时显示 `.sk-row` 骨架。
+
+实测（本机，链路基线本身有 1–2.4s）：`/api/data` 由 1.2–3.3s 降到命中后 0.76s 起，`/api/tools/items` 由 1.6–2.6s 降到 0.78s。反馈站（`theslowtidefk.pages.dev`）不在本仓库，其 `posts/list` 建表 DDL 与 `Feedback` 全量查询仍是源头慢。
+
