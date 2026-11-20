@@ -7010,7 +7010,7 @@ navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
   function bindRender(d){
     var bound=!!(d&&d.bound&&d.mc);
     if(bound){
-      bind.innerHTML='<div class="pf-bindon"><img class="pf-av" alt="" src="https://mc-heads.net/avatar/'+encodeURIComponent(d.mc)+'/40"><div style="flex:1;"><div class="pf-row"><span>已绑定角色</span><b>'+esc(d.mc)+'</b></div><div class="pf-row"><span>绑定方式</span><b>验证码</b></div></div></div><button class="btn" id="pfResync" type="button">刷新状态</button><p class="pf-hint">换角色需要先在游戏里执行 <code>/bind unbind</code> 看解绑说明，或联系管理员在后台解除。</p>';
+      bind.innerHTML='<div class="pf-bindon"><img class="pf-av" alt="" src="https://minotar.net/helm/'+encodeURIComponent(d.mc)+'/40"><div style="flex:1;"><div class="pf-row"><span>已绑定角色</span><b>'+esc(d.mc)+'</b></div><div class="pf-row"><span>绑定方式</span><b>验证码</b></div></div></div><button class="btn" id="pfResync" type="button">刷新状态</button><p class="pf-hint">换角色需要先在游戏里执行 <code>/bind unbind</code> 看解绑说明，或联系管理员在后台解除。</p>';
     }else{
       bind.innerHTML='<p class="empty-hint" style="margin:0 0 6px;">还没有绑定游戏角色。</p><p class="pf-hint">第一步：点下面「生成验证码」，本页会显示一个 6 位码。<br>第二步：进服，在聊天栏输入 <code>/bind 验证码</code>（例如 <code>/bind A7K2M9</code>），游戏内提示绑定成功即可。<br>第三步：回本页点「刷新状态」，这里会显示角色头像和名字。</p><button class="btn btn-primary" id="pfGen" type="button">生成验证码</button><button class="btn" id="pfResync" type="button">刷新状态</button>';
     }
@@ -10278,7 +10278,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
       var chip=document.createElement('div'); chip.className='pchip';
       var img=document.createElement('img'); img.className='pavatar'; img.alt=p.name||'';
       var fb=avatarDataUri(p.name||'');
-      if(p.skin && p.uuid){ img.src='https://mc-heads.net/avatar/'+encodeURIComponent(p.uuid)+'/26'; }
+      if(p.skin && p.uuid){ img.src='https://minotar.net/helm/'+encodeURIComponent(p.uuid)+'/26'; }
       else { img.src=fb; }
       img.onerror=function(){ img.onerror=null; img.src=fb; };
       var nm=document.createElement('span'); nm.className='pname'; nm.textContent=p.name||'未知';
@@ -14380,7 +14380,7 @@ function render() {
     var v = Number(state.metric === 'online' ? r.online_min : (state.metric === 'coins' ? r.coins : r.deaths)) || 0;
     html += '<div class="row" data-r="' + (i + 1) + '" data-mc="' + esc(r.mc) + '" onclick="openPlayer(this.getAttribute(\'data-mc\'))">'
       + '<div class="no">' + (i + 1) + '</div>'
-      + '<div class="av" data-mc="' + esc(r.mc) + '"></div>'
+      + '<div class="av"><img alt="" src="https://minotar.net/helm/' + encodeURIComponent(r.mc) + '/40" style="width:100%;height:100%;border-radius:3px;image-rendering:pixelated;"></div>'
       + '<div class="nm"><b>' + esc(r.mc) + '</b><span>' + ago(r.ts) + ' · 在线 ' + shortVal(r.online_min) + '</span></div>'
       + '<div class="val"><b>' + (state.metric === 'online' ? shortVal(v) : fmtInt(v)) + '</b><span>' + (state.metric === 'online' ? '累计在线' : (state.metric === 'coins' ? '金币' : '次数')) + '</span></div>'
       + '</div>';
@@ -14388,14 +14388,6 @@ function render() {
   box.innerHTML = html;
   box.querySelectorAll('.row').forEach(function (row) {
     row.onclick = function () { openPlayer(row.getAttribute('data-mc')); };
-  });
-  box.querySelectorAll('.av').forEach(function (av) {
-    var mc = av.getAttribute('data-mc');
-    if (mc) {
-      av.style.backgroundImage = 'url("https://mc-heads.net/avatar/' + encodeURIComponent(mc) + '/40")';
-      av.style.backgroundSize = 'cover';
-      av.style.backgroundPosition = 'center';
-    }
   });
 }
 
@@ -14460,7 +14452,7 @@ function mountSkin(s) {
   var stage = el('dStage');
   var mc = (s && s.mc) || '';
   if (!mc) { stage.innerHTML = '<div class="fallback">没有角色名</div>'; return; }
-  stage.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><img alt="" style="width:150px;height:auto;image-rendering:pixelated;" src="https://mc-heads.net/body/' + encodeURIComponent(mc) + '/180"></div><div class="hint">形象由皮肤站生成，非正版账号显示默认皮肤</div>';
+  stage.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><img alt="" style="width:150px;height:auto;image-rendering:pixelated;" src="https://minotar.net/body/' + encodeURIComponent(mc) + '/180"></div><div class="hint">形象由皮肤站生成，非正版账号显示默认皮肤</div>';
 }
 
 el('dClose').onclick = function () { document.body.classList.remove('open'); };
