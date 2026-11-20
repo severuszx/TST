@@ -1,5 +1,14 @@
 # TST 接手文档（给三个月后的自己）
 
+## 最新修复（2026-11-20 深夜）
+commit `2a2462f`（524 Commits）。「我的」页「生成验证码」点了没反应。
+
+- 根因：`bindRender(d)` 里绑定的 `onclick` 引用 `genCode(t)` / `bindStatus(t)`，而 `t` 只存在于 `fetchMe()` 内部（`var t=localStorage...`），`bindRender` 与按钮作用域里没有 `t` → 点击抛 `ReferenceError: t is not defined`，表现为完全无反应（按钮不变灰、不发请求）。
+- 修法：IIFE 顶部提升为 `var tk=''`，`fetchMe()` 写入 `tk`，`bindRender` / `genCode` / 刷新按钮全部改用 `tk`；`bindStatus(t)` 与 `genCode(t)` 的形参保持不变，调用处统一传 `tk`。
+- 线上实测：`/index.html?v=fix2a2462f#profile` 点「生成验证码」得到 6 位码 `62PRQG`，页面显示「进服后输入 /bind 62PRQG」「复制验证码 / 重新生成」。
+- 排查提示：页面 `#profile` 的 DOM 段落正常，别被 Service Worker 的 `SW=yes` 误导（`sw.js` 只有 install/activate 清理缓存，没有 fetch 拦截，不提供旧文档）。
+- 排行榜金币榜复核：切「金币余额」显示 `40,065 金币`，字段契约正常；tab 点击在真实鼠标事件下有效，用坐标自动化点击容易落到 iframe 边界，改在目标 iframe 内调用 `click()` 验证。
+
 ## 最新变更（2026-11-20 晚）
 线上最新 commit `b44d67f`（519 Commits）。三条急件：
 
