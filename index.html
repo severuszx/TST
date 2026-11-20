@@ -35,13 +35,13 @@
 
 const serverStart=new Date('2026-06-30T00:00:00');
 
-const offsetMs=120*1000; // 服务器启动时间校准偏移：serverStart 比实际开服晚 2 分钟，此处补回（单位毫秒）
+const offsetMs=120*1000; 
 
-// ===== 云端时间校准 =====
 
-// 以同源请求响应的 Date 头为云端基准，用 performance.now()（单调时钟）计算流逝，
 
-// 玩家修改本地系统时间不影响任何时间显示与倒计时。
+
+
+
 
 var cloudBaseMs=Date.now(), perfBase=performance.now();
 
@@ -157,7 +157,7 @@ try{ var gbInit=localStorage.getItem('tst-glass-bg'); if(gbInit){document.docume
 
 })();
 
-// ===== 服务器工具（禁用物品/任务查询 + 管理员管理）=====
+
 (function(){
   function initTools(){
   var tmode='items', tq='';
@@ -292,7 +292,7 @@ try{ var gbInit=localStorage.getItem('tst-glass-bg'); if(gbInit){document.docume
 </script>
 
 <style>
-/* ===== 经济模拟器 ===== */
+
 .eco-wrap{font-size:14px;line-height:1.75;color:var(--text);}
 .eco-wrap details{border:1px solid var(--border);border-radius:16px;background:var(--card);margin-bottom:18px;overflow:hidden;box-shadow:0 2px 12px rgba(15,23,42,.06);}
 .eco-wrap summary{cursor:pointer;padding:13px 18px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;gap:10px;position:relative;background:var(--card);border-bottom:1px solid var(--border);}
@@ -334,7 +334,7 @@ html[data-theme="dark"] .eco-ok,html[data-theme="glass"] .eco-ok{color:#93e6a0;}
 .eco-hint{font-size:12px;color:var(--text-secondary);opacity:.85;margin-top:10px;}
 .eco-apt{font-size:11.5px;color:var(--text-secondary);margin-left:8px;flex:none;border:1px solid var(--border);border-radius:4px;padding:1px 6px;background:var(--card);white-space:nowrap;}
 .eco-toolsbar{display:flex;justify-content:flex-end;gap:8px;margin:-6px 0 12px;}
-/* 服务器工具切换卡片 */
+
 #toolsTabs{display:grid;grid-template-columns:repeat(3,minmax(140px,1fr));gap:12px;margin-bottom:18px;max-width:720px;}
 #toolsTabs button{border:1px solid var(--border);background:var(--card);color:var(--text);padding:14px 16px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;text-align:left;box-shadow:0 2px 10px rgba(15,23,42,.05);transition:transform .18s,box-shadow .18s,border-color .18s,background .18s;}
 #toolsTabs button b{display:block;font-size:14.5px;}
@@ -343,25 +343,25 @@ html[data-theme="dark"] .eco-ok,html[data-theme="glass"] .eco-ok{color:#93e6a0;}
 #toolsTabs button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
 #toolsTabs button.on span{color:var(--text-secondary);}
 @media(max-width:640px){#toolsTabs{grid-template-columns:1fr;}}
-/* 物品联想浮层 */
+
 .eco-suggest{position:absolute;z-index:999;max-height:320px;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 10px 30px rgba(15,23,42,.14);font-size:13px;display:none;min-width:220px;}
 .eco-suggest .es-item{padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:12px;align-items:center;}
 .eco-suggest .es-item:hover{background:var(--hover);}
 .eco-suggest .es-item .es-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .eco-suggest .es-item .es-price{color:var(--text-secondary);font-size:12px;flex:none;}
 .eco-suggest .es-empty{padding:9px 12px;color:var(--text-secondary);}
-/* 经济模拟器：双栏排版 */
+
 .eco-cols{display:flex;gap:18px;align-items:flex-start;}
 .eco-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:16px;}
 @media(max-width:1100px){.eco-cols{flex-direction:column;}}
-/* 物品输入 + 下拉选择按钮 */
+
 .eco-inbox{display:flex;gap:6px;align-items:center;min-width:0;}
 .eco-inbox .eco-in{flex:1;min-width:0;}
 .eco-pick{flex:none;width:38px;padding:0;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text-secondary);cursor:pointer;font-size:13px;line-height:1;height:38px;box-shadow:none;}
-/* 普通模式（浅色/深色）：关闭鼠标悬停位移/缩放/过渡动效；玻璃主题保留其效果 */
+
 html[data-theme="light"] :hover,html[data-theme="dark"] :hover{transform:none !important;transition:none !important;}
 
-/* 导航平铺 + 更多下拉；手机端横向滚动 */
+
 .main-nav{flex-wrap:nowrap;row-gap:6px;}
 @media(max-width:820px){
   .main-nav{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
@@ -370,7 +370,7 @@ html[data-theme="light"] :hover,html[data-theme="dark"] :hover{transform:none !i
 </style>
 
 <script>
-// ===== 经济模拟器（服务器工具·PC 端）=====
+
 var ECO_ITEMS=[
 {c:'特殊',n:'称号 The Slow Tide',b:200000,s:null,note:'永久限购1'},
 {c:'末地三神器',n:'末影统治者',b:192,s:96,note:'每日限购3'},
@@ -450,7 +450,7 @@ function ecoFind(nm){
   return null;
 }
 function ecoEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-/* 物品联想浮层（替代原生 datalist，避免下拉列表超出屏幕；document 委托，任何阶段可用） */
+
 var ecoSG=null;
 function ecoHideSG(){ if(ecoSG) ecoSG.style.display='none'; }
 function ecoShowSG(inp,full){
@@ -506,7 +506,7 @@ function renderEcoUI(){
   var h='<div class="eco-wrap">';
   h+='<datalist id="ecoDL">'+ecoDL()+'</datalist>';
 
-  /* 使用说明 */
+  
   h+='<details open><summary>使用说明</summary><div class="eco-inner">'
     +'<p style="margin:0 0 6px;">这里是服务器经济系统的配套计算工具，帮你把 <b>游戏里的资源换算成金币</b>、找 <b>套利空间</b>、评估 <b>全服通胀</b>，也能当 <b>通用物价计算器</b> 用（不限于游戏）。</p>'
     +'<ul style="margin:0 0 6px;padding-left:18px;">'
@@ -517,13 +517,13 @@ function renderEcoUI(){
     +'<li>“时间性价比”里的产出效率是经验估计值，可自行改成你的真实数据。</li>'
     +'</ul></div></details>';
 
-  /* 重置工具栏 */
+  
   h+='<div class="eco-toolsbar"><button class="eco-btn" id="ecoResetU" title="只清空你在「自定义物价库」里添加的价格">重置自定义物价</button><button class="eco-btn" id="ecoResetAll" title="清空自定义物价并恢复所有输入为初始状态">全部重置</button></div>';
 
-  /* 双栏排版：左列 = 输入计算类，右列 = 数据模拟类 */
+  
   h+='<div class="eco-cols"><div class="eco-col">';
 
-  /* ① 资产计算器 */
+  
   h+='<div class="eco-mod"><h4>资产计算器</h4><p class="eco-sub">输入你的金币和物资数量，折算你的总资产（按系统商店回收价，可手改单价）。</p>'
     +'<div class="eco-grid"><div><label>金币余额</label><input class="eco-in eco-num" id="ecoAcoin" type="number" min="0" step="any" value="0"></div></div>'
     +'<div id="ecoArows">'+ecoARowHtml()+ecoARowHtml()+'</div>'
@@ -531,7 +531,7 @@ function renderEcoUI(){
     +'<button class="eco-btn primary" id="ecoAgo">计算总资产</button>'
     +'<div class="eco-out" id="ecoAout"></div></div>';
 
-  /* ② 套利计算器 */
+  
   h+='<div class="eco-mod"><h4>套利计算器</h4><p class="eco-sub">买入、卖出两个物品（或同一物品低买高卖），看单件利润、利润率与限购下的最大套利。</p>'
     +'<div class="eco-row"><div class="eco-inbox"><input class="eco-in" id="ecoBbuy" placeholder="买入物品"><button class="eco-pick" type="button">▾</button></div><input class="eco-in eco-num" id="ecoBbuyP" type="number" min="0" step="any" placeholder="买入单价"><span class="eco-apt" id="ecoBbuyD"></span></div>'
     +'<div class="eco-row"><div class="eco-inbox"><input class="eco-in" id="ecoBsell" placeholder="卖出物品"><button class="eco-pick" type="button">▾</button></div><input class="eco-in eco-num" id="ecoBsellP" type="number" min="0" step="any" placeholder="卖出单价"><span class="eco-apt" id="ecoBsellD"></span></div>'
@@ -539,7 +539,7 @@ function renderEcoUI(){
     +'<button class="eco-btn primary" id="ecoBgo">计算套利</button>'
     +'<div class="eco-out" id="ecoBout"></div></div>';
 
-  /* ⑤ 自定义计算器（游戏走进生活） */
+  
   h+='<div class="eco-mod"><h4>通用物价计算器（不限于游戏）</h4><p class="eco-sub">任意物品：填名称、数量、单价算总价；再填回收/卖出价可算利润。生活中也能用。</p>'
     +'<div id="ecoCrows">'
     +'<div class="eco-row"><input class="eco-in" data-fname placeholder="物品名称"><input class="eco-in eco-num" data-fqty type="number" min="0" step="any" placeholder="数量"><input class="eco-in eco-num" data-fbuy type="number" min="0" step="any" placeholder="买入单价"><input class="eco-in eco-num" data-fsell type="number" min="0" step="any" placeholder="卖出单价"></div>'
@@ -549,7 +549,7 @@ function renderEcoUI(){
     +'<button class="eco-btn primary" id="ecoFgo">计算</button>'
     +'<div class="eco-out" id="ecoFout"></div></div>';
 
-  /* ⑥ 攒钱计划 */
+  
   h+='<div class="eco-mod"><h4>攒钱计划</h4><p class="eco-sub">想买某件东西（比如 20 万金币的称号），按你每天的收入算算要攒多久。</p>'
     +'<div class="eco-grid">'
     +'<div><label>目标金额（金币）</label><input class="eco-in eco-num" id="ecoGgoal" type="number" min="0" step="any" placeholder="如 200000"></div>'
@@ -561,7 +561,7 @@ function renderEcoUI(){
 
   h+='</div><div class="eco-col">';
 
-  /* ③ 全服经济模拟 */
+  
   h+='<div class="eco-mod"><h4>全服经济模拟（通胀推演）</h4><p class="eco-sub">估算全服货币总量，模拟“全民刷钻石”等情景对物价的影响（简化货币模型，仅供参考）。</p>'
     +'<div class="eco-grid">'
     +'<div><label>当前全服货币总量（金币）</label><input class="eco-in eco-num" id="ecoCM" type="number" min="0" step="any" placeholder="如 5000000"></div>'
@@ -573,17 +573,17 @@ function renderEcoUI(){
     +'<button class="eco-btn primary" id="ecoCgo">推演通胀</button>'
     +'<div class="eco-out" id="ecoCout"></div></div>';
 
-  /* ④ 时间性价比 */
+  
   h+='<div class="eco-mod"><h4>时间性价比对比</h4><p class="eco-sub">每小时做什么最赚（按系统回收价折算，效率为经验估计，可改成你的真实数据）。</p>'
     +'<div class="eco-row"><div class="eco-inbox"><input class="eco-in" id="ecoTitem" placeholder="物品名称"><button class="eco-pick" type="button">▾</button></div><input class="eco-in eco-num" id="ecoTcnt" type="number" min="0" step="any" placeholder="每小时产出数量"><button class="eco-btn" id="ecoTadd">加入对比</button></div>'
     +'<div class="eco-out" id="ecoTout"></div></div>';
 
-  /* ⑦ 自定义物价库 */
+  
   h+='<div class="eco-mod"><h4>自定义物价库</h4><p class="eco-sub">把你自己的成交价 / 收购价记下来（保存在本机浏览器），之后所有计算器都会优先使用你的价格。</p>'
     +'<div class="eco-row"><input class="eco-in" id="ecoUname" placeholder="物品名称"><input class="eco-in eco-num" id="ecoUbuy" type="number" min="0" step="any" placeholder="买价（可选）"><input class="eco-in eco-num" id="ecoUsell" type="number" min="0" step="any" placeholder="回收/卖出价"><input class="eco-in" id="ecoUnote" placeholder="备注（可选）"><button class="eco-btn" id="ecoUadd">添加</button></div>'
     +'<div class="eco-out" id="ecoUlist"></div></div>';
 
-  /* ⑧ 单位换算 */
+  
   h+='<div class="eco-mod"><h4>单位换算（组 / 个）</h4><p class="eco-sub">一组 = 64 个。输入单价和数量（个或组）算总价；填预算可反算能买多少。</p>'
     +'<div class="eco-grid">'
     +'<div><label>物品单价（金币 / 个）</label><input class="eco-in eco-num" id="ecoUcP" type="number" min="0" step="any" placeholder="如 14"></div>'
@@ -594,7 +594,7 @@ function renderEcoUI(){
     +'<button class="eco-btn primary" id="ecoUcGo">换算</button>'
     +'<div class="eco-out" id="ecoUcOut"></div></div>';
 
-  /* ⑨ 购买力对比 */
+  
   h+='<div class="eco-mod"><h4>购买力对比</h4><p class="eco-sub">同样一笔钱，分别能买多少件不同物品，直观看出哪边更“值”。</p>'
     +'<div class="eco-grid">'
     +'<div><label>预算（金币）</label><input class="eco-in eco-num" id="ecoPB" type="number" min="0" step="any" placeholder="如 10000"></div>'
@@ -606,7 +606,7 @@ function renderEcoUI(){
 
   h+='</div></div>';
 
-  /* ⑥ 物价表参考 */
+  
   h+='<details><summary>物价表参考（'+ECO_ITEMS.length+' 项）</summary><div class="eco-inner">'
     +'<input class="eco-in" id="ecoSearch" placeholder="筛选物品…" style="max-width:260px;margin-bottom:8px;">'
     +'<table class="eco-table" id="ecoTable"><thead><tr><th>分类</th><th>物品</th><th class="num">买价</th><th class="num">回收价</th><th>限购</th></tr></thead><tbody></tbody></table>'
@@ -616,7 +616,7 @@ function renderEcoUI(){
   h+='</div>';
   box.innerHTML=h;
 
-  /* 物价表填充 */
+  
   var tb=document.getElementById('ecoTable').getElementsByTagName('tbody')[0];
   var rowsHtml='';
   for(var i=0;i<ECO_ITEMS.length;i++){ var it=ECO_ITEMS[i];
@@ -630,7 +630,7 @@ function renderEcoUI(){
     for(var i=0;i<rows.length;i++){ rows[i].style.display=(!q||rows[i].getAttribute('data-n').indexOf(q)>=0)?'':'none'; }
   });
 
-  /* ① 资产计算器 */
+  
   function ecoARowHtml(){
     return '<div class="eco-row"><div class="eco-inbox"><input class="eco-in" data-aname placeholder="物品名称（可直接输入）"><button class="eco-pick" type="button">▾</button></div><input class="eco-in eco-num" data-apx type="number" min="0" step="any" placeholder="回收单价·可选"><input class="eco-in eco-num" data-acnt type="number" min="0" step="any" placeholder="数量"><span class="eco-apt" data-apt></span></div>';
   }
@@ -678,7 +678,7 @@ function renderEcoUI(){
       +(!rowsUsed?'<p class="eco-hint">还没有填写物品行。</p>':'')+det+unRec+'<p class="eco-hint">已收录物品按系统商店回收价折算（可手改单价）；未收录物品需自行填写回收单价。实际价值以交易市场为准。</p>';
   };
 
-  /* ② 套利计算器 */
+  
   function syncB(){
     var bi=ecoFind(document.getElementById('ecoBbuy').value);
     var si=ecoFind(document.getElementById('ecoBsell').value);
@@ -713,7 +713,7 @@ function renderEcoUI(){
   };
   syncB();
 
-  /* ③ 全服经济模拟 */
+  
   var cGo=document.getElementById('ecoCgo');
   if(cGo) cGo.onclick=function(){
     var M=parseFloat(document.getElementById('ecoCM').value);
@@ -733,7 +733,7 @@ function renderEcoUI(){
     document.getElementById('ecoCout').innerHTML=o;
   };
 
-  /* ④ 时间性价比 */
+  
   var ecoTrows=[{name:'钻石',cnt:12},{name:'远古残骸',cnt:8},{name:'铁锭',cnt:40},{name:'橡木原木',cnt:256},{name:'小麦',cnt:384},{name:'生牛肉',cnt:200}];
   function renderT(){
     var o='<table class="eco-table"><thead><tr><th>项目</th><th class="num">每小时产出</th><th class="num">回收单价</th><th class="num">折合金币/时</th></tr></thead><tbody>';
@@ -760,7 +760,7 @@ function renderEcoUI(){
   };
   renderT();
 
-  /* ⑤ 通用计算器 */
+  
   function addCRow(){
     var d=document.createElement('div');
     d.className='eco-row';
@@ -794,7 +794,7 @@ function renderEcoUI(){
       +'<p class="eco-hint">没填卖出价时按买入单价计总价值；两者都填则额外算利润。不限物品，生活里算账也能用。</p>';
   };
 
-  /* ⑥ 攒钱计划 */
+  
   var gGo=document.getElementById('ecoGgo');
   if(gGo) gGo.onclick=function(){
     var goal=parseFloat(document.getElementById('ecoGgoal').value);
@@ -811,7 +811,7 @@ function renderEcoUI(){
     document.getElementById('ecoGout').innerHTML=o;
   };
 
-  /* ⑦ 自定义物价库 */
+  
   function renderUList(){
     var box=document.getElementById('ecoUlist');
     if(!box) return;
@@ -838,7 +838,7 @@ function renderEcoUI(){
   };
   renderUList();
 
-  /* 重置 */
+  
   var rU=document.getElementById('ecoResetU'), rA=document.getElementById('ecoResetAll');
   if(rU) rU.onclick=function(){
     if(!ECO_USER.length){ ECO_USER=[]; ecoSaveUser(); renderEcoUI(); return; }
@@ -854,9 +854,9 @@ function renderEcoUI(){
     });
   };
 
-  /* （经济模拟器为双栏布局，无节点切换） */
+  
 
-  /* ⑧ 单位换算 */
+  
   var ucGo=document.getElementById('ecoUcGo');
   if(ucGo) ucGo.onclick=function(){
     var p=parseFloat(document.getElementById('ecoUcP').value);
@@ -880,7 +880,7 @@ function renderEcoUI(){
     document.getElementById('ecoUcOut').innerHTML=o||'<span class="eco-warn">请填写物品单价，并填数量或预算。</span>';
   };
 
-  /* ⑨ 购买力对比 */
+  
   var pGo=document.getElementById('ecoPGo');
   if(pGo) pGo.onclick=function(){
     var b=parseFloat(document.getElementById('ecoPB').value);
@@ -986,7 +986,7 @@ a{color:var(--accent);}
 
 button{font-family:inherit;}
 
-/* ===== 顶部导航 ===== */
+
 
 .site-header{
 
@@ -1174,7 +1174,7 @@ display:flex;align-items:center;justify-content:center;
 
 .icon-btn:hover{background:var(--hover);}
 
-/* 主题切换开关 */
+
 
 .theme-toggle{
 
@@ -1210,7 +1210,7 @@ font-size:11px;color:#fff;transition:left .28s cubic-bezier(.4,0,.2,1),backgroun
 
 html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 
-/* 主题切换过渡动画 */
+
 
 body,.site-header,.card,.server-card,.search-row input,.suggest-box,.results-box,
 
@@ -1222,7 +1222,7 @@ transition:background-color .3s ease,color .3s ease,border-color .3s ease;
 
 }
 
-/* ===== Hero 轮播 ===== */
+
 
 .hero{padding:22px 0 6px;}
 
@@ -1248,7 +1248,7 @@ box-shadow:var(--shadow);border:1px solid var(--border);
 
 .dot.active{background:var(--accent);}
 
-/* ===== 服务器状态条 ===== */
+
 
 .server-bar{padding:14px 0;}
 
@@ -1270,7 +1270,7 @@ padding:14px 18px;box-shadow:var(--shadow);
 
 .addr{font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--accent);word-break:break-all;}
 
-/* ===== Java 服 · the slow tide（真实状态检测） ===== */
+
 
 .java-bar{padding:0 0 6px;}
 
@@ -1314,7 +1314,7 @@ padding:14px 18px;box-shadow:var(--shadow);
 
 .pempty{font-size:13px;color:var(--text-secondary);}
 
-/* Java 卡片 · 性能补充 */
+
 .jperf{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
 .jperf > div{display:flex;flex-direction:column;gap:3px;}
 .jperf-toggle{margin-top:12px;background:none;border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text-secondary);cursor:pointer;font-family:inherit;}
@@ -1323,7 +1323,7 @@ padding:14px 18px;box-shadow:var(--shadow);
 .jchart canvas{width:100%;height:170px;display:block;}
 .jchart-meta{margin-top:6px;font-size:12px;color:var(--text-secondary);display:flex;gap:14px;flex-wrap:wrap;}
 
-/* 服务器面板 */
+
 .panel-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
 .panel-tab{padding:7px 12px;border:1px solid var(--border);border-radius:6px;background:var(--card);font-size:13px;cursor:pointer;font-family:inherit;color:var(--text-secondary);}
 .tst-field{flex:1;min-width:130px;padding:10px 14px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-size:14px;outline:none;font-family:inherit;}
@@ -1348,7 +1348,7 @@ padding:14px 18px;box-shadow:var(--shadow);
 .pw-row input{flex:1;min-width:140px;}
 .panel-note{font-size:12px;color:var(--text-secondary);margin-top:8px;}
 
-/* ===== Section 通用 ===== */
+
 
 .section{padding:26px 0;}
 
@@ -1397,13 +1397,13 @@ html[data-theme="dark"] .pinned-tag{background:#71717a;}
 
 .empty-hint{color:var(--text-secondary);font-size:14px;padding:10px 0;}
 
-/* ===== 页面切换 ===== */
+
 
 .page{display:none;}
 
 .page.active{display:block;}
 
-/* ===== 搜索 ===== */
+
 
 .notice-ticker{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin:12px 0 0;}
 
@@ -1481,7 +1481,7 @@ html[data-theme="dark"] mark{background:#c99400;color:#1a1a1a;}
 
 .search-flash{outline:3px solid #ffb300;outline-offset:2px;border-radius:6px;}
 
-/* ===== 公约 ===== */
+
 
 .rule-scroll{max-height:65vh;overflow-y:auto;padding-right:6px;font-size:14px;margin-top:8px;}
 
@@ -1511,7 +1511,7 @@ html[data-theme="dark"] mark{background:#c99400;color:#1a1a1a;}
 
 #ruleToc a{text-decoration:none;}
 
-/* ===== 管理面板 ===== */
+
 
 .modal-mask{
 
@@ -1638,7 +1638,7 @@ padding:8px;overflow:hidden;display:flex;flex-direction:column;gap:6px;
 
 .img-item .im-ops .btn{padding:4px 8px;font-size:12px;}
 
-/* ===== 页脚 ===== */
+
 
 .site-footer{
 
@@ -1694,7 +1694,7 @@ padding-top:14px;text-align:center;color:var(--text-secondary);font-size:12px;
 
 }
 
-/* ===== 回顶 / Toast ===== */
+
 
 .back-top{
 
@@ -1792,7 +1792,7 @@ img{background:var(--hover);}
 
 @media(max-width:960px){.dot{width:13px;height:13px;}}
 
-/* ===== 液态玻璃主题 v8（iOS 27 液态玻璃·管理员内测）===== */
+
 
 html[data-theme="glass"]{
 
@@ -1822,17 +1822,17 @@ color-scheme:light;
 
 --hero-grad:linear-gradient(135deg,#dbe4ff,#e9e2ff);
 
---go1:.24;--go2:.08;--go3:.13;    /* 卡片渐变三段透明度（通透液态玻璃） */
+--go1:.24;--go2:.08;--go3:.13;    
 
---gn1:.24;                       /* 导航透明度 */
+--gn1:.24;                       
 
---gb1:.42;--gb2:.12;             /* 按钮透明度 */
+--gb1:.42;--gb2:.12;             
 
---gsh1:30px;--gsh2:.12;--gsh3:10px;  /* 阴影扩展/强度/偏移 */
+--gsh1:30px;--gsh2:.12;--gsh3:10px;  
 
 }
 
-/* 背景：干净 iOS 壁纸渐变（无杂乱光斑） */
+
 
 html[data-theme="glass"] body{
 
@@ -1848,7 +1848,7 @@ html[data-theme="glass"][data-gb="plain"] body,
 
 html[data-theme="glass"][data-gb="transparent"] body{background-size:auto;}
 
-/* 顶部柔和透亮光 */
+
 
 html[data-theme="glass"] body::before{
 
@@ -1876,7 +1876,7 @@ html[data-theme="glass"] .container,
 
 html[data-theme="glass"] .site-footer{position:relative;z-index:1;}
 
-/* 导航液态玻璃 */
+
 
 html[data-theme="glass"] .site-header{
 
@@ -1902,7 +1902,7 @@ html[data-theme="glass"] .main-nav a:hover,
 
 html[data-theme="glass"] .main-nav button:hover{color:#4f63d8;text-shadow:0 0 16px rgba(79,99,216,.4);}
 
-/* 卡片：真液态玻璃（顶部反射光带+边缘白描边+大圆角+柔阴影） */
+
 
 html[data-theme="glass"] .card,
 
@@ -1956,7 +1956,7 @@ inset 0 1px 0 rgba(255,255,255,1);
 
 }
 
-/* 卡片入场 */
+
 
 html[data-theme="glass"] .card-grid .card:nth-child(2){}
 
@@ -1968,7 +1968,7 @@ html[data-theme="glass"] .card-grid .card:nth-child(5){}
 
 html[data-theme="glass"] .card-grid .card:nth-child(6){}
 
-/* 按钮：液态玻璃胶囊 */
+
 
 html[data-theme="glass"] .btn-primary,
 
@@ -2010,7 +2010,7 @@ html[data-theme="glass"] .feedback-btn:active,
 
 html[data-theme="glass"] .collapse-btn:active{}
 
-/* 输入框玻璃 */
+
 
 html[data-theme="glass"] input[type="text"],
 
@@ -2046,7 +2046,7 @@ box-shadow:0 0 0 3px rgba(79,99,216,.12),0 10px 30px rgba(70,90,160,.14);
 
 }
 
-/* 时间徽章 */
+
 
 html[data-theme="glass"] .time-badge{
 
@@ -2062,7 +2062,7 @@ box-shadow:0 4px 16px rgba(70,90,160,.1),inset 0 1px 0 rgba(255,255,255,.9);
 
 }
 
-/* 标题渐变 */
+
 
 html[data-theme="glass"] .section-title{
 
@@ -2072,7 +2072,7 @@ background:linear-gradient(120deg,#111827,#4f63d8 55%,#7c3aed);
 
 }
 
-/* 徽章适配 */
+
 
 html[data-theme="glass"] .pinned-tag{background:#4f63d8;color:#fff;}
 
@@ -2096,7 +2096,7 @@ box-shadow:0 30px 70px rgba(70,90,160,.3),0 0 0 1px rgba(255,255,255,.4),inset 0
 
 }
 
-/* 壁纸自选 */
+
 
 html[data-theme="glass"][data-gb="aurora"] body{background:linear-gradient(165deg,#d3f8f5 0%,#e0f2fe 30%,#ede9fe 60%,#dff0ff 100%);}
 
@@ -2114,7 +2114,7 @@ html[data-theme="glass"][data-gb="sakura"] body{background:linear-gradient(165de
 
 html[data-theme="glass"][data-gb="custom"] body{background:linear-gradient(165deg,var(--gb-c1,#dce7ff) 0%,var(--gb-c2,#f4e8fb) 100%);}
 
-/* 色板按钮与浮层 */
+
 
 .glass-bg-picker{display:none;}
 
@@ -2192,7 +2192,7 @@ transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease;
 
 html[data-theme="glass"] .glass-bg-picker.hidden{display:none;}
 
-/* 玻璃实验室（仅玻璃主题的专属功能） */
+
 
 html[data-theme="glass"] .glass-bg-picker{
 
@@ -2244,7 +2244,7 @@ padding:14px;
 
 html[data-theme="glass"] .glass-bg-picker.hidden{display:none;}
 
-/* 调试入口 */
+
 
 .tst-debug-link{font-size:11px;color:var(--text-secondary);opacity:.55;cursor:pointer;margin-left:12px;text-decoration:none;transition:opacity .2s ease;}
 
@@ -2282,7 +2282,7 @@ html[data-theme="glass"] #debugOk{background:rgba(20,35,90,.85)!important;color:
 
 #debugHint{font-size:11px;color:var(--text-secondary);margin-top:10px;}
 html[data-theme="glass"] #debugHint{color:rgba(20,30,70,.65);}
-/* ===== 3D 性能渲染测试（调试台 bench3d）===== */
+
 .bench-wrap{position:relative;width:min(94vw,1000px);aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#05070f;border:1px solid var(--border);box-shadow:var(--shadow);}
 #benchCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
 .bench-hud{position:absolute;inset:0;pointer-events:none;color:#fff;}
@@ -2298,7 +2298,7 @@ html[data-theme="glass"] .bench-corner{background:rgba(8,14,32,.5);}
 .bench-note{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:12px;color:rgba(255,255,255,.85);text-shadow:0 1px 4px rgba(0,0,0,.6);}
 html[data-theme="glass"] .bench-wrap{background:rgba(5,10,22,.9);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 80px rgba(70,90,160,.3);}
 
-/* 滚动条 */
+
 
 html[data-theme="glass"] ::-webkit-scrollbar{width:10px;height:10px;}
 
@@ -2306,9 +2306,9 @@ html[data-theme="glass"] ::-webkit-scrollbar-thumb{background:rgba(31,41,55,.2);
 
 html[data-theme="glass"] ::-webkit-scrollbar-track{background:transparent;}
 
-/* ===== 液态玻璃特效层（往死里叠）===== */
 
-/* 1.背景光斑漂移+呼吸 */
+
+
 
 html[data-theme="glass"] body::before{}
 
@@ -2324,7 +2324,7 @@ html[data-theme="glass"] body::after{
 
 }
 
-/* 2.标题流光渐变文字 */
+
 
 html[data-theme="glass"] .section-title{
 
@@ -2336,11 +2336,11 @@ html[data-theme="glass"] .section-title{
 
 }
 
-/* 3.卡片逐张弹入 */
 
-/* 4.卡片常驻呼吸光晕 */
 
-/* 5.卡片 hover 大弹跳 + 流光扫过 */
+
+
+
 
 html[data-theme="glass"] .card-grid .card::after{
 
@@ -2356,7 +2356,7 @@ html[data-theme="glass"] .card-grid .card:hover{}
 
 html[data-theme="glass"] .card-grid .card:hover::after{}
 
-/* 6.卡片反光跟随鼠标（--mx/--my 由 JS 注入） */
+
 
 html[data-theme="glass"] .card-grid .card{
 
@@ -2390,7 +2390,7 @@ html[data-theme="glass"] .card-grid .card{
 
 }
 
-/* 7.导航 hover 弹跳 */
+
 
 html[data-theme="glass"] .main-nav .nav-link{transition:transform .4s cubic-bezier(.34,1.56,.64,1),color .25s ease,background .25s ease;}
 
@@ -2398,7 +2398,7 @@ html[data-theme="glass"] .main-nav .nav-link:hover{}
 
 html[data-theme="glass"] .main-nav .nav-link:active{}
 
-/* 8.按钮 hover 弹跳+光晕 */
+
 
 html[data-theme="glass"] .btn-primary,
 
@@ -2412,9 +2412,9 @@ html[data-theme="glass"] .feedback-btn:hover,
 
 html[data-theme="glass"] .collapse-btn:hover{box-shadow:0 14px 34px rgba(90,110,170,.25),0 0 26px rgba(160,190,255,.3),inset 0 1px 0 rgba(255,255,255,1);}
 
-/* 9.轮播图呼吸光晕 */
 
-/* 10.搜索框聚焦微弹 */
+
+
 
 html[data-theme="glass"] input[type="search"]:focus,
 
@@ -2422,17 +2422,17 @@ html[data-theme="glass"] input[type="text"]:focus,
 
 html[data-theme="glass"] textarea:focus{box-shadow:0 8px 28px rgba(90,110,170,.16),0 0 0 3px rgba(79,99,216,.2),inset 0 1px 0 rgba(255,255,255,.9);}
 
-/* 11.滚动渐入 */
+
 
 html[data-theme="glass"] .gb-wait{opacity:0;transition:opacity .75s ease,transform .9s cubic-bezier(.34,1.56,.64,1);}
 
 html[data-theme="glass"] .gb-in{opacity:1;transform:none;}
 
-/* 12.玻璃实验室面板弹入 */
+
 
 html[data-theme="glass"] .glass-bg-picker{transform-origin:top right;}
 
-/* ===== 卡片自由拖动（玻璃主题·拖到哪放哪）===== */
+
 
 html[data-theme="glass"] .card-grid{
 
@@ -2460,17 +2460,17 @@ html[data-theme="glass"] .card-grid .card.dragging{
 
 }
 
-/* ===== 导航全套动画（玻璃主题）===== */
 
-/* 导航栏整体滑入 */
 
-/* 导航链接逐个错峰弹入 */
 
-/* hover 增强：上浮+光晕 */
+
+
+
+
 
 html[data-theme="glass"] .main-nav .nav-link:hover{box-shadow:0 10px 22px rgba(79,99,216,.28),0 0 18px rgba(140,160,255,.35);}
 
-/* 导航底部流光循环扫过 */
+
 
 html[data-theme="glass"] .site-header::after{
 
@@ -2482,7 +2482,7 @@ html[data-theme="glass"] .site-header::after{
 
 }
 
-/* ===== 玩家公约页玻璃化+动画 ===== */
+
 
 html[data-theme="glass"] .rule-scroll{
 
@@ -2520,7 +2520,7 @@ html[data-theme="glass"] .rule-section h3{color:#4f63d8;}
 
 html[data-theme="glass"] .rule-section p strong{color:#4f63d8;}
 
-/* ===== 拖动模式分段开关 ===== */
+
 
 html[data-theme="glass"] .gb-seg{display:flex;gap:6px;}
 
@@ -2538,13 +2538,13 @@ html[data-theme="glass"] .gb-seg-btn.active{background:linear-gradient(180deg,rg
 
 html[data-theme="glass"] .gb-seg-btn:active{}
 
-/* 液态玻璃：卡片触屏拖动（防滚动抢占） */
+
 
 html[data-theme="glass"] .card-grid .card,
 
 html[data-theme="glass"] #feedList .card{touch-action:none;}
 
-/* ===== 便捷工具卡片（tool-grid）玻璃适配：全站小卡片可拖动 ===== */
+
 
 html[data-theme="glass"] .tool-grid{
 
@@ -2606,7 +2606,7 @@ html[data-theme="glass"] .tool-grid .tool-card.dragging{
 
 html[data-theme="glass"] .tool-grid .tool-card.drag-ready{cursor:grab;}
 
-/* 触屏拖动：所有可拖动卡片禁止浏览器滚动抢占 */
+
 
 html[data-theme="glass"] .card-grid .card,
 
@@ -2614,7 +2614,7 @@ html[data-theme="glass"] #feedList .card,
 
 html[data-theme="glass"] .tool-grid .tool-card{touch-action:none;}
 
-/* 手机端玻璃卡片 UI 优化 */
+
 
 @media (max-width:700px){
 
@@ -2640,9 +2640,9 @@ html[data-theme="glass"] .tool-grid .tool-card{touch-action:none;}
 
 }
 
-/* ===== 拖动 Q弹动效（玻璃主题）：换位弹跳 / 碰壁震动 ===== */
 
-/* ===== 手机渲染修复：锁滚动仅 body（防 iOS 视口缩放闪烁）+ 无 backdrop 降级 + 调试台按钮统一玻璃风 ===== */
+
+
 
 body.drag-lock{overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important;}
 
@@ -2672,7 +2672,7 @@ html[data-theme="glass"] #debugOk{
 
 }
 
-/* ===== 卡片纯透明（液态玻璃：无杂色底色，仅模糊+极淡描边；拖动用强阴影辨识）===== */
+
 
 html[data-theme="glass"] .card-grid .card,
 
@@ -2726,7 +2726,7 @@ html[data-theme="glass"] .tool-grid .tool-card.dragging{
 
 }
 
-/* ===== 碰撞粘合动效（粘一起再弹开）+ 纯白/透明背景 ===== */
+
 
 html[data-theme="glass"][data-gb="plain"],
 
@@ -2760,11 +2760,11 @@ html[data-theme="glass"][data-gb="plain"] .page-wrap,
 
 html[data-theme="glass"][data-gb="transparent"] .page-wrap{background:#ffffff!important;}
 
-/* ===== 碰撞完全融合：两张卡先完全重叠再弹开 ===== */
+
 
 html[data-theme="glass"] .merge-anim{z-index:998;}
 
-/* ===== 深色玻璃（实验室开关开启后生效） ===== */
+
 
 html[data-theme="glass"][data-glass-dark]{
 
@@ -2798,7 +2798,7 @@ html[data-theme="glass"][data-glass-dark] .site-header{background:linear-gradien
 
 html[data-theme="glass"][data-glass-dark] .time-badge{background:rgba(40,52,84,.4);}
 
-/* ===== 玻璃效果开关（body.glass-off：卡片/导航恢复实色） ===== */
+
 
 body.glass-off html[data-theme="glass"] .card,
 
@@ -2836,11 +2836,11 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .results-box,
 
 body.glass-off html[data-theme="glass"][data-glass-dark] .glass-bg-picker{background:rgba(24,30,48,.97)!important;backdrop-filter:none!important;}
 
-/* ===== 性能优先（body.glass-lite：全站关闭 backdrop-filter） ===== */
+
 
 body.glass-lite html[data-theme="glass"] *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
 
-/* ===== 实验室新控件 ===== */
+
 
 html[data-theme="glass"] .gb-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 
@@ -2866,7 +2866,7 @@ html[data-theme="glass"] .gb-share-row input{flex:1;min-width:0;padding:5px 8px;
 
 html[data-theme="glass"] .gb-custom-preview{width:18px;height:18px;border-radius:6px;border:1px solid rgba(255,255,255,.8);background:linear-gradient(135deg,#dce7ff,#f4e8fb);display:inline-block;vertical-align:middle;}
 
-/* ===== 全卡玻璃：搜索/结果/轮播等实色元素统一玻璃 ===== */
+
 
 html[data-theme="glass"] .search-row input,
 
@@ -2880,7 +2880,7 @@ html[data-theme="glass"] .notice-card{background:rgba(255,255,255,.3);backdrop-f
 
 html[data-theme="glass"] .search-row input{color:#1f2937;}
 
-/* ===== 管理团队 ===== */
+
 
 .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;}
 
@@ -2930,7 +2930,7 @@ html[data-theme="glass"] .team-avatar.noimg{background:linear-gradient(135deg,rg
 
 @media(max-width:560px){.team-grid{grid-template-columns:1fr;}.team-avatar{width:56px;height:56px;}}
 
-/* ===== 玩家投票 ===== */
+
 
 .vote-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
 
@@ -2983,7 +2983,7 @@ html[data-theme="glass"] .vote-bar i{background:linear-gradient(90deg,#38bdf8,#8
 @media (max-width:720px){ 
 
 .cf-wrap{grid-template-columns:1fr!important;} }
-/* ===== 插件公示 ===== */
+
 .plugins-intro{max-width:780px;font-size:14px;line-height:1.85;color:var(--text-secondary);margin:0;}
 .plugins-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:18px;}
 .plugin-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 16px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;}
@@ -3190,7 +3190,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 (function(){
   function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn); else fn(); }
   ready(function(){
-    /* ---- 09 手机导航：旧主页面没有汉堡，这里补一个可靠的抽屉 ---- */
+    
     var header=document.querySelector('.site-header .header-inner')||document.querySelector('.site-header');
     var nav=document.getElementById('mainNav');
     if(header && nav && !document.getElementById('navBurgerFix')){
@@ -3223,7 +3223,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
       drawer.querySelector('.close').addEventListener('click',function(){ drawer.classList.remove('open'); });
     }
 
-    /* ---- 11 投票页：不再永久“加载中…” ---- */
+    
     var voteBody=document.getElementById('voteBody');
     var voteTabs=document.getElementById('voteTabs');
     if(voteBody && !voteBody.getAttribute('data-ready')){
@@ -3232,7 +3232,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
       if(voteTabs){ voteTabs.querySelectorAll('button').forEach(function(b){ b.addEventListener('click',function(){ voteTabs.querySelectorAll('button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); }); }); }
     }
 
-    /* ---- 02 嵌入页主题持续同步（每秒一次，开销极低） ---- */
+    
     function syncEmbedTheme(){
       var th=localStorage.getItem('tst-theme')||'light';
       if(th==='glass') th='light';
@@ -3243,7 +3243,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
     syncEmbedTheme(); setTimeout(syncEmbedTheme,800); setTimeout(syncEmbedTheme,2000);
     var __tt=document.getElementById('themeToggle'); if(__tt) __tt.addEventListener('click',function(){ setTimeout(syncEmbedTheme,80); });
 
-    /* ---- 13 最小错误记录（本地留痕，便于复现） ---- */
+    
     window.__TST_ERRORS=window.__TST_ERRORS||[];
     window.addEventListener('error',function(e){ try{ window.__TST_ERRORS.push({t:Date.now(),m:String(e.message||''),s:String(e.filename||''),l:e.lineno||0}); if(window.__TST_ERRORS.length>30) window.__TST_ERRORS.shift(); }catch(x){} });
     window.addEventListener('unhandledrejection',function(e){ try{ window.__TST_ERRORS.push({t:Date.now(),m:'unhandled: '+String(e.reason&&e.reason.message||e.reason||'')}); if(window.__TST_ERRORS.length>30) window.__TST_ERRORS.shift(); }catch(x){} });
@@ -3281,7 +3281,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <script>
 
-// 手机/平板自动进入移动端专属 UI（?m=0 可跳过）
+
 
 (function(){
   try{
@@ -3491,7 +3491,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <main>
 
-<!-- 首页 -->
+
 
 <section id="home" class="page active">
 
@@ -3629,7 +3629,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </section>
 
-</section><!-- 公告 -->
+</section>
 
 <section id="notice" class="page">
 
@@ -3645,7 +3645,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </section>
 
-<!-- 动态 -->
+
 
 <section id="feed" class="page">
 
@@ -3653,10 +3653,10 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <div class="section-title">服务器动态</div>
 
-<!-- 发帖入口：独立行右对齐 -->
+
 <div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:24px;"><button class="btn post-btn primary" id="poOpenBtn">✍ 发帖</button></div>
 
-<!-- 工具条：排序 tab + 筛选下拉（常规筛选交互） -->
+
 <div class="feed-bar">
 <div class="feed-bar-item"><span class="feed-bar-label">排序</span><button class="feed-bar-tab active" id="poSortNew">最新</button><button class="feed-bar-tab" id="poSortHot">热门</button></div>
 <div class="feed-bar-sep"></div>
@@ -3677,7 +3677,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 <span id="poCount" class="post-msg" style="margin-left:auto;margin-right:0;"></span>
 </div>
 
-<!-- 发帖面板：独立卡片（默认收起，点「发帖」展开） -->
+
 <div id="postPanel" style="display:none;">
 <div class="post-panel-card">
 <div class="post-panel-head"><span>发布帖子</span><span class="post-msg">内测阶段需填写卡密</span></div>
@@ -3697,7 +3697,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </section>
 
-<!-- 投票 -->
+
 
 <section id="vote" class="page">
 
@@ -3725,7 +3725,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </section>
 
-<!-- 赛事 -->
+
 
 <section id="event" class="page">
 
@@ -3763,7 +3763,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </section>
 
-<!-- 兑换码 -->
+
 
 <section id="cdkey" class="page">
 
@@ -3783,7 +3783,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </section>
 
-<!-- 赞助 -->
+
 
 <section id="sponsor" class="page">
 
@@ -3819,7 +3819,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </section>
 
-<!-- 服务器工具 -->
+
 
 <section id="tools" class="page">
 
@@ -3891,7 +3891,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </section>
 
-<!-- 聊天室 -->
+
 
 <section id="chat" class="page">
 
@@ -4007,7 +4007,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </section>
 
-<!-- 服务器面板 -->
+
 
 <section id="panel" class="page">
 
@@ -4055,7 +4055,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </section>
 
-<!-- 公约 -->
+
 
 <section id="rule" class="page">
 
@@ -4690,7 +4690,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <div class="toast-wrap" id="toastWrap"></div>
 
-<!-- 开源说明弹窗 -->
+
 
 <div class="modal-mask" id="osModal">
 
@@ -4714,7 +4714,7 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 </div>
 
-<!-- 管理面板 -->
+
 
 <div class="modal-mask" id="adminModal">
 
@@ -5026,11 +5026,11 @@ html[data-theme="dark"] .ver-both{color:#a1a1aa;border-color:#a1a1aa;background:
 
 <script>
 
-// ============================================================
 
-// 工具
 
-// ============================================================
+
+
+
 
 const $ = s => document.querySelector(s);
 
@@ -5116,7 +5116,7 @@ applyTheme();
 
 if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
-// ===== 液态玻璃实验室：壁纸/透明度/光影 + 卡片拖动 + 调试入口（仅玻璃主题）=====
+
 
 (function(){
 
@@ -5338,13 +5338,13 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
   }
 
-  // 关闭按钮
+  
 
   var gbClose=document.getElementById('gbClose');
 
   if(gbClose){gbClose.addEventListener('click',function(){gbPicker.classList.add('hidden');});}
 
-  // 三个开关
+  
 
   function bindCheck(id,key,fn){
 
@@ -5374,7 +5374,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
   bindCheck('gbDark','tst-glass-dark');
 
-  // 强度预设
+  
 
   var presetMap={soft:8,normal:18,strong:34};
 
@@ -5398,7 +5398,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
   });
 
-  // 随机主题
+  
 
   var gbRandom=document.getElementById('gbRandom');
 
@@ -5436,7 +5436,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
   }
 
-  // 重置默认
+  
 
   var gbReset=document.getElementById('gbReset');
 
@@ -5456,7 +5456,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
   }
 
-  // 分享码
+  
 
   var gbShare=document.getElementById('gbShare');
 
@@ -5580,7 +5580,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
 })();
 
-// ===== 调试入口（输入代码激活内测功能）=====
+
 
 (function(){
 
@@ -5752,7 +5752,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
 })();
 
-// ===== 3D 性能渲染测试（原生 WebGL，调试台 bench3d 激活）=====
+
 function openBench3D(){
   const mask=document.getElementById('benchMask');
   if(!mask)return;
@@ -5770,7 +5770,7 @@ function openBench3D(){
   try{ const ext=gl.getExtension('WEBGL_debug_renderer_info');
     if(ext)gpuName=String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||'未知'); }catch(e){}
   if(gpuEl)gpuEl.textContent=gpuName;
-  // ---- 16 光源逐像素光照 ----
+  
   const vsrc='attribute vec3 aPos;attribute vec3 aNor;attribute vec3 aCol;uniform mat4 uM,uVP;uniform vec3 uCam;varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vN=mat3(uM)*aNor;vC=aCol;vec4 wp=uM*vec4(aPos,1.0);vP=wp.xyz;vV=uCam-wp.xyz;gl_Position=uVP*wp;}';
   const fsrc='precision mediump float;uniform vec3 uL[16];varying vec3 vN;varying vec3 vP;varying vec3 vC;varying vec3 vV;void main(){vec3 n=normalize(vN);vec3 v=normalize(vV);float fr=pow(1.0-max(dot(n,v),0.0),2.0)*0.22;vec3 acc=vec3(0.045,0.085,0.18)+vC*0.35;for(int i=0;i<16;i++){vec3 l=normalize(uL[i]);float d=max(dot(n,l),0.0);float s=pow(max(dot(reflect(-l,n),v),0.0),20.0+float(i)*3.0);float dd=0.40-float(i)*0.024;float ss=0.90-float(i)*0.055;acc+=vC*d*max(dd,0.015)+vec3(1.0,0.92,0.85)*s*max(ss,0.035);}acc+=vec3(0.5,0.42,0.85)*fr;gl_FragColor=vec4(acc,1.0);}';
   const pvs='attribute vec3 aPos;attribute vec3 aCol;attribute float aSize;uniform mat4 uVP;varying vec3 vC;void main(){vC=aCol;gl_Position=uVP*vec4(aPos,1.0);gl_PointSize=aSize;}';
@@ -5812,7 +5812,7 @@ function openBench3D(){
       idx.push(a,b,c,b,d,c);}
     return {pos:new Float32Array(pos),nor:new Float32Array(nor),col:new Float32Array(col),idx:new Uint16Array(idx),tri:segT*segR*2};
   }
-  // ---- 重型场景：中心 320 + 20×256 + 10×192 轨道球 + 8 环（约 185 万三角）----
+  
   const core=buildSphere(320);
   const orbA=[],orbB=[];
   for(let i=0;i<20;i++)orbA.push(buildSphere(256));
@@ -5838,7 +5838,7 @@ function openBench3D(){
   const orbBM=orbB.map(function(o,i){return makeMesh(o,tB[i]);});
   const tR=[[0.85,0.72,0.30],[0.35,0.85,0.95],[0.90,0.40,0.60],[0.55,0.90,0.70],[0.70,0.45,0.90],[0.95,0.65,0.40],[0.45,0.80,0.65],[0.85,0.55,0.80]];
   const ringM=rings.map(function(o,i){return makeMesh(o,tR[i]);});
-  // 星尘粒子
+  
   const DN=5000,dPos=new Float32Array(DN*3),dCol=new Float32Array(DN*3),dSz=new Float32Array(DN),dP=new Float32Array(DN),dR=new Float32Array(DN),dX=new Float32Array(DN),dZ=new Float32Array(DN);
   for(let i=0;i<DN;i++){
     const r=7+Math.random()*24,th=Math.random()*6.283,ph=Math.acos(Math.random()*2-1);
@@ -5851,7 +5851,7 @@ function openBench3D(){
   function setMesh(b){gl.bindBuffer(gl.ARRAY_BUFFER,b.pos);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,3,gl.FLOAT,false,0,0);
     gl.bindBuffer(gl.ARRAY_BUFFER,b.nor);gl.enableVertexAttribArray(locN);gl.vertexAttribPointer(locN,3,gl.FLOAT,false,0,0);
     gl.bindBuffer(gl.ARRAY_BUFFER,b.col);gl.enableVertexAttribArray(locC);gl.vertexAttribPointer(locC,3,gl.FLOAT,false,0,0);}
-  // ---- 档位：1x/2x/3x/4x 超采样阶梯 ----
+  
   const STEPS=[[1,12,8],[2,12,8],[3,9,9],[4,6,10],[5,4,10],[6,3,10]];
   let curPasses=12;
   const fov=48*Math.PI/180,zn=0.1,zf=120;
@@ -5866,7 +5866,7 @@ function openBench3D(){
     const m=m4();m[0]=r[0];m[1]=u[0];m[2]=-f[0];m[4]=r[1];m[5]=u[1];m[6]=-f[1];m[8]=r[2];m[9]=u[2];m[10]=-f[2];
     m[12]=-(r[0]*eye[0]+r[1]*eye[1]+r[2]*eye[2]);m[13]=-(u[0]*eye[0]+u[1]*eye[1]+u[2]*eye[2]);m[14]=f[0]*eye[0]+f[1]*eye[1]+f[2]*eye[2];
     return m;}
-  // 固定基础渲染分辨率（不依赖 DOM 布局）
+  
   const baseW=1280,baseH=720;
   function applyRes(mult){
     canvas.width=Math.round(baseW*mult);canvas.height=Math.round(baseH*mult);
@@ -5910,7 +5910,7 @@ function openBench3D(){
     gl.enableVertexAttribArray(pSzL);gl.vertexAttribPointer(pSzL,1,gl.FLOAT,false,0,0);
     gl.drawArrays(gl.POINTS,0,DN);
     gl.disable(gl.BLEND);
-    // 场景两遍叠加渲染（第二遍 additive 辉光，几何与像素负载翻倍）
+    
     for(let pass=0;pass<curPasses;pass++){
       if(pass>0){const off=(pass-1)*0.0012;vp[12]+=off;vp[13]-=off*0.5;}
       gl.enable(gl.DEPTH_TEST);gl.disable(gl.BLEND);
@@ -5999,7 +5999,7 @@ function openBench3D(){
   document.addEventListener('keydown',onKey);
   const cc=document.getElementById('benchClose');
   if(cc){cc.onclick=close;}
-  // 同步帧测量（验证用）：连续渲染 N 帧取真实 GPU 帧成本，不依赖 rAF
+  
   window.__benchSync=function(N){
     const t0=performance.now();
     for(let i=0;i<N;i++)renderFrame(t0/1000+i*0.016);
@@ -6009,7 +6009,7 @@ function openBench3D(){
   window.__benchApplyRes=applyRes;
   raf=requestAnimationFrame(tick);
 }
-// ===== 调试信息弹窗关闭 =====
+
 
 (function(){
 
@@ -6025,7 +6025,7 @@ function openBench3D(){
 
 })();
 
-// ===== 卡片拖动（双模式：网格排序 / 自由摆放；全站小卡片通用：公告/动态/赛事回放/赞助/便捷工具，含触屏丝滑 + q弹音效）=====
+
 
 (function(){
 
@@ -6157,7 +6157,7 @@ function openBench3D(){
 
   function refreshAll(){allGrids().forEach(function(g){if(isGlass())layoutInit(g);else resetCardFree(g);});}
 
-  // ===== q弹音效（Web Audio 合成，无外部文件；圆润正弦波+果冻扫频，仅玻璃主题播放）=====
+  
 
   var actx=null,lastSwap=0,sfxThrottle=0,lastDragMove=0,lastEdgeSfx=0;
 
@@ -6227,7 +6227,7 @@ function openBench3D(){
 
   window.sfx=sfx;
 
-  // 全局按钮音效（玻璃主题下按钮/导航/折叠/背景选项统一 Q弹反馈；拖动刚结束时静默防误触）
+  
 
   document.addEventListener('click',function(e){
 
@@ -6315,7 +6315,7 @@ function openBench3D(){
 
     if(dragMode()==='free'){
 
-      // 跨容器自由排列：拖到其他卡片容器时把卡片迁移过去
+      
 
       const hitEl=document.elementFromPoint(e.clientX,e.clientY);
 
@@ -6391,7 +6391,7 @@ function openBench3D(){
 
       const sp=posOf(g,startIdx);
 
-      // 跟手用 transform（GPU 丝滑），释放后过渡归位
+      
 
       card.style.transform='translate('+dx+'px,'+dy+'px) translateZ(0) scale(1.02) rotate('+(dx*0.0012)+'deg)';
 
@@ -6591,7 +6591,7 @@ function openBench3D(){
 
   window.applyDragMode=function(){allGrids().forEach(function(g){resetCardFree(g);});refreshAll();};
 
-  // 切页后重新布局（修复：隐藏页容器宽度为 0 导致玻璃卡片重叠）
+  
 
   window.refreshGlassLayout=function(){
 
@@ -6607,7 +6607,7 @@ function openBench3D(){
 
 })();
 
-// ===== 配置要求折叠 =====
+
 (function(){
   var tg=document.getElementById('cfgToggle'),blk=document.getElementById('cfgBlock');
   if(tg&&blk){
@@ -6622,7 +6622,7 @@ function openBench3D(){
   }
 })();
 
-// ===== 管理团队折叠 =====
+
 
 (function(){
 
@@ -6646,7 +6646,7 @@ function openBench3D(){
 
 })();
 
-// ===== 拖动模式切换（玻璃实验室面板）=====
+
 
 (function(){
 
@@ -6700,7 +6700,7 @@ function openBench3D(){
 
 })();
 
-// ===== 液态玻璃特效：鼠标光晕 + 卡片反光 + 滚动渐入 =====
+
 
 (function(){
 
@@ -6760,7 +6760,7 @@ function openBench3D(){
 
   }
 
-  // 兜底：1.2s 后仍未进入视口的元素强制显示，避免卡白
+  
 
   setTimeout(function(){
 
@@ -6772,7 +6772,7 @@ function openBench3D(){
 
 })();
 
-// 首次玻璃主题提示：小卡片可自由拖动
+
 
 (function(){
 
@@ -6806,11 +6806,11 @@ function openBench3D(){
 
 })();
 
-// ============================================================
 
-// 导航切换
 
-// ============================================================
+
+
+
 
 const navBtns=document.querySelectorAll('.nav-link');
 
@@ -6858,7 +6858,7 @@ function switchPage(pid){
   }, true);
 })();
 navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
-/* 投票维护中：入口置灰，点击只提示不跳转 */
+
 (function(){
   var vb=document.querySelector('[data-nav="vote"]');
   if(!vb) return;
@@ -6875,11 +6875,11 @@ navBtns.forEach(b=>{ b.onclick=()=>switchPage(b.dataset.nav); });
   vb.onclick=function(e){ e.preventDefault(); e.stopPropagation(); tip(); };
 })();
 
-// ===== 聊天室（调试码 chat 激活，内测功能）=====
+
 
 var chatTimer=null, chatStatusTimer=null, chatLastId=0, chatInited=false, chatMe={nickname:''};
 
-// 轮询频率：聊天 12 秒、服务器状态 2 分钟
+
 var CHAT_POLL_MS=12000, CHAT_STATUS_MS=120000;
 
 function chatPollStart(){
@@ -7006,7 +7006,7 @@ function chatInit(){
   if(box)box.addEventListener('scroll',function(){box.dataset.userScroll=(box.scrollHeight-box.scrollTop-box.clientHeight>90)?'1':'';});
 
   document.querySelectorAll('.nav-link[data-nav="chat"]').forEach(function(b){b.addEventListener('click',function(){setTimeout(chatSeenNow,300);});});
-  // 已读标记不再单独轮询：每次拉到新消息后顺带清一次未读（见 loadChatHistory）
+  
 
   var dmS=document.getElementById('dmSend'),dmI=document.getElementById('dmInput'),dmC=document.getElementById('dmClose');
   if(dmS)dmS.onclick=sendDm;
@@ -7023,7 +7023,7 @@ function openChatCmd(){
 }
 
 function checkPanelAdminAndFocus(){
-  // 面板内部会按账号管理员标签自动放行，这里只负责切页与聚焦
+  
   setTimeout(function(){ var i=document.getElementById('cmdInput'); if(i && !i.disabled) i.focus(); },300);
 }
 
@@ -7345,7 +7345,7 @@ function loadChatStatus(){
 
 }
 
-// hash 路由：index.html#notice 等直达对应页
+
 
 (function(){
 
@@ -7363,7 +7363,7 @@ function loadChatStatus(){
 
 })();
 
-// 更多下拉
+
 
 const navMoreBtn=document.getElementById('navMoreBtn');
 
@@ -7447,11 +7447,11 @@ document.querySelectorAll('[data-fnav]').forEach(b=>{
 
 });
 
-// ============================================================
 
-// 轮播
 
-// ============================================================
+
+
+
 
 const heroSlider=$('#heroSlider');
 
@@ -7505,7 +7505,7 @@ document.addEventListener('visibilitychange',()=>{
 
 });
 
-// ============================================================
+
 
 function applyServerStatus(){
 
@@ -7531,7 +7531,7 @@ function applyServerStatus(){
 
 }
 
-// 复制地址
+
 
 let copyFlag=false;
 
@@ -7573,11 +7573,11 @@ $('#openQQGroup').onclick=()=>{
 
 };
 
-// ============================================================
 
-// 数据加载（公开 API）
 
-// ============================================================
+
+
+
 
 let SITE_DATA={announcements:[],feeds:[],sponsors:[],images:[],replays:[],serverStatus:'online'};
 
@@ -7904,11 +7904,11 @@ function renderSponsors(){
 
 }
 
-// ============================================================
 
-// 玩家公约（本地数据）
 
-// ============================================================
+
+
+
 
 const RULES={
 treatyTitle:'The Slow Tide 综合玩家公约',
@@ -8034,7 +8034,7 @@ document.addEventListener('click',(e)=>{
 
 });
 
-// 公约搜索
+
 
 $('#ruleSearchBtn').onclick=()=>doRuleSearch($('#ruleSearchInput').value);
 
@@ -8078,11 +8078,11 @@ function doRuleSearch(kw){
 
 }
 
-// ============================================================
 
-// 全局搜索（公告 / 动态 / 公约 / 页面）
 
-// ============================================================
+
+
+
 
 function searchUnits(){
 
@@ -8325,11 +8325,11 @@ $('#globalSearchInput').addEventListener('keydown',(e)=>{
 
 $('#globalSearchInput').addEventListener('input',()=>hideResults());
 
-// ============================================================
 
-// 搜索联想
 
-// ============================================================
+
+
+
 
 function suggestOpen(id){ return document.getElementById(id).classList.contains('show'); }
 
@@ -8451,11 +8451,11 @@ initSuggest('globalSearchInput','globalSuggest',(kw)=>doGlobalSearch(kw));
 
 initSuggest('ruleSearchInput','ruleSuggest',(kw)=>doRuleSearch(kw));
 
-// ============================================================
 
-// 管理员面板
 
-// ============================================================
+
+
+
 
 const osModal=$('#osModal');
 
@@ -8659,7 +8659,7 @@ async function loadStats(){
 
 }
 
-// Tab 切换
+
 
 document.querySelectorAll('.admin-tab').forEach(t=>{
 
@@ -8861,7 +8861,7 @@ document.addEventListener('click',async(e)=>{
 
 });
 
-// 编辑状态（点编辑 → 表单进入修改模式）
+
 
 let editingAn=null, editingHy=null, editingFd=null, editingSp=null;
 
@@ -9113,7 +9113,7 @@ $('#spCancelBtn').onclick=cancelSpEdit;
 
 $('#rpCancelBtn').onclick=cancelRpEdit;
 
-// 发布公告 / 保存修改
+
 
 $('#anAddBtn').onclick=async()=>{
 
@@ -9143,7 +9143,7 @@ $('#anAddBtn').onclick=async()=>{
 
 };
 
-// 发布动态（含图片）
+
 
 let fdImageData=null;
 
@@ -9205,7 +9205,7 @@ $('#fdAddBtn').onclick=async()=>{
 
 };
 
-// 添加赞助 / 保存修改
+
 
 $('#spAddBtn').onclick=async()=>{
 
@@ -9235,7 +9235,7 @@ $('#spAddBtn').onclick=async()=>{
 
 };
 
-// 赛事回放管理
+
 
 function renderAdminReplays(){
 
@@ -9289,11 +9289,11 @@ $('#rpAddBtn').onclick=async()=>{
 
 };
 
-// ============================================================
 
-// 图片管理（上传 / 引用 / 删除）
 
-// ============================================================
+
+
+
 
 function resolveImg(src){
 
@@ -9779,7 +9779,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
 </div>
 
 <script>
-// ===== 玩家发帖（PC · 内测卡密，数据存储于反馈站 D1）=====
+
 (function(){
   const POST_API='https://theslowtidefk.pages.dev/api/posts';
   function pDev(){
@@ -9968,7 +9968,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
 })();
 </script>
 <script>
-// 管理员入口：whoami 判定
+
 (function(){
   var token=localStorage.getItem('tst_token')||'';
   var link=document.getElementById('planLink');
@@ -9980,7 +9980,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
 })();
 </script>
 <script>
-// Java 服 · the slow tide 实时状态：数据来自服务器插件每 30 秒上报，不是模拟值
+
 (function(){
   var URL_STATE='/api/tst-status/state';
   var dot=document.getElementById('javaDot'), st=document.getElementById('javaState'),
@@ -10067,7 +10067,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
     });
   }
 
-  // 24 小时性能曲线（点开才请求，不拖慢首页）
+  
   var chartBtn=document.getElementById('javaChartBtn'), chartWrap=document.getElementById('javaChartWrap');
   if(chartBtn && chartWrap){
     var chartLoaded=false;
@@ -10088,7 +10088,7 @@ try{ eval('const __t=()=>1;'); }catch(e){
   document.addEventListener('visibilitychange',function(){ if(!document.hidden){ tick(); } });
 })();
 </script><script>
-// 服务器面板：性能曲线 / 日志 / 控制台 / 游戏动态
+
 (function(){
   function num(v){ var n=Number(v); return isFinite(n)?n:null; }
   function pad(n){ return (n<10?'0':'')+n; }
@@ -10468,7 +10468,7 @@ body::after{
 }
 .wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:28px 20px 90px}
 
-/* ---------- 顶栏 ---------- */
+
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;
   padding:14px 18px;border:1px solid var(--line);border-radius:14px;
   background:linear-gradient(180deg, rgba(255,252,240,.85), rgba(240,228,202,.75));
@@ -10489,7 +10489,7 @@ body::after{
   background:rgba(214,181,86,.16);font-size:13.5px;color:#5c470f;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .banner b{color:var(--wine)}
 
-/* ---------- 登录弹窗 ---------- */
+
 .mask{display:none;position:fixed;inset:0;z-index:100;background:rgba(40,25,5,.5);align-items:center;justify-content:center;padding:20px}
 .mask.show{display:flex}
 .dialog{width:100%;max-width:380px;border:1px solid var(--gold2);border-radius:18px;
@@ -10508,7 +10508,7 @@ body::after{
 .dlg-btns .btn{flex:1;text-align:center}
 .dlg-close{position:absolute;top:12px;right:16px;border:none;background:none;font-size:18px;color:var(--ink2);cursor:pointer}
 
-/* 目录 */
+
 .toc{position:fixed;left:16px;top:50%;transform:translateY(-50%);z-index:45;width:172px;
   border:1px solid var(--line);border-radius:14px;background:rgba(255,250,238,.92);
   box-shadow:var(--shadow);padding:14px 12px}
@@ -10522,7 +10522,7 @@ body::after{
 .toc a.on{color:var(--wine);border-left-color:var(--wine);font-weight:bold}
 .toc a.on::before{background:var(--wine);opacity:1}
 
-/* Hero */
+
 .hero{position:relative;margin:34px 0 26px;border:1px solid var(--line);border-radius:20px;overflow:hidden;
   background:linear-gradient(150deg,#f6eedb,#e5d7b6 55%,#d8c69a);box-shadow:var(--shadow);
   padding:56px 48px 46px;min-height:340px;display:flex;flex-direction:column;justify-content:center}
@@ -10665,7 +10665,7 @@ footer b{color:var(--wine)}
 </head>
 <body>
 
-<!-- 顶栏 -->
+
 <div class="wrap">
 <header class="topbar">
   <div class="brand">
@@ -10687,7 +10687,7 @@ footer b{color:var(--wine)}
   🪄 还没登录。登录后主页会亮出你的 <b>巫师身份</b>，管理员还能进 <b>策划台</b>。<button class="btn" id="btnBannerLogin" style="margin-left:6px">点这里登录</button>
 </div>
 
-<!-- 目录 -->
+
 <nav class="toc" id="toc">
   <h4>📜 目录</h4>
   <a href="#hero">序 · 卷首</a>
@@ -10712,7 +10712,7 @@ footer b{color:var(--wine)}
   <a href="#progress">程 · 开发进度</a>
 </nav>
 
-<!-- HERO -->
+
 <section class="hero" id="hero">
   <svg class="stamp" viewBox="0 0 90 90">
     <circle cx="45" cy="45" r="40" fill="none" stroke="#7d2f22" stroke-width="2.5"/>
@@ -10727,7 +10727,7 @@ footer b{color:var(--wine)}
   <div class="note">本页是<b>企划预告</b>——饼先画给大家看，能不能烙熟、什么时候烙熟，作者心里也没底。内容以游戏内最终版本为准，上线时间先按<b>几年后</b>算，催更请轻拍，鸽子也是会害羞的。<br>立项于 <b>2026年6月25日</b> · 目前开发进度 3%</div>
 </section>
 
-<!-- 时间线 -->
+
 <section class="sec" id="timeline">
   <div class="sec-head"><span class="ico">✦</span><h2>这个世界发生过什么</h2><span class="desc">三个时代，一场未灭的余烬</span></div>
   <div class="timeline">
@@ -10737,7 +10737,7 @@ footer b{color:var(--wine)}
   </div>
 </section>
 
-<!-- 主线 -->
+
 <section class="sec" id="mainline">
   <div class="sec-head"><span class="ico">⚔</span><h2>主线 · 七个学年的暗流</h2><span class="desc">真伏笔零提示，真假线索混杂</span></div>
   <div class="card">
@@ -10753,7 +10753,7 @@ footer b{color:var(--wine)}
   </div>
 </section>
 
-<!-- 四学院 -->
+
 <section class="sec" id="houses">
   <div class="sec-head"><span class="ico">🛡</span><h2>四学院</h2><span class="desc">你的归宿在哪里</span></div>
   <div class="houses">
@@ -10780,7 +10780,7 @@ footer b{color:var(--wine)}
   </div>
 </section>
 
-<!-- 支线 -->
+
 <section class="sec" id="branch">
   <div class="sec-head"><span class="ico">✦</span><h2>支线 · 预埋闲笔</h2><span class="desc">三条支线，同样零提示</span></div>
   <div class="card">
@@ -10795,7 +10795,7 @@ footer b{color:var(--wine)}
   </div>
 </section>
 
-<!-- 魔法地图 -->
+
 <section class="sec" id="map">
   <div class="sec-head"><span class="ico">🗺</span><h2>魔法地图 · 点击任务点</h2><span class="desc">地图为示意，点位会随版本更新</span></div>
   <div class="map-wrap" id="mapWrap">
@@ -10831,7 +10831,7 @@ footer b{color:var(--wine)}
   </div>
 </section>
 
-<!-- 彩蛋 -->
+
 <section class="sec" id="egg">
   <div class="sec-head"><span class="ico">🔮</span><h2>彩蛋 · 一点私心</h2><span class="desc">都是脏活累活，但值得</span></div>
   <div class="eggs">
@@ -10844,7 +10844,7 @@ footer b{color:var(--wine)}
   </div>
 </section>
 
-<!-- 进度 -->
+
 <section class="sec" id="progress">
   <div class="sec-head"><span class="ico">⚒</span><h2>开发进度</h2><span class="desc">诚实地告诉你，还很早</span></div>
   <div class="progress">
@@ -10873,7 +10873,7 @@ footer b{color:var(--wine)}
 </footer>
 </div>
 
-<!-- 登录弹窗 -->
+
 <div class="mask" id="loginMask">
   <div class="dialog">
     <button class="dlg-close" id="dlgClose">✕</button>
@@ -10898,13 +10898,13 @@ footer b{color:var(--wine)}
   </div>
 </div>
 
-<!-- 音乐 -->
+
 <audio id="bgm" loop preload="auto"><source src="https://theslowtide.pages.dev/hogwarts_music.mp3" type="audio/mpeg"></audio>
 <button class="mus on" id="mus" aria-label="音乐">
   <svg viewBox="0 0 24 24"><path d="M9 6v9a3 3 0 1 1-2-2.8V8z"/><path d="M12 4l6-1.5v11.5" fill="none" stroke="#7d2f22" stroke-width="1.6"/><path class="vib" d="M15 6v8a3 3 0 1 1-2-2.8V6z" fill="none" stroke="#7d2f22" stroke-width="1.6"/></svg>
 </button>
 
-<!-- 登录中继：读主站已有登录态 -->
+
 <iframe id="authRelay" src="https://theslowtide.pages.dev/auth-relay.html" style="display:none"></iframe>
 
 <script>
@@ -11078,7 +11078,7 @@ a{color:inherit;text-decoration:none;}
 .back-btn:hover{background:var(--hover);}
 .user-tag{font-size:12px;color:var(--gold);border:1px solid var(--gold);background:var(--gold-soft);border-radius:10px;padding:2px 10px;white-space:nowrap;}
 
-/* 权限门 */
+
 .gate{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;}
 .gate-card{max-width:440px;width:100%;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:30px 26px;box-shadow:var(--shadow);text-align:center;}
 .gate-card h2{font-size:20px;font-weight:800;margin-bottom:10px;}
@@ -11089,7 +11089,7 @@ a{color:inherit;text-decoration:none;}
 .gate-lock{font-size:40px;margin-bottom:12px;}
 .gate-sub{font-size:12px;color:var(--text-secondary);margin-top:14px;}
 
-/* 布局 */
+
 .layout{max-width:1200px;margin:0 auto;display:flex;gap:26px;padding:24px 20px;align-items:flex-start;}
 .toc{width:210px;flex:none;position:sticky;top:76px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;max-height:calc(100vh - 100px);overflow-y:auto;}
 .toc-title{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;margin-bottom:6px;}
@@ -11098,21 +11098,21 @@ a{color:inherit;text-decoration:none;}
 .toc a.active{background:var(--gold-soft);color:var(--gold);font-weight:600;}
 .content{flex:1;min-width:0;}
 
-/* 区块 */
+
 .section{padding:10px 0 30px;}
 .sec-head{margin-bottom:16px;}
 .sec-head h2{font-size:22px;font-weight:800;letter-spacing:.5px;}
 .sec-head h2 .g{color:var(--gold);}
 .sec-head p{color:var(--text-secondary);font-size:13px;margin-top:4px;}
 
-/* 搜索 */
+
 .searchbar{position:sticky;top:64px;z-index:900;background:var(--bg);padding:10px 0;display:flex;gap:8px;flex-wrap:wrap;}
 .searchbar input{flex:1;min-width:200px;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);font-size:14px;}
 .searchbar input:focus{outline:none;border-color:var(--gold);}
 .searchbar .fbtn{padding:9px 14px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text-secondary);font-size:13px;cursor:pointer;white-space:nowrap;}
 .searchbar .fbtn.on{background:var(--gold-soft);border-color:var(--gold);color:var(--gold);font-weight:600;}
 
-/* 卡片 */
+
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:20px;margin-bottom:14px;}
 .card h3{font-size:16px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 .card h3 .t{color:var(--gold);font-size:12px;letter-spacing:1px;}
@@ -11125,7 +11125,7 @@ a{color:inherit;text-decoration:none;}
 .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
 
-/* 表格 */
+
 .tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--card);box-shadow:var(--shadow);margin-bottom:16px;}
 table.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:680px;}
 table.tbl th{background:var(--gold-soft);color:var(--gold);font-weight:700;text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:.5px;}
@@ -11138,7 +11138,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
 .tag.red{color:var(--accent);border-color:var(--accent);}
 .tag.gray{color:var(--text-secondary);border-color:var(--border);}
 
-/* 提示框 */
+
 .note{background:var(--gold-soft);border:1px dashed var(--gold);border-radius:12px;padding:16px 18px;margin-bottom:16px;font-size:13.5px;color:var(--text);line-height:1.8;}
 .note b{color:var(--gold);}
 
@@ -11167,7 +11167,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
   </div>
 </header>
 
-<!-- 权限门 -->
+
 <div class="gate" id="gate">
   <div class="gate-card">
     <div class="gate-lock" id="gateIcon">🔒</div>
@@ -11196,7 +11196,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
   </aside>
   <div class="content">
 
-  <!-- ===== 文档索引 ===== -->
+  
   <section class="section" id="docs">
     <div class="sec-head">
       <h2>文档索引</h2>
@@ -11226,7 +11226,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
     <div class="note">本资料台数据源：14 份策划定稿文档（截至 2026.10.19 定稿版）。页面为方便策划快速查询而做的表格化整理，具体数值以文档原文为准。</div>
   </section>
 
-  <!-- ===== 世界观 ===== -->
+  
   <section class="section" id="world">
     <div class="sec-head">
       <h2>世界观总纲 <span class="g">· TST-WORLD-001</span></h2>
@@ -11247,7 +11247,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
     </div>
   </section>
 
-  <!-- ===== 势力 ===== -->
+  
   <section class="section" id="faction">
     <div class="sec-head">
       <h2>势力与阵营速览 <span class="g">· TST-FAC-001</span></h2>
@@ -11276,7 +11276,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
     </div>
   </section>
 
-  <!-- ===== 主线 ===== -->
+  
   <section class="section" id="main">
     <div class="sec-head">
       <h2>主线任务 <span class="g">· TST-IDEA-006 V6.3</span></h2>
@@ -11290,7 +11290,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
     </div>
   </section>
 
-  <!-- ===== 支线 ===== -->
+  
   <section class="section" id="side">
     <div class="sec-head">
       <h2>支线体系 <span class="g">· 42 条</span></h2>
@@ -11323,7 +11323,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
     <div class="note">学院专属支线仅本院可接，非本院玩家靠近触发 NPC 时无任何交互响应；多周目换学院可体验不同视角。</div>
   </section>
 
-  <!-- ===== 地图 ===== -->
+  
   <section class="section" id="map">
     <div class="sec-head">
       <h2>地图任务 <span class="g">· 区域 / NPC 动线</span></h2>
@@ -11346,7 +11346,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
     </div>
   </section>
 
-  <!-- ===== 道具 ===== -->
+  
   <section class="section" id="items">
     <div class="sec-head">
       <h2>道具与剧情关联 <span class="g">· TST-XREF-001 / TST-ITEM-001 / TST-SPELL-001</span></h2>
@@ -11374,7 +11374,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
     <div class="note">咒语效果对照表、物品道具咒语清单、设定冲突校验表为附表文档，本页摘录与任务强关联条目；完整清单见文档原文。</div>
   </section>
 
-  <!-- ===== 规则 ===== -->
+  
   <section class="section" id="rules">
     <div class="sec-head">
       <h2>伏笔规则与项目约束 <span class="g">· TST-RISK-001 / TST-CONF-001</span></h2>
@@ -11405,7 +11405,7 @@ table.tbl .dim{color:var(--text-secondary);font-size:12px;}
     </div>
   </section>
 
-  <!-- ===== 进度 ===== -->
+  
   <section class="section" id="progress">
     <div class="sec-head">
       <h2>开发进度</h2>
@@ -11704,7 +11704,7 @@ line-height:1.65;
 a{color:var(--accent);text-decoration:none;}
 button{font-family:inherit;}
 
-/* ===== 顶部导航 ===== */
+
 .site-header{
 position:sticky;top:0;z-index:100;
 background:var(--header-bg);
@@ -11768,7 +11768,7 @@ body,.site-header,.card,.btn,.theme-toggle{
 transition:background-color .3s ease,color .3s ease,border-color .3s ease;
 }
 
-/* ===== 页面 ===== */
+
 .section{padding:26px 0;}
 .section-title{
 display:flex;align-items:center;gap:10px;
@@ -11787,7 +11787,7 @@ transition:transform .2s ease,box-shadow .2s ease;
 .tool-card h3{font-size:17px;margin-bottom:8px;}
 .tool-card p{font-size:14px;color:var(--text-secondary);}
 
-/* ===== 编译器 ===== */
+
 .compiler-wrap{display:none;}
 .compiler-wrap.show{display:block;}
 .compiler-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
@@ -11838,7 +11838,7 @@ font-size:14px;box-shadow:var(--shadow);
 }
 .hint{font-size:12px;color:var(--text-secondary);margin-top:6px;}
 
-/* ===== 元素卡片 ===== */
+
 .elem-list{display:flex;flex-direction:column;gap:12px;margin-top:4px;}
 .elem-card{
 border:1px solid var(--border);border-radius:8px;padding:12px;
@@ -11867,7 +11867,7 @@ cursor:pointer;font-size:14px;
 .add-elem:hover{background:var(--hover);color:var(--text);}
 .hint-line{font-size:12px;color:var(--text-secondary);margin-top:6px;}
 
-/* 移动端导航（2A2MF6） */
+
 @media(max-width:960px){
 .header-inner{gap:8px;flex-wrap:wrap;}
 .main-nav{order:3;flex-basis:100%;display:flex;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap;padding-bottom:2px;}
@@ -11891,7 +11891,7 @@ cursor:pointer;font-size:14px;
 
 
 
-/* ===== 液态玻璃主题 v8（iOS 27 液态玻璃·管理员内测）===== */
+
 html[data-theme="glass"]{
 color-scheme:light;
 --bg:#eef2fb;
@@ -11906,12 +11906,12 @@ color-scheme:light;
 --accent-soft:rgba(79,99,216,.12);
 --shadow:0 20px 60px rgba(70,90,160,.16);
 --hero-grad:linear-gradient(135deg,#dbe4ff,#e9e2ff);
---go1:.24;--go2:.08;--go3:.13;    /* 卡片渐变三段透明度（通透液态玻璃） */
---gn1:.24;                       /* 导航透明度 */
---gb1:.42;--gb2:.12;             /* 按钮透明度 */
---gsh1:30px;--gsh2:.12;--gsh3:10px;  /* 阴影扩展/强度/偏移 */
+--go1:.24;--go2:.08;--go3:.13;    
+--gn1:.24;                       
+--gb1:.42;--gb2:.12;             
+--gsh1:30px;--gsh2:.12;--gsh3:10px;  
 }
-/* 背景：干净 iOS 壁纸渐变（无杂乱光斑） */
+
 html[data-theme="glass"] body{
 background:linear-gradient(160deg,#dee9ff 0%,#eaf2ff 26%,#e6efff 48%,#e5eeff 72%,#eef3ff 100%);
 background-attachment:fixed;
@@ -11921,7 +11921,7 @@ animation:gbFlow 26s ease-in-out infinite;
 @keyframes gbFlow{0%{background-position:0% 0%;}50%{background-position:100% 100%;}100%{background-position:0% 0%;}}
 html[data-theme="glass"][data-gb="plain"] body,
 html[data-theme="glass"][data-gb="transparent"] body{animation:none;background-size:auto;}
-/* 顶部柔和透亮光 */
+
 html[data-theme="glass"] body::before{
 content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 background:radial-gradient(1200px 800px at 10% -10%,rgba(130,185,255,.78),transparent 60%),
@@ -11936,7 +11936,7 @@ html[data-theme="glass"] .site-header,
 html[data-theme="glass"] .notice-ticker,
 html[data-theme="glass"] .container,
 html[data-theme="glass"] .site-footer{position:relative;z-index:1;}
-/* 导航液态玻璃 */
+
 html[data-theme="glass"] .site-header{
 background:linear-gradient(180deg,rgba(255,255,255,calc(var(--gn1,.16)*1.35)) 0%,rgba(255,255,255,var(--gn1,.16)) 100%);
 backdrop-filter:saturate(250%) contrast(1.04);
@@ -11949,7 +11949,7 @@ html[data-theme="glass"] .main-nav a,
 html[data-theme="glass"] .main-nav button{transition:color .25s ease,text-shadow .25s ease;}
 html[data-theme="glass"] .main-nav a:hover,
 html[data-theme="glass"] .main-nav button:hover{color:#4f63d8;text-shadow:0 0 16px rgba(79,99,216,.4);}
-/* 卡片：真液态玻璃（顶部反射光带+边缘白描边+大圆角+柔阴影） */
+
 html[data-theme="glass"] .card,
 html[data-theme="glass"] .server-card,
 html[data-theme="glass"] .notice-ticker,
@@ -11977,7 +11977,7 @@ box-shadow:
 0 0 30px rgba(160,190,255,.14),
 inset 0 1px 0 rgba(255,255,255,1);
 }
-/* 卡片入场 */
+
 @keyframes cardIn{0%{opacity:0;transform:translateY(18px) scale(.97);}100%{opacity:1;transform:none;}}
 html[data-theme="glass"] .card-grid .card{animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) backwards;}
 html[data-theme="glass"] .card-grid .card:nth-child(2){animation-delay:.06s;}
@@ -11985,7 +11985,7 @@ html[data-theme="glass"] .card-grid .card:nth-child(3){animation-delay:.12s;}
 html[data-theme="glass"] .card-grid .card:nth-child(4){animation-delay:.18s;}
 html[data-theme="glass"] .card-grid .card:nth-child(5){animation-delay:.24s;}
 html[data-theme="glass"] .card-grid .card:nth-child(6){animation-delay:.3s;}
-/* 按钮：液态玻璃胶囊 */
+
 html[data-theme="glass"] .btn-primary,
 html[data-theme="glass"] .feedback-btn,
 html[data-theme="glass"] .collapse-btn{
@@ -12007,7 +12007,7 @@ box-shadow:0 10px 28px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,1);
 html[data-theme="glass"] .btn-primary:active,
 html[data-theme="glass"] .feedback-btn:active,
 html[data-theme="glass"] .collapse-btn:active{transform:scale(.93);}
-/* 输入框玻璃 */
+
 html[data-theme="glass"] input[type="text"],
 html[data-theme="glass"] input[type="search"],
 html[data-theme="glass"] textarea,
@@ -12025,7 +12025,7 @@ html[data-theme="glass"] select:focus{
 border-color:rgba(79,99,216,.55);
 box-shadow:0 0 0 3px rgba(79,99,216,.12),0 10px 30px rgba(70,90,160,.14);
 }
-/* 时间徽章 */
+
 html[data-theme="glass"] .time-badge{
 background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,.2));
 backdrop-filter:saturate(170%);
@@ -12033,12 +12033,12 @@ border:1px solid rgba(255,255,255,.6);
 border-radius:999px;
 box-shadow:0 4px 16px rgba(70,90,160,.1),inset 0 1px 0 rgba(255,255,255,.9);
 }
-/* 标题渐变 */
+
 html[data-theme="glass"] .section-title{
 background:linear-gradient(120deg,#111827,#4f63d8 55%,#7c3aed);
 -webkit-background-clip:text;background-clip:text;color:transparent;
 }
-/* 徽章适配 */
+
 html[data-theme="glass"] .pinned-tag{background:#4f63d8;color:#fff;}
 html[data-theme="glass"] mark{background:rgba(250,204,21,.5);color:#111827;}
 html[data-theme="glass"] .activity-joined{background:rgba(4,120,87,.12);color:#047857;}
@@ -12057,7 +12057,7 @@ box-shadow:0 30px 70px rgba(70,90,160,.3),0 0 0 1px rgba(255,255,255,.4),inset 0
 80%{transform:scale(.992)}
 100%{transform:scale(1)}
 }
-/* 壁纸自选 */
+
 html[data-theme="glass"][data-gb="aurora"] body{background:linear-gradient(165deg,#d3f8f5 0%,#e0f2fe 30%,#ede9fe 60%,#dff0ff 100%);}
 html[data-theme="glass"][data-gb="sunset"] body{background:linear-gradient(165deg,#ffe8d6 0%,#ffe4e6 35%,#ffd6e7 65%,#ffe8e0 100%);}
 html[data-theme="glass"][data-gb="mint"] body{background:linear-gradient(165deg,#d8f8e4 0%,#d9f4f2 30%,#dff0ff 65%,#e8f2ff 100%);}
@@ -12066,7 +12066,7 @@ html[data-theme="glass"][data-gb="forest"] body{background:linear-gradient(165de
 html[data-theme="glass"][data-gb="ocean"] body{background:linear-gradient(165deg,#cffafe 0%,#a5f3fc 35%,#67e8f9 70%,#7dd3fc 100%);}
 html[data-theme="glass"][data-gb="sakura"] body{background:linear-gradient(165deg,#ffe4e6 0%,#fecdd3 35%,#fbcfe8 70%,#fae8ff 100%);}
 html[data-theme="glass"][data-gb="custom"] body{background:linear-gradient(165deg,var(--gb-c1,#dce7ff) 0%,var(--gb-c2,#f4e8fb) 100%);}
-/* 色板按钮与浮层 */
+
 .glass-bg-picker{display:none;}
 html[data-theme="glass"] .glass-bg-picker{display:block;}
 html[data-theme="glass"] .glass-bg-btn{
@@ -12105,7 +12105,7 @@ transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease;
 .gb-opt.active .gb-swatch{box-shadow:0 0 0 2px #4f63d8,0 6px 18px rgba(70,90,160,.25);}
 .gb-opt span{display:block;margin-top:5px;font-size:10px;color:#5b6675;}
 html[data-theme="glass"] .glass-bg-picker.hidden{display:none;}
-/* 玻璃实验室（仅玻璃主题的专属功能） */
+
 html[data-theme="glass"] .glass-bg-picker{
 position:fixed;top:64px;right:18px;z-index:850;width:256px;
 background:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.12) 100%);
@@ -12131,7 +12131,7 @@ padding:14px;
 .lab-slider input[type="range"]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:rgba(31,41,55,.15);border-radius:4px;outline:none;}
 .lab-slider input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,#fff,#e2e8f0);border:1px solid rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(70,90,160,.3),inset 0 1px 0 rgba(255,255,255,1);cursor:pointer;}
 html[data-theme="glass"] .glass-bg-picker.hidden{display:none;}
-/* 调试入口 */
+
 .tst-debug-link{font-size:11px;color:var(--text-secondary);opacity:.55;cursor:pointer;margin-left:12px;text-decoration:none;transition:opacity .2s ease;}
 .tst-debug-link:hover{opacity:1;}
 .tst-debug-mask{position:fixed;inset:0;z-index:900;background:rgba(17,24,39,.35);backdrop-filter:none;display:flex;align-items:center;justify-content:center;}
@@ -12148,12 +12148,12 @@ html[data-theme="glass"] #debugInput{background:rgba(255,255,255,.42);border-col
 html[data-theme="glass"] .db-btns button{background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.3));border-color:rgba(255,255,255,.7);box-shadow:0 4px 14px rgba(70,90,160,.14),inset 0 1px 0 rgba(255,255,255,.95);}
 .db-btns button:hover{transform:scale(1.05);}
 #debugOk{color:#fff!important;background:linear-gradient(180deg,#4f63d8,#3b4fd0)!important;border-color:rgba(79,99,216,.6)!important;}
-#debugHint{font-size:11px;color:var(--text-secondary);margin-top:10px;}/* 滚动条 */
+#debugHint{font-size:11px;color:var(--text-secondary);margin-top:10px;}
 html[data-theme="glass"] ::-webkit-scrollbar{width:10px;height:10px;}
 html[data-theme="glass"] ::-webkit-scrollbar-thumb{background:rgba(31,41,55,.2);border-radius:8px;border:2px solid transparent;background-clip:content-box;}
 html[data-theme="glass"] ::-webkit-scrollbar-track{background:transparent;}
-/* ===== 液态玻璃特效层（往死里叠）===== */
-/* 1.背景光斑漂移+呼吸 */
+
+
 html[data-theme="glass"] body::before{
   animation:gbGlowDrift 16s ease-in-out infinite alternate;
 }
@@ -12173,7 +12173,7 @@ html[data-theme="glass"] body::after{
   0%{transform:translate(0,0) rotate(0deg);opacity:.7}
   100%{transform:translate(3%,-3%) rotate(3deg);opacity:1}
 }
-/* 2.标题流光渐变文字 */
+
 html[data-theme="glass"] .section-title{
   background:linear-gradient(90deg,#3b4bd8,#8a63ff,#3b4bd8,#8a63ff);
   background-size:300% 100%;
@@ -12181,19 +12181,19 @@ html[data-theme="glass"] .section-title{
   animation:gbTitleFlow 6s linear infinite;
 }
 @keyframes gbTitleFlow{0%{background-position:0% 50%}100%{background-position:300% 50%}}
-/* 3.卡片逐张弹入 */
+
 html[data-theme="glass"] .card-grid .card{animation:gbCardIn .8s cubic-bezier(.34,1.56,.64,1) backwards,gbCardBreathe 5s ease-in-out 1.6s infinite;}
 html[data-theme="glass"] .card-grid .card:nth-child(1){animation-delay:.06s,1.6s}
 html[data-theme="glass"] .card-grid .card:nth-child(2){animation-delay:.16s,1.6s}
 html[data-theme="glass"] .card-grid .card:nth-child(3){animation-delay:.26s,1.6s}
 html[data-theme="glass"] .card-grid .card:nth-child(4){animation-delay:.36s,1.6s}
 @keyframes gbCardIn{0%{opacity:0;transform:translateY(30px) scale(.9)}55%{opacity:1;transform:translateY(-6px) scale(1.04)}75%{transform:translateY(2px) scale(.99)}100%{opacity:1;transform:none}}
-/* 4.卡片常驻呼吸光晕 */
+
 @keyframes gbCardBreathe{
   0%,100%{box-shadow:0 0 0 1px rgba(140,160,210,.16),0 14px 40px rgba(90,110,170,.12),inset 0 1px 0 rgba(255,255,255,.85)}
   50%{box-shadow:0 0 0 1px rgba(140,160,210,.24),0 16px 50px rgba(110,140,220,.2),0 0 30px rgba(160,190,255,.22),inset 0 1px 0 rgba(255,255,255,.92)}
 }
-/* 5.卡片 hover 大弹跳 + 流光扫过 */
+
 html[data-theme="glass"] .card-grid .card::after{
   content:'';position:absolute;top:0;left:-80%;width:55%;height:100%;pointer-events:none;z-index:1;
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.6),transparent);
@@ -12208,7 +12208,7 @@ html[data-theme="glass"] .card-grid .card:hover::after{animation:gbShine .95s ea
   100%{transform:scale(1.025) rotate(0deg)}
 }
 @keyframes gbShine{0%{left:-80%;opacity:0}28%{opacity:1}100%{left:135%;opacity:0}}
-/* 6.卡片反光跟随鼠标（--mx/--my 由 JS 注入） */
+
 html[data-theme="glass"] .card-grid .card{
   background:
     radial-gradient(240px 240px at var(--mx,50%) var(--my,18%),rgba(255,255,255,.5),transparent 72%),
@@ -12225,11 +12225,11 @@ html[data-theme="glass"] .card-grid .card{
     inset 0 -20px 44px rgba(255,255,255,.3);
   backdrop-filter:saturate(300%) contrast(1.06) brightness(1.06);
 }
-/* 7.导航 hover 弹跳 */
+
 html[data-theme="glass"] .main-nav .nav-link{transition:transform .4s cubic-bezier(.34,1.56,.64,1),color .25s ease,background .25s ease;}
 html[data-theme="glass"] .main-nav .nav-link:hover{transform:translateY(-2px) scale(1.1);}
 html[data-theme="glass"] .main-nav .nav-link:active{transform:scale(.94);}
-/* 8.按钮 hover 弹跳+光晕 */
+
 html[data-theme="glass"] .btn-primary,
 html[data-theme="glass"] .feedback-btn,
 html[data-theme="glass"] .collapse-btn{transition:transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .35s ease,background .3s ease;}
@@ -12237,22 +12237,22 @@ html[data-theme="glass"] .btn-primary:hover,
 html[data-theme="glass"] .feedback-btn:hover,
 html[data-theme="glass"] .collapse-btn:hover{animation:gbBtnPop .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 14px 34px rgba(90,110,170,.25),0 0 26px rgba(160,190,255,.3),inset 0 1px 0 rgba(255,255,255,1);}
 @keyframes gbBtnPop{0%{transform:scale(1)}45%{transform:scale(1.15)}70%{transform:scale(.95)}100%{transform:scale(1.07)}}
-/* 9.轮播图呼吸光晕 */
+
 html[data-theme="glass"] .hero-slider-wrap{animation:gbHeroBreathe 6s ease-in-out 1.2s infinite;}
 @keyframes gbHeroBreathe{0%,100%{box-shadow:0 18px 46px rgba(90,110,170,.14),inset 0 1px 0 rgba(255,255,255,.95)}50%{box-shadow:0 18px 60px rgba(110,140,220,.22),0 0 40px rgba(160,190,255,.25),inset 0 1px 0 rgba(255,255,255,1)}}
-/* 10.搜索框聚焦微弹 */
+
 html[data-theme="glass"] input[type="search"]:focus,
 html[data-theme="glass"] input[type="text"]:focus,
 html[data-theme="glass"] textarea:focus{transform:scale(1.015);box-shadow:0 8px 28px rgba(90,110,170,.16),0 0 0 3px rgba(79,99,216,.2),inset 0 1px 0 rgba(255,255,255,.9);}
-/* 11.滚动渐入 */
+
 html[data-theme="glass"] .gb-wait{opacity:0;transform:translateY(34px) scale(.96);transition:opacity .75s ease,transform .9s cubic-bezier(.34,1.56,.64,1);}
 html[data-theme="glass"] .gb-in{opacity:1;transform:none;}
-/* 12.玻璃实验室面板弹入 */
+
 html[data-theme="glass"] .glass-bg-picker{animation:gbPanelIn .6s cubic-bezier(.34,1.56,.64,1);transform-origin:top right;}
 @keyframes gbPanelIn{0%{opacity:0;transform:scale(.85) translateY(-14px)}60%{opacity:1;transform:scale(1.03) translateY(2px)}100%{opacity:1;transform:none}}
 
 
-/* ===== 卡片自由拖动（玻璃主题·拖到哪放哪）===== */
+
 html[data-theme="glass"] .card-grid{
   display:block;position:relative;
 }
@@ -12268,11 +12268,11 @@ html[data-theme="glass"] .card-grid .card.dragging{
 }
 
 
-/* ===== 导航全套动画（玻璃主题）===== */
-/* 导航栏整体滑入 */
+
+
 html[data-theme="glass"] .site-header{animation:gbNavIn .7s cubic-bezier(.34,1.56,.64,1);}
 @keyframes gbNavIn{0%{opacity:0;transform:translateY(-46px)}100%{opacity:1;transform:none}}
-/* 导航链接逐个错峰弹入 */
+
 html[data-theme="glass"] .main-nav .nav-link{animation:gbNavLinkIn .6s cubic-bezier(.34,1.56,.64,1) backwards;}
 html[data-theme="glass"] .main-nav .nav-link:nth-child(1){animation-delay:.08s}
 html[data-theme="glass"] .main-nav .nav-link:nth-child(2){animation-delay:.15s}
@@ -12282,9 +12282,9 @@ html[data-theme="glass"] .main-nav .nav-link:nth-child(5){animation-delay:.36s}
 html[data-theme="glass"] .main-nav .nav-link:nth-child(6){animation-delay:.43s}
 html[data-theme="glass"] .main-nav .nav-link:nth-child(7){animation-delay:.5s}
 @keyframes gbNavLinkIn{0%{opacity:0;transform:translateY(-16px) scale(.7)}60%{opacity:1;transform:translateY(3px) scale(1.12)}100%{opacity:1;transform:none}}
-/* hover 增强：上浮+光晕 */
+
 html[data-theme="glass"] .main-nav .nav-link:hover{transform:translateY(-4px) scale(1.16);box-shadow:0 10px 22px rgba(79,99,216,.28),0 0 18px rgba(140,160,255,.35);}
-/* 导航底部流光循环扫过 */
+
 html[data-theme="glass"] .site-header::after{
   content:'';position:absolute;left:-60%;bottom:0;height:2px;width:40%;
   background:linear-gradient(90deg,transparent,rgba(140,160,255,.9),transparent);
@@ -12294,7 +12294,7 @@ html[data-theme="glass"] .site-header::after{
 @keyframes gbNavShine{0%{left:-60%}100%{left:120%}}
 
 
-/* ===== 玩家公约页玻璃化+动画 ===== */
+
 html[data-theme="glass"] .rule-scroll{
   background:rgba(255,255,255,.05);
   backdrop-filter:blur(14px) saturate(260%) contrast(1.04);
@@ -12325,7 +12325,7 @@ html[data-theme="glass"] .rule-section h3{color:#4f63d8;}
 html[data-theme="glass"] .rule-section p strong{color:#4f63d8;}
 
 
-/* ===== 拖动模式分段开关 ===== */
+
 html[data-theme="glass"] .gb-seg{display:flex;gap:6px;}
 html[data-theme="glass"] .gb-seg-btn{
   flex:1;padding:6px 8px;font-size:12px;border-radius:10px;cursor:pointer;
@@ -12336,12 +12336,12 @@ html[data-theme="glass"] .gb-seg-btn.active{background:linear-gradient(180deg,rg
 html[data-theme="glass"] .gb-seg-btn:active{transform:scale(.92);}
 
 
-/* 液态玻璃：卡片触屏拖动（防滚动抢占） */
+
 html[data-theme="glass"] .card-grid .card,
 html[data-theme="glass"] #feedList .card{touch-action:none;}
 
 
-/* ===== 便捷工具卡片（tool-grid）玻璃适配：全站小卡片可拖动 ===== */
+
 html[data-theme="glass"] .tool-grid{
   display:block;position:relative;
 }
@@ -12374,11 +12374,11 @@ html[data-theme="glass"] .tool-grid .tool-card.dragging{
   transform:scale(1.05) rotate(.6deg);
 }
 html[data-theme="glass"] .tool-grid .tool-card.drag-ready{cursor:grab;}
-/* 触屏拖动：所有可拖动卡片禁止浏览器滚动抢占 */
+
 html[data-theme="glass"] .card-grid .card,
 html[data-theme="glass"] #feedList .card,
 html[data-theme="glass"] .tool-grid .tool-card{touch-action:none;}
-/* 手机端玻璃卡片 UI 优化 */
+
 @media (max-width:700px){
   html[data-theme="glass"] .card-grid .card,
   html[data-theme="glass"] #feedList .card,
@@ -12392,13 +12392,13 @@ html[data-theme="glass"] .tool-grid .tool-card{touch-action:none;}
   html[data-theme="glass"] .tool-grid{min-height:40px;}
 }
 
-/* ===== 拖动 Q弹动效（玻璃主题）：换位弹跳 / 碰壁震动 ===== */
+
 html[data-theme="glass"] .swap-bounce{animation:gbSwapBounce .34s cubic-bezier(.34,1.56,.64,1);}
 html[data-theme="glass"] .edge-shake{animation:gbEdgeShake .24s ease;}
 @keyframes gbSwapBounce{0%{transform:scale(.86);}55%{transform:scale(1.07);}100%{transform:scale(1);}}
 @keyframes gbEdgeShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px) scale(1.02);}75%{transform:translateX(5px) scale(1.02);}}
 
-/* ===== 手机渲染修复：锁滚动仅 body（防 iOS 视口缩放闪烁）+ 无 backdrop 降级 + 调试台按钮统一玻璃风 ===== */
+
 body.drag-lock{overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important;}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   html[data-theme="glass"] .card-grid .card,
@@ -12414,7 +12414,7 @@ html[data-theme="glass"] #debugOk{
   box-shadow:0 4px 14px rgba(70,90,160,.14),inset 0 1px 0 rgba(255,255,255,.95)!important;
 }
 
-/* ===== 卡片纯透明（液态玻璃：无杂色底色，仅模糊+极淡描边；拖动用强阴影辨识）===== */
+
 html[data-theme="glass"] .card-grid .card,
 html[data-theme="glass"] #feedList .card,
 html[data-theme="glass"] .tool-grid .tool-card{
@@ -12442,7 +12442,7 @@ html[data-theme="glass"] .tool-grid .tool-card.dragging{
   box-shadow:0 30px 70px rgba(70,90,160,.35),0 0 0 1.5px rgba(255,255,255,.5);
 }
 
-/* ===== 碰撞粘合动效（粘一起再弹开）+ 纯白/透明背景 ===== */
+
 html[data-theme="glass"] .stick-pair{animation:gbStick .34s cubic-bezier(.34,1.56,.64,1);}
 @keyframes gbStick{
   0%{transform:scale(1);}
@@ -12468,7 +12468,7 @@ html[data-theme="glass"][data-gb="transparent"] body::before{display:none!import
 html[data-theme="glass"][data-gb="plain"] .page-wrap,
 html[data-theme="glass"][data-gb="transparent"] .page-wrap{background:#ffffff!important;}
 
-/* ===== 碰撞完全融合：两张卡先完全重叠再弹开 ===== */
+
 html[data-theme="glass"] .merge-anim{animation:gbMerge .46s cubic-bezier(.34,1.56,.64,1);z-index:998;}
 html[data-theme="glass"] .merge-hit{animation:gbMergeHit .46s cubic-bezier(.34,1.56,.64,1);}
 @keyframes gbMerge{
@@ -12484,7 +12484,7 @@ html[data-theme="glass"] .merge-hit{animation:gbMergeHit .46s cubic-bezier(.34,1
   100%{transform:scale(1);}
 }
 
-/* ===== 深色玻璃（实验室开关开启后生效） ===== */
+
 html[data-theme="glass"][data-glass-dark]{
 color-scheme:dark;--text:#e7ecf5;--text-secondary:#93a0b5;
 --border:rgba(255,255,255,.12);--card:rgba(30,38,58,.45);--hover:rgba(70,90,150,.3);
@@ -12501,7 +12501,7 @@ html[data-theme="glass"][data-glass-dark] .suggest-box,
 html[data-theme="glass"][data-glass-dark] .results-box{background:rgba(40,52,84,.45);border-color:rgba(255,255,255,.12);}
 html[data-theme="glass"][data-glass-dark] .site-header{background:linear-gradient(180deg,rgba(28,36,60,.6),rgba(22,28,44,.5));border-bottom-color:rgba(255,255,255,.1);}
 html[data-theme="glass"][data-glass-dark] .time-badge{background:rgba(40,52,84,.4);}
-/* ===== 玻璃效果开关（body.glass-off：卡片/导航恢复实色） ===== */
+
 body.glass-off html[data-theme="glass"] .card,
 body.glass-off html[data-theme="glass"] .server-card,
 body.glass-off html[data-theme="glass"] .notice-card,
@@ -12520,9 +12520,9 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .search-row input,
 body.glass-off html[data-theme="glass"][data-glass-dark] .suggest-box,
 body.glass-off html[data-theme="glass"][data-glass-dark] .results-box,
 body.glass-off html[data-theme="glass"][data-glass-dark] .glass-bg-picker{background:rgba(24,30,48,.97)!important;backdrop-filter:none!important;}
-/* ===== 性能优先（body.glass-lite：全站关闭 backdrop-filter） ===== */
+
 body.glass-lite html[data-theme="glass"] *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
-/* ===== 实验室新控件 ===== */
+
 html[data-theme="glass"] .gb-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 html[data-theme="glass"] .gb-close{width:26px;height:26px;border-radius:8px;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.35);color:#5b6675;font-size:13px;cursor:pointer;line-height:1;}
 html[data-theme="glass"] .gb-close:hover{background:rgba(255,255,255,.6);color:#dc2626;}
@@ -12535,7 +12535,7 @@ html[data-theme="glass"] .gb-switch input{width:15px;height:15px;accent-color:#4
 html[data-theme="glass"] .gb-share-row{display:flex;gap:6px;margin-top:8px;align-items:center;}
 html[data-theme="glass"] .gb-share-row input{flex:1;min-width:0;padding:5px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.4);color:#1f2937;font-size:12px;}
 html[data-theme="glass"] .gb-custom-preview{width:18px;height:18px;border-radius:6px;border:1px solid rgba(255,255,255,.8);background:linear-gradient(135deg,#dce7ff,#f4e8fb);display:inline-block;vertical-align:middle;}
-/* ===== 全卡玻璃：搜索/结果/轮播等实色元素统一玻璃 ===== */
+
 html[data-theme="glass"] .search-row input,
 html[data-theme="glass"] .suggest-box,
 html[data-theme="glass"] .results-box,
@@ -12543,7 +12543,7 @@ html[data-theme="glass"] .hero-slider-wrap,
 html[data-theme="glass"] .notice-card{background:rgba(255,255,255,.3);backdrop-filter:blur(24px) saturate(220%);border:1px solid rgba(255,255,255,.55);}
 html[data-theme="glass"] .search-row input{color:#1f2937;}
 
-/* ===== 管理团队 ===== */
+
 .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;}
 .team-card{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;transition:transform .25s ease,box-shadow .25s ease;}
 .team-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(70,90,150,.14);}
@@ -12560,7 +12560,7 @@ body.glass-off html[data-theme="glass"] .team-card{background:rgba(255,255,255,.
 body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:rgba(24,30,48,.97)!important;backdrop-filter:none!important;}
 @media(max-width:900px){.team-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:560px){.team-grid{grid-template-columns:1fr;}.team-avatar{width:56px;height:56px;}}
-/* ===== 地图画生成器 ===== */
+
 .eco-wrap{font-size:14px;line-height:1.75;color:var(--text);}
 .eco-wrap details{border:1px solid var(--border);border-radius:16px;background:var(--card);margin-bottom:18px;overflow:hidden;box-shadow:0 2px 12px rgba(15,23,42,.06);}
 .eco-wrap summary{cursor:pointer;padding:13px 18px;font-weight:700;color:var(--text);list-style:none;display:flex;align-items:center;gap:10px;position:relative;background:var(--card);border-bottom:1px solid var(--border);}
@@ -12599,7 +12599,7 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 .ma-blockhint{font-size:12px;color:var(--text-secondary);margin:6px 0 8px;}
 </style>
 <style>
-/* 手机专属排版（二改） */
+
 @media (max-width:820px){
   body{padding-bottom:28px;}
   .section{padding:14px 0;}
@@ -12618,7 +12618,7 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
   .ma-block{grid-template-columns:repeat(4,1fr);}
   .form-row{flex-direction:column;align-items:stretch;}
 }
-/* ===== 手机导航：抽屉 + 底部 Tab（子页面统一） ===== */
+
 .nav-burger{display:none;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid var(--border,#ddd);border-radius:8px;background:var(--card,#fff);color:var(--text,#333);font-size:18px;cursor:pointer;line-height:1;padding:0;flex:none;}
 .nav-burger:hover{background:var(--hover,rgba(0,0,0,.05));}
 .mobile-drawer{position:fixed;inset:0;z-index:10050;display:none;pointer-events:none;}
@@ -12681,7 +12681,7 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 </div>
 </div>
 </header>
-<!-- ===== 手机导航：抽屉菜单 ===== -->
+
 <div class="mobile-drawer" id="mobileDrawer">
 <div class="drawer-mask" id="drawerMask"></div>
 <div class="drawer-panel" id="drawerPanel">
@@ -12701,7 +12701,7 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 </div>
 </div>
 </div>
-<!-- ===== 手机导航：底部 Tab ===== -->
+
 <div class="mobile-tabbar" id="mobileTabbar">
 <a class="mtab" href="#home"><span class="mtab-ic">&#8962;</span><span class="mtab-tx">首页</span></a>
 <a class="mtab" href="#notice"><span class="mtab-ic">&#9635;</span><span class="mtab-tx">公告</span></a>
@@ -12712,7 +12712,7 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 <section class="section">
 <div class="container">
 
-<!-- 工具列表 -->
+
 <div id="toolList">
 <div class="section-title">便捷工具</div>
 <div class="tool-grid">
@@ -12735,13 +12735,13 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 </div>
 </div>
 
-<!-- 编译器 -->
+
 <div id="compilerPage" class="compiler-wrap">
 <button class="btn back-btn" onclick="backToList()">← 返回工具列表</button>
 <div class="section-title">T显编译器</div>
 
 <div class="compiler-grid">
-<!-- 编辑区 -->
+
 <div class="card">
 <h3>编辑内容</h3>
 <div class="form-row">
@@ -12755,7 +12755,7 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 <button class="add-elem" onclick="addElem()">+ 添加元素</button>
 </div>
 
-<!-- 预览区 -->
+
 <div class="card">
 <h3>预览</h3>
 <div class="preview-box" id="previewBox"></div>
@@ -12772,7 +12772,7 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 </div>
 </div>
 
-<!-- JSON 工具 -->
+
 <div id="jsonPage" class="compiler-wrap">
 <button class="btn back-btn" onclick="backToList()">← 返回工具列表</button>
 <div class="section-title">JSON 工具</div>
@@ -12805,7 +12805,7 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 </div>
 </div>
 
-<!-- 地图画生成器 -->
+
 <div id="mapartPage" class="compiler-wrap">
 <button class="btn back-btn" onclick="backToList()">← 返回工具列表</button>
 <div class="section-title">地图画生成器</div>
@@ -12879,7 +12879,7 @@ body{padding-bottom:calc(56px + env(safe-area-inset-bottom));}
 </div>
 </div>
 
-<!-- Base64 工具 -->
+
 <div id="base64Page" class="compiler-wrap">
 <button class="btn back-btn" onclick="backToList()">← 返回工具列表</button>
 <div class="section-title">Base64 工具</div>
@@ -13962,7 +13962,7 @@ html[data-theme="dark"] .tabs button.on{color:#fff}
 .empty b{display:block;color:var(--text);font-size:15px;margin-bottom:6px}
 .foot{margin-top:18px;font-size:12px;color:var(--muted);line-height:1.9}
 
-/* 详情抽屉 */
+
 .mask{position:fixed;inset:0;background:rgba(15,23,42,.34);opacity:0;pointer-events:none;transition:opacity .18s;z-index:20}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:min(400px,100%);background:var(--card);border-left:1px solid var(--border);transform:translateX(102%);transition:transform .2s cubic-bezier(.2,.8,.2,1);z-index:21;display:flex;flex-direction:column;overflow:hidden}
 body.open .mask{opacity:1;pointer-events:auto}
@@ -14358,7 +14358,7 @@ line-height:1.65;
 
 }
 
-/* ===== 顶部导航 ===== */
+
 
 .site-header{
 
@@ -14546,7 +14546,7 @@ display:flex;align-items:center;justify-content:center;
 
 .icon-btn:hover{background:var(--hover);}
 
-/* 主题切换开关 */
+
 
 .theme-toggle{
 
@@ -14582,7 +14582,7 @@ font-size:11px;color:#fff;transition:left .28s cubic-bezier(.4,0,.2,1),backgroun
 
 html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 
-/* 主题切换过渡动画 */
+
 
 body,.site-header,.card,.server-card,.search-row input,.suggest-box,.results-box,
 
@@ -14594,7 +14594,7 @@ transition:background-color .3s ease,color .3s ease,border-color .3s ease;
 
 }
 
-/* ===== 页脚 ===== */
+
 
 .site-footer{
 
@@ -14658,7 +14658,7 @@ padding-top:14px;text-align:center;color:var(--text-secondary);font-size:12px;
 .nav-link{font-size:13px;padding:7px 10px;}
 }html[data-theme="glass"] .site-footer{position:relative;z-index:1;}
 
-/* 导航液态玻璃 */
+
 
 html[data-theme="glass"] .site-header{
 
@@ -14685,7 +14685,7 @@ html[data-theme="glass"] .main-nav a:hover,
 html[data-theme="glass"] .main-nav button:hover{color:#4f63d8;text-shadow:0 0 16px rgba(79,99,216,.4);}
 
 
-/* 子页壳层对齐补丁：container/a/button 基础规则 */
+
 .container{max-width:1140px;margin-left:auto;margin-right:auto;padding-left:16px;padding-right:16px;}
 a{color:var(--accent);}
 button{font-family:inherit;}
@@ -15044,7 +15044,7 @@ line-height:1.65;
 
 }
 
-/* ===== 顶部导航 ===== */
+
 
 .site-header{
 
@@ -15232,7 +15232,7 @@ display:flex;align-items:center;justify-content:center;
 
 .icon-btn:hover{background:var(--hover);}
 
-/* 主题切换开关 */
+
 
 .theme-toggle{
 
@@ -15268,7 +15268,7 @@ font-size:11px;color:#fff;transition:left .28s cubic-bezier(.4,0,.2,1),backgroun
 
 html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 
-/* 主题切换过渡动画 */
+
 
 body,.site-header,.card,.server-card,.search-row input,.suggest-box,.results-box,
 
@@ -15280,7 +15280,7 @@ transition:background-color .3s ease,color .3s ease,border-color .3s ease;
 
 }
 
-/* ===== 页脚 ===== */
+
 
 .site-footer{
 
@@ -15344,7 +15344,7 @@ padding-top:14px;text-align:center;color:var(--text-secondary);font-size:12px;
 .nav-link{font-size:13px;padding:7px 10px;}
 }html[data-theme="glass"] .site-footer{position:relative;z-index:1;}
 
-/* 导航液态玻璃 */
+
 
 html[data-theme="glass"] .site-header{
 
@@ -15371,7 +15371,7 @@ html[data-theme="glass"] .main-nav a:hover,
 html[data-theme="glass"] .main-nav button:hover{color:#4f63d8;text-shadow:0 0 16px rgba(79,99,216,.4);}
 
 
-/* 子页壳层对齐补丁：container/a/button 基础规则 */
+
 .container{max-width:1140px;margin-left:auto;margin-right:auto;padding-left:16px;padding-right:16px;}
 a{color:var(--accent);}
 button{font-family:inherit;}
@@ -15611,7 +15611,7 @@ line-height:1.65;
 
 }
 
-/* ===== 顶部导航 ===== */
+
 
 .site-header{
 
@@ -15799,7 +15799,7 @@ display:flex;align-items:center;justify-content:center;
 
 .icon-btn:hover{background:var(--hover);}
 
-/* 主题切换开关 */
+
 
 .theme-toggle{
 
@@ -15835,7 +15835,7 @@ font-size:11px;color:#fff;transition:left .28s cubic-bezier(.4,0,.2,1),backgroun
 
 html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 
-/* 主题切换过渡动画 */
+
 
 body,.site-header,.card,.server-card,.search-row input,.suggest-box,.results-box,
 
@@ -15847,7 +15847,7 @@ transition:background-color .3s ease,color .3s ease,border-color .3s ease;
 
 }
 
-/* ===== 页脚 ===== */
+
 
 .site-footer{
 
@@ -15911,7 +15911,7 @@ padding-top:14px;text-align:center;color:var(--text-secondary);font-size:12px;
 .nav-link{font-size:13px;padding:7px 10px;}
 }html[data-theme="glass"] .site-footer{position:relative;z-index:1;}
 
-/* 导航液态玻璃 */
+
 
 html[data-theme="glass"] .site-header{
 
@@ -15938,7 +15938,7 @@ html[data-theme="glass"] .main-nav a:hover,
 html[data-theme="glass"] .main-nav button:hover{color:#4f63d8;text-shadow:0 0 16px rgba(79,99,216,.4);}
 
 
-/* 子页壳层对齐补丁：container/a/button 基础规则 */
+
 .container{max-width:1140px;margin-left:auto;margin-right:auto;padding-left:16px;padding-right:16px;}
 a{color:var(--accent);}
 button{font-family:inherit;}
@@ -16177,7 +16177,7 @@ line-height:1.65;
 
 }
 
-/* ===== 顶部导航 ===== */
+
 
 .site-header{
 
@@ -16365,7 +16365,7 @@ display:flex;align-items:center;justify-content:center;
 
 .icon-btn:hover{background:var(--hover);}
 
-/* 主题切换开关 */
+
 
 .theme-toggle{
 
@@ -16401,7 +16401,7 @@ font-size:11px;color:#fff;transition:left .28s cubic-bezier(.4,0,.2,1),backgroun
 
 html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
 
-/* 主题切换过渡动画 */
+
 
 body,.site-header,.card,.server-card,.search-row input,.suggest-box,.results-box,
 
@@ -16413,7 +16413,7 @@ transition:background-color .3s ease,color .3s ease,border-color .3s ease;
 
 }
 
-/* ===== 页脚 ===== */
+
 
 .site-footer{
 
@@ -16477,7 +16477,7 @@ padding-top:14px;text-align:center;color:var(--text-secondary);font-size:12px;
 .nav-link{font-size:13px;padding:7px 10px;}
 }html[data-theme="glass"] .site-footer{position:relative;z-index:1;}
 
-/* 导航液态玻璃 */
+
 
 html[data-theme="glass"] .site-header{
 
@@ -16504,7 +16504,7 @@ html[data-theme="glass"] .main-nav a:hover,
 html[data-theme="glass"] .main-nav button:hover{color:#4f63d8;text-shadow:0 0 16px rgba(79,99,216,.4);}
 
 
-/* 子页壳层对齐补丁：container/a/button 基础规则 */
+
 .container{max-width:1140px;margin-left:auto;margin-right:auto;padding-left:16px;padding-right:16px;}
 a{color:var(--accent);}
 button{font-family:inherit;}

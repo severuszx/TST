@@ -197,7 +197,7 @@ function fmtDate(v){
   return s.replace('T',' ').slice(0,16);
 }
 
-/* ---------- 站内弹窗 / 提示 ---------- */
+
 var dialogResolve = null;
 function confirmBox(opt){
   var box = $('#dialogBox');
@@ -230,7 +230,7 @@ function busy(on, text){
   $('#busyBox').classList.toggle('show', !!on);
 }
 
-/* ---------- 接口 ---------- */
+
 function authHeaders(){ return TOKEN ? { 'Authorization': 'Bearer ' + TOKEN } : {}; }
 function adminApi(action, payload){
   var body = Object.assign({ action: action }, payload || {});
@@ -260,7 +260,7 @@ function tokenEmail(){
   }catch(e){ return ''; }
 }
 
-/* ---------- 权限检测：账号即权限，不输入口令 ---------- */
+
 function showGate(reason){
   $('#appBox').classList.add('hide');
   $('#gateBox').classList.remove('hide');
@@ -297,7 +297,7 @@ function checkAdmin(){
     .catch(function(e){ showGate(String((e&&e.message)||e)); return false; });
 }
 
-/* ---------- 渲染工具 ---------- */
+
 function S(k){ return (DATA && DATA[k]) || []; }
 function setCounts(){
   var m = { announcements:0, feeds:0, sponsors:0, replays:0, images:0 };
@@ -341,7 +341,7 @@ function filt(arr, q, fields){
   });
 }
 
-/* ---------- 概览 ---------- */
+
 function viewOverview(){
   var ann = S('announcements'), fd = S('feeds'), sp = S('sponsors'), rp = S('replays'), im = S('images');
   var d = (DATA && DATA.server) || {};
@@ -387,7 +387,7 @@ function viewOverview(){
   return h;
 }
 
-/* ---------- 通用表单壳 ---------- */
+
 function formShell(title, fieldsHtml, submitLabel, kind){
   return '<div class="card" style="margin-bottom:16px">'+
     '<div class="sub-title">'+esc(title)+'</div>'+
@@ -398,7 +398,7 @@ function formShell(title, fieldsHtml, submitLabel, kind){
     '</div></div>';
 }
 
-/* ---------- 公告 ---------- */
+
 function viewAnnounce(){
   var all = S('announcements').slice();
   var rows = filt(all, SEARCH.announce, ['title','content','date']);
@@ -424,7 +424,7 @@ function viewAnnounce(){
   return h;
 }
 
-/* ---------- 赛事动态 ---------- */
+
 function viewFeed(){
   var all = S('feeds').slice();
   var rows = filt(all, SEARCH.feed, ['title','content','date']);
@@ -452,7 +452,7 @@ function viewFeed(){
   return h;
 }
 
-/* ---------- 赞助 ---------- */
+
 function viewSponsor(){
   var all = S('sponsors').slice();
   var rows = filt(all, SEARCH.sponsor, ['name','amount']);
@@ -476,7 +476,7 @@ function viewSponsor(){
   return h;
 }
 
-/* ---------- 录像 ---------- */
+
 function viewReplay(){
   var all = S('replays').slice();
   var rows = filt(all, SEARCH.replay, ['title','url','date']);
@@ -502,7 +502,7 @@ function viewReplay(){
   return h;
 }
 
-/* ---------- 图片素材 ---------- */
+
 function viewImage(){
   var all = S('images').slice();
   var rows = filt(all, SEARCH.image, ['name']);
@@ -531,7 +531,7 @@ function viewImage(){
   return h;
 }
 
-/* ---------- 服务器控制 ---------- */
+
 function viewServer(){
   var st = STATUS || {};
   var on = String(st.status||'') === 'online';
@@ -585,7 +585,7 @@ function logText(){
   }).join('\n');
 }
 
-/* ---------- 服务器信息（数据站） ---------- */
+
 function viewServerInfo(){
   var d = (DATA && DATA.server) || {};
   var h = '<div class="section-title">服务器信息</div><div class="card">'+
@@ -599,7 +599,7 @@ function viewServerInfo(){
   return h;
 }
 
-/* ---------- 版本发布 ---------- */
+
 function viewVersion(){
   return '<div class="section-title">版本发布</div><div class="card" id="verBox"><div class="muted">正在读取 version.json…</div></div>'+
     '<div class="section-title">发版流程</div><div class="card"><div class="muted" style="line-height:2">'+
@@ -624,7 +624,7 @@ function renderVersion(){
   });
 }
 
-/* ---------- 路由 ---------- */
+
 var VIEWS = {
   overview: viewOverview, announce: viewAnnounce, feed: viewFeed, sponsor: viewSponsor,
   replay: viewReplay, image: viewImage, server: viewServer, serverinfo: viewServerInfo, version: viewVersion
@@ -661,7 +661,7 @@ function bindSearch(){
   });
 }
 
-/* ---------- 操作 ---------- */
+
 function submitAnnounce(){
   var title = ($('#a_title')||{}).value || '';
   var date = ($('#a_date')||{}).value || today();
@@ -705,7 +705,7 @@ function submitReplay(){
   doWrite(act, payload, function(){ EDIT.replay = null; });
 }
 
-/* 统一写：按钮锁 + 忙锁 + 成功后用服务端返回集合整体替换（不去 push，避免"传一次出多条"） */
+
 function doWrite(action, payload, after){
   if(BUSY){ toast('还有操作正在进行','warn'); return; }
   busy(true, '提交中…');
@@ -742,7 +742,7 @@ function doDelete(kind, id){
   confirmBox({ title:'确认删除', desc:'删除后无法撤销，确定要删除这条内容吗？', okText:'删除', danger:true }).then(function(yes){
     if(!yes) return;
     busy(true, '删除中…');
-    /* deleteXxx 的 id 放在 data 里（与 updateXxx 的顶层 id 不同） */
+    
     adminApi(act, { data:{ id:id } }).then(function(r){
       busy(false);
       if(!r || r.ok === false){ toast('删除失败：' + ((r&&(r.error||r.message))||'未知错误'), 'err', 4200); return; }
@@ -821,7 +821,7 @@ function loadStatus(){
   }).catch(function(){ STATUS = null; });
 }
 
-/* ---------- 事件绑定 ---------- */
+
 document.addEventListener('click', function(e){
   var t = e.target.closest ? e.target.closest('button') : null;
   if(!t) return;
@@ -878,7 +878,7 @@ $('#btnReload').addEventListener('click', function(){
 });
 $('#gateRetry').addEventListener('click', function(){ location.reload(); });
 
-/* ---------- 启动 ---------- */
+
 checkAdmin().then(function(ok){
   if(!ok) return;
   return loadData(true).then(function(){

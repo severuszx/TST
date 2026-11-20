@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """部署前门禁：拦 </html> 后的垃圾、重复 DOCTYPE、内联脚本语法错误、sitemap 死链。"""
 import json
 import re
@@ -62,7 +62,7 @@ def check_sitemap():
             continue
         target = ROOT / path.lstrip("/")
         if not target.exists():
-            # 子页允许由 _redirects 301 到锚点
+            
             redirects = (ROOT / "_redirects").read_text(encoding="utf-8") if (ROOT / "_redirects").exists() else ""
             if path not in redirects and path.lstrip("/") not in redirects:
                 errors.append(f"sitemap: {loc} 在本地不存在，且 _redirects 没有对应规则")

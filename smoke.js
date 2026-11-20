@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* 线上冒烟：页面 200 + 标题/正文，核心接口 200。Node 18+（内置 fetch）。 */
+
 const BASE = process.env.TST_BASE || "https://theslowtide.pages.dev";
 const API = process.env.TST_API || "https://theslowtidefk.pages.dev";
 const pages = ["/", "/login.html", "/profile.html", "/tool.html", "/shop.html", "/hogwarts.html", "/planning.html", "/download.html"];

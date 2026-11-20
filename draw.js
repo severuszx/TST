@@ -1,9 +1,9 @@
-// The Slow Tide 国庆&开服100天双庆抽奖 —— 抽奖端点（具体路由优先于 functions/api/[[path]].js）
+
 const SUPABASE_URL = 'https://jilcbcodphxpasicjghv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs';
-// 管理员口令：注意公开仓库可见，后续需改为环境变量并在数据库侧改密
-// 管理员口令：优先读环境变量 ADMIN_PWD（Cloudflare Pages Secret），未配置时回退内置
-let ADMIN_PWD = null; // 管理员口令：仅由 onRequest 从环境变量 ADMIN_PWD 注入（仓库不含口令）
+
+
+let ADMIN_PWD = null; 
 const L_START = new Date('2026-10-01T00:30:00+08:00');
 const L_END = new Date('2026-10-08T23:59:59+08:00');
 const DRAW_DEV_MAP = new Map();
@@ -32,7 +32,7 @@ async function sbFetch(path, opts) {
 async function adminLottery(action, payload) {
   if (!ADMIN_PWD) return { ok: false, error: 'no_pwd' };
   if (!ADMIN_PWD) return { ok: false, error: 'no_pwd' };
-  // 经同域代理 /api/rest/rpc/admin_lottery 调用（CF 环境直连 Supabase 偶发空响应，代理已验证稳定）
+  
   const r = await fetch('https://theslowtide.pages.dev/api/rest/rpc/admin_lottery', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -55,11 +55,11 @@ async function drawGate(fp, device, ip, sdate) {
   const ikey = 'DCIP:' + ip + ':' + sdate;
   const row = list.codes.find(c => c.code === fkey || c.code === dkey || c.code === ikey);
   if (row) return { existing: row };
-  // IP 闸门：每 IP 每天一次（防换浏览器/清 Cookie 绕过；唯一约束原子防并发）
+  
   const addIp = await adminLottery('add', { code: ikey, prize: 'IP抽奖标记', weight: 0 });
   if (addIp && addIp.error === 'code_exists') return { existing: { prize: 'IP抽奖标记' } };
   if (!addIp || !addIp.ok) return { err: 'server_error' };
-  // 设备指纹闸门：同设备防重复
+  
   const addF = await adminLottery('add', { code: fkey, prize: '设备抽奖标记', weight: 0 });
   if (addF && addF.error === 'code_exists') return { existing: { prize: '设备抽奖标记' } };
   if (!addF || !addF.ok) return { err: 'server_error' };
@@ -98,7 +98,7 @@ export async function onRequestPost(context) {
   const device = String(body.p_device || '').slice(0, 80);
   if (!device) return json({ ok: false, error: 'bad_device', serverDate: sdate }, 200, request);
   const ip = clientIp(request);
-  // 服务端指纹：IP+UA+平台头+前端指纹 组合（防单点伪造；NAT 同 IP 不同设备不互锁）
+  
   const ua = String(request.headers.get('User-Agent') || '');
   const secUa = String(request.headers.get('Sec-CH-UA-Platform') || request.headers.get('Sec-CH-UA') || '');
   const rawFp = ip + '|' + ua + '|' + secUa + '|' + device;
@@ -120,7 +120,7 @@ export async function onRequestPost(context) {
   let picked = null;
   for (let i = 0; i < 6; i++) {
     const c = pickWeighted(codes);
-    // 原子核销：把奖品标记为【已使用】+原名（防止并发重复发放；重试刷新池）
+    
     const res = await adminLottery('update_prize', { id: String(c.id), prize: '【已使用】' + (c.prize || '') });
     if (res && res.ok) { picked = c; break; }
     codes = await fetchUnclaimedCodes();

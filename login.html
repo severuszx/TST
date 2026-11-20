@@ -54,7 +54,7 @@ html[data-theme="dark"] .logo-img{filter:invert(1);mix-blend-mode:screen;}
 .section-title::before{content:'';width:5px;height:22px;background:var(--accent);}
 .card .sub{font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.7;}
 
-/* ===== 视图切换 ===== */
+
 .view{display:none;}
 .view.show{display:block;}
 .mode-row{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:18px;}
@@ -128,7 +128,7 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
 <div class="section-title">登录 / 注册</div>
 <div class="sub">设置密码注册账号，登录可用密码或邮箱验证码；忘记密码可邮箱重置。</div>
 
-<!-- ===== 登录视图 ===== -->
+
 <div class="view show" id="viewLogin">
 <form id="loginForm" onsubmit="doLogin();return false;" novalidate>
   <div class="mode-row" id="loginModeRow">
@@ -162,7 +162,7 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
 </form>
 </div>
 
-<!-- ===== 注册视图 ===== -->
+
 <div class="view" id="viewRegister">
 <form id="registerForm" onsubmit="doRegister();return false;" novalidate>
   <div class="field">
@@ -204,7 +204,7 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
 </form>
 </div>
 
-<!-- ===== 忘记密码视图 ===== -->
+
 <div class="view" id="viewReset">
 <form id="resetForm" onsubmit="doReset();return false;" novalidate>
   <div class="field">
@@ -250,7 +250,7 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
 </div>
 </div>
 
-<!-- ===== 协议：用户协议 ===== -->
+
 <div id="terms_user" style="display:none">
 <p><b>最后更新日期：2026年11月6日　生效日期：2026年11月6日</b></p>
 <h4>第一章 总则</h4>
@@ -278,7 +278,7 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
 <p><b>第15条 联系方式</b><br>如有疑问，可通过官网反馈页面（https://theslowtidefk.pages.dev/）或官方 QQ 群（833470853）联系运营方，我们将在七个工作日内予以回复。</p>
 </div>
 
-<!-- ===== 协议：服务器隐私政策（含 App 补充条款）===== -->
+
 <div id="terms_privacy" style="display:none">
 <p><b>最后更新日期：2026年11月3日　生效日期：2026年11月3日</b></p>
 <p>The Slow Tide 服务器（以下简称"本服务器"或"我们"）深知个人信息对您的重要性，并庄严承诺保护所有使用本服务器官方网站及相关服务的用户（以下简称"用户"或"您"）的个人信息与隐私安全。</p>
@@ -354,14 +354,14 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
     if(hint && msg!==undefined){ hint.className='hint'; hint.textContent=msg; }
   }
 
-  // ===== 视图切换 =====
+  
   window.switchView=function(name){
     ['viewLogin','viewRegister','viewReset'].forEach(function(v){
       $(v).classList.toggle('show', v===name);
     });
   };
 
-  // ===== 登录模式切换（密码 / 验证码）=====
+  
   var loginMode='pwd';
   document.querySelectorAll('#loginModeRow .mode-item').forEach(function(el){
     el.addEventListener('click',function(){
@@ -373,7 +373,7 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
     });
   });
 
-  // ===== 发送验证码（通用）=====
+  
   function bindSend(emailInput, sendBtn, hint, purpose){
     var left=0, timer=null;
     function checkEmail(){
@@ -414,10 +414,10 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
   bindSend($('re'), $('rcSend'), $('rcHint'), 'register');
   bindSend($('fpe'), $('fpcSend'), $('fpcHint'), 'reset');
 
-  // ===== 密码校验 =====
+  
   function validPwd(p){ return p.length>=6 && p.length<=64; }
 
-  // ===== 登录 =====
+  
   $('loginBtn').addEventListener('click',doLogin);
   document.addEventListener('keydown',function(e){ if(e.key==='Enter' && $('viewLogin').classList.contains('show')) doLogin(); });
   function doLogin(){
@@ -457,7 +457,7 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
       .catch(function(){ btn.disabled=false; btn.innerHTML='登录'; toast('网络异常，请稍后再试','err'); });
   }
 
-  // ===== 注册 =====
+  
   $('regBtn').addEventListener('click',doRegister);
   document.addEventListener('keydown',function(e){ if(e.key==='Enter' && $('viewRegister').classList.contains('show')) doRegister(); });
   function doRegister(){
@@ -495,7 +495,7 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
       .catch(function(){ btn.disabled=false; btn.innerHTML='注册'; toast('网络异常，请稍后再试','err'); });
   }
 
-  // ===== 忘记密码 =====
+  
   $('resetBtn').addEventListener('click',doReset);
   document.addEventListener('keydown',function(e){ if(e.key==='Enter' && $('viewReset').classList.contains('show')) doReset(); });
   function doReset(){
@@ -528,7 +528,7 @@ function hideLoad(){var el=document.getElementById('glbLoad');if(el){el.style.di
   }
 })();
 
-// ===== 协议弹窗 =====
+
 var MODALS={terms_user:['用户协议','terms_user'],terms_privacy:['服务器隐私政策','terms_privacy']};
 function showModal(k){
   var m=MODALS[k];

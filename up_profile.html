@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v9-fix2 profile: hide admin btn + device memory -->
+
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -7,7 +7,7 @@
 <title>The Slow Tide 官网</title>
 <script>
 (function(){
-// 主题：浅色 / 深色，localStorage 优先，默认浅色
+
 var mode=localStorage.getItem('tst-theme');
 if(mode!=='dark' && mode!=='light'){ mode='light'; }
 document.documentElement.setAttribute('data-theme',mode);
@@ -64,7 +64,7 @@ line-height:1.65;
 a{color:var(--accent);}
 button{font-family:inherit;}
 
-/* ===== 顶部导航 ===== */
+
 .site-header{
 position:sticky;top:0;z-index:100;
 background:var(--header-bg);
@@ -134,7 +134,7 @@ background:var(--card);color:var(--text);cursor:pointer;font-size:17px;
 display:flex;align-items:center;justify-content:center;
 }
 .icon-btn:hover{background:var(--hover);}
-/* 主题切换开关 */
+
 .theme-toggle{
 position:relative;width:54px;height:28px;flex:none;
 border:1px solid var(--border);background:var(--card);
@@ -152,14 +152,14 @@ background:var(--accent);display:flex;align-items:center;justify-content:center;
 font-size:11px;color:#fff;transition:left .28s cubic-bezier(.4,0,.2,1),background-color .28s;
 }
 html[data-theme="dark"] .theme-toggle .tt-thumb{left:29px;}
-/* 主题切换过渡动画 */
+
 body,.site-header,.card,.server-card,.search-row input,.suggest-box,.results-box,
 .rule-section,.modal,.admin-tab,.btn,.feedback-btn,.icon-btn,.theme-toggle,
 .time-badge,.footer-col,.img-item,.toast-item{
 transition:background-color .3s ease,color .3s ease,border-color .3s ease;
 }
 
-/* ===== Hero 轮播 ===== */
+
 .hero{padding:22px 0 6px;}
 .hero-slider-wrap{
 position:relative;overflow:hidden;border-radius:12px;
@@ -173,7 +173,7 @@ box-shadow:var(--shadow);border:1px solid var(--border);
 .dot{width:9px;height:9px;border-radius:50%;background:var(--border);cursor:pointer;}
 .dot.active{background:var(--accent);}
 
-/* ===== 服务器状态条 ===== */
+
 .server-bar{padding:14px 0;}
 .server-card{
 display:flex;align-items:center;gap:16px;flex-wrap:wrap;
@@ -185,7 +185,7 @@ padding:14px 18px;box-shadow:var(--shadow);
 .server-card .label{color:var(--text-secondary);}
 .addr{font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--accent);word-break:break-all;}
 
-/* ===== Section 通用 ===== */
+
 .section{padding:26px 0;}
 .section-title{
 display:flex;align-items:center;gap:10px;
@@ -210,12 +210,12 @@ html[data-theme="dark"] .pinned-tag{background:#71717a;}
 .feed-img{width:100%;max-height:260px;object-fit:cover;border-radius:8px;margin-top:10px;border:1px solid var(--border);}
 .empty-hint{color:var(--text-secondary);font-size:14px;padding:10px 0;}
 
-/* ===== 页面切换 ===== */
+
 .page{display:none;}
 .page.active{display:block;animation:fadeIn .25s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
 
-/* ===== 搜索 ===== */
+
 .search-row{
 position:relative;display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px;
 }
@@ -249,7 +249,7 @@ mark{background:#ffd54a;color:#333;border-radius:2px;padding:0 1px;}
 html[data-theme="dark"] mark{background:#c99400;color:#1a1a1a;}
 .search-flash{outline:3px solid #ffb300;outline-offset:2px;border-radius:6px;}
 
-/* ===== 公约 ===== */
+
 .rule-scroll{max-height:65vh;overflow-y:auto;padding-right:6px;font-size:14px;margin-top:8px;}
 .rule-section{margin:16px 0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
 .rule-section h3{margin-bottom:8px;font-size:16px;}
@@ -258,7 +258,7 @@ html[data-theme="dark"] mark{background:#c99400;color:#1a1a1a;}
 #ruleToc li{margin:4px 0;}
 #ruleToc a{text-decoration:none;}
 
-/* ===== 管理面板 ===== */
+
 .modal-mask{
 position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
 display:none;align-items:center;justify-content:center;padding:16px;
@@ -305,7 +305,7 @@ padding:8px;overflow:hidden;display:flex;flex-direction:column;gap:6px;
 .img-item .im-ops{display:flex;gap:5px;flex-wrap:wrap;}
 .img-item .im-ops .btn{padding:4px 8px;font-size:12px;}
 
-/* ===== 页脚 ===== */
+
 .site-footer{
 margin-top:40px;padding:30px 0 18px;border-top:1px solid var(--border);
 background:var(--card);
@@ -334,7 +334,7 @@ padding-top:14px;text-align:center;color:var(--text-secondary);font-size:12px;
 .footer-grid{grid-template-columns:1fr;gap:16px;}
 }
 
-/* ===== 回顶 / Toast ===== */
+
 .back-top{
 position:fixed;right:22px;bottom:26px;width:44px;height:44px;border-radius:8px;
 background:var(--accent);color:#fff;border:none;font-size:20px;cursor:pointer;
@@ -379,7 +379,7 @@ font-size:14px;box-shadow:var(--shadow);animation:toastIn .25s ease;
 
 
 
-/* ===== 液态玻璃主题 v8（iOS 27 液态玻璃·管理员内测）===== */
+
 html[data-theme="glass"]{
 color-scheme:light;
 --bg:#eef2fb;
@@ -394,12 +394,12 @@ color-scheme:light;
 --accent-soft:rgba(79,99,216,.12);
 --shadow:0 20px 60px rgba(70,90,160,.16);
 --hero-grad:linear-gradient(135deg,#dbe4ff,#e9e2ff);
---go1:.24;--go2:.08;--go3:.13;    /* 卡片渐变三段透明度（通透液态玻璃） */
---gn1:.24;                       /* 导航透明度 */
---gb1:.42;--gb2:.12;             /* 按钮透明度 */
---gsh1:30px;--gsh2:.12;--gsh3:10px;  /* 阴影扩展/强度/偏移 */
+--go1:.24;--go2:.08;--go3:.13;    
+--gn1:.24;                       
+--gb1:.42;--gb2:.12;             
+--gsh1:30px;--gsh2:.12;--gsh3:10px;  
 }
-/* 背景：干净 iOS 壁纸渐变（无杂乱光斑） */
+
 html[data-theme="glass"] body{
 background:linear-gradient(160deg,#dee9ff 0%,#eaf2ff 26%,#e6efff 48%,#e5eeff 72%,#eef3ff 100%);
 background-attachment:fixed;
@@ -409,7 +409,7 @@ animation:gbFlow 26s ease-in-out infinite;
 @keyframes gbFlow{0%{background-position:0% 0%;}50%{background-position:100% 100%;}100%{background-position:0% 0%;}}
 html[data-theme="glass"][data-gb="plain"] body,
 html[data-theme="glass"][data-gb="transparent"] body{animation:none;background-size:auto;}
-/* 顶部柔和透亮光 */
+
 html[data-theme="glass"] body::before{
 content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 background:radial-gradient(1200px 800px at 10% -10%,rgba(130,185,255,.78),transparent 60%),
@@ -424,7 +424,7 @@ html[data-theme="glass"] .site-header,
 html[data-theme="glass"] .notice-ticker,
 html[data-theme="glass"] .container,
 html[data-theme="glass"] .site-footer{position:relative;z-index:1;}
-/* 导航液态玻璃 */
+
 html[data-theme="glass"] .site-header{
 background:linear-gradient(180deg,rgba(255,255,255,calc(var(--gn1,.16)*1.35)) 0%,rgba(255,255,255,var(--gn1,.16)) 100%);
 backdrop-filter:saturate(250%) contrast(1.04);
@@ -437,7 +437,7 @@ html[data-theme="glass"] .main-nav a,
 html[data-theme="glass"] .main-nav button{transition:color .25s ease,text-shadow .25s ease;}
 html[data-theme="glass"] .main-nav a:hover,
 html[data-theme="glass"] .main-nav button:hover{color:#4f63d8;text-shadow:0 0 16px rgba(79,99,216,.4);}
-/* 卡片：真液态玻璃（顶部反射光带+边缘白描边+大圆角+柔阴影） */
+
 html[data-theme="glass"] .card,
 html[data-theme="glass"] .server-card,
 html[data-theme="glass"] .notice-ticker,
@@ -465,7 +465,7 @@ box-shadow:
 0 0 30px rgba(160,190,255,.14),
 inset 0 1px 0 rgba(255,255,255,1);
 }
-/* 卡片入场 */
+
 @keyframes cardIn{0%{opacity:0;transform:translateY(18px) scale(.97);}100%{opacity:1;transform:none;}}
 html[data-theme="glass"] .card-grid .card{animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) backwards;}
 html[data-theme="glass"] .card-grid .card:nth-child(2){animation-delay:.06s;}
@@ -473,7 +473,7 @@ html[data-theme="glass"] .card-grid .card:nth-child(3){animation-delay:.12s;}
 html[data-theme="glass"] .card-grid .card:nth-child(4){animation-delay:.18s;}
 html[data-theme="glass"] .card-grid .card:nth-child(5){animation-delay:.24s;}
 html[data-theme="glass"] .card-grid .card:nth-child(6){animation-delay:.3s;}
-/* 按钮：液态玻璃胶囊 */
+
 html[data-theme="glass"] .btn-primary,
 html[data-theme="glass"] .feedback-btn,
 html[data-theme="glass"] .collapse-btn{
@@ -495,7 +495,7 @@ box-shadow:0 10px 28px rgba(70,90,160,.2),inset 0 1px 0 rgba(255,255,255,1);
 html[data-theme="glass"] .btn-primary:active,
 html[data-theme="glass"] .feedback-btn:active,
 html[data-theme="glass"] .collapse-btn:active{transform:scale(.93);}
-/* 输入框玻璃 */
+
 html[data-theme="glass"] input[type="text"],
 html[data-theme="glass"] input[type="search"],
 html[data-theme="glass"] textarea,
@@ -513,7 +513,7 @@ html[data-theme="glass"] select:focus{
 border-color:rgba(79,99,216,.55);
 box-shadow:0 0 0 3px rgba(79,99,216,.12),0 10px 30px rgba(70,90,160,.14);
 }
-/* 时间徽章 */
+
 html[data-theme="glass"] .time-badge{
 background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,.2));
 backdrop-filter:saturate(170%);
@@ -521,12 +521,12 @@ border:1px solid rgba(255,255,255,.6);
 border-radius:999px;
 box-shadow:0 4px 16px rgba(70,90,160,.1),inset 0 1px 0 rgba(255,255,255,.9);
 }
-/* 标题渐变 */
+
 html[data-theme="glass"] .section-title{
 background:linear-gradient(120deg,#111827,#4f63d8 55%,#7c3aed);
 -webkit-background-clip:text;background-clip:text;color:transparent;
 }
-/* 徽章适配 */
+
 html[data-theme="glass"] .pinned-tag{background:#4f63d8;color:#fff;}
 html[data-theme="glass"] mark{background:rgba(250,204,21,.5);color:#111827;}
 html[data-theme="glass"] .activity-joined{background:rgba(4,120,87,.12);color:#047857;}
@@ -545,7 +545,7 @@ box-shadow:0 30px 70px rgba(70,90,160,.3),0 0 0 1px rgba(255,255,255,.4),inset 0
 80%{transform:scale(.992)}
 100%{transform:scale(1)}
 }
-/* 壁纸自选 */
+
 html[data-theme="glass"][data-gb="aurora"] body{background:linear-gradient(165deg,#d3f8f5 0%,#e0f2fe 30%,#ede9fe 60%,#dff0ff 100%);}
 html[data-theme="glass"][data-gb="sunset"] body{background:linear-gradient(165deg,#ffe8d6 0%,#ffe4e6 35%,#ffd6e7 65%,#ffe8e0 100%);}
 html[data-theme="glass"][data-gb="mint"] body{background:linear-gradient(165deg,#d8f8e4 0%,#d9f4f2 30%,#dff0ff 65%,#e8f2ff 100%);}
@@ -554,7 +554,7 @@ html[data-theme="glass"][data-gb="forest"] body{background:linear-gradient(165de
 html[data-theme="glass"][data-gb="ocean"] body{background:linear-gradient(165deg,#cffafe 0%,#a5f3fc 35%,#67e8f9 70%,#7dd3fc 100%);}
 html[data-theme="glass"][data-gb="sakura"] body{background:linear-gradient(165deg,#ffe4e6 0%,#fecdd3 35%,#fbcfe8 70%,#fae8ff 100%);}
 html[data-theme="glass"][data-gb="custom"] body{background:linear-gradient(165deg,var(--gb-c1,#dce7ff) 0%,var(--gb-c2,#f4e8fb) 100%);}
-/* 色板按钮与浮层 */
+
 .glass-bg-picker{display:none;}
 html[data-theme="glass"] .glass-bg-picker{display:block;}
 html[data-theme="glass"] .glass-bg-btn{
@@ -593,7 +593,7 @@ transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease;
 .gb-opt.active .gb-swatch{box-shadow:0 0 0 2px #4f63d8,0 6px 18px rgba(70,90,160,.25);}
 .gb-opt span{display:block;margin-top:5px;font-size:10px;color:#5b6675;}
 html[data-theme="glass"] .glass-bg-picker.hidden{display:none;}
-/* 玻璃实验室（仅玻璃主题的专属功能） */
+
 html[data-theme="glass"] .glass-bg-picker{
 position:fixed;top:64px;right:18px;z-index:850;width:256px;
 background:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.12) 100%);
@@ -619,7 +619,7 @@ padding:14px;
 .lab-slider input[type="range"]{width:100%;height:4px;-webkit-appearance:none;appearance:none;background:rgba(31,41,55,.15);border-radius:4px;outline:none;}
 .lab-slider input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,#fff,#e2e8f0);border:1px solid rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(70,90,160,.3),inset 0 1px 0 rgba(255,255,255,1);cursor:pointer;}
 html[data-theme="glass"] .glass-bg-picker.hidden{display:none;}
-/* 调试入口 */
+
 .tst-debug-link{font-size:11px;color:var(--text-secondary);opacity:.55;cursor:pointer;margin-left:12px;text-decoration:none;transition:opacity .2s ease;}
 .tst-debug-link:hover{opacity:1;}
 .tst-debug-mask{position:fixed;inset:0;z-index:900;background:rgba(17,24,39,.35);backdrop-filter:none;display:flex;align-items:center;justify-content:center;}
@@ -636,12 +636,12 @@ html[data-theme="glass"] #debugInput{background:rgba(255,255,255,.42);border-col
 html[data-theme="glass"] .db-btns button{background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.3));border-color:rgba(255,255,255,.7);box-shadow:0 4px 14px rgba(70,90,160,.14),inset 0 1px 0 rgba(255,255,255,.95);}
 .db-btns button:hover{transform:scale(1.05);}
 #debugOk{color:#fff!important;background:linear-gradient(180deg,#4f63d8,#3b4fd0)!important;border-color:rgba(79,99,216,.6)!important;}
-#debugHint{font-size:11px;color:var(--text-secondary);margin-top:10px;}/* 滚动条 */
+#debugHint{font-size:11px;color:var(--text-secondary);margin-top:10px;}
 html[data-theme="glass"] ::-webkit-scrollbar{width:10px;height:10px;}
 html[data-theme="glass"] ::-webkit-scrollbar-thumb{background:rgba(31,41,55,.2);border-radius:8px;border:2px solid transparent;background-clip:content-box;}
 html[data-theme="glass"] ::-webkit-scrollbar-track{background:transparent;}
-/* ===== 液态玻璃特效层（往死里叠）===== */
-/* 1.背景光斑漂移+呼吸 */
+
+
 html[data-theme="glass"] body::before{
   animation:gbGlowDrift 16s ease-in-out infinite alternate;
 }
@@ -661,7 +661,7 @@ html[data-theme="glass"] body::after{
   0%{transform:translate(0,0) rotate(0deg);opacity:.7}
   100%{transform:translate(3%,-3%) rotate(3deg);opacity:1}
 }
-/* 2.标题流光渐变文字 */
+
 html[data-theme="glass"] .section-title{
   background:linear-gradient(90deg,#3b4bd8,#8a63ff,#3b4bd8,#8a63ff);
   background-size:300% 100%;
@@ -669,19 +669,19 @@ html[data-theme="glass"] .section-title{
   animation:gbTitleFlow 6s linear infinite;
 }
 @keyframes gbTitleFlow{0%{background-position:0% 50%}100%{background-position:300% 50%}}
-/* 3.卡片逐张弹入 */
+
 html[data-theme="glass"] .card-grid .card{animation:gbCardIn .8s cubic-bezier(.34,1.56,.64,1) backwards,gbCardBreathe 5s ease-in-out 1.6s infinite;}
 html[data-theme="glass"] .card-grid .card:nth-child(1){animation-delay:.06s,1.6s}
 html[data-theme="glass"] .card-grid .card:nth-child(2){animation-delay:.16s,1.6s}
 html[data-theme="glass"] .card-grid .card:nth-child(3){animation-delay:.26s,1.6s}
 html[data-theme="glass"] .card-grid .card:nth-child(4){animation-delay:.36s,1.6s}
 @keyframes gbCardIn{0%{opacity:0;transform:translateY(30px) scale(.9)}55%{opacity:1;transform:translateY(-6px) scale(1.04)}75%{transform:translateY(2px) scale(.99)}100%{opacity:1;transform:none}}
-/* 4.卡片常驻呼吸光晕 */
+
 @keyframes gbCardBreathe{
   0%,100%{box-shadow:0 0 0 1px rgba(140,160,210,.16),0 14px 40px rgba(90,110,170,.12),inset 0 1px 0 rgba(255,255,255,.85)}
   50%{box-shadow:0 0 0 1px rgba(140,160,210,.24),0 16px 50px rgba(110,140,220,.2),0 0 30px rgba(160,190,255,.22),inset 0 1px 0 rgba(255,255,255,.92)}
 }
-/* 5.卡片 hover 大弹跳 + 流光扫过 */
+
 html[data-theme="glass"] .card-grid .card::after{
   content:'';position:absolute;top:0;left:-80%;width:55%;height:100%;pointer-events:none;z-index:1;
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.6),transparent);
@@ -696,7 +696,7 @@ html[data-theme="glass"] .card-grid .card:hover::after{animation:gbShine .95s ea
   100%{transform:scale(1.025) rotate(0deg)}
 }
 @keyframes gbShine{0%{left:-80%;opacity:0}28%{opacity:1}100%{left:135%;opacity:0}}
-/* 6.卡片反光跟随鼠标（--mx/--my 由 JS 注入） */
+
 html[data-theme="glass"] .card-grid .card{
   background:
     radial-gradient(240px 240px at var(--mx,50%) var(--my,18%),rgba(255,255,255,.5),transparent 72%),
@@ -713,11 +713,11 @@ html[data-theme="glass"] .card-grid .card{
     inset 0 -20px 44px rgba(255,255,255,.3);
   backdrop-filter:saturate(300%) contrast(1.06) brightness(1.06);
 }
-/* 7.导航 hover 弹跳 */
+
 html[data-theme="glass"] .main-nav .nav-link{transition:transform .4s cubic-bezier(.34,1.56,.64,1),color .25s ease,background .25s ease;}
 html[data-theme="glass"] .main-nav .nav-link:hover{transform:translateY(-2px) scale(1.1);}
 html[data-theme="glass"] .main-nav .nav-link:active{transform:scale(.94);}
-/* 8.按钮 hover 弹跳+光晕 */
+
 html[data-theme="glass"] .btn-primary,
 html[data-theme="glass"] .feedback-btn,
 html[data-theme="glass"] .collapse-btn{transition:transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .35s ease,background .3s ease;}
@@ -725,22 +725,22 @@ html[data-theme="glass"] .btn-primary:hover,
 html[data-theme="glass"] .feedback-btn:hover,
 html[data-theme="glass"] .collapse-btn:hover{animation:gbBtnPop .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 14px 34px rgba(90,110,170,.25),0 0 26px rgba(160,190,255,.3),inset 0 1px 0 rgba(255,255,255,1);}
 @keyframes gbBtnPop{0%{transform:scale(1)}45%{transform:scale(1.15)}70%{transform:scale(.95)}100%{transform:scale(1.07)}}
-/* 9.轮播图呼吸光晕 */
+
 html[data-theme="glass"] .hero-slider-wrap{animation:gbHeroBreathe 6s ease-in-out 1.2s infinite;}
 @keyframes gbHeroBreathe{0%,100%{box-shadow:0 18px 46px rgba(90,110,170,.14),inset 0 1px 0 rgba(255,255,255,.95)}50%{box-shadow:0 18px 60px rgba(110,140,220,.22),0 0 40px rgba(160,190,255,.25),inset 0 1px 0 rgba(255,255,255,1)}}
-/* 10.搜索框聚焦微弹 */
+
 html[data-theme="glass"] input[type="search"]:focus,
 html[data-theme="glass"] input[type="text"]:focus,
 html[data-theme="glass"] textarea:focus{transform:scale(1.015);box-shadow:0 8px 28px rgba(90,110,170,.16),0 0 0 3px rgba(79,99,216,.2),inset 0 1px 0 rgba(255,255,255,.9);}
-/* 11.滚动渐入 */
+
 html[data-theme="glass"] .gb-wait{opacity:0;transform:translateY(34px) scale(.96);transition:opacity .75s ease,transform .9s cubic-bezier(.34,1.56,.64,1);}
 html[data-theme="glass"] .gb-in{opacity:1;transform:none;}
-/* 12.玻璃实验室面板弹入 */
+
 html[data-theme="glass"] .glass-bg-picker{animation:gbPanelIn .6s cubic-bezier(.34,1.56,.64,1);transform-origin:top right;}
 @keyframes gbPanelIn{0%{opacity:0;transform:scale(.85) translateY(-14px)}60%{opacity:1;transform:scale(1.03) translateY(2px)}100%{opacity:1;transform:none}}
 
 
-/* ===== 卡片自由拖动（玻璃主题·拖到哪放哪）===== */
+
 html[data-theme="glass"] .card-grid{
   display:block;position:relative;
 }
@@ -756,11 +756,11 @@ html[data-theme="glass"] .card-grid .card.dragging{
 }
 
 
-/* ===== 导航全套动画（玻璃主题）===== */
-/* 导航栏整体滑入 */
+
+
 html[data-theme="glass"] .site-header{animation:gbNavIn .7s cubic-bezier(.34,1.56,.64,1);}
 @keyframes gbNavIn{0%{opacity:0;transform:translateY(-46px)}100%{opacity:1;transform:none}}
-/* 导航链接逐个错峰弹入 */
+
 html[data-theme="glass"] .main-nav .nav-link{animation:gbNavLinkIn .6s cubic-bezier(.34,1.56,.64,1) backwards;}
 html[data-theme="glass"] .main-nav .nav-link:nth-child(1){animation-delay:.08s}
 html[data-theme="glass"] .main-nav .nav-link:nth-child(2){animation-delay:.15s}
@@ -770,9 +770,9 @@ html[data-theme="glass"] .main-nav .nav-link:nth-child(5){animation-delay:.36s}
 html[data-theme="glass"] .main-nav .nav-link:nth-child(6){animation-delay:.43s}
 html[data-theme="glass"] .main-nav .nav-link:nth-child(7){animation-delay:.5s}
 @keyframes gbNavLinkIn{0%{opacity:0;transform:translateY(-16px) scale(.7)}60%{opacity:1;transform:translateY(3px) scale(1.12)}100%{opacity:1;transform:none}}
-/* hover 增强：上浮+光晕 */
+
 html[data-theme="glass"] .main-nav .nav-link:hover{transform:translateY(-4px) scale(1.16);box-shadow:0 10px 22px rgba(79,99,216,.28),0 0 18px rgba(140,160,255,.35);}
-/* 导航底部流光循环扫过 */
+
 html[data-theme="glass"] .site-header::after{
   content:'';position:absolute;left:-60%;bottom:0;height:2px;width:40%;
   background:linear-gradient(90deg,transparent,rgba(140,160,255,.9),transparent);
@@ -782,7 +782,7 @@ html[data-theme="glass"] .site-header::after{
 @keyframes gbNavShine{0%{left:-60%}100%{left:120%}}
 
 
-/* ===== 玩家公约页玻璃化+动画 ===== */
+
 html[data-theme="glass"] .rule-scroll{
   background:rgba(255,255,255,.05);
   backdrop-filter:blur(14px) saturate(260%) contrast(1.04);
@@ -813,7 +813,7 @@ html[data-theme="glass"] .rule-section h3{color:#4f63d8;}
 html[data-theme="glass"] .rule-section p strong{color:#4f63d8;}
 
 
-/* ===== 拖动模式分段开关 ===== */
+
 html[data-theme="glass"] .gb-seg{display:flex;gap:6px;}
 html[data-theme="glass"] .gb-seg-btn{
   flex:1;padding:6px 8px;font-size:12px;border-radius:10px;cursor:pointer;
@@ -824,12 +824,12 @@ html[data-theme="glass"] .gb-seg-btn.active{background:linear-gradient(180deg,rg
 html[data-theme="glass"] .gb-seg-btn:active{transform:scale(.92);}
 
 
-/* 液态玻璃：卡片触屏拖动（防滚动抢占） */
+
 html[data-theme="glass"] .card-grid .card,
 html[data-theme="glass"] #feedList .card{touch-action:none;}
 
 
-/* ===== 便捷工具卡片（tool-grid）玻璃适配：全站小卡片可拖动 ===== */
+
 html[data-theme="glass"] .tool-grid{
   display:block;position:relative;
 }
@@ -862,11 +862,11 @@ html[data-theme="glass"] .tool-grid .tool-card.dragging{
   transform:scale(1.05) rotate(.6deg);
 }
 html[data-theme="glass"] .tool-grid .tool-card.drag-ready{cursor:grab;}
-/* 触屏拖动：所有可拖动卡片禁止浏览器滚动抢占 */
+
 html[data-theme="glass"] .card-grid .card,
 html[data-theme="glass"] #feedList .card,
 html[data-theme="glass"] .tool-grid .tool-card{touch-action:none;}
-/* 手机端玻璃卡片 UI 优化 */
+
 @media (max-width:700px){
   html[data-theme="glass"] .card-grid .card,
   html[data-theme="glass"] #feedList .card,
@@ -880,13 +880,13 @@ html[data-theme="glass"] .tool-grid .tool-card{touch-action:none;}
   html[data-theme="glass"] .tool-grid{min-height:40px;}
 }
 
-/* ===== 拖动 Q弹动效（玻璃主题）：换位弹跳 / 碰壁震动 ===== */
+
 html[data-theme="glass"] .swap-bounce{animation:gbSwapBounce .34s cubic-bezier(.34,1.56,.64,1);}
 html[data-theme="glass"] .edge-shake{animation:gbEdgeShake .24s ease;}
 @keyframes gbSwapBounce{0%{transform:scale(.86);}55%{transform:scale(1.07);}100%{transform:scale(1);}}
 @keyframes gbEdgeShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px) scale(1.02);}75%{transform:translateX(5px) scale(1.02);}}
 
-/* ===== 手机渲染修复：锁滚动仅 body（防 iOS 视口缩放闪烁）+ 无 backdrop 降级 + 调试台按钮统一玻璃风 ===== */
+
 body.drag-lock{overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important;}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   html[data-theme="glass"] .card-grid .card,
@@ -902,7 +902,7 @@ html[data-theme="glass"] #debugOk{
   box-shadow:0 4px 14px rgba(70,90,160,.14),inset 0 1px 0 rgba(255,255,255,.95)!important;
 }
 
-/* ===== 卡片纯透明（液态玻璃：无杂色底色，仅模糊+极淡描边；拖动用强阴影辨识）===== */
+
 html[data-theme="glass"] .card-grid .card,
 html[data-theme="glass"] #feedList .card,
 html[data-theme="glass"] .tool-grid .tool-card{
@@ -930,7 +930,7 @@ html[data-theme="glass"] .tool-grid .tool-card.dragging{
   box-shadow:0 30px 70px rgba(70,90,160,.35),0 0 0 1.5px rgba(255,255,255,.5);
 }
 
-/* ===== 碰撞粘合动效（粘一起再弹开）+ 纯白/透明背景 ===== */
+
 html[data-theme="glass"] .stick-pair{animation:gbStick .34s cubic-bezier(.34,1.56,.64,1);}
 @keyframes gbStick{
   0%{transform:scale(1);}
@@ -956,7 +956,7 @@ html[data-theme="glass"][data-gb="transparent"] body::before{display:none!import
 html[data-theme="glass"][data-gb="plain"] .page-wrap,
 html[data-theme="glass"][data-gb="transparent"] .page-wrap{background:#ffffff!important;}
 
-/* ===== 碰撞完全融合：两张卡先完全重叠再弹开 ===== */
+
 html[data-theme="glass"] .merge-anim{animation:gbMerge .46s cubic-bezier(.34,1.56,.64,1);z-index:998;}
 html[data-theme="glass"] .merge-hit{animation:gbMergeHit .46s cubic-bezier(.34,1.56,.64,1);}
 @keyframes gbMerge{
@@ -972,7 +972,7 @@ html[data-theme="glass"] .merge-hit{animation:gbMergeHit .46s cubic-bezier(.34,1
   100%{transform:scale(1);}
 }
 
-/* ===== 深色玻璃（实验室开关开启后生效） ===== */
+
 html[data-theme="glass"][data-glass-dark]{
 color-scheme:dark;--text:#e7ecf5;--text-secondary:#93a0b5;
 --border:rgba(255,255,255,.12);--card:rgba(30,38,58,.45);--hover:rgba(70,90,150,.3);
@@ -989,7 +989,7 @@ html[data-theme="glass"][data-glass-dark] .suggest-box,
 html[data-theme="glass"][data-glass-dark] .results-box{background:rgba(40,52,84,.45);border-color:rgba(255,255,255,.12);}
 html[data-theme="glass"][data-glass-dark] .site-header{background:linear-gradient(180deg,rgba(28,36,60,.6),rgba(22,28,44,.5));border-bottom-color:rgba(255,255,255,.1);}
 html[data-theme="glass"][data-glass-dark] .time-badge{background:rgba(40,52,84,.4);}
-/* ===== 玻璃效果开关（body.glass-off：卡片/导航恢复实色） ===== */
+
 body.glass-off html[data-theme="glass"] .card,
 body.glass-off html[data-theme="glass"] .server-card,
 body.glass-off html[data-theme="glass"] .notice-card,
@@ -1008,9 +1008,9 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .search-row input,
 body.glass-off html[data-theme="glass"][data-glass-dark] .suggest-box,
 body.glass-off html[data-theme="glass"][data-glass-dark] .results-box,
 body.glass-off html[data-theme="glass"][data-glass-dark] .glass-bg-picker{background:rgba(24,30,48,.97)!important;backdrop-filter:none!important;}
-/* ===== 性能优先（body.glass-lite：全站关闭 backdrop-filter） ===== */
+
 body.glass-lite html[data-theme="glass"] *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
-/* ===== 实验室新控件 ===== */
+
 html[data-theme="glass"] .gb-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 html[data-theme="glass"] .gb-close{width:26px;height:26px;border-radius:8px;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.35);color:#5b6675;font-size:13px;cursor:pointer;line-height:1;}
 html[data-theme="glass"] .gb-close:hover{background:rgba(255,255,255,.6);color:#dc2626;}
@@ -1023,7 +1023,7 @@ html[data-theme="glass"] .gb-switch input{width:15px;height:15px;accent-color:#4
 html[data-theme="glass"] .gb-share-row{display:flex;gap:6px;margin-top:8px;align-items:center;}
 html[data-theme="glass"] .gb-share-row input{flex:1;min-width:0;padding:5px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.4);color:#1f2937;font-size:12px;}
 html[data-theme="glass"] .gb-custom-preview{width:18px;height:18px;border-radius:6px;border:1px solid rgba(255,255,255,.8);background:linear-gradient(135deg,#dce7ff,#f4e8fb);display:inline-block;vertical-align:middle;}
-/* ===== 全卡玻璃：搜索/结果/轮播等实色元素统一玻璃 ===== */
+
 html[data-theme="glass"] .search-row input,
 html[data-theme="glass"] .suggest-box,
 html[data-theme="glass"] .results-box,
@@ -1031,7 +1031,7 @@ html[data-theme="glass"] .hero-slider-wrap,
 html[data-theme="glass"] .notice-card{background:rgba(255,255,255,.3);backdrop-filter:blur(24px) saturate(220%);border:1px solid rgba(255,255,255,.55);}
 html[data-theme="glass"] .search-row input{color:#1f2937;}
 
-/* ===== 管理团队 ===== */
+
 .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;}
 .team-card{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;transition:transform .25s ease,box-shadow .25s ease;}
 .team-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(70,90,150,.14);}
@@ -1095,7 +1095,7 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 </section>
 
 <main>
-<!-- 首页 -->
+
 
 <section id="profile" class="page active">
 <div class="container" style="max-width:600px;">
@@ -1126,7 +1126,7 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <div class="card" style="padding:18px;margin-bottom:16px;">
 <div style="font-size:15px;font-weight:600;margin-bottom:14px;">设备状态</div>
 
-<!-- CPU -->
+
 <div style="margin-bottom:12px;">
 <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
 <span style="color:var(--text-secondary);">CPU</span>
@@ -1135,7 +1135,7 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <div class="bar-bg"><div class="bar-fill bar-cpu" id="stCpuBar"></div></div>
 </div>
 
-<!-- GPU -->
+
 <div style="margin-bottom:12px;">
 <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
 <span style="color:var(--text-secondary);">GPU</span>
@@ -1143,7 +1143,7 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 </div>
 </div>
 
-<!-- 内存 -->
+
 <div style="margin-bottom:12px;">
 <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
 <span style="color:var(--text-secondary);">内存</span>
@@ -1152,7 +1152,7 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <div class="bar-bg"><div class="bar-fill bar-mem" id="stMemBar"></div></div>
 </div>
 
-<!-- 网络 -->
+
 <div style="margin-bottom:12px;">
 <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
 <span style="color:var(--text-secondary);">网络</span>
@@ -1160,7 +1160,7 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 </div>
 </div>
 
-<!-- 屏幕 -->
+
 <div>
 <div style="display:flex;justify-content:space-between;font-size:12px;">
 <span style="color:var(--text-secondary);">屏幕</span>
@@ -1242,7 +1242,7 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 <div class="toast-wrap" id="toastWrap"></div>
 
 
-<!-- 管理面板 -->
+
 <div class="modal-mask" id="adminModal">
 <div class="modal">
 <button class="modal-close" id="adminClose">✕</button>
@@ -1336,9 +1336,9 @@ body.glass-off html[data-theme="glass"][data-glass-dark] .team-card{background:r
 
 <script>
 
-// ============================================================
-// 工具
-// ============================================================
+
+
+
 const $ = s => document.querySelector(s);
 function esc(s){
   return String(s==null?'':s)
@@ -1369,9 +1369,9 @@ if($('#themeToggle')) $('#themeToggle').onclick=()=>{
 };
 applyTheme();
 
-// ============================================================
-// 导航切换
-// ============================================================
+
+
+
 const navBtns=document.querySelectorAll('.nav-link');
 const pages=document.querySelectorAll('.page');
 function switchPage(pid){
@@ -1390,9 +1390,9 @@ document.querySelectorAll('[data-fnav]').forEach(b=>{
 };
 });
 
-// ============================================================
-// 轮播
-// ============================================================
+
+
+
 const heroSlider=$('#heroSlider');
 if(heroSlider){
 const slides=Array.from(heroSlider.querySelectorAll('.slide-item'));
@@ -1421,10 +1421,10 @@ document.addEventListener('visibilitychange',()=>{
   if(document.hidden){ stopTimer(); } else { startTimer(); }
 });
 
-// ============================================================
+
 }
-// 时间徽章（北京时间 + 运行时间）
-// ============================================================
+
+
 let SITE_DATA={announcements:[],feeds:[],sponsors:[],images:[],replays:[],serverStatus:'online'};
 const serverStart=new Date('2026-06-30T00:00:00');
 const offsetMs=120*1000;
@@ -1460,7 +1460,7 @@ function applyServerStatus(){
 }
 updateTime();
 
-// 复制地址
+
 let copyFlag=false;
 if($('#copyAddrBtn')) if($('#copyAddrBtn')) $('#copyAddrBtn').onclick=async()=>{
   if(copyFlag){ return; }
@@ -1486,9 +1486,9 @@ if($('#openQQGroup')) $('#openQQGroup').onclick=()=>{
   window.location.href='mqqapi://card/show_pslcard?src_type=internal&version=1&card_type=group&uin=833470853';
 };
 
-// ============================================================
-// 数据加载（公开 API）
-// ============================================================
+
+
+
 
 async function loadData(){
   try{
@@ -1496,7 +1496,7 @@ async function loadData(){
     const d=await r.json();
     if(d.ok){
     SITE_DATA=d;
-    // 提取服务器状态（隐藏系统条目）
+    
     const sysIdx = (SITE_DATA.announcements||[]).findIndex(a=>a.id==='_sys_server_status');
     if(sysIdx>=0){
       try{
@@ -1582,9 +1582,9 @@ function renderSponsors(){
   </tbody></table>`;
 }
 
-// ============================================================
-// 玩家公约（本地数据）
-// ============================================================
+
+
+
 const RULES={
 treatyTitle:'The Slow Tide 服务器总条约',
 subTitle:'网易基岩 TST 山头',
@@ -1762,7 +1762,7 @@ document.addEventListener('click',(e)=>{
   const a=e.target.closest('#ruleToc a');
   if(a){ e.preventDefault(); scrollToSec(a.getAttribute('href').substring(1)); }
 });
-// 公约搜索
+
 if($('#ruleSearchBtn')) $('#ruleSearchBtn').onclick=()=>doRuleSearch($('#ruleSearchInput').value);
 if($('#ruleSearchInput')) $('#ruleSearchInput').addEventListener('keydown',(e)=>{
   if(e.key==='Enter' && !suggestOpen('ruleSuggest')){ doRuleSearch(e.target.value); }
@@ -1785,9 +1785,9 @@ function doRuleSearch(kw){
   if(!found){ tip.textContent='未在公约中找到匹配关键词'; }
 }
 
-// ============================================================
-// 全局搜索（公告 / 动态 / 公约 / 页面）
-// ============================================================
+
+
+
 function searchUnits(){
   const units=[];
   const pids=['home','notice','feed','event','cdkey','sponsor','rule'];
@@ -1906,9 +1906,9 @@ if($('#globalSearchInput')) $('#globalSearchInput').addEventListener('keydown',(
 });
 if($('#globalSearchInput')) $('#globalSearchInput').addEventListener('input',()=>hideResults());
 
-// ============================================================
-// 搜索联想
-// ============================================================
+
+
+
 function suggestOpen(id){ const el=document.getElementById(id); return el?el.classList.contains('show'):false; }
 function getSuggestions(kwLow){
   const pool=['首页','公告','动态','赛事活动','兑换码','服务器赞助','玩家公约','服务器地址','QQ交流群','裂痕杯','PVP','红石','生电','建筑','领地','经济','交易','村民','外挂','赌博','赞助','运行时间','状态'];
@@ -1971,9 +1971,9 @@ function initSuggest(inputId,boxId,runSearch){
 initSuggest('globalSearchInput','globalSuggest',(kw)=>doGlobalSearch(kw));
 initSuggest('ruleSearchInput','ruleSuggest',(kw)=>doRuleSearch(kw));
 
-// ============================================================
-// 管理员面板
-// ============================================================
+
+
+
 let ADMIN_TOKEN=sessionStorage.getItem('tst_admin_token')||'';
 const adminModal=$('#adminModal');
 function openAdmin(){
@@ -2012,7 +2012,7 @@ function showAdminPanel(){
   $('#adminPanel').style.display='block';
   refreshAdminLists();
 }
-// Tab 切换
+
 document.querySelectorAll('.admin-tab').forEach(t=>{
   t.onclick=()=>{
     document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));
@@ -2094,7 +2094,7 @@ document.addEventListener('click',async(e)=>{
     renderAdminNotices(); renderAdminFeeds(); renderAdminSponsors(); renderAdminReplays(); renderAdminImages(); renderAll();
   }
 });
-// 编辑状态（点编辑 → 表单进入修改模式）
+
 let editingAn=null, editingFd=null, editingSp=null;
 document.addEventListener('click',(e)=>{
   const eb=e.target.closest('[data-edit]');
@@ -2189,7 +2189,7 @@ if($('#anCancelBtn')) $('#anCancelBtn').onclick=cancelAnEdit;
 if($('#fdCancelBtn')) $('#fdCancelBtn').onclick=cancelFdEdit;
 if($('#spCancelBtn')) $('#spCancelBtn').onclick=cancelSpEdit;
 if($('#rpCancelBtn')) $('#rpCancelBtn').onclick=cancelRpEdit;
-// 发布公告 / 保存修改
+
 if($('#anAddBtn')) $('#anAddBtn').onclick=async()=>{
   const title=$('#anTitle').value.trim(), content=$('#anContent').value.trim(), date=$('#anDate').value.trim();
   if(!title||!content){ showToast('请填写标题和内容'); return; }
@@ -2204,7 +2204,7 @@ if($('#anAddBtn')) $('#anAddBtn').onclick=async()=>{
     renderAdminNotices(); renderAll();
   }
 };
-// 发布动态（含图片）
+
 let fdImageData=null;
 if($('#fdImage')) $('#fdImage').addEventListener('change',(e)=>{
   const file=e.target.files[0];
@@ -2235,7 +2235,7 @@ if($('#fdAddBtn')) $('#fdAddBtn').onclick=async()=>{
     renderAdminFeeds(); renderAll();
   }
 };
-// 添加赞助 / 保存修改
+
 if($('#spAddBtn')) $('#spAddBtn').onclick=async()=>{
   const name=$('#spName').value.trim(), amount=$('#spAmount').value.trim();
   if(!name||!amount){ showToast('请填写玩家名和金额'); return; }
@@ -2251,7 +2251,7 @@ if($('#spAddBtn')) $('#spAddBtn').onclick=async()=>{
   }
 };
 
-// 赛事回放管理
+
 function renderAdminReplays(){
   const list=SITE_DATA.replays||[];
   $('#rpList').innerHTML=list.map(r=>`
@@ -2279,9 +2279,9 @@ if($('#rpAddBtn')) $('#rpAddBtn').onclick=async()=>{
   }
 };
 
-// ============================================================
-// 图片管理（上传 / 引用 / 删除）
-// ============================================================
+
+
+
 function resolveImg(src){
   if(typeof src==='string' && src.startsWith('img:') && Array.isArray(SITE_DATA.images)){
     const it=SITE_DATA.images.find(x=>x.id===src.slice(4));
@@ -2691,7 +2691,7 @@ $('#themeToggle').onclick=()=>{
 applyTheme();
 if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 
-// ===== 液态玻璃实验室：壁纸/透明度/光影 + 卡片拖动 + 调试入口（仅玻璃主题）=====
+
 (function(){
   const gbBtn=document.getElementById('glassBgBtn');
   const gbPicker=document.getElementById('glassBgPicker');
@@ -2802,10 +2802,10 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     tt.textContent=msg;tt.style.opacity='1';tt.style.transform='translateX(-50%) translateY(0)';
     clearTimeout(tt._t);tt._t=setTimeout(function(){tt.style.opacity='0';tt.style.transform='translateX(-50%) translateY(16px)';},1400);
   }
-  // 关闭按钮
+  
   var gbClose=document.getElementById('gbClose');
   if(gbClose){gbClose.addEventListener('click',function(){gbPicker.classList.add('hidden');});}
-  // 三个开关
+  
   function bindCheck(id,key,fn){
     var el=document.getElementById(id);
     if(!el)return;
@@ -2820,7 +2820,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   bindCheck('gbOff','tst-glass-off');
   bindCheck('gbLite','tst-glass-lite');
   bindCheck('gbDark','tst-glass-dark');
-  // 强度预设
+  
   var presetMap={soft:8,normal:18,strong:34};
   document.querySelectorAll('#gbPresetSeg .gb-seg-btn').forEach(function(b){
     b.addEventListener('click',function(){
@@ -2832,7 +2832,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
       gbToast('强度预设：'+(b.textContent||''));
     });
   });
-  // 随机主题
+  
   var gbRandom=document.getElementById('gbRandom');
   if(gbRandom){
     gbRandom.addEventListener('click',function(){
@@ -2851,7 +2851,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
       gbToast('已随机一套主题');
     });
   }
-  // 重置默认
+  
   var gbReset=document.getElementById('gbReset');
   if(gbReset){
     gbReset.addEventListener('click',function(){
@@ -2861,7 +2861,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
       gbToast('已恢复默认设置');
     });
   }
-  // 分享码
+  
   var gbShare=document.getElementById('gbShare');
   if(gbShare){
     function readGlassSettings(){
@@ -2924,7 +2924,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   window.syncGlassBgUI=syncGlassBgUI;
 })();
 
-// ===== 调试入口（输入代码激活内测功能）=====
+
 (function(){
   const link=document.getElementById('debugLink');
   if(!link)return;
@@ -2967,7 +2967,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   });
 })();
 
-// ===== 卡片拖动（双模式：网格排序 / 自由摆放；全站小卡片通用：公告/动态/赛事回放/赞助/便捷工具，含触屏丝滑 + q弹音效）=====
+
 (function(){
   function isGlass(){return themeState()==='glass';}
   function dragMode(){return localStorage.getItem('tst-drag-mode')||'grid';}
@@ -3034,7 +3034,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   function allGrids(){return [].slice.call(document.querySelectorAll('.card-grid,#feedList,.tool-grid')).filter(function(g){return g.clientWidth;});}
   function refreshAll(){allGrids().forEach(function(g){if(isGlass())layoutInit(g);else resetCardFree(g);});}
 
-  // ===== q弹音效（Web Audio 合成，无外部文件；圆润正弦波+果冻扫频，仅玻璃主题播放）=====
+  
   var actx=null,lastSwap=0,sfxThrottle=0,lastDragMove=0,lastEdgeSfx=0;
   function sfx(kind){
     if(!isGlass())return;
@@ -3069,7 +3069,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     }catch(e){}
   }
   window.sfx=sfx;
-  // 全局按钮音效（玻璃主题下按钮/导航/折叠/背景选项统一 Q弹反馈；拖动刚结束时静默防误触）
+  
   document.addEventListener('click',function(e){
     if(!isGlass())return;
     var t=e.target.closest('button,a,[data-nav],.collapse-btn,.gb-opt,.more-toggle');
@@ -3114,7 +3114,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     }
     const cards=cardEls(g);
     if(dragMode()==='free'){
-      // 跨容器自由排列：拖到其他卡片容器时把卡片迁移过去
+      
       const hitEl=document.elementFromPoint(e.clientX,e.clientY);
       const hitGrid=hitEl&&hitEl.closest?hitEl.closest('.card-grid,#feedList,.tool-grid'):null;
       if(hitGrid&&hitGrid!==g&&g.contains(card)){
@@ -3152,7 +3152,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     }else{
       const c=cols(g),cw=cardWidth(g),ch=cards[0]?cards[0].offsetHeight:0;
       const sp=posOf(g,startIdx);
-      // 跟手用 transform（GPU 丝滑），释放后过渡归位
+      
       card.style.transform='translate('+dx+'px,'+dy+'px) translateZ(0) scale(1.02) rotate('+(dx*0.0012)+'deg)';
       lastDragMove=Date.now();
       const col=Math.round(dx/(cw+GAP))+(startIdx%c);
@@ -3256,7 +3256,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   });
   window.resetCardFree=function(){allGrids().forEach(function(g){resetCardFree(g);});};
   window.applyDragMode=function(){allGrids().forEach(function(g){resetCardFree(g);});refreshAll();};
-  // 切页后重新布局（修复：隐藏页容器宽度为 0 导致玻璃卡片重叠）
+  
   window.refreshGlassLayout=function(){
     if(!isGlass())return;
     allGrids().forEach(function(g){
@@ -3266,7 +3266,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
 })();
 
 
-// ===== 拖动模式切换（玻璃实验室面板）=====
+
 (function(){
   var seg=document.getElementById('gbDragSeg');
   if(!seg)return;
@@ -3295,7 +3295,7 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
   sync();
 })();
 
-// ===== 液态玻璃特效：鼠标光晕 + 卡片反光 + 滚动渐入 =====
+
 (function(){
   function gs(){return themeState()==='glass';}
   var m=document.createElement('div');
@@ -3325,14 +3325,14 @@ if(typeof syncGlassBgUI==='function')syncGlassBgUI();
     },{threshold:.05});
     els.forEach(function(el){io.observe(el);});
   }
-  // 兜底：1.2s 后仍未进入视口的元素强制显示，避免卡白
+  
   setTimeout(function(){
     els.forEach(function(el){el.classList.add('gb-in');});
     if(io)io.disconnect();
   },1200);
 })();
 
-// 首次玻璃主题提示：小卡片可自由拖动
+
 (function(){
   if(localStorage.getItem('tst-card-drag-hint'))return;
   let shown=false;

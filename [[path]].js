@@ -1,21 +1,21 @@
-// Cloudflare Pages Functions - The Slow Tide 官网 API 代理
-// /api/auth/* -> Supabase Auth；/api/rest/* -> Supabase REST
-// /api/data、/api/admin -> 转发到数据服务站点
-// 国庆&开服100天双庆抽奖：/api/lottery/draw（后端加权随机+原子核销）、/api/lottery/state
-// 每日限抽：设备指纹+IP（isolate 内存 Map，尽力方案）+ 兑换码原子核销兜底
-// CORS 仅放行本站与反馈站
+
+
+
+
+
+
 
 const SUPABASE_URL = 'https://jilcbcodphxpasicjghv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs';
 const DATA_ORIGIN = 'https://tst-server-site.pages.dev';
-// 管理员口令：注意此文件在公开仓库，密码会随源码可见；后续需改为环境变量+数据库侧改密
-let ADMIN_PWD = null; // 管理员口令：仅由 onRequest 从环境变量 ADMIN_PWD 注入（仓库不含口令）
 
-// ===== 国庆&开服100天双庆抽奖（时区：北京时间 UTC+8）=====
-const L_START = new Date('2026-10-01T00:00:00+08:00');  // 2026-10-01 00:00 正式开放
-const L_END = new Date('2026-10-08T23:59:59+08:00');    // 2026-10-08 23:59:59 结束
-const DRAW_DEV_MAP = new Map();  // dev:<device>:<cnDate> -> {prize,code,seq}
-const DRAW_IP_MAP = new Map();   // ip:<ip>:<cnDate> -> {prize,code,seq}
+let ADMIN_PWD = null; 
+
+
+const L_START = new Date('2026-10-01T00:00:00+08:00');  
+const L_END = new Date('2026-10-08T23:59:59+08:00');    
+const DRAW_DEV_MAP = new Map();  
+const DRAW_IP_MAP = new Map();   
 
 function cnDate(d) {
   return new Date(d.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10);
@@ -52,8 +52,8 @@ async function fetchUnclaimedCodes() {
   if (!res || !res.ok || !Array.isArray(res.codes)) return null;
   return res.codes.filter(c => !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
 }
-// 核销：把奖品名标记为【已使用】+原名（数据库侧无 claimed 更新通道，用 prize 前缀做已使用标记；
-// 后台管理员列表会显示【已使用】提示，仍可 delete 删除）
+
+
 async function claimCode(id, prize, device, now) {
   const res = await adminLottery('update_prize', { id: String(id), prize: '【已使用】' + (prize || '') });
   return !!(res && res.ok);
@@ -107,7 +107,7 @@ export async function onRequest(context) {
     return new Response(null, { headers: corsHeaders(request) });
   }
 
-  // ===== 抽奖状态查询（含开放状态/剩余码数/今日已抽）=====
+  
   if (path === '/api/lottery/state' && request.method === 'GET') {
     const now = new Date();
     const sdate = cnDate(now);
@@ -130,7 +130,7 @@ export async function onRequest(context) {
     }, 200, request);
   }
 
-  // ===== 国庆&开服100天抽奖（后端加权随机 + 原子核销 + 每日限抽）=====
+  
   if (path === '/api/lottery/draw' && request.method === 'POST') {
     const now = new Date();
     const sdate = cnDate(now);
@@ -148,12 +148,12 @@ export async function onRequest(context) {
     if (rec) {
       return json({ ok: false, error: 'already_drawn', prize: rec.prize, code: rec.code, seq: rec.seq, serverDate: sdate }, 200, request);
     }
-    // 读未认领码池
+    
     let codes = await fetchUnclaimedCodes();
     if (!codes || codes.length === 0) {
       return json({ ok: false, error: 'sold_out', serverDate: sdate }, 200, request);
     }
-    // 加权随机 + 原子核销（并发下重试）
+    
     let picked = null;
     for (let i = 0; i < 6; i++) {
       const c = pickWeighted(codes);
@@ -171,7 +171,7 @@ export async function onRequest(context) {
     return json({ ok: true, ...recInfo, serverDate: sdate }, 200, request);
   }
 
-  // 数据/管理接口：转发到数据服务站点
+  
   if (path === '/api/data' || path.startsWith('/api/data/')) {
     return proxyFetch(DATA_ORIGIN + '/api/data' + url.search, request);
   }
@@ -179,7 +179,7 @@ export async function onRequest(context) {
     return proxyFetch(DATA_ORIGIN + '/api/admin' + url.search, request);
   }
 
-  // 仅代理 /api/auth/* 与 /api/rest/*（含 draw_lottery 兼容转发）
+  
   if (path.startsWith('/api/auth/') || path.startsWith('/api/rest/')) {
     let p = path.slice('/api'.length);
     if (p.startsWith('/rest/') && !p.startsWith('/rest/v1/')) {
@@ -197,7 +197,7 @@ export async function onRequest(context) {
         const cfIp = request.headers.get('CF-Connecting-IP') || '';
         if (!obj.ip) obj.ip = cfIp;
         bd = new TextEncoder().encode(JSON.stringify(obj));
-      } catch (e) { /* 非 JSON 原样转发 */ }
+      } catch (e) {  }
     }
     const upstream = await fetch(target, { method: request.method, headers: headers, body: bd, redirect: 'manual' });
     const respHeaders = new Headers(upstream.headers);

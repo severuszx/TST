@@ -1,4 +1,4 @@
-// The Slow Tide 站内弹窗，替代浏览器 prompt / confirm / alert
+
 (function () {
   var overlay = null, pending = null;
 
