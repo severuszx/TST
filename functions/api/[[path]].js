@@ -105,6 +105,9 @@ async function proxyFetch(target, request) {
   return new Response(upstream.body, { status: upstream.status, headers: respHeaders });
 }
 
+// ===== /api/data 热数据：isolate 内存缓存（同实例 10 分钟内不再读 KV）=====
+let MEM_DATA = null, MEM_TS = 0, MEM_REFRESHING = false;
+
 // ===== 边缘缓存：GET 只读接口命中 caches.default 直接返回，不再打后端 =====
 function cacheKeyOf(request) {
   const u = new URL(request.url);
@@ -715,14 +718,23 @@ export async function onRequest(context) {
     const baseHead = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev' };
     const kv = (context && context.env && context.env.SITE_CACHE) || null;
     let stale = null, staleAge = 1e9;
-    if (kv) {
+    // 先看本实例内存：热路径完全不碰 KV
+    if (MEM_DATA) { stale = MEM_DATA; staleAge = Date.now() - MEM_TS; }
+    if (!stale && kv) {
       try {
-        const cached = await kv.get('site_data_v1');
-        const tsRaw = await kv.get('site_data_v1_ts');
-        if (cached) { stale = cached; staleAge = tsRaw ? (Date.now() - parseInt(tsRaw, 10)) : 1e9; }
+        const r = await kv.getWithMetadata('site_data_v1', 'text');
+        if (r && r.value) {
+          const ts = Number((r.metadata && r.metadata.ts) || 0);
+          stale = r.value;
+          staleAge = ts ? (Date.now() - ts) : 1e9;
+          MEM_DATA = stale; MEM_TS = Date.now() - staleAge;
+        }
       } catch (e) {}
     }
     async function refresh() {
+      if (MEM_REFRESHING) return MEM_DATA;
+      MEM_REFRESHING = true;
+      try {
       const up = await proxyFetch(DATA_ORIGIN + '/api/data' + url.search, request);
       let text = null;
       try {
@@ -744,13 +756,12 @@ export async function onRequest(context) {
         text = JSON.stringify(obj);
       } catch (e) {}
       if (text === null) text = await up.text();
+      MEM_DATA = text; MEM_TS = Date.now();
       if (kv) {
-        try {
-          await kv.put('site_data_v1', text, { expirationTtl: 1800 });
-          await kv.put('site_data_v1_ts', String(Date.now()), { expirationTtl: 1800 });
-        } catch (e) {}
+        try { await kv.put('site_data_v1', text, { expirationTtl: 1800, metadata: { ts: Date.now() } }); } catch (e) {}
       }
       return text;
+      } finally { MEM_REFRESHING = false; }
     }
     function wrap(text, tag, ttl) {
       const headers = new Headers(baseHead);
@@ -760,9 +771,9 @@ export async function onRequest(context) {
     }
     if (stale) {
       // 有旧数据就先给用户，过期了后台再刷：用户永远不等源站那 15 秒
-      if (staleAge > 240 && context.waitUntil) context.waitUntil(refresh().catch(function () {}));
-      const resp = wrap(stale, staleAge > 240 ? 'STALE' : 'KV', 60);
-      if (useEdge && staleAge <= 240 && context.waitUntil) {
+      if (staleAge > 1200 && context.waitUntil) context.waitUntil(refresh().catch(function () {}));
+      const resp = wrap(stale, staleAge > 1200 ? 'STALE' : (MEM_DATA === stale ? 'MEM' : 'KV'), 60);
+      if (useEdge && staleAge <= 1200 && context.waitUntil) {
         context.waitUntil(caches.default.put(cacheKeyOf(request), resp.clone()).catch(function () {}));
       }
       return resp;
