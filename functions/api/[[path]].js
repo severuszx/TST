@@ -794,7 +794,299 @@ export async function onRequest(context) {
     }
   }
 
-  // 管理员专属：LuckPerms 网页编辑器入口。链接只存 D1，不出现在前端源码。
+  const PUSH_KEY = (context && context.env && context.env.TST_STATUS_TOKEN) || TST_TOKEN;
+  function pushAllowed(request) {
+    const k = String(request.headers.get('x-tst-key') || '');
+    return !!k && k === PUSH_KEY;
+  }
+  async function ensureFeatureTables(db) {
+    if (!db) return false;
+    if (globalThis.__TST_FT_OK) return true;
+    try {
+      await db.batch([
+        db.prepare('CREATE TABLE IF NOT EXISTS p3d (mc TEXT PRIMARY KEY, online_min INTEGER, deaths INTEGER, coins INTEGER, inv TEXT, armor TEXT, ts INTEGER)'),
+        db.prepare('CREATE TABLE IF NOT EXISTS mkt_coin (mc TEXT PRIMARY KEY, bal INTEGER, ts INTEGER)'),
+        db.prepare('CREATE TABLE IF NOT EXISTS mkt_price (item TEXT PRIMARY KEY, buy INTEGER, prev INTEGER, day TEXT, ts INTEGER)'),
+        db.prepare('CREATE TABLE IF NOT EXISTS mkt_bet (id INTEGER PRIMARY KEY AUTOINCREMENT, mc TEXT, item TEXT, dir TEXT, stake INTEGER, price INTEGER, day TEXT, ts INTEGER)'),
+        db.prepare('CREATE TABLE IF NOT EXISTS th_post (id INTEGER PRIMARY KEY AUTOINCREMENT, nick TEXT, content TEXT, likes INTEGER, ts INTEGER)'),
+        db.prepare('CREATE TABLE IF NOT EXISTS th_like (ip TEXT, pid INTEGER)'),
+        db.prepare('CREATE TABLE IF NOT EXISTS appeals (id INTEGER PRIMARY KEY AUTOINCREMENT, nick TEXT, mc TEXT, content TEXT, ban_reason TEXT, status TEXT, reply TEXT, ts INTEGER)'),
+        db.prepare('CREATE TABLE IF NOT EXISTS rpt (ym TEXT, mc TEXT, online_min INTEGER, deaths INTEGER, coins_in INTEGER, coins_out INTEGER, top_item TEXT, wealth_rank INTEGER, ts INTEGER, PRIMARY KEY(ym, mc))'),
+      ]);
+      globalThis.__TST_FT_OK = true;
+      return true;
+    } catch (e) { return false; }
+  }
+  async function webNick(request) {
+    const tk = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+    if (!tk) return '';
+    try {
+      const r = await fetch('https://theslowtidefk.pages.dev/api/me', { headers: { 'Authorization': 'Bearer ' + tk } });
+      const d = await r.json();
+      if (d && d.ok) return String(d.nickname || (d.email || '').split('@')[0] || '').trim().slice(0, 24);
+    } catch (e) {}
+    return '';
+  }
+
+  if (path === '/api/player3d/push' && request.method === 'POST') {
+    if (!pushAllowed(request)) return json({ ok: false, error: 'bad_token' }, 403, request);
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const now = tstNowS();
+    const list = Array.isArray(bd.players) ? bd.players.slice(0, 200) : [];
+    const stmts = [];
+    for (const p of list) {
+      const mc = String((p && p.mc) || '').slice(0, 32);
+      if (!mc) continue;
+      const om = Math.max(0, Math.min(52560000, Math.round(num(p.online_min) || 0)));
+      const dt = Math.max(0, Math.round(num(p.deaths) || 0));
+      const coins = Math.round(num(p.coins) || 0);
+      const inv = p.inventory ? JSON.stringify(p.inventory).slice(0, 2000) : null;
+      const armor = p.armor ? JSON.stringify(p.armor).slice(0, 800) : null;
+      stmts.push(TST_DB.prepare('INSERT INTO p3d (mc,online_min,deaths,coins,inv,armor,ts) VALUES (?,?,?,?,?,?,?) ON CONFLICT(mc) DO UPDATE SET online_min=excluded.online_min, deaths=excluded.deaths, coins=excluded.coins, inv=COALESCE(excluded.inv,p3d.inv), armor=COALESCE(excluded.armor,p3d.armor), ts=excluded.ts').bind(mc, om, dt, coins, inv, armor, now));
+    }
+    if (!stmts.length) return json({ ok: true, saved: 0 }, 200, request);
+    try {
+      await TST_DB.batch(stmts);
+      return json({ ok: true, saved: stmts.length }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/rank/top' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: true, rows: [], total: 0 }, 200, request);
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const metric = ['online', 'deaths', 'coins'].includes(url.searchParams.get('metric')) ? url.searchParams.get('metric') : 'online';
+    const col = metric === 'deaths' ? 'deaths' : (metric === 'coins' ? 'coins' : 'online_min');
+    const limit = Math.max(1, Math.min(100, parseInt(url.searchParams.get('limit') || '30', 10) || 30));
+    try {
+      const rows = await TST_DB.prepare('SELECT mc,' + col + ' AS value,ts FROM p3d WHERE ' + col + ' > 0 ORDER BY ' + col + ' DESC, ts DESC LIMIT ?').bind(limit).all();
+      const cnt = await TST_DB.prepare('SELECT COUNT(*) AS c FROM p3d WHERE ' + col + ' > 0').first();
+      return json({ ok: true, metric: metric, rows: ((rows && rows.results) || []).map(function (r) { return { mc: r.mc, value: Number(r.value) || 0, ts: Number(r.ts) || 0 }; }), total: Number((cnt && cnt.c) || 0), ts: tstNowS() }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/rank/player' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const metric = ['online', 'deaths', 'coins'].includes(url.searchParams.get('metric')) ? url.searchParams.get('metric') : 'online';
+    const col = metric === 'deaths' ? 'deaths' : (metric === 'coins' ? 'coins' : 'online_min');
+    const name = String(url.searchParams.get('name') || '').trim().slice(0, 32);
+    if (!name) return json({ ok: false, error: 'bad_name' }, 200, request);
+    try {
+      const row = await TST_DB.prepare('SELECT mc,' + col + ' AS value,ts,coins,deaths,online_min,inv,armor FROM p3d WHERE mc=? COLLATE NOCASE').bind(name).first();
+      if (!row) return json({ ok: false, error: 'not_found' }, 200, request);
+      const above = await TST_DB.prepare('SELECT COUNT(*) AS c FROM p3d WHERE ' + col + ' > ?').bind(Number(row.value) || 0).first();
+      const cnt = await TST_DB.prepare('SELECT COUNT(*) AS c FROM p3d WHERE ' + col + ' > 0').first();
+      return json({ ok: true, metric: metric, player: { mc: row.mc, value: Number(row.value) || 0, ts: Number(row.ts) || 0, rank: Number((above && above.c) || 0) + 1, total: Number((cnt && cnt.c) || 0), coins: Number(row.coins) || 0, deaths: Number(row.deaths) || 0, online_min: Number(row.online_min) || 0, inv: row.inv || '', armor: row.armor || '' } }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/market/coin' && request.method === 'POST') {
+    if (!pushAllowed(request)) return json({ ok: false, error: 'bad_token' }, 403, request);
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const now = tstNowS();
+    const stmts = [];
+    const list = Array.isArray(bd.players) ? bd.players.slice(0, 200) : [];
+    for (const p of list) {
+      const mc = String((p && p.mc) || '').slice(0, 32);
+      if (!mc) continue;
+      const bal = Math.round(num(p.balance) || 0);
+      stmts.push(TST_DB.prepare('INSERT INTO mkt_coin (mc,bal,ts) VALUES (?,?,?) ON CONFLICT(mc) DO UPDATE SET bal=excluded.bal, ts=excluded.ts').bind(mc, bal, now));
+    }
+    if (!stmts.length) return json({ ok: true, saved: 0 }, 200, request);
+    try {
+      await TST_DB.batch(stmts);
+      return json({ ok: true, saved: stmts.length }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/market/push' && request.method === 'POST') {
+    if (!pushAllowed(request)) return json({ ok: false, error: 'bad_token' }, 403, request);
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const day = todayStr();
+    const now = tstNowS();
+    const list = Array.isArray(bd.items) ? bd.items.slice(0, 60) : [];
+    const stmts = [];
+    for (const it of list) {
+      const item = String((it && it.item) || '').trim().slice(0, 40);
+      const buy = Math.round(num(it && it.buy) || 0);
+      if (!item || buy <= 0) continue;
+      stmts.push(TST_DB.prepare('INSERT INTO mkt_price (item,buy,prev,day,ts) VALUES (?,?,?,?,?) ON CONFLICT(item) DO UPDATE SET prev=CASE WHEN mkt_price.day=? THEN mkt_price.prev ELSE mkt_price.buy END, buy=excluded.buy, day=excluded.day, ts=excluded.ts').bind(item, buy, buy, day, now, day));
+    }
+    if (!stmts.length) return json({ ok: true, saved: 0 }, 200, request);
+    try {
+      await TST_DB.batch(stmts);
+      return json({ ok: true, saved: stmts.length, day: day }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/market/state' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: true, focus: '', items: [], bets: [], balance: null }, 200, request);
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const want = String(url.searchParams.get('item') || '').trim();
+    try {
+      const rows = await TST_DB.prepare('SELECT item,buy,prev FROM mkt_price ORDER BY item ASC LIMIT 60').all();
+      const items = ((rows && rows.results) || []).map(function (r) {
+        const buy = Number(r.buy) || 0;
+        const prev = Number(r.prev) || buy;
+        const change = prev > 0 ? Math.round(((buy - prev) / prev) * 1000) / 10 : 0;
+        return { item: r.item, buy: buy, change: change };
+      });
+      let focus = '';
+      if (want) { for (const it of items) if (it.item === want) focus = want; }
+      if (!focus && items.length) focus = items[0].item;
+      let balance = null;
+      const nick = await webNick(request);
+      if (nick) {
+        const c = await TST_DB.prepare('SELECT bal FROM mkt_coin WHERE mc=? COLLATE NOCASE').bind(nick).first();
+        if (c) balance = Number(c.bal) || 0;
+      }
+      let bets = [];
+      if (nick) {
+        const b = await TST_DB.prepare('SELECT id,item,dir,stake,price,day,ts FROM mkt_bet WHERE mc=? COLLATE NOCASE ORDER BY id DESC LIMIT 20').bind(nick).all();
+        bets = ((b && b.results) || []).map(function (x) { return { id: x.id, item: x.item, dir: x.dir, stake: Number(x.stake) || 0, price: Number(x.price) || 0, day: x.day, ts: Number(x.ts) || 0 }; });
+      }
+      return json({ ok: true, focus: focus, items: items, bets: bets, balance: balance, day: todayStr(), updated: (items.length ? (await TST_DB.prepare('SELECT MAX(ts) AS t FROM mkt_price').first() || {}).t : 0) || 0 }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/market/bet' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    const nick = await webNick(request);
+    if (!nick) return json({ ok: false, error: 'login_required' }, 401, request);
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const item = String(bd.item || '').trim().slice(0, 40);
+    const dir = bd.dir === 'down' ? 'down' : (bd.dir === 'up' ? 'up' : '');
+    const stake = Math.round(num(bd.stake) || 0);
+    if (!item || !dir) return json({ ok: false, error: 'bad_params' }, 200, request);
+    if (stake < 100) return json({ ok: false, error: 'stake_too_low' }, 200, request);
+    try {
+      const price = await TST_DB.prepare('SELECT buy FROM mkt_price WHERE item=?').bind(item).first();
+      if (!price) return json({ ok: false, error: 'no_price' }, 200, request);
+      const coin = await TST_DB.prepare('SELECT bal FROM mkt_coin WHERE mc=? COLLATE NOCASE').bind(nick).first();
+      if (coin && (Number(coin.bal) || 0) < stake) return json({ ok: false, error: 'balance_low' }, 200, request);
+      const day = todayStr();
+      const dup = await TST_DB.prepare('SELECT id FROM mkt_bet WHERE mc=? COLLATE NOCASE AND item=? AND day=?').bind(nick, item, day).first();
+      if (dup) return json({ ok: false, error: 'already_bet' }, 200, request);
+      await TST_DB.prepare('INSERT INTO mkt_bet (mc,item,dir,stake,price,day,ts) VALUES (?,?,?,?,?,?,?)').bind(nick, item, dir, stake, Number(price.buy) || 0, day, tstNowS()).run();
+      return json({ ok: true, item: item, dir: dir, stake: stake, price: Number(price.buy) || 0, day: day }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/treehole/list' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: true, posts: [], liked: [] }, 200, request);
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const sort = url.searchParams.get('sort') === 'hot' ? 'hot' : 'new';
+    const ip = clientIp(request);
+    try {
+      const rows = await TST_DB.prepare('SELECT id,content,likes,ts FROM th_post ORDER BY ' + (sort === 'hot' ? 'likes DESC, ts DESC' : 'ts DESC') + ' LIMIT 30').all();
+      const mine = await TST_DB.prepare('SELECT pid FROM th_like WHERE ip=?').bind(ip).all();
+      return json({ ok: true, posts: ((rows && rows.results) || []).map(function (r) { return { id: r.id, content: r.content, likes: Number(r.likes) || 0, ts: Number(r.ts) || 0 }; }), liked: ((mine && mine.results) || []).map(function (r) { return r.pid; }) }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/treehole/post' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    const nick = await webNick(request);
+    if (!nick) return json({ ok: false, error: 'login_required' }, 401, request);
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const content = String(bd.content || '').trim().slice(0, 300);
+    if (content.length < 2) return json({ ok: false, error: 'too_short' }, 200, request);
+    const ip = clientIp(request);
+    const rl = globalThis.__TST_TH_RL || (globalThis.__TST_TH_RL = new Map());
+    const last = rl.get(ip) || 0;
+    if (Date.now() - last < 60000) return json({ ok: false, error: 'too_fast' }, 200, request);
+    try {
+      const dayStart = Math.floor(Date.now() / 1000) - 86400;
+      const c = await TST_DB.prepare('SELECT COUNT(*) AS n FROM th_post WHERE nick=? AND ts > ?').bind(nick, dayStart).first();
+      if (Number((c && c.n) || 0) >= 5) return json({ ok: false, error: 'daily_limit' }, 200, request);
+      rl.set(ip, Date.now());
+      await TST_DB.prepare('INSERT INTO th_post (nick,content,likes,ts) VALUES (?,?,?,?)').bind(nick, content, 0, tstNowS()).run();
+      return json({ ok: true }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/treehole/like' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const pid = Math.round(num(bd.id) || 0);
+    if (!pid) return json({ ok: false, error: 'bad_id' }, 200, request);
+    const ip = clientIp(request);
+    try {
+      const had = await TST_DB.prepare('SELECT 1 AS x FROM th_like WHERE ip=? AND pid=?').bind(ip, pid).first();
+      if (had) {
+        await TST_DB.batch([
+          TST_DB.prepare('DELETE FROM th_like WHERE ip=? AND pid=?').bind(ip, pid),
+          TST_DB.prepare('UPDATE th_post SET likes=MAX(0,likes-1) WHERE id=?').bind(pid),
+        ]);
+        return json({ ok: true, liked: false }, 200, request);
+      }
+      await TST_DB.batch([
+        TST_DB.prepare('INSERT INTO th_like (ip,pid) VALUES (?,?)').bind(ip, pid),
+        TST_DB.prepare('UPDATE th_post SET likes=likes+1 WHERE id=?').bind(pid),
+      ]);
+      return json({ ok: true, liked: true }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/appeal/mine' && request.method === 'GET') {
+    if (!TST_DB) return json([], 200, request);
+    if (!await ensureFeatureTables(TST_DB)) return json([], 200, request);
+    const nick = await webNick(request);
+    if (!nick) return json([], 200, request);
+    try {
+      const rows = await TST_DB.prepare('SELECT id,content,ban_reason,status,reply,ts FROM appeals WHERE nick=? ORDER BY id DESC LIMIT 20').bind(nick).all();
+      return json(((rows && rows.results) || []).map(function (r) { return { id: r.id, content: r.content, ban_reason: r.ban_reason || '', status: r.status || 'pending', reply: r.reply || '', ts: Number(r.ts) || 0 }; }), 200, request);
+    } catch (e) { return json([], 200, request); }
+  }
+
+  if (path === '/api/appeal/submit' && request.method === 'POST') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    let bd = {};
+    try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
+    const nick = await webNick(request);
+    if (!nick) return json({ ok: false, error: 'login_required' }, 401, request);
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const content = String(bd.content || '').trim().slice(0, 800);
+    const reason = String(bd.ban_reason || '').trim().slice(0, 200);
+    if (content.length < 10) return json({ ok: false, error: 'too_short' }, 200, request);
+    try {
+      const pend = await TST_DB.prepare('SELECT id FROM appeals WHERE nick=? AND status=?').bind(nick, 'pending').first();
+      if (pend) return json({ ok: false, error: 'already_pending' }, 200, request);
+      const c = await TST_DB.prepare('SELECT COUNT(*) AS n FROM appeals WHERE nick=? AND ts > ?').bind(nick, tstNowS() - 86400).first();
+      if (Number((c && c.n) || 0) >= 3) return json({ ok: false, error: 'daily_limit' }, 200, request);
+      await TST_DB.prepare('INSERT INTO appeals (nick,mc,content,ban_reason,status,reply,ts) VALUES (?,?,?,?,?,?,?)').bind(nick, nick, content, reason, 'pending', '', tstNowS()).run();
+      return json({ ok: true }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
+  if (path === '/api/report/me' && request.method === 'GET') {
+    if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
+    if (!await ensureFeatureTables(TST_DB)) return json({ ok: false, error: 'db_error' }, 200, request);
+    const nick = await webNick(request);
+    if (!nick) return json({ ok: false, error: 'login_required' }, 401, request);
+    const ym = /^\d{4}-\d{2}$/.test(String(url.searchParams.get('ym') || '')) ? String(url.searchParams.get('ym')) : todayStr().slice(0, 7);
+    try {
+      const cur = await TST_DB.prepare('SELECT ym,mc,online_min,deaths,coins_in,coins_out,top_item,wealth_rank FROM rpt WHERE mc=? COLLATE NOCASE AND ym=?').bind(nick, ym).first();
+      const his = await TST_DB.prepare('SELECT ym,online_min,deaths,coins_in,coins_out FROM rpt WHERE mc=? COLLATE NOCASE ORDER BY ym DESC LIMIT 12').bind(nick).all();
+      return json({ ok: true, ym: ym, current: cur ? { ym: cur.ym, mc: cur.mc, online_min: Number(cur.online_min) || 0, deaths: Number(cur.deaths) || 0, coins_in: Number(cur.coins_in) || 0, coins_out: Number(cur.coins_out) || 0, top_item: cur.top_item || '', wealth_rank: Number(cur.wealth_rank) || 0 } : null, history: ((his && his.results) || []).map(function (r) { return { ym: r.ym, online_min: Number(r.online_min) || 0, deaths: Number(r.deaths) || 0, coins_in: Number(r.coins_in) || 0, coins_out: Number(r.coins_out) || 0 }; }) }, 200, request);
+    } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
+  }
+
   if (path === '/api/admin/luckperms') {
     if (!(await tstIsAdmin(request))) return json({ ok: false, error: 'forbidden' }, 403, request);
     if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
