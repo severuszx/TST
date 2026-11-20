@@ -67,3 +67,11 @@ v1.5.4 更新点：登录注册全部重做（密码登录、邮箱验证码、�
 - 线上源码已零注释：`strip_comments.py` 剥离、`verify_html_js.py` 校验；后续新增文件照此执行。
 - 25 条体验项落地：在线状态带「多久前更新」与过期/出错分态、公告与赛事统一时间+类型+状态标签、Wiki 新手入口与 FAQ、登录失败分类提示、新增内联「我的」页（绑定状态可见、可重新同步）、各页空态与失败重试、下载页读真实版本号、工具页搜索、下注前确认、移动端触控尺寸。
 - 提交链：`c13a053` → `f8625d3` → `6ec3609` → `8d47466`。
+
+## 绑定流程回滚 + 排行榜数据修复（2026-11-20 晚）
+
+- 绑定恢复老流程：官网「我的」页生成 6 位验证码（10 分钟有效、同账号复用旧码），玩家进服 `/bind 验证码` 完成绑定。新增 `/api/tst/game/bind/code`、`/api/tst/game/bind/status`、`POST /api/tst/game/bind`、`GET /api/tst/game/bind`，响应码与插件 `TSTBind.parseBinding` 对齐（404 无效码 / 409 已绑定）。
+- 鉴权同时接受 `TST_TOKEN` 与线上 `TST_STATUS_TOKEN`；插件 `X-Server-Token` 已实测通过。
+- 排行榜金币与角色详情修复：`/api/rank/top` 回 `online_min/coins/deaths` 与 `mine`；`/api/rank/player` 接受 `mc` 并回 `ready/snapshot/player`。金币列不再全 0，点角色不再 `bad_name`。
+- 头像与形象改用 `mc-heads.net`，移除不存在的 `/api/skin` 与 `skinview3d.js` 依赖。
+- 提交链：`1dcc6aa`（后端绑定+榜字段）→ `6cc87db`（index 绑定 UI 与 Wiki）→ `b44d67f`（server-token 兼容）。
