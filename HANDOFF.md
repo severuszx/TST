@@ -164,3 +164,36 @@ $r = Invoke-WebRequest "https://theslowtide.pages.dev/?v=$(Get-Random)" -UseBasi
 ### 待办（本轮遗留）
 - `ver-banner` 的 CSS 规则串、`#wk .wk-sub` 样式、两段空转折叠 JS 仍留在文件里，无引用、不影响功能，未清理
 - 本地 `section` 标签 open 60 / close 61 不配对：**改动前就是 62/63，差值一致**，属原文件固有，浏览器容错，非本轮引入
+
+## 2026-11-20 · 数据接口提速（本轮）
+
+### 实测基线（失败前先测清楚）
+| 接口 | 改前 |
+| --- | --- |
+| `/api/data` | 主站 1.2–3.3s / 44KB；**源站直连 8–20s、1.9MB**（`feeds` 6 条 = 1,875,501B，里面是 base64 大图） |
+| `/api/tools/items` | 1.6–2.6s / 4.4KB（主站转发到 FK，双跳） |
+| `/api/posts/list` | 4.6–6.0s，返回 `{"posts":[]}` 12 字节（空表也在跑建表 DDL） |
+| `/api/rest/v1/Feedback` | 2.6–9.1s / 152KB（`SELECT *` 500 行，含 images 字段） |
+| `/api/server-status` | 0.7–0.9s / 117B（主站直接实现，非转发） |
+| 静态 `sw.js`（560B，本机基线） | **1.0–2.4s** → 说明本机到 Cloudflare 的链路本身就慢，别把所有 TTFB 都算到 Worker 头上 |
+
+### 改了 `functions/api/[[path]].js`
+1. 新增 `caches.default` 边缘缓存：`cacheKeyOf` / `canUseEdgeCache` / `edgeGet` / `edgeStore`，响应加 `X-Cache: HIT|MISS|STALE|MEM|KV`，`?nocache=1` 可绕过。
+2. `/api/data` 重写：isolate 内存缓存（`MEM_DATA/MEM_TS`，10 分钟）→ KV 单次 `getWithMetadata`（时间戳存 metadata，TTL 1800s）→ 都没有才回源。命中就立即返回，超过 20 分钟才 `waitUntil` 后台刷新；`MEM_REFRESHING` 单飞防止并发回源。回源失败返回 503 `{ok:false,error:'data_unavailable'}`，不再让前端空等 20 秒。
+3. `/api/tools/*` 45s、`/api/posts/*` 20s、`/api/server-status` 10s 走边缘缓存。
+
+### 改了 `index.html`
+1. `loadData()` 重写：**先读 `tst_site_cache` 立即 `renderAll()`**，再后台拉取覆盖；失败时不再清空，只在无缓存时提示。
+2. 重试从 3×2000ms 改成 3×300ms，并加 `AbortController` 9 秒超时（原来最坏要等 20 秒才落缓存）。
+3. 新增 `#loadBar` 顶部细进度条（任何 `/api/*` 请求 pending 超过 150ms 就出现）+ `#noticeList` 三行 `.sk-row` 骨架；`html[data-theme="dark"]` 有深色版骨架。
+
+### 部署
+- commit `4225184` 首页（655,392 字符，`loadBar`/`.sk-row`/`perf-1119` 各命中）
+- commit `d10cd18` 边缘缓存
+- commit `133d569` 内存缓存 + KV 单次读（901→912 行，47.5KB）
+- 上线后 `/api/data` 头：`X-Cache` 依次出现 `STALE → MEM → HIT`；`/api/tools/items` 出现 `MISS → HIT`（1.9s→0.78s）
+
+### 还没解决的（重要）
+- **FK 站（`theslowtidefk.pages.dev`）不在本账号仓库里**：账号下只有 `TST` 和 `theslowtidetor`，说明 FK 是 Cloudflare Pages 直传，改不了 `posts/list` 的建表 DDL 和 `Feedback` 的 152KB 全量查询。主站只能靠 20s 边缘缓存兜住。
+- 本机到 Cloudflare 的链路基线 1–2.4s（560B 静态文件也这样），所以「TTFB 3 秒」里有相当一部分不是 Worker 的锅，换网络/换出口再测才能定责。
+- `/api/server-status` 是主站自己实现的，没走边缘缓存，仍在 0.7–1.5s。
