@@ -10362,14 +10362,6 @@ try{ eval('const __t=()=>1;'); }catch(e){
       }
       return;
     }
-    if(key==='rank'){
-      var _rf=document.querySelector('.embed-frame[data-embed="rank"]');
-      if(_rf && _rf.getAttribute('data-loaded')!=='1'){
-        _rf.setAttribute('data-loaded','1');
-        _rf.src='/rank.html'+(location.search||'');
-      }
-      return;
-    }
     var frame=document.querySelector('.embed-frame[data-embed="'+key+'"]');
     var src=document.getElementById('embed-'+key);
     if(!frame||!src) return;
