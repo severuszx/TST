@@ -75,3 +75,12 @@ v1.5.4 更新点：登录注册全部重做（密码登录、邮箱验证码、�
 - 排行榜金币与角色详情修复：`/api/rank/top` 回 `online_min/coins/deaths` 与 `mine`；`/api/rank/player` 接受 `mc` 并回 `ready/snapshot/player`。金币列不再全 0，点角色不再 `bad_name`。
 - 头像与形象改用 `mc-heads.net`，移除不存在的 `/api/skin` 与 `skinview3d.js` 依赖。
 - 提交链：`1dcc6aa`（后端绑定+榜字段）→ `6cc87db`（index 绑定 UI 与 Wiki）→ `b44d67f`（server-token 兼容）。
+
+## 生成验证码按钮修复（2026-11-20 深夜）
+
+- 症状：「我的」页未绑定时点「生成验证码」无任何反应。
+- 根因：按钮 `onclick` 引用的 `t` 只存在于 `fetchMe()` 局部作用域，点击抛 `ReferenceError: t is not defined`。
+- 修法：IIFE 顶部引入 `var tk=''`，`fetchMe()` 写入，`bindRender`/`genCode`/刷新按钮统一改用 `tk`。
+- 线上实测：点按钮得到 6 位码 `62PRQG`，显示 `/bind` 指令与复制、重新生成；金币榜切换显示 `40,065 金币`。
+- 提交：`2a2462f`。
+
