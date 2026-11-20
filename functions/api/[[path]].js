@@ -1,29 +1,29 @@
-// Cloudflare Pages Functions - The Slow Tide 官网 API 代理
-// /api/auth/* -> Supabase Auth；/api/rest/* -> Supabase REST
-// /api/data、/api/admin -> 转发到数据服务站点
-// 国庆&开服100天双庆抽奖：/api/lottery/draw（后端加权随机+原子核销）、/api/lottery/state
-// 每日限抽：设备指纹+IP（isolate 内存 Map，尽力方案）+ 兑换码原子核销兜底
-// CORS 仅放行本站与反馈站
+
+
+
+
+
+
 
 const SUPABASE_URL = 'https://jilcbcodphxpasicjghv.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbGNiY29kcGh4cGFzaWNqZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDUzNTgsImV4cCI6MjEwNDE4MTM1OH0._DkyiWyL5viXByCJ5ejFifn9RuEVkVHjAnU4oQepsbs';
 const DATA_ORIGIN = 'https://tst-server-site.pages.dev';
-// Java 服（the slow tide）状态：插件每 180 秒 POST 一次，这里只做接收与缓存，不主动连服务器
+
 const TST_TOKEN = '0e18fe94d4f9259cb0eb3f59c44f6984a8a280ad399b1fb7';
 const TST_KEY = 'tst_status_v1';
-const TST_STALE_MS = 420000; // 上报间隔 180 秒，连续 7 分钟没消息才判离线（留两轮容错）
-function tstMemSet(rec) { try { globalThis.__TST_STATUS_REC = rec; } catch (e) { /* 忽略 */ } }
+const TST_STALE_MS = 420000; 
+function tstMemSet(rec) { try { globalThis.__TST_STATUS_REC = rec; } catch (e) {  } }
 function tstMemGet() { try { return globalThis.__TST_STATUS_REC || null; } catch (e) { return null; } }
-// 管理员口令：注意此文件在公开仓库，密码会随源码可见；后续需改为环境变量+数据库侧改密
-let ADMIN_PWD = null; // 管理员口令：仅由 onRequest 从环境变量 ADMIN_PWD 注入（仓库不含口令）
-// ===== 调试台验证（同源；前端优先调用，兜底反馈站）=====
+
+let ADMIN_PWD = null; 
+
 const DEBUG_CODES = { 'TST-G4N7QX': 'bench3d', 'TST-K3M9X7': 'glass', 'TST-X2W5V8': 'light', 'TST-Q8N4R2': 'desktop', 'TST-M7Z1P6': 'mobile', 'TST-H6D3B9': 'perf', 'TST-F5J8C4': 'dev', 'TST-R2T7W1': 'reset', 'TST-7KQ2WP': 'chat', K3M9X7: 'glass', X2W5V8: 'light', Q8N4R2: 'desktop', M7Z1P6: 'mobile', H6D3B9: 'perf', F5J8C4: 'dev', R2T7W1: 'reset' };
 
-// ===== 国庆&开服100天双庆抽奖（时区：北京时间 UTC+8）=====
-const L_START = new Date('2026-10-01T00:00:00+08:00');  // 2026-10-01 00:00 正式开放
-const L_END = new Date('2026-10-08T23:59:59+08:00');    // 2026-10-08 23:59:59 结束
-const DRAW_DEV_MAP = new Map();  // dev:<device>:<cnDate> -> {prize,code,seq}
-const DRAW_IP_MAP = new Map();   // ip:<ip>:<cnDate> -> {prize,code,seq}
+
+const L_START = new Date('2026-10-01T00:00:00+08:00');  
+const L_END = new Date('2026-10-08T23:59:59+08:00');    
+const DRAW_DEV_MAP = new Map();  
+const DRAW_IP_MAP = new Map();   
 
 function cnDate(d) {
   return new Date(d.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10);
@@ -60,8 +60,8 @@ async function fetchUnclaimedCodes() {
   if (!res || !res.ok || !Array.isArray(res.codes)) return null;
   return res.codes.filter(c => !c.claimed && !String(c.prize || '').startsWith('【已使用】'));
 }
-// 核销：把奖品名标记为【已使用】+原名（数据库侧无 claimed 更新通道，用 prize 前缀做已使用标记；
-// 后台管理员列表会显示【已使用】提示，仍可 delete 删除）
+
+
 async function claimCode(id, prize, device, now) {
   const res = await adminLottery('update_prize', { id: String(id), prize: '【已使用】' + (prize || '') });
   return !!(res && res.ok);
@@ -105,10 +105,10 @@ async function proxyFetch(target, request) {
   return new Response(upstream.body, { status: upstream.status, headers: respHeaders });
 }
 
-// ===== /api/data 热数据：isolate 内存缓存（同实例 10 分钟内不再读 KV）=====
+
 let MEM_DATA = null, MEM_TS = 0, MEM_REFRESHING = null;
 
-// ===== 边缘缓存：GET 只读接口命中 caches.default 直接返回，不再打后端 =====
+
 function cacheKeyOf(request) {
   const u = new URL(request.url);
   u.searchParams.delete('nocache');
@@ -150,7 +150,7 @@ export async function onRequest(context) {
   if (request.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders(request) });
   }
-  // ===== 调试台验证（同源，减少对反馈站域名的依赖）=====
+  
   if (path === '/api/debug/verify' && request.method === 'POST') {
     let bd = {};
     try { bd = await request.json(); } catch (e) { bd = {}; }
@@ -160,7 +160,7 @@ export async function onRequest(context) {
     return json({ ok: false, error: 'bad_code' }, 200, request);
   }
 
-  // ===== Java 服 · the slow tide：状态推送与查询（插件只出站 POST，不占任何端口）=====
+  
   if (path === '/api/tst-status/push' && request.method === 'POST') {
     let bd = {};
     try { bd = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400, request); }
@@ -188,7 +188,7 @@ export async function onRequest(context) {
       } : null,
       receivedAt: Date.now(),
     };
-    // 只有带状态字段的包才更新「在线状态」，实时聊天/结果包不能把在线人数清零
+    
     const isStatus = (typeof bd.online === 'number') || Array.isArray(bd.players);
     try {
       if (isStatus) {
@@ -200,7 +200,7 @@ export async function onRequest(context) {
       tstMemSet(rec);
       return json({ ok: false, error: 'kv_unavailable', receivedAt: rec.receivedAt }, 200, request);
     }
-    // 同时写入 D1（性能历史 / 游戏内聊天 / 事件 / 日志 / 指令结果）
+    
     try {
       const db = (context && context.env && context.env.TST_DB) || null;
       if (db) {
@@ -227,7 +227,7 @@ export async function onRequest(context) {
           stmts.push(db.prepare('INSERT INTO events (ts,kind,actor,detail) VALUES (?,?,?,?)')
             .bind(num(r.ts) || (rec.receivedAt / 1000 | 0), 'cmd', String(r.by || 'admin').slice(0, 32), ('$ ' + String(r.cmd || '').slice(0, 120) + ' → ' + String(r.out || r.error || 'ok').slice(0, 200))));
         });
-        // 老数据清理（插件每小时带 cleanup=true 触发一次）
+        
         if (bd.cleanup) {
           const nowS = rec.receivedAt / 1000 | 0;
           stmts.push(db.prepare('DELETE FROM logs WHERE ts < ?').bind(nowS - 172800));
@@ -275,7 +275,7 @@ export async function onRequest(context) {
     }), { status: 200, headers: { ...noStore, ...corsHeaders(request) } });
   }
 
-  // ===== Java 服 · 聊天 / 指令队列 / 性能 / 日志（D1: TST_DB）=====
+  
   const TST_DB = (context && context.env && context.env.TST_DB) || null;
   const tstPwd = function () { return (context && context.env && context.env.SITE_ADMIN_PWD) || ADMIN_PWD || ''; };
   const tstNowS = function () { return Math.floor(Date.now() / 1000); };
@@ -300,7 +300,7 @@ export async function onRequest(context) {
     return !!base && TST_CMD_OK.indexOf(base) >= 0;
   }
 
-  // 游戏内聊天记录
+  
   if (path === '/api/chat/history' && request.method === 'GET') {
     if (!TST_DB) return json({ ok: false, error: 'no_db', messages: [] }, 200, request);
     const after = Number(url.searchParams.get('after') || 0) || 0;
@@ -327,7 +327,7 @@ export async function onRequest(context) {
     return json({ ok: true, messages: messages }, 200, request);
   }
 
-  // 官网发言 → 写入聊天记录 + 指令队列（昵称取自官网登录账号，不能自己改）
+  
   if (path === '/api/chat/send' && request.method === 'POST') {
     if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
     let bd = {};
@@ -360,7 +360,7 @@ export async function onRequest(context) {
     }
   }
 
-  // 游戏内 /com → 官网私聊：插件带令牌写入
+  
   if (path === '/api/game/dm' && request.method === 'POST') {
     if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
     let bd = {};
@@ -382,7 +382,7 @@ export async function onRequest(context) {
     } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
   }
 
-  // 私聊：官网 → 官网 / 游戏内玩家
+  
   if (path === '/api/chat/dm' && request.method === 'POST') {
     if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
     let bd = {};
@@ -420,7 +420,7 @@ export async function onRequest(context) {
     } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
   }
 
-  // 私聊历史：?with=对方昵称
+  
   if (path === '/api/chat/dm' && request.method === 'GET') {
     if (!TST_DB) return json({ ok: false, messages: [] }, 200, request);
     const tk = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
@@ -446,7 +446,7 @@ export async function onRequest(context) {
     }) }, 200, request);
   }
 
-  // 举报：把该玩家最近 30 条聊天打包给管理员
+  
   if (path === '/api/chat/report' && request.method === 'POST') {
     if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
     let bd = {};
@@ -477,7 +477,7 @@ export async function onRequest(context) {
     } catch (e) { return json({ ok: false, error: 'db_error' }, 200, request); }
   }
 
-  // 管理员看举报
+  
   if (path === '/api/reports/list' && request.method === 'GET') {
     if (!TST_DB) return json({ ok: false, reports: [] }, 200, request);
     if (String(request.headers.get('x-admin-pw') || '') !== tstPwd() || !tstPwd()) return json({ ok: false, error: 'forbidden' }, 403, request);
@@ -491,7 +491,7 @@ export async function onRequest(context) {
     } catch (e) { return json({ ok: false, reports: [] }, 200, request); }
   }
 
-  // 官网管理员指令下发（聊天室里的那个按钮）
+  
   if (path === '/api/chat/cmd' && request.method === 'POST') {
     if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
     let bd = {};
@@ -509,7 +509,7 @@ export async function onRequest(context) {
     return json({ ok: true }, 200, request);
   }
 
-  // 管理员控制台接口（带登录态）
+  
   if (path === '/api/tst-cmd/send' && request.method === 'POST') {
     if (!TST_DB) return json({ ok: false, error: 'no_db' }, 200, request);
     if (!(await tstIsAdmin(request))) return json({ ok: false, error: 'forbidden' }, 403, request);
@@ -525,7 +525,7 @@ export async function onRequest(context) {
     return json({ ok: true }, 200, request);
   }
 
-  // 插件拉取待执行任务（聊天广播 / 指令）
+  
   if (path === '/api/tst-task/pull' && request.method === 'GET') {
     const want = (context && context.env && context.env.TST_STATUS_TOKEN) || TST_TOKEN;
     if (String(url.searchParams.get('token') || '') !== want) return json({ ok: false, error: 'bad_token' }, 403, request);
@@ -544,7 +544,7 @@ export async function onRequest(context) {
       try { p = JSON.parse(x.payload || '{}'); } catch (e) { p = {}; }
       return { id: x.id, kind: x.kind, data: p };
     });
-    // fmt=line：给插件用的纯文本协议（避免在 Java 里写 JSON 解析）
+    
     if (String(url.searchParams.get('fmt') || '') === 'line') {
       const b64 = function (s) { return btoa(unescape(encodeURIComponent(String(s == null ? '' : s)))); };
       const lines = tasks.map(function (t) {
@@ -560,7 +560,7 @@ export async function onRequest(context) {
     return json({ ok: true, tasks: tasks }, 200, request);
   }
 
-  // 性能历史（24h 折线）
+  
   if (path === '/api/tst-perf/history' && request.method === 'GET') {
     if (!TST_DB) return json({ ok: false, error: 'no_db', points: [] }, 200, request);
     const hours = Math.min(168, Math.max(1, Number(url.searchParams.get('hours') || 24)));
@@ -573,7 +573,7 @@ export async function onRequest(context) {
     return json({ ok: true, points: rows, hours: hours }, 200, request);
   }
 
-  // 服务器日志（仅管理员）
+  
   if (path === '/api/tst-log/list' && request.method === 'GET') {
     if (!TST_DB) return json({ ok: false, error: 'no_db', logs: [] }, 200, request);
     if (!(await tstIsAdmin(request))) return json({ ok: false, error: 'forbidden', logs: [] }, 403, request);
@@ -598,7 +598,7 @@ export async function onRequest(context) {
     return json({ ok: true, logs: rows }, 200, request);
   }
 
-  // 游戏动态（进出/死亡/成就/指令记录）
+  
   if (path === '/api/tst-events/list' && request.method === 'GET') {
     if (!TST_DB) return json({ ok: false, error: 'no_db', events: [] }, 200, request);
     const limit = Math.min(200, Math.max(5, Number(url.searchParams.get('limit') || 60)));
@@ -610,7 +610,7 @@ export async function onRequest(context) {
     return json({ ok: true, events: rows }, 200, request);
   }
 
-  // 服务器状态（老聊天室的在线状态条复用）
+  
   if (path === '/api/server-status' && request.method === 'GET') {
     let st = null;
     try {
@@ -624,7 +624,7 @@ export async function onRequest(context) {
     return json({ ok: true, status: on ? 'online' : 'offline', online: on ? st.online : 0, max: st.max, tps: st.tps, latency: 0, ts: new Date(st.receivedAt || Date.now()).toISOString(), players: on && Array.isArray(st.players) ? st.players.map(function (x) { return String((x && x.name) || ''); }).filter(Boolean) : [] }, 200, request);
   }
 
-  // ===== 抽奖状态查询（含开放状态/剩余码数/今日已抽）=====
+  
   if (path === '/api/lottery/state' && request.method === 'GET') {
     const now = new Date();
     const sdate = cnDate(now);
@@ -647,7 +647,7 @@ export async function onRequest(context) {
     }, 200, request);
   }
 
-  // ===== 国庆&开服100天抽奖（后端加权随机 + 原子核销 + 每日限抽）=====
+  
   if (path === '/api/lottery/draw' && request.method === 'POST') {
     const now = new Date();
     const sdate = cnDate(now);
@@ -665,12 +665,12 @@ export async function onRequest(context) {
     if (rec) {
       return json({ ok: false, error: 'already_drawn', prize: rec.prize, code: rec.code, seq: rec.seq, serverDate: sdate }, 200, request);
     }
-    // 读未认领码池
+    
     let codes = await fetchUnclaimedCodes();
     if (!codes || codes.length === 0) {
       return json({ ok: false, error: 'sold_out', serverDate: sdate }, 200, request);
     }
-    // 加权随机 + 原子核销（并发下重试）
+    
     let picked = null;
     for (let i = 0; i < 6; i++) {
       const c = pickWeighted(codes);
@@ -689,7 +689,7 @@ export async function onRequest(context) {
   }
 
 
-  // /api/data 去重：同 id 或同 title+date 只保留第一条
+  
   function dedupeSiteData(obj) {
     if (!obj) return obj;
     function clean(list) {
@@ -707,7 +707,7 @@ export async function onRequest(context) {
     return obj;
   }
 
-  // 数据/管理接口：转发到数据服务站点
+  
   if (path === '/api/data' || path.startsWith('/api/data/')) {
     if (request.method !== 'GET') return proxyFetch(DATA_ORIGIN + '/api/data' + url.search, request);
     const useEdge = canUseEdgeCache(request);
@@ -718,7 +718,7 @@ export async function onRequest(context) {
     const baseHead = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': allowedOrigin(request) || 'https://theslowtide.pages.dev' };
     const kv = (context && context.env && context.env.SITE_CACHE) || null;
     let stale = null, staleAge = 1e9, src = 'MEM';
-    // 先看本实例内存：热路径完全不碰 KV
+    
     if (MEM_DATA) { stale = MEM_DATA; staleAge = Date.now() - MEM_TS; }
     if (!stale && kv) {
       try {
@@ -774,7 +774,7 @@ export async function onRequest(context) {
       return new Response(text, { status: 200, headers: headers });
     }
     if (stale) {
-      // 有旧数据就先给用户，过期了后台再刷：用户永远不等源站那 15 秒
+      
       if (staleAge > 1200 && context.waitUntil) context.waitUntil(refresh().catch(function () {}));
       const resp = wrap(stale, staleAge > 1200 ? 'STALE' : src, 60);
       if (useEdge && staleAge <= 1200 && context.waitUntil) {
@@ -1114,7 +1114,7 @@ export async function onRequest(context) {
   if (path === '/api/admin' || path.startsWith('/api/admin/')) {
     return proxyFetch(DATA_ORIGIN + '/api/admin' + url.search, request);
   }
-  // 数据站管理鉴权中介：官网 token 校验（经 TSTFK whoami）+ 服务器端带数据站口令转发，前端全程不接触数据站密码
+  
   if (path === '/api/dadmin' && request.method === 'POST') {
     let bd = {};
     try { bd = await request.json(); } catch (e) { bd = {}; }
@@ -1147,7 +1147,7 @@ export async function onRequest(context) {
     return new Response(JSON.stringify(upBody === null ? { ok: false, error: 'site_error' } : upBody), { status: 200, headers: rhead });
   }
 
-  // 服务器工具（禁用物品/任务）转发到数据服务站点（反馈站 TSTFK 的 D1）
+  
   if (path.startsWith('/api/tools')) {
     if (canUseEdgeCache(request)) {
       const hit = await edgeGet(request);
@@ -1157,7 +1157,7 @@ export async function onRequest(context) {
     return proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request);
   }
 
-  // 玩家自由发帖（内测·卡密）转发到 TSTFK
+  
   if (path.startsWith('/api/posts')) {
     if (canUseEdgeCache(request)) {
       const hit = await edgeGet(request);
@@ -1167,7 +1167,7 @@ export async function onRequest(context) {
     return proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request);
   }
 
-  // 聊天桥 + 服务器状态转发到 TSTFK
+  
   if (path.startsWith('/api/server-status') && canUseEdgeCache(request)) {
     const hit = await edgeGet(request);
     if (hit) return hit;
@@ -1177,7 +1177,7 @@ export async function onRequest(context) {
     return proxyFetch('https://theslowtidefk.pages.dev' + path + url.search, request);
   }
 
-  // 仅代理 /api/auth/* 与 /api/rest/*（含 draw_lottery 兼容转发）
+  
   if (path.startsWith('/api/auth/') || path.startsWith('/api/rest/')) {
     let p = path.slice('/api'.length);
     if (p.startsWith('/rest/') && !p.startsWith('/rest/v1/')) {
@@ -1195,7 +1195,7 @@ export async function onRequest(context) {
         const cfIp = request.headers.get('CF-Connecting-IP') || '';
         if (!obj.ip) obj.ip = cfIp;
         bd = new TextEncoder().encode(JSON.stringify(obj));
-      } catch (e) { /* 非 JSON 原样转发 */ }
+      } catch (e) {  }
     }
     const upstream = await fetch(target, { method: request.method, headers: headers, body: bd, redirect: 'manual' });
     const respHeaders = new Headers(upstream.headers);
