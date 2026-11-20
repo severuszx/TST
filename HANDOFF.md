@@ -190,8 +190,10 @@ $r = Invoke-WebRequest "https://theslowtide.pages.dev/?v=$(Get-Random)" -UseBasi
 ### 部署
 - commit `4225184` 首页（655,392 字符，`loadBar`/`.sk-row`/`perf-1119` 各命中）
 - commit `d10cd18` 边缘缓存
-- commit `133d569` 内存缓存 + KV 单次读（901→912 行，47.5KB）
-- 上线后 `/api/data` 头：`X-Cache` 依次出现 `STALE → MEM → HIT`；`/api/tools/items` 出现 `MISS → HIT`（1.9s→0.78s）
+- commit `133d569` 内存缓存 + KV 单次读（912 行 / 47.5KB）
+- commit `edd6df0` 刷新单飞改成共享 Promise（原来并发首个请求会拿到 null body）+ `X-Cache` 正确区分 `MEM`/`KV`（原来 KV 命中也会被标成 MEM）；916 行 / 47.6KB
+- 上线后实测（同一 URL，本机）：`/api/data` `STALE 1.9s → MEM 1.0s → MEM 2.0s`（值恒定 19,650B，ann=23 / feeds=6 / images=8，无字段丢失）；`/api/tools/items` `MISS 1.6s → HIT 1.0s / 2.7s`；`/api/posts/list` `MISS 6.3s → HIT 1.7s`；`/api/server-status` 117B、~0.9s（主站自己实现，没进边缘缓存分支）
+- 注意：`/api/data` 里 KV 存的 `metadata.ts` 在部分边缘节点读回来仍是旧值，所以会反复看到 `STALE`——那是后台在刷新，用户侧拿到的始终是缓存值，不会等源站；如果要彻底消掉，得把时间戳单独存一个 KV 键或用 Durable Object
 
 ### 还没解决的（重要）
 - **FK 站（`theslowtidefk.pages.dev`）不在本账号仓库里**：账号下只有 `TST` 和 `theslowtidetor`，说明 FK 是 Cloudflare Pages 直传，改不了 `posts/list` 的建表 DDL 和 `Feedback` 的 152KB 全量查询。主站只能靠 20s 边缘缓存兜住。
